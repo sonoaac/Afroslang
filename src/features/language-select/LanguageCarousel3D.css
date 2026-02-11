@@ -7,12 +7,15 @@
   overflow: hidden;
   perspective: 35em;
   mask: linear-gradient(90deg, transparent, #000 16% 84%, transparent);
+  touch-action: pan-y pinch-zoom;
+  -webkit-overflow-scrolling: touch;
 }
 
 .afroA3d {
   place-self: center;
   transform-style: preserve-3d;
   animation: afroRy 28s linear infinite;
+  will-change: transform;
 }
 
 @keyframes afroRy {
@@ -86,9 +89,25 @@
   color: rgba(255, 255, 255, 0.72);
 }
 
-/* Pause animation on hover so clicks feel intentional */
-.afroScene:hover .afroA3d {
+/* Pause animation on hover/touch so clicks feel intentional */
+.afroScene:hover .afroA3d,
+.afroScene:active .afroA3d {
   animation-play-state: paused;
+}
+
+/* Mobile: Speed up carousel with faster animation */
+@media (max-width: 768px) {
+  .afroA3d {
+    animation: afroRy 18s linear infinite;
+  }
+
+  .afroCard3d {
+    --w: 15em;
+  }
+
+  .afroScene {
+    perspective: 25em;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

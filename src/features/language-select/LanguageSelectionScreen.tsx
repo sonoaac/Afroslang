@@ -2,7 +2,7 @@ import { Language, InterfaceLanguage } from '../../types';
 import { languages } from '../../data/languages';
 import { FlagIcon } from './FlagIcon';
 import { ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 import './LanguageCarousel3D.css';
 import { SelectMotionOverlay } from './SelectMotionOverlay';
@@ -25,8 +25,67 @@ export function LanguageSelectionScreen({
   const [showSiteLanguageDropdown, setShowSiteLanguageDropdown] = useState(false);
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectingName, setSelectingName] = useState<string>('');
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [swipeStartX, setSwipeStartX] = useState<number | null>(null);
+  const [rotationOffset, setRotationOffset] = useState(0);
 
   const brown = '#6B4F3A'; // dark brown
+
+  // Swipe gesture handling for mobile
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+
+    let isDragging = false;
+    let startX = 0;
+    let currentRotation = 0;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      isDragging = true;
+      startX = e.touches[0].clientX;
+      // Pause animation during touch
+      const carouselElement = carousel.querySelector('.afroA3d') as HTMLElement;
+      if (carouselElement) {
+        carouselElement.style.animationPlayState = 'paused';
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isDragging) return;
+      const currentX = e.touches[0].clientX;
+      const diff = currentX - startX;
+      
+      // Calculate rotation based on swipe distance (more sensitive)
+      const rotationChange = diff * 0.3;
+      currentRotation = rotationOffset + rotationChange;
+      
+      const carouselElement = carousel.querySelector('.afroA3d') as HTMLElement;
+      if (carouselElement) {
+        carouselElement.style.transform = `rotateY(${currentRotation}deg)`;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      isDragging = false;
+      setRotationOffset(currentRotation);
+      
+      // Resume animation
+      const carouselElement = carousel.querySelector('.afroA3d') as HTMLElement;
+      if (carouselElement) {
+        carouselElement.style.animationPlayState = 'running';
+      }
+    };
+
+    carousel.addEventListener('touchstart', handleTouchStart, { passive: true });
+    carousel.addEventListener('touchmove', handleTouchMove, { passive: true });
+    carousel.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    return () => {
+      carousel.removeEventListener('touchstart', handleTouchStart);
+      carousel.removeEventListener('touchmove', handleTouchMove);
+      carousel.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [rotationOffset]);
 
   const handleSiteLanguageChange = (lang: InterfaceLanguage) => {
     onInterfaceLanguageChange?.(lang);
@@ -137,7 +196,7 @@ export function LanguageSelectionScreen({
           </div>
         </div>
 
-        <div className="afroScene py-10">
+        <div className="afroScene py-10" ref={carouselRef}>
           <div className="afroA3d" style={{ ['--n' as any]: languages.length }}>
             {languages.map((language, index) => (
               <LanguageCarouselCard

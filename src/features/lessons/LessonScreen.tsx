@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { InterfaceLanguage, Lesson, Exercise } from '../../types';
-import { X, Heart, CheckCircle2, XCircle, Lightbulb, Sparkles, Zap, RotateCcw, Home } from 'lucide-react';
+import { X, Heart, CheckCircle2, XCircle, Lightbulb, Zap, RotateCcw, Home } from 'lucide-react';
 import { checkIgboAnswer } from '../../utils/igboTextUtils';
 import { HeartsTimer } from '../../components/ui/HeartsTimer';
 import { HeartsOutModal } from '../../components/ui/HeartsOutModal';
@@ -408,9 +408,9 @@ export function LessonScreen({
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'var(--app-bg)' }}>
+    <div className="min-h-screen flex flex-col touch-manipulation" style={{ background: 'var(--app-bg)' }}>
         {/* Header */}
-        <div className="bg-white/95 backdrop-blur-md game-border border-b-0 px-0.5 sm:px-6 py-0.5 sm:py-4">
+        <div className="bg-white/95 backdrop-blur-md game-border border-b-0 px-0.5 sm:px-6 py-0.5 sm:py-4 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto">
           {/* Mobile Layout */}
           <div className="flex flex-col sm:hidden space-y-1">
@@ -510,9 +510,9 @@ export function LessonScreen({
       </div>
 
         {/* Exercise Content */}
-        <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 max-w-5xl mx-auto w-full">
+        <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 max-w-5xl mx-auto w-full overflow-y-auto">
         {/* XP & Type indicator */}
-        <div className="mb-4 sm:mb-8 flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+        <div className="mb-4 sm:mb-8 flex flex-col sm:flex-row items-center gap-2 sm:gap-4 flex-shrink-0">
           <div className="bg-white px-3 sm:px-8 py-2 sm:py-3 rounded-lg sm:rounded-2xl game-border retro-shadow-sm flex items-center gap-2 sm:gap-3">
             <span className="text-2xl sm:text-4xl">{getLessonIcon()}</span>
             <div className="flex items-center gap-2">
@@ -525,7 +525,7 @@ export function LessonScreen({
           
           {/* Redemption Badge */}
           {isRedemption && !showFeedback && (
-            <div className="bg-gradient-to-r from-[#9D4EDD] to-[#FFB6D9] px-3 sm:px-8 py-2 sm:py-3 rounded-lg sm:rounded-2xl game-border retro-shadow-sm animate-pulse">
+            <div className="bg-gradient-to-r from-[#9D4EDD] to-[#FFB6D9] px-3 sm:px-8 py-2 sm:py-3 rounded-lg sm:rounded-2xl game-border retro-shadow-sm animate-pulse flex-shrink-0">
               <div className="flex items-center gap-2 sm:gap-3 text-white">
                 <RotateCcw className="w-4 h-4 sm:w-6 sm:h-6" />
                 <span className="text-xs sm:text-xl uppercase tracking-wider font-semibold">
@@ -607,12 +607,12 @@ export function LessonScreen({
               disabled={showFeedback}
               placeholder={isEnglish ? 'Type your answer...' : 'Tapez votre réponse...'}
               className={`
-                w-full p-4 sm:p-8 rounded-xl sm:rounded-3xl game-border text-base sm:text-2xl text-center transition-all min-h-[56px] sm:min-h-auto
+                w-full p-4 sm:p-8 rounded-xl sm:rounded-3xl game-border text-base sm:text-2xl text-center transition-all min-h-[56px] sm:min-h-auto font-semibold
                 ${showFeedback
                   ? isCorrect
                     ? 'bg-gradient-to-r from-[#00FF94] to-[#7FFF00] text-white retro-shadow-lg'
                     : 'bg-gradient-to-r from-[#FF1493] to-[#FF69B4] text-white retro-shadow-lg'
-                  : 'bg-white focus:retro-shadow-lg focus:outline-none focus:scale-105'
+                  : 'bg-white text-black placeholder:text-gray-400 focus:retro-shadow-lg focus:outline-none focus:scale-105'
                 }
               `}
               autoFocus
