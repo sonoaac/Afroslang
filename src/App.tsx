@@ -6,10 +6,10 @@ import { LearningPath } from './features/lessons/LearningPath';
 import { LessonScreen } from './features/lessons/LessonScreen';
 import { LessonComplete } from './features/lessons/LessonComplete';
 import { AuthScreen } from './components/auth/AuthScreen';
-import { Header } from './components/layout/Header';
 import { LeaderboardScreen } from './components/leaderboard/LeaderboardScreen';
 import { SubscriptionPage } from './components/subscription/SubscriptionPage';
 import { FeedbackPage } from './components/feedback/FeedbackPage';
+import { LatestNews } from './components/layout/LatestNews';
 import { ShopScreen } from './features/store/ShopScreen';
 import { FirebaseQuickSetup } from './components/debug/FirebaseQuickSetup';
 import { useAuth } from './contexts/AuthContext';
@@ -18,7 +18,7 @@ import { getStagesForLanguage, getLessonById } from './data/lessons';
 import { saveUserProgress } from './utils/userData';
 import { addWeeklyXP, getCurrentWeekIdFromDB, getUserLeague } from './utils/leaderboardUtils';
 
-type Screen = 'auth' | 'interface-select' | 'language-select' | 'path' | 'lesson' | 'complete' | 'leaderboard' | 'subscription' | 'feedback' | 'shop';
+type Screen = 'auth' | 'interface-select' | 'language-select' | 'path' | 'lesson' | 'complete' | 'leaderboard' | 'subscription' | 'feedback' | 'shop' | 'latest-news';
 
 function App() {
   const { user, userData, isGuest, loading } = useAuth();
@@ -331,7 +331,10 @@ function App() {
   // Show loading screen while checking authentication
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-600">
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: 'var(--app-bg)' }}
+      >
         <div className="text-white text-xl">Loading Afroslang...</div>
       </div>
     );
@@ -344,35 +347,6 @@ function App() {
 
   return (
     <>
-      {/* Header for all screens except auth */}
-      {currentScreen !== 'auth' && (
-        <Header 
-          title="Afroslang"
-          showBackButton={currentScreen !== 'interface-select'}
-          onBack={() => {
-            if (currentScreen === 'language-select') {
-              setCurrentScreen('interface-select');
-            } else if (currentScreen === 'path') {
-              setCurrentScreen('language-select');
-            } else if (currentScreen === 'lesson') {
-              setCurrentScreen('path');
-            } else if (currentScreen === 'complete') {
-              setCurrentScreen('path');
-            } else if (currentScreen === 'leaderboard') {
-              setCurrentScreen('interface-select');
-            } else if (currentScreen === 'subscription') {
-              setCurrentScreen('interface-select');
-            } else if (currentScreen === 'feedback') {
-              setCurrentScreen('interface-select');
-            }
-          }}
-          onLeaderboard={() => setCurrentScreen('leaderboard')}
-          onSubscription={() => setCurrentScreen('subscription')}
-          onFeedback={() => setCurrentScreen('feedback')}
-          isSubscribed={userData?.subscription?.active || false}
-        />
-      )}
-
       {currentScreen === 'interface-select' && (
         <InterfaceLanguageSelector onSelect={handleInterfaceLanguageSelect} />
       )}
@@ -398,6 +372,8 @@ function App() {
               setCurrentScreen('leaderboard');
             } else if (screen === 'shop') {
               setCurrentScreen('shop');
+            } else if (screen === 'latest-news') {
+              setCurrentScreen('latest-news');
             } else if (screen === 'profile') {
               // Add profile screen if needed
             } else if (screen === 'settings') {
@@ -455,6 +431,13 @@ function App() {
 
       {currentScreen === 'shop' && (
         <ShopScreen
+          interfaceLanguage={interfaceLanguage}
+          onBack={() => setCurrentScreen('path')}
+        />
+      )}
+
+      {currentScreen === 'latest-news' && (
+        <LatestNews
           interfaceLanguage={interfaceLanguage}
           onBack={() => setCurrentScreen('path')}
         />

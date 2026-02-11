@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { InterfaceLanguage, Stage, Lesson, UserProgress } from '../../types';
-import { Lock, Star, CheckCircle2, Trophy, Sparkles, Flame, Zap, Heart, Clock, Home, Trophy as TrophyIcon, BookOpen, Store, User, Settings, Shield, Gem } from 'lucide-react';
+import { Heart, Home, Trophy as TrophyIcon, Store, User, Settings, Shield, Newspaper } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getLanguageById } from '../../data/languages';
-import { SandbitsIcon } from '../../components/ui/SandbitsIcon';
 import { FlagIcon } from '../language-select/FlagIcon';
-import { StreakPopup } from '../../components/streak/StreakPopup';
+import { Exercise } from '../../types';
+
+import './StackedLessonCards.css';
 
 interface LearningPathProps {
   interfaceLanguage: InterfaceLanguage;
@@ -13,7 +14,7 @@ interface LearningPathProps {
   progress: UserProgress;
   onStartLesson: (lesson: Lesson) => void;
   onBackToLanguageSelect: () => void;
-  onNavigate?: (screen: 'leaderboard' | 'shop' | 'profile' | 'settings' | 'quests') => void;
+  onNavigate?: (screen: 'leaderboard' | 'shop' | 'profile' | 'settings' | 'quests' | 'latest-news') => void;
   currentLanguageId?: string;
 }
 
@@ -29,8 +30,7 @@ export function LearningPath({
   const isEnglish = interfaceLanguage === 'en';
   const [timeRemaining, setTimeRemaining] = useState('');
   const [logoError, setLogoError] = useState(false);
-  const [showStreakPopup, setShowStreakPopup] = useState(false);
-  const [activeSidebarItem, setActiveSidebarItem] = useState<'learn' | 'leaderboard' | 'quests' | 'shop' | 'profile' | 'settings'>('learn');
+  const [activeSidebarItem, setActiveSidebarItem] = useState<'learn' | 'leaderboard' | 'quests' | 'shop' | 'profile' | 'settings' | 'latest-news'>('learn');
   const { user, userData, isGuest } = useAuth();
   
   // Get current language data for flag display
@@ -62,39 +62,85 @@ export function LearningPath({
     return () => clearInterval(interval);
   }, [progress.heartsResetTime]);
 
-  const isLessonUnlocked = (lesson: Lesson, lessonIndex: number): boolean => {
-    if (lessonIndex === 0) return true;
-    
-    let totalPreviousLessons = 0;
-    for (const stage of stages) {
-      for (const l of stage.lessons) {
-        if (l.id === lesson.id) break;
-        totalPreviousLessons++;
-      }
-      if (stage.lessons.find(l => l.id === lesson.id)) break;
-    }
-    
-    return (progress.completedLessons || []).length >= totalPreviousLessons;
-  };
-
   const isLessonCompleted = (lessonId: string): boolean => {
     return (progress.completedLessons || []).includes(lessonId);
   };
 
-  const calculateGlobalLessonIndex = (stageNumber: number, lessonNumber: number): number => {
-    let index = 0;
-    for (let i = 0; i < stageNumber - 1; i++) {
-      if (stages[i] && stages[i].lessons) {
-        index += stages[i].lessons.length;
+  const ensureExerciseCount = (source: Exercise[], desiredCount: number, idPrefix: string): Exercise[] => {
+    if (source.length >= desiredCount) {
+      // Select a deterministic subset so every lesson is exactly desiredCount questions.
+      const seed = idPrefix;
+      let h = 2166136261;
+      for (let i = 0; i < seed.length; i++) {
+        h ^= seed.charCodeAt(i);
+        h = Math.imul(h, 16777619);
       }
+      let s = h >>> 0;
+      const rand = () => {
+        s += 0x6d2b79f5;
+        let t = s;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+
+      const shuffled = [...source];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(rand() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled.slice(0, desiredCount);
     }
-    return index + lessonNumber - 1;
+
+    const base = source.length > 0 ? source : [
+      {
+        id: `${idPrefix}-fallback-1`,
+        type: 'multiple-choice',
+        question: 'Select the correct answer',
+        questionFr: 'Sélectionnez la bonne réponse',
+        correctAnswer: 'A',
+        options: ['A', 'B', 'C', 'D']
+      }
+    ];
+
+    const out: Exercise[] = [...source];
+    let i = 0;
+    while (out.length < desiredCount) {
+      const template = base[i % base.length];
+      const cloneIndex = out.length + 1;
+      out.push({
+        ...template,
+        id: `${idPrefix}-p${cloneIndex}`,
+        question: template.question ? `${template.question} (Review)` : template.question,
+        questionFr: template.questionFr ? `${template.questionFr} (Révision)` : template.questionFr,
+      });
+      i += 1;
+    }
+    return out;
   };
 
-  const handleSidebarClick = (item: 'learn' | 'leaderboard' | 'quests' | 'shop' | 'profile' | 'settings') => {
+  const startLessonWithTwentyQuestions = (lesson: Lesson) => {
+    const patchedLesson: Lesson = {
+      ...lesson,
+      exercises: ensureExerciseCount(lesson.exercises || [], 20, lesson.id)
+    };
+    onStartLesson(patchedLesson);
+  };
+
+  const flattenedLessons = stages.flatMap(s => s.lessons || []);
+  const lessonIndexById = new Map(flattenedLessons.map((l, i) => [l.id, i] as const));
+
+  const isLessonUnlocked = (lesson: Lesson): boolean => {
+    const idx = lessonIndexById.get(lesson.id);
+    if (idx === undefined) return false;
+    if (idx === 0) return true;
+    return (progress.completedLessons || []).length >= idx;
+  };
+
+  const handleSidebarClick = (item: 'learn' | 'leaderboard' | 'quests' | 'shop' | 'profile' | 'settings' | 'latest-news') => {
     setActiveSidebarItem(item);
     if (item !== 'learn' && onNavigate) {
-      onNavigate(item);
+      onNavigate(item as any);
     }
   };
 
@@ -102,8 +148,7 @@ export function LearningPath({
   const getCurrentLesson = () => {
     for (const stage of stages) {
       for (const lesson of stage.lessons) {
-        const globalIndex = calculateGlobalLessonIndex(stage.stageNumber, lesson.lessonNumber);
-        if (isLessonUnlocked(lesson, globalIndex) && !isLessonCompleted(lesson.id)) {
+        if (isLessonUnlocked(lesson) && !isLessonCompleted(lesson.id)) {
           return { lesson, stage };
         }
       }
@@ -112,8 +157,39 @@ export function LearningPath({
   };
 
   const currentLessonInfo = getCurrentLesson();
-  const firstStage = stages[0];
-  const firstLesson = firstStage?.lessons[0];
+
+  const getStageForIndex = (stageIndex: number): Stage => {
+    const real = stages[stageIndex];
+    if (real) return real;
+    return {
+      id: `${currentLanguageId || 'lang'}-stage-${stageIndex + 1}`,
+      stageNumber: stageIndex + 1,
+      title: isEnglish ? 'Coming soon' : 'Bientôt',
+      titleFr: isEnglish ? 'Coming soon' : 'Bientôt',
+      color: 'from-[#F4A300] to-[#FF9500]',
+      lessons: []
+    } as Stage;
+  };
+
+  const getLessonForSlot = (stageIndex: number, slotIndex: number): { lesson: Lesson; isReal: boolean } => {
+    const stage = getStageForIndex(stageIndex);
+    const existing = stage.lessons?.[slotIndex];
+    if (existing) return { lesson: existing, isReal: true };
+
+    return {
+      lesson: {
+        id: `${stage.id}-coming-soon-${slotIndex + 1}`,
+        stageId: stage.id,
+        lessonNumber: slotIndex + 1,
+        type: 'vocabulary',
+        title: stackedLessonLabels[slotIndex] || (isEnglish ? `Lesson ${slotIndex + 1}` : `Leçon ${slotIndex + 1}`),
+        titleFr: stackedLessonLabels[slotIndex] || (isEnglish ? `Lesson ${slotIndex + 1}` : `Leçon ${slotIndex + 1}`),
+        xpReward: 0,
+        exercises: []
+      },
+      isReal: false
+    };
+  };
 
   // Safety check
   if (!stages || stages.length === 0) {
@@ -130,9 +206,9 @@ export function LearningPath({
   }
 
   return (
-    <div className="min-h-screen flex bg-white">
+    <div className="min-h-screen flex bg-gray-50">
       {/* Left Sidebar - Hidden on mobile */}
-      <div className="hidden md:flex w-20 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col items-center py-6">
+      <div className="hidden md:flex w-20 flex-shrink-0 bg-gray-50 border-r border-gray-200 flex flex-col items-center py-6">
         {/* Logo at top */}
         <button
           onClick={() => handleSidebarClick('learn')}
@@ -224,6 +300,24 @@ export function LearningPath({
             </div>
           </div>
 
+          {/* Latest News */}
+          <div className="relative group">
+            <button
+              onClick={() => handleSidebarClick('latest-news')}
+              className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all ${
+                activeSidebarItem === 'latest-news'
+                  ? 'bg-orange-500 text-white shadow-lg'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+              aria-label="Latest News"
+            >
+              <Newspaper className="w-6 h-6" />
+            </button>
+            <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+              {isEnglish ? 'Latest News' : 'Dernières Actualités'}
+            </div>
+          </div>
+
           {/* Profile */}
           <div className="relative group">
             <button
@@ -265,7 +359,7 @@ export function LearningPath({
       {/* Central Content Area */}
       <div className="flex-1 flex flex-col overflow-y-auto min-w-0">
         {/* Mobile Header - Only visible on mobile */}
-        <div className="md:hidden bg-green-500 text-white px-4 py-4 flex items-center justify-between sticky top-0 z-40">
+        <div className="md:hidden bg-gray-900 text-white px-4 py-4 flex items-center justify-between sticky top-0 z-40">
           <button
             onClick={onBackToLanguageSelect}
             className="p-2 hover:bg-white/20 rounded-lg transition-colors"
@@ -283,255 +377,99 @@ export function LearningPath({
           </div>
         </div>
 
-        {/* Top Banner */}
-        {firstStage && (
-          <div className="bg-green-500 text-white px-4 sm:px-8 py-4 sm:py-6 flex items-center justify-between">
-            <div>
-              <button className="flex items-center gap-2 text-white/90 hover:text-white mb-1 sm:mb-2">
-                <span className="text-xs sm:text-sm font-semibold uppercase">SECTION 1, UNIT 1</span>
-              </button>
-              <h1 className="text-lg sm:text-2xl font-bold">
-                {isEnglish ? firstStage.title : firstStage.titleFr}
-              </h1>
-            </div>
-            <button className="hidden sm:block text-white hover:bg-white/20 rounded-lg p-2">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
-        )}
+        {/* Lesson Stacks */}
+        <div className="flex-1 px-3 sm:px-6 py-4 sm:py-6">
+          <div className="afroStackedWrap">
+            <div className="space-y-6">
+              {Array.from({ length: 7 }).map((_, stageIndex) => {
+                const stage = getStageForIndex(stageIndex);
+                const stageTitle = isEnglish ? stage.title : stage.titleFr;
 
-        {/* Lesson Path */}
-        <div className="flex-1 px-4 sm:px-8 py-4 sm:py-8 relative">
-          <div className="max-w-3xl mx-auto relative">
-            {/* START Button */}
-            {firstLesson && !isLessonCompleted(firstLesson.id) && (
-              <div className="mb-4 sm:mb-8 flex justify-center">
-                <button
-                  onClick={() => {
-                    if (progress.hearts > 0 || isGuest || userData?.subscription?.active) {
-                      onStartLesson(firstLesson);
-                    }
-                  }}
-                  disabled={progress.hearts === 0 && !isGuest && !userData?.subscription?.active}
-                  className="bg-gray-500 hover:bg-gray-600 text-white font-bold px-6 sm:px-8 py-3 sm:py-4 rounded-lg transition-colors disabled:opacity-50 text-base sm:text-lg min-h-[48px] touch-manipulation"
-                >
-                  {isEnglish ? 'START' : 'COMMENCER'}
-                </button>
-              </div>
-            )}
-
-            {/* Lesson Nodes - Vertical Path */}
-            <div className="relative flex flex-col items-center gap-4 sm:gap-6 py-4 sm:py-8">
-              {stages.flatMap((stage, stageIndex) =>
-                stage.lessons.map((lesson, lessonIndex) => {
-                  const globalIndex = calculateGlobalLessonIndex(stage.stageNumber, lesson.lessonNumber);
-                  const isUnlocked = isLessonUnlocked(lesson, globalIndex);
-                  const isCompleted = isLessonCompleted(lesson.id);
-                  const isCurrent = !isCompleted && isUnlocked && lesson === currentLessonInfo?.lesson;
-                  const isLast = stageIndex === stages.length - 1 && lessonIndex === stage.lessons.length - 1;
-
-                  return (
-                    <div key={lesson.id} className="relative flex flex-col items-center w-full">
-                      {/* Connecting line above (except first lesson) */}
-                      {!(stageIndex === 0 && lessonIndex === 0) && (
-                        <div className="w-1 h-8 sm:h-12 bg-gray-300 mb-0" />
-                      )}
-
-                      {/* Lesson Node - Larger on mobile for better touch targets */}
-                      <button
-                        onClick={() => {
-                          if (isUnlocked && (progress.hearts > 0 || isGuest || userData?.subscription?.active || isCompleted)) {
-                            onStartLesson(lesson);
-                          }
-                        }}
-                        disabled={!isUnlocked || (progress.hearts === 0 && !isGuest && !userData?.subscription?.active && !isCompleted)}
-                        className={`
-                          relative w-20 h-20 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all touch-manipulation min-h-[80px] min-w-[80px] sm:min-h-[64px] sm:min-w-[64px]
-                          ${isCurrent
-                            ? 'bg-green-500 ring-4 ring-green-300 scale-110 shadow-lg z-10'
-                            : isCompleted
-                            ? 'bg-green-400 ring-2 ring-green-300 z-10'
-                            : isUnlocked
-                            ? 'bg-gray-400 active:bg-gray-500 sm:hover:bg-gray-500 z-10'
-                            : 'bg-gray-300 opacity-50 z-10'
-                          }
-                        `}
-                        aria-label={`Lesson ${lesson.lessonNumber}: ${isEnglish ? lesson.title : lesson.titleFr}`}
-                      >
-                        {isCompleted ? (
-                          <Star className="w-10 h-10 sm:w-8 sm:h-8 text-white fill-white" />
-                        ) : isCurrent ? (
-                          <Star className="w-10 h-10 sm:w-8 sm:h-8 text-white fill-white" />
-                        ) : isUnlocked ? (
-                          <Star className="w-10 h-10 sm:w-8 sm:h-8 text-white" />
-                        ) : (
-                          <Lock className="w-10 h-10 sm:w-8 sm:h-8 text-gray-500" />
-                        )}
-                      </button>
-
-                      {/* Lesson Title - Visible on mobile */}
-                      <div className="mt-2 sm:hidden text-center px-2">
-                        <p className={`text-xs font-semibold ${isUnlocked ? 'text-gray-900' : 'text-gray-400'}`}>
-                          {isEnglish ? lesson.title : lesson.titleFr}
-                        </p>
-                      </div>
-
-                      {/* Connecting line below (except last lesson) */}
-                      {!isLast && (
-                        <div className="w-1 h-8 sm:h-12 bg-gray-300 mt-0" />
-                      )}
-
-                      {/* Treasure Chest or Trophy between some lessons */}
-                      {lessonIndex < stage.lessons.length - 1 && (
-                        <div className="absolute top-full mt-4 sm:mt-8 left-1/2 transform -translate-x-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded-lg flex items-center justify-center shadow-sm">
-                          <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" />
-                        </div>
-                      )}
+                return (
+                  <section
+                    key={stage.id}
+                    className="afroStackedCards"
+                    aria-label={isEnglish ? `Stage ${stageIndex + 1} lessons` : `Étape ${stageIndex + 1} leçons`}
+                  >
+                    <div className="afroStackSectionHeader">
+                      <h2>{(stageTitle || (isEnglish ? 'Lessons' : 'Leçons')).trim()}</h2>
+                      <p>{isEnglish ? '7 lessons • 20 questions each' : '7 leçons • 20 questions chacune'}</p>
                     </div>
-                  );
-                })
-              )}
-            </div>
 
-          </div>
+                    <div className="afroStackGrid">
+                      <div className="afroStackRow">
+                        {Array.from({ length: 7 }).map((_, slotIndex) => {
+                          const { lesson, isReal } = getLessonForSlot(stageIndex, slotIndex);
+                          const unlocked = isReal ? isLessonUnlocked(lesson) : false;
+                          const completed = isReal ? isLessonCompleted(lesson.id) : false;
+                          const heartsBlocked = progress.hearts === 0 && !isGuest && !userData?.subscription?.active && !completed;
+                          const label = isReal
+                            ? (isEnglish ? lesson.title : (lesson.titleFr || lesson.title))
+                            : (isEnglish ? `Lesson ${slotIndex + 1}` : `Leçon ${slotIndex + 1}`);
 
-          {/* Bottom Section - Next Unit Preview */}
-          {stages.length > 1 && (
-            <div className="mt-8 sm:mt-16 pt-4 sm:pt-8 border-t border-gray-200 text-center px-4">
-              <p className="text-gray-600 mb-4 text-sm sm:text-base">
-                {isEnglish ? 'Ask how someone is' : 'Demander comment quelqu\'un va'}
-              </p>
-              <div className="flex gap-2 sm:gap-4 justify-center">
-                <button className="bg-purple-500 active:bg-purple-600 sm:hover:bg-purple-600 text-white font-bold px-4 sm:px-6 py-2 rounded-lg text-sm sm:text-base touch-manipulation min-h-[44px]">
-                  {isEnglish ? 'JUMP HERE?' : 'SAUTER ICI?'}
-                </button>
-                <button className="bg-purple-500 active:bg-purple-600 sm:hover:bg-purple-600 text-white font-bold px-4 sm:px-6 py-2 rounded-full w-12 h-12 flex items-center justify-center touch-manipulation">
-                  →
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+                          return (
+                            <article key={lesson.id} className="afroStackCard" tabIndex={0}>
+                              <div className="afroStackMeta">
+                                {isEnglish ? `Lesson ${slotIndex + 1}` : `Leçon ${slotIndex + 1}`} • {
+                                  !isReal
+                                    ? (isEnglish ? 'Coming soon' : 'Bientôt')
+                                    : completed
+                                      ? (isEnglish ? 'Completed' : 'Terminé')
+                                      : unlocked
+                                        ? (isEnglish ? 'Ready' : 'Prêt')
+                                        : (isEnglish ? 'Locked' : 'Verrouillé')
+                                }
+                              </div>
+                              <h3>{label}</h3>
+                              <p className="afroStackDesc">
+                                {!isReal
+                                  ? (isEnglish ? 'More content is coming for this stage.' : 'Plus de contenu arrive pour cette étape.')
+                                  : (isEnglish ? '20 questions. Keep your hearts to continue.' : '20 questions. Gardez vos cœurs pour continuer.')}
+                              </p>
 
-      {/* Right Sidebar - Hidden on mobile */}
-      <div className="hidden lg:flex w-80 flex-shrink-0 bg-white border-l border-gray-200 overflow-y-auto relative">
-        {/* Top Stats Bar */}
-        <div className="border-b border-gray-200 px-4 py-4 flex items-center justify-between">
-          {currentLanguage && currentLanguage.flags && currentLanguage.flags.length > 0 && (
-            <FlagIcon country={currentLanguage.flags[0]} size="md" />
-          )}
-          <div className="flex items-center gap-3 flex-wrap">
-            <button 
-              onClick={() => setShowStreakPopup(true)}
-              className="flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer"
-            >
-              <Flame className="w-5 h-5 text-orange-500" />
-              <span className="text-sm font-semibold">{progress.streak || 0}</span>
-            </button>
-            <div className="flex items-center gap-1">
-              <Gem className="w-5 h-5 text-blue-500" />
-              <span className="text-sm font-semibold">{userData?.gems || 500}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <SandbitsIcon size={20} className="text-amber-700" />
-              <span className="text-sm font-semibold">{userData?.sandbits || 0}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Heart className="w-5 h-5 text-red-500 fill-red-500" />
-              <span className="text-sm font-semibold">{progress.hearts}</span>
-            </div>
-          </div>
-        </div>
+                              <div className="afroStackFooter">
+                                <button
+                                  type="button"
+                                  className="afroStackButton"
+                                  onClick={() => {
+                                    if (!isReal) return;
+                                    if (!unlocked) return;
+                                    if (heartsBlocked) return;
+                                    startLessonWithTwentyQuestions(lesson);
+                                  }}
+                                  disabled={!isReal || !unlocked || heartsBlocked}
+                                >
+                                  {!isReal
+                                    ? (isEnglish ? 'Soon' : 'Bientôt')
+                                    : completed
+                                      ? (isEnglish ? 'Review' : 'Réviser')
+                                      : isEnglish
+                                        ? 'Start'
+                                        : 'Démarrer'}
+                                </button>
 
-        <div className="p-4 space-y-4">
-          {/* Unlock Leaderboards Card */}
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <div className="flex items-start justify-between mb-2">
-              <h3 className="font-bold text-gray-900">Unlock Leaderboards!</h3>
-              <Shield className="w-6 h-6 text-gray-400" />
+                                <span className="afroStackPill">
+                                  {!isReal
+                                    ? (isEnglish ? '⏳ Soon' : '⏳ Bientôt')
+                                    : completed
+                                      ? (isEnglish ? '★ Done' : '★ Fait')
+                                      : unlocked
+                                        ? (isEnglish ? '✓ Unlocked' : '✓ Débloqué')
+                                        : (isEnglish ? '🔒 Locked' : '🔒 Verrouillé')}
+                                </span>
+                              </div>
+                            </article>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </section>
+                );
+              })}
             </div>
-            <p className="text-sm text-gray-600">
-              {isEnglish 
-                ? 'Complete 10 more lessons to start competing'
-                : 'Terminez 10 leçons de plus pour commencer à rivaliser'}
-            </p>
-          </div>
-
-          {/* Daily Quests Card */}
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <div className="flex items-start justify-between mb-2">
-              <h3 className="font-bold text-gray-900">Daily Quests</h3>
-              <a href="#" className="text-sm text-blue-600 font-semibold">VIEW ALL</a>
-            </div>
-            <div className="flex items-center gap-2 mb-2">
-              <Zap className="w-5 h-5 text-yellow-500" />
-              <span className="text-sm text-gray-600">
-                {isEnglish ? 'Earn 10 XP' : 'Gagnez 10 XP'}
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-              <div className="bg-yellow-500 h-2 rounded-full" style={{ width: '0%' }} />
-            </div>
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span>0 / 10</span>
-              <Trophy className="w-4 h-4" />
-            </div>
-          </div>
-
-          {/* Create Profile Card */}
-          {!user && !isGuest && (
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <h3 className="font-bold text-gray-900 mb-3">
-                {isEnglish 
-                  ? 'Create a profile to save your progress!'
-                  : 'Créez un profil pour sauvegarder votre progression!'}
-              </h3>
-              <div className="space-y-2">
-                <button className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors uppercase">
-                  {isEnglish ? 'CREATE A PROFILE' : 'CRÉER UN PROFIL'}
-                </button>
-                <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-colors uppercase">
-                  {isEnglish ? 'SIGN IN' : 'SE CONNECTER'}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Footer Links */}
-        <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-4 mt-auto">
-          <div className="flex flex-wrap gap-3 text-xs text-gray-500">
-            <a href="#" className="hover:text-gray-700">ABOUT</a>
-            <a href="#" className="hover:text-gray-700">BLOG</a>
-            <a href="#" className="hover:text-gray-700">STORE</a>
-            <a href="#" className="hover:text-gray-700">EFFICACY</a>
-            <a href="#" className="hover:text-gray-700">CAREERS</a>
-            <a href="#" className="hover:text-gray-700">INVESTORS</a>
-            <a href="#" className="hover:text-gray-700">TERMS</a>
-            <a href="#" className="hover:text-gray-700">PRIVACY</a>
           </div>
         </div>
       </div>
-
-      {/* Streak Popup */}
-      {showStreakPopup && (
-        <StreakPopup
-          interfaceLanguage={interfaceLanguage}
-          streak={progress.streak || 0}
-          streakDays={progress.streakDays || []}
-          onClose={() => setShowStreakPopup(false)}
-          onStartLesson={() => {
-            setShowStreakPopup(false);
-            // Start first available lesson or show message
-            if (stages.length > 0 && stages[0].lessons.length > 0) {
-              onStartLesson(stages[0].lessons[0]);
-            }
-          }}
-        />
-      )}
     </div>
   );
 }
