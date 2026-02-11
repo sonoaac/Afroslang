@@ -1,0 +1,221 @@
+.afroStackedCards{
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-left: 1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.afroStackedCards::-webkit-scrollbar{
+  height: 10px;
+}
+
+.afroStackedCards::-webkit-scrollbar-track{
+  background: rgba(0,0,0,0.15);
+  border-radius: 999px;
+}
+
+.afroStackedCards::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,0.20);
+  border-radius: 999px;
+}
+
+.afroStackedWrap{
+  background: #0d0c13;
+  color: #888;
+  border-radius: 18px;
+  padding: 0.75rem 0;
+}
+
+.afroStackSectionHeader{
+  background-image: linear-gradient(0deg,#ff8a00,#e52e71);
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+  flex: 0 0 auto;
+  margin: 1.25rem 0;
+  width: 110px;
+  padding: 1.75rem;
+  border-radius: 16px;
+  transform: rotate(180deg);
+  writing-mode: vertical-rl;
+}
+
+.afroStackSectionHeader h2{
+  color: #fff;
+  font-size: 1.6rem;
+  margin: 0 0 0.5rem;
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.afroStackSectionHeader p{
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.80);
+}
+
+.afroStackGrid{
+  padding: 1.75rem;
+  min-width: 240px;
+}
+
+.afroStackRow{
+  display: flex;
+  overflow-x: visible;
+}
+
+.afroStackCard{
+  margin: 0;
+  padding: 1.25rem;
+  background-color: #17141d;
+  border-radius: 0.75rem;
+  box-shadow: -1rem 0 3rem rgba(0,0,0,0.65);
+  transition: transform 0.2s ease;
+
+  min-width: 240px;
+  min-height: 340px;
+
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.afroStackCard:not(:first-child){
+  margin-left: -2rem;
+}
+
+.afroStackCard:hover,
+.afroStackCard:focus-within{
+  transform: translateY(-1rem);
+}
+
+.afroStackCard:hover ~ .afroStackCard,
+.afroStackCard:focus-within ~ .afroStackCard{
+  transform: translateX(2rem);
+}
+
+@media (max-width: 640px){
+  .afroStackedWrap{
+    max-width: 100%;
+  }
+
+  .afroStackedCards{
+    flex-direction: column;
+  }
+
+  .afroStackSectionHeader{
+    width: 100%;
+    flex: 0 0 auto;
+    height: auto;
+    padding: 12px 14px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(0,0,0,.08);
+    border-radius: 18px 18px 0 0;
+  }
+
+  .afroStackSectionHeader h2{
+    writing-mode: horizontal-tb;
+    transform: none;
+    text-align: left;
+    line-height: 1.1;
+  }
+
+  .afroStackSectionHeader p{
+    writing-mode: horizontal-tb;
+    transform: none;
+    text-align: left;
+  }
+
+  .afroStackRow{
+    padding: 10px;
+  }
+
+  .afroStackCard{
+    width: 250px;
+    min-width: 250px;
+    max-width: 250px;
+    border-radius: 16px;
+  }
+
+  .afroStackCard:hover,
+  .afroStackCard:hover ~ .afroStackCard{
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .afroStackCard,
+  .afroStackButton{
+    transition: none !important;
+  }
+}
+
+.afroStackCard h3{
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  color: #fff;
+}
+
+.afroStackMeta{
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 0.75rem;
+}
+
+.afroStackDesc{
+  color: #7a7a8c;
+  margin: 0 0 1rem;
+  line-height: 1.35;
+}
+
+.afroStackFooter{
+  margin-top: auto;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.afroStackButton{
+  outline: none;
+  border: 3px solid #28242f;
+  border-radius: 999px;
+  padding: 0.35rem 0.95rem 0.4rem;
+  background-color: #17141d;
+  color: #c1c1d0;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  transition: border-color 120ms ease, opacity 120ms ease;
+}
+
+.afroStackButton:hover{
+  border-color: #545465;
+  cursor: pointer;
+}
+
+.afroStackButton:disabled{
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.afroStackPill{
+  border: 1px solid rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.72);
+  border-radius: 999px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px){
+  .afroStackSectionHeader{ width: 96px; padding: 1.25rem; }
+  .afroStackGrid{ padding: 1.25rem; }
+  .afroStackCard{ min-width: 220px; }
+}

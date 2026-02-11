@@ -62,7 +62,7 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({ onBack }) =>
   // Show message for guest users
   if (isGuest) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#FFB6D9] via-[#9D4EDD] to-[#00FF94] p-6">
+      <div className="min-h-screen p-6" style={{ background: 'var(--app-bg)' }}>
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">
@@ -106,7 +106,7 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({ onBack }) =>
 
   if (isSubscribed) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#FFB6D9] via-[#9D4EDD] to-[#00FF94] p-6">
+      <div className="min-h-screen p-6" style={{ background: 'var(--app-bg)' }}>
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">
@@ -148,7 +148,7 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({ onBack }) =>
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FFB6D9] via-[#9D4EDD] to-[#00FF94] p-6">
+    <div className="min-h-screen p-6" style={{ background: 'var(--app-bg)' }}>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">

@@ -1,0 +1,188 @@
+.authSplitPage {
+  min-height: 100vh;
+  background: radial-gradient(1200px 600px at 20% 20%, rgba(176, 0, 32, 0.35) 0%, rgba(0, 0, 0, 0) 60%),
+    linear-gradient(135deg, #000000 0%, #120007 55%, #000000 100%);
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.authSplitBrand {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.authSplitContainer {
+  width: 600px;
+  height: 350px;
+  position: relative;
+  display: inline-flex;
+}
+
+.authSplitBackbox {
+  background: linear-gradient(135deg, #000000 0%, #1a000a 55%, #000000 100%);
+  width: 100%;
+  height: 80%;
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
+  display: inline-flex;
+}
+
+.authSplitFrontbox {
+  background-color: #ffffff;
+  border-radius: 20px;
+  height: 100%;
+  width: 50%;
+  z-index: 10;
+  position: absolute;
+  right: 0;
+  margin-right: 3%;
+  margin-left: 3%;
+  transition: right 0.8s ease-in-out;
+}
+
+.authSplitMoving {
+  right: 45%;
+}
+
+.authSplitLoginMsg,
+.authSplitSignupMsg {
+  width: 50%;
+  height: 100%;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.authSplitTitle {
+  font-weight: 300;
+  font-size: 23px;
+}
+
+.authSplitTextContent {
+  color: white;
+  margin-top: 65px;
+  margin-left: 12%;
+}
+
+.authSplitLoginMsg p,
+.authSplitSignupMsg p {
+  font-weight: 100;
+}
+
+.authSplitSwitchBtn {
+  background-color: transparent;
+  border: 2px solid #35b729;
+  border-radius: 10px;
+  color: #35b729;
+  font-size: 12px;
+  box-sizing: content-box;
+  font-weight: 300;
+  padding: 10px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.authSplitSwitchBtn:hover {
+  background-color: #35b729;
+  color: #000000;
+}
+
+.authSplitVisibility {
+  opacity: 0;
+}
+
+.authSplitLogin,
+.authSplitSignup {
+  padding: 20px;
+  text-align: center;
+  height: 100%;
+  position: relative;
+}
+
+.authSplitLogin h2,
+.authSplitSignup h2 {
+  color: #35b729;
+  font-size: 22px;
+}
+
+.authSplitInputbox {
+  margin-top: 30px;
+}
+
+.authSplitInput {
+  display: block;
+  width: 100%;
+  height: 40px;
+  background-color: #f2f2f2;
+  border: none;
+  margin-bottom: 20px;
+  font-size: 12px;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.authSplitSubmitBtn {
+  background-color: #35b729;
+  border: none;
+  color: white;
+  font-size: 12px;
+  font-weight: 300;
+  box-sizing: content-box;
+  padding: 10px;
+  border-radius: 10px;
+  width: 60px;
+  position: absolute;
+  right: 30px;
+  bottom: 30px;
+  cursor: pointer;
+}
+
+.authSplitSubmitBtn:hover {
+  filter: brightness(0.95);
+}
+
+.authSplitSubmitBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.authSplitForgot {
+  cursor: pointer;
+  color: #000000;
+  font-size: 15px;
+}
+
+.authSplitError {
+  color: #b00020;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+.authSplitSuccess {
+  color: #0b7a26;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+.authSplitHide {
+  display: none;
+}
+
+@media (max-width: 680px) {
+  .authSplitContainer {
+    width: 100%;
+    max-width: 420px;
+    height: 420px;
+  }
+
+  .authSplitBackbox {
+    height: 72%;
+  }
+}

@@ -50,7 +50,6 @@ export const igboTextVariations: Record<string, string[]> = {
   'Zụta': ['Zuta', 'zụta', 'zuta', 'Zuta'],
   'Ree': ['ree', 'Ree'],
   'Gbaa': ['gbaa', 'Gbaa'],
-  'Kpọọ': ['Kpoo', 'kpọọ', 'kpoo', 'Kpoo'],
   'Kpụ': ['Kpu', 'kpụ', 'kpu', 'Kpu'],
   'Kpọ': ['Kpo', 'kpọ', 'kpo', 'Kpo'],
   'Kpị': ['Kpi', 'kpị', 'kpi', 'Kpi'],

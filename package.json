@@ -8,7 +8,9 @@
     "build": "vite build",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "logo:transparent": "node scripts/make-logo-transparent.mjs",
+    "validate:lessons": "tsx scripts/validate-lessons.ts"
   },
   "dependencies": {
     "@stripe/stripe-js": "^8.1.0",
@@ -31,9 +33,11 @@
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
+    "pngjs": "^7.0.0",
     "postcss": "^8.4.27",
     "tailwindcss": "^3.3.3",
     "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.20.5",
     "typescript": "^5.0.2",
     "vite": "^4.4.5"
   },

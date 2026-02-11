@@ -98,7 +98,7 @@ export function LessonScreen({
 
   if (!currentExercise) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-8 bg-gradient-to-br from-[#FFB6D9] via-[#9D4EDD] to-[#00FF94]">
+      <div className="min-h-screen flex items-center justify-center p-8" style={{ background: 'var(--app-bg)' }}>
         <div className="text-center space-y-6 bg-white rounded-3xl p-12 retro-shadow-lg game-border max-w-2xl">
           <div className="text-8xl mb-6 animate-bounce">📚</div>
           <h2 className="text-[#1A1A1A] text-4xl">
@@ -408,7 +408,7 @@ export function LessonScreen({
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#FFB6D9] via-[#9D4EDD] to-[#00FF94]">
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--app-bg)' }}>
         {/* Header */}
         <div className="bg-white/95 backdrop-blur-md game-border border-b-0 px-0.5 sm:px-6 py-0.5 sm:py-4">
         <div className="max-w-6xl mx-auto">

@@ -154,7 +154,7 @@ export const FeedbackPage: React.FC<FeedbackPageProps> = ({ onBack }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#FFB6D9] via-[#9D4EDD] to-[#00FF94] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--app-bg)' }}>
         <div className="text-center">
           <div className="animate-spin w-12 h-12 border-4 border-white/30 border-t-white rounded-full mx-auto mb-4"></div>
           <p className="text-white text-xl">Loading your feedback...</p>
@@ -164,7 +164,7 @@ export const FeedbackPage: React.FC<FeedbackPageProps> = ({ onBack }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FFB6D9] via-[#9D4EDD] to-[#00FF94] p-6">
+    <div className="min-h-screen p-6" style={{ background: 'var(--app-bg)' }}>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">

@@ -77,7 +77,7 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ onBack }) 
   const canGoRight = currentLeagueIndex < LEAGUES.length - 1;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FFB6D9] via-[#9D4EDD] to-[#00FF94] p-6">
+    <div className="min-h-screen p-6" style={{ background: 'var(--app-bg)' }}>
       {/* Header */}
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">

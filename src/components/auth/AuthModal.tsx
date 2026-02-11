@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { Login } from './Login';
-import { SignUp } from './SignUp';
+import React from 'react';
 import { X } from 'lucide-react';
+import { AuthSplit } from './AuthSplit';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -14,8 +13,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onClose, 
   initialMode = 'login' 
 }) => {
-  const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
-
   if (!isOpen) return null;
 
   return (
@@ -30,19 +27,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </button>
 
         {/* Auth content */}
-        <div className="p-6">
-          {mode === 'login' ? (
-            <Login
-              onSuccess={onClose}
-              onSwitchToSignUp={() => setMode('signup')}
-              onGuestMode={onClose}
-            />
-          ) : (
-            <SignUp
-              onSuccess={onClose}
-              onSwitchToLogin={() => setMode('login')}
-            />
-          )}
+        <div className="p-0">
+          <AuthSplit initialMode={initialMode} onSuccess={onClose} hideGuestMode />
         </div>
       </div>
     </div>

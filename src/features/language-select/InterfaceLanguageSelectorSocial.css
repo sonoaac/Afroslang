@@ -1,0 +1,433 @@
+.afroSocialRoot {
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+  background:
+    radial-gradient(900px 520px at 70% 20%, color-mix(in srgb, var(--brand-green) 14%, transparent) 0%, transparent 60%),
+    radial-gradient(1200px 600px at 25% 20%, color-mix(in srgb, var(--brand-red) 35%, transparent) 0%, transparent 60%),
+    linear-gradient(135deg, var(--brand-black) 0%, color-mix(in srgb, var(--brand-black) 85%, var(--brand-red) 15%) 55%, var(--brand-black) 100%);
+  color: var(--text-primary);
+}
+
+.afroPanel {
+  background: color-mix(in srgb, var(--surface) 82%, var(--brand-red) 18%);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, var(--brand-red) 30%);
+  border-radius: 12px;
+}
+
+.afroDivider {
+  border-color: color-mix(in srgb, var(--border) 60%, var(--brand-green) 40%);
+}
+
+.afroSocialLeft {
+  width: 260px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(520px 360px at 20% 20%, color-mix(in srgb, var(--brand-red) 28%, transparent) 0%, transparent 70%),
+    radial-gradient(700px 520px at 60% 60%, color-mix(in srgb, var(--brand-green) 10%, transparent) 0%, transparent 75%),
+    color-mix(in srgb, var(--surface) 84%, var(--brand-red) 16%);
+  border-right: 1px solid color-mix(in srgb, var(--border) 60%, var(--brand-green) 25%);
+}
+
+.afroSocialMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+}
+
+.afroSocialRight {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(520px 360px at 80% 20%, color-mix(in srgb, var(--brand-red) 28%, transparent) 0%, transparent 70%),
+    radial-gradient(700px 520px at 40% 70%, color-mix(in srgb, var(--brand-green) 10%, transparent) 0%, transparent 75%),
+    color-mix(in srgb, var(--surface) 84%, var(--brand-red) 16%);
+  border-left: 1px solid color-mix(in srgb, var(--border) 60%, var(--brand-green) 25%);
+}
+
+.afroSideHeader {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: 18px 18px 14px;
+  background:
+    radial-gradient(520px 220px at 20% 0%, color-mix(in srgb, var(--brand-red) 32%, transparent) 0%, transparent 65%),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--surface) 88%, var(--brand-red) 12%) 0%,
+      color-mix(in srgb, var(--surface) 88%, var(--brand-red) 12%) 76%,
+      transparent 100%
+    );
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, var(--brand-green) 25%);
+}
+
+.afroBrand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.afroBrandLogo {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  object-fit: contain;
+  background: color-mix(in srgb, var(--surface) 85%, var(--brand-red) 15%);
+  border: 1px solid color-mix(in srgb, var(--border) 65%, var(--brand-green) 25%);
+}
+
+.afroBrandName {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--text-primary) 92%, var(--brand-green) 8%);
+}
+
+.afroBeta {
+  margin-top: 6px;
+  font-size: 12px;
+  color: color-mix(in srgb, var(--text-secondary) 85%, var(--brand-green) 15%);
+}
+
+.afroSideSection {
+  padding: 18px;
+}
+
+.afroSideTitle {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  color: color-mix(in srgb, var(--text-secondary) 80%, var(--brand-green) 20%);
+  margin-bottom: 12px;
+}
+
+.afroMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.afroMenuButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px;
+  border-radius: 10px;
+  text-align: left;
+  color: color-mix(in srgb, var(--text-secondary) 85%, var(--brand-green) 15%);
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.afroMenuButton:hover {
+  background: color-mix(in srgb, var(--brand-green) 10%, transparent);
+  border-color: color-mix(in srgb, var(--brand-green) 25%, var(--border));
+  color: var(--text-primary);
+}
+
+.afroMenuButtonActive {
+  background: color-mix(in srgb, var(--brand-green) 14%, transparent);
+  border-color: color-mix(in srgb, var(--brand-green) 28%, var(--border));
+  color: var(--text-primary);
+}
+
+.afroMenuIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.afroTopBar {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  gap: 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, var(--brand-green) 25%);
+  background:
+    radial-gradient(700px 220px at 20% 20%, color-mix(in srgb, var(--brand-red) 22%, transparent) 0%, transparent 65%),
+    color-mix(in srgb, var(--surface) 84%, var(--brand-red) 16%);
+}
+
+.afroSearch {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--border) 65%, var(--brand-green) 25%);
+}
+
+.afroSearch input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+}
+
+.afroSearch input::placeholder {
+  color: color-mix(in srgb, var(--text-secondary) 80%, var(--brand-green) 20%);
+}
+
+.afroIconButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--brand-green) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 65%, var(--brand-green) 25%);
+  color: var(--text-primary);
+}
+
+.afroIconButton:hover {
+  background: color-mix(in srgb, var(--brand-green) 16%, transparent);
+}
+
+.afroMainScroll {
+  flex: 1;
+  overflow: auto;
+  padding: 18px;
+}
+
+.afroProfile {
+  position: relative;
+  min-height: 240px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--border) 65%, var(--brand-green) 25%);
+}
+
+.afroProfileCover {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(800px 280px at 25% 25%, color-mix(in srgb, var(--brand-red) 45%, transparent) 0%, transparent 70%),
+    linear-gradient(135deg, var(--brand-black) 0%, color-mix(in srgb, var(--brand-black) 70%, var(--brand-red) 30%) 60%, var(--brand-black) 100%);
+}
+
+.afroProfileCover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(520px 220px at 70% 35%, color-mix(in srgb, var(--brand-green) 18%, transparent) 0%, transparent 65%);
+  opacity: 0.85;
+}
+
+.afroProfileHeader {
+  position: relative;
+  height: 240px;
+}
+
+.afroProfileAvatar {
+  position: absolute;
+  left: 18px;
+  bottom: 14px;
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.afroAvatarImg {
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 86%, var(--brand-red) 14%);
+  object-fit: contain;
+  border: 3px solid color-mix(in srgb, var(--surface) 86%, var(--brand-red) 14%);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+}
+
+.afroProfileName {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.afroProfileTagline {
+  margin-top: 6px;
+  font-size: 13px;
+  color: color-mix(in srgb, var(--text-secondary) 80%, var(--brand-green) 20%);
+}
+
+.afroProfileMenu {
+  display: flex;
+  gap: 8px;
+  padding: 12px 12px;
+  background: color-mix(in srgb, var(--surface) 86%, var(--brand-red) 14%);
+  border-top: 1px solid color-mix(in srgb, var(--border) 60%, var(--brand-green) 25%);
+}
+
+.afroProfileTab {
+  padding: 10px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+  color: color-mix(in srgb, var(--text-secondary) 85%, var(--brand-green) 15%);
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.afroProfileTab:hover {
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--brand-green) 10%, transparent);
+  border-color: color-mix(in srgb, var(--brand-green) 25%, var(--border));
+}
+
+.afroProfileTabActive {
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--brand-green) 14%, transparent);
+  border-color: color-mix(in srgb, var(--brand-green) 28%, var(--border));
+}
+
+.afroTimeline {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.afroBox {
+  padding: 16px;
+  background:
+    radial-gradient(520px 260px at 18% 0%, color-mix(in srgb, var(--brand-red) 30%, transparent) 0%, transparent 62%),
+    radial-gradient(700px 360px at 85% 10%, color-mix(in srgb, var(--brand-green) 10%, transparent) 0%, transparent 70%),
+    color-mix(in srgb, var(--surface) 80%, var(--brand-red) 20%);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, var(--brand-red) 30%);
+  border-radius: 12px;
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.35);
+}
+
+.afroBoxTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: color-mix(in srgb, var(--text-primary) 92%, var(--brand-green) 8%);
+  margin-bottom: 12px;
+}
+
+.afroPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-green) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 65%, var(--brand-green) 25%);
+  color: color-mix(in srgb, var(--text-secondary) 78%, var(--brand-green) 22%);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.afroCtaRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.afroPrimaryButton {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #071006;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.afroPrimaryButton:hover {
+  filter: brightness(1.06);
+}
+
+.afroSecondaryButton {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--border) 65%, var(--brand-green) 25%);
+  color: var(--text-primary);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.afroSecondaryButton:hover {
+  background: color-mix(in srgb, var(--brand-green) 10%, transparent);
+}
+
+.afroLanguageGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.afroLangChip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px;
+  border-radius: 12px;
+  background:
+    radial-gradient(220px 120px at 0% 0%, color-mix(in srgb, var(--brand-red) 26%, transparent) 0%, transparent 70%),
+    color-mix(in srgb, var(--brand-black) 78%, var(--brand-green) 22%);
+  border: 1px solid color-mix(in srgb, var(--border) 65%, var(--brand-green) 25%);
+}
+
+.afroLangChip span {
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.afroRightSection {
+  padding: 18px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, var(--brand-green) 25%);
+}
+
+.afroAccountLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.afroAccountName {
+  font-weight: 900;
+  color: var(--text-primary);
+}
+
+.afroSmallText {
+  font-size: 12px;
+  color: color-mix(in srgb, var(--text-secondary) 85%, var(--brand-green) 15%);
+}
+
+@media (max-width: 1200px) {
+  .afroSocialRight {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .afroSocialLeft {
+    display: none;
+  }
+  .afroTimeline {
+    grid-template-columns: 1fr;
+  }
+  .afroLanguageGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

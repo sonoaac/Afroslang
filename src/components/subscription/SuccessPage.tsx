@@ -15,7 +15,7 @@ export const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue }) => {
   }, [refreshUserData]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FFB6D9] via-[#9D4EDD] to-[#00FF94] flex items-center justify-center p-6">
+    <div className="min-h-screen flex items-center justify-center p-6" style={{ background: 'var(--app-bg)' }}>
       <div className="max-w-4xl w-full">
         <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-12 text-center">
           {/* Success Animation */}

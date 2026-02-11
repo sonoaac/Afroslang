@@ -1,0 +1,154 @@
+.afroSelectOverlay{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.afroSelectBackdrop{
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1200px 700px at 50% 30%, rgba(16, 185, 129, 0.16) 0%, rgba(16, 185, 129, 0.00) 60%),
+    radial-gradient(900px 520px at 50% 70%, rgba(225, 29, 72, 0.14) 0%, rgba(225, 29, 72, 0.00) 62%),
+    linear-gradient(180deg, #050308 0%, #07040b 60%, #050308 100%);
+}
+
+.afroSelectWaves{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: blur(0px);
+  opacity: 0.95;
+}
+
+.afroSelectWave{
+  fill: var(--wave-fill);
+  transform-origin: center;
+  transform: translateY(-110%);
+  animation: afroWaveDrop 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--wave-delay);
+  opacity: 0.42;
+}
+
+@keyframes afroWaveDrop{
+  0%{ transform: translateY(-110%); opacity: 0.0; }
+  35%{ opacity: 0.55; }
+  100%{ transform: translateY(0%); opacity: 0.42; }
+}
+
+.afroSelectCenterWrap{
+  position: relative;
+  width: min(420px, 86vw);
+  height: min(420px, 86vw);
+  display: grid;
+  place-items: center;
+}
+
+.afroSelectCenter{
+  width: min(120px, 28vw);
+  height: min(120px, 28vw);
+  border-radius: 999px;
+  background: var(--mix);
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,0.06),
+    0 0 0 10px rgba(16, 185, 129, 0.10),
+    0 18px 45px rgba(0,0,0,0.55);
+  animation: afroCenterPulse 900ms ease-in-out infinite;
+}
+
+@keyframes afroCenterPulse{
+  0%, 100%{ transform: scale(1); filter: saturate(1.05); }
+  50%{ transform: scale(1.06); filter: saturate(1.18); }
+}
+
+.afroSelectCenterInner{
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(5,3,8,0.55);
+  backdrop-filter: blur(10px);
+  transition: background 240ms ease;
+}
+
+.afroSelectCenterInner[data-logo="1"]{
+  /* Keep a dark backing so white pixels blend out */
+  background: rgba(5,3,8,0.55);
+}
+
+.afroSelectLogo{
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
+  /* If the PNG has a baked-in white background, multiply makes white become the backing color */
+  mix-blend-mode: multiply;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.50));
+  animation: afroLogoIn 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes afroLogoIn{
+  0%{ transform: translateY(6px) scale(0.85); opacity: 0; }
+  100%{ transform: translateY(0px) scale(1); opacity: 1; }
+}
+
+.afroSelectDots{
+  position: absolute;
+  inset: 0;
+}
+
+.afroSelectDot{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--dot);
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,0.10),
+    0 12px 28px rgba(0,0,0,0.45);
+
+  transform: translate(-50%, -50%) translate(0px, 0px);
+  opacity: 0.0;
+
+  animation:
+    afroDotOut 700ms cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards,
+    afroDotOrbit 1200ms linear 900ms infinite;
+  animation-delay: var(--dot-delay), 900ms;
+}
+
+@keyframes afroDotOut{
+  0%{ transform: translate(-50%, -50%) translate(0px, 0px); opacity: 0.0; }
+  40%{ opacity: 1.0; }
+  100%{ transform: translate(-50%, -50%) translate(var(--dx), var(--dy)); opacity: 1.0; }
+}
+
+@keyframes afroDotOrbit{
+  0%{ transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) rotate(0deg) translateX(0px); }
+  100%{ transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) rotate(360deg) translateX(0px); }
+}
+
+.afroSelectLabel{
+  position: absolute;
+  bottom: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.78);
+}
+
+@media (prefers-reduced-motion: reduce){
+  .afroSelectWave,
+  .afroSelectDot,
+  .afroSelectCenter{
+    animation: none !important;
+    transform: none !important;
+  }
+}

@@ -12,7 +12,7 @@ export function LessonComplete({ interfaceLanguage, xpEarned, onContinue, onBack
   const isEnglish = interfaceLanguage === 'en';
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-8 relative overflow-hidden bg-gradient-to-br from-[#FFB6D9] via-[#9D4EDD] to-[#00FF94]">
+    <div className="min-h-screen flex items-center justify-center p-8 relative overflow-hidden" style={{ background: 'var(--app-bg)' }}>
       {/* Animated Celebration Confetti */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {[...Array(30)].map((_, i) => (

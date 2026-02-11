@@ -1,264 +1,256 @@
-import { useState, useRef, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { InterfaceLanguage } from '../../types';
-import { Moon, Sun, ChevronLeft, ChevronRight } from 'lucide-react';
+import { BookOpen, Compass, Home, Newspaper, Search } from 'lucide-react';
 import { languages } from '../../data/languages';
 import { FlagIcon } from './FlagIcon';
+
+import './InterfaceLanguageSelectorSocial.css';
 
 interface InterfaceLanguageSelectorProps {
   onSelect: (language: InterfaceLanguage) => void;
 }
 
-// UK Flag Component
-function UKFlag() {
-  return (
-    <svg viewBox="0 0 60 40" className="w-8 h-8 sm:w-20 sm:h-20 rounded-lg sm:rounded-xl retro-shadow game-border">
-      <rect width="60" height="40" fill="#012169"/>
-      <path d="M0,0 L60,40 M60,0 L0,40" stroke="#FFFFFF" strokeWidth="8"/>
-      <path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" strokeWidth="4.8"/>
-      <path d="M30,0 L30,40 M0,20 L60,20" stroke="#FFFFFF" strokeWidth="13.3"/>
-      <path d="M30,0 L30,40 M0,20 L60,20" stroke="#C8102E" strokeWidth="8"/>
-    </svg>
-  );
-}
-
-// French Flag Component
-function FrenchFlag() {
-  return (
-    <svg viewBox="0 0 60 40" className="w-8 h-8 sm:w-20 sm:h-20 rounded-lg sm:rounded-xl retro-shadow game-border">
-      <rect width="20" height="40" fill="#002395"/>
-      <rect x="20" width="20" height="40" fill="#FFFFFF"/>
-      <rect x="40" width="20" height="40" fill="#ED2939"/>
-    </svg>
-  );
-}
-
 export function InterfaceLanguageSelector({ onSelect }: InterfaceLanguageSelectorProps) {
-  const [isDark, setIsDark] = useState(false);
   const [logoError, setLogoError] = useState(false);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState<'timeline' | 'about' | 'languages'>('timeline');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const brown = '#6B4F3A'; // dark brown
-  const lightBrown = '#A67B5B';
-  const green = '#10B981'; // text color (bright green like Duolingo)
-  const pink = '#EC4899'; // subtle accent
+  const handleGetStarted = () => onSelect('en');
+  const handleLogin = () => onSelect('en');
 
-  const handleGetStarted = () => onSelect('en'); // default English
-  const handleLogin = () => onSelect('en'); // Navigate to login/auth
-
-  // Check scroll position and update chevron states
-  const updateScrollButtons = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      setCanScrollLeft(scrollLeft > 0);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
-    }
-  };
-
-  // Scroll handlers
-  const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
-    }
-  };
-
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
-    }
-  };
-
-  // Initialize and watch scroll position
-  useEffect(() => {
-    updateScrollButtons();
-    const container = scrollContainerRef.current;
-    if (container) {
-      container.addEventListener('scroll', updateScrollButtons);
-      return () => container.removeEventListener('scroll', updateScrollButtons);
-    }
-  }, []);
+  const visibleLanguages = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return languages;
+    return languages.filter((l) => l.name.toLowerCase().includes(q) || l.nameFr.toLowerCase().includes(q));
+  }, [searchQuery]);
 
   return (
-    <div className={`${isDark ? 'bg-black' : 'bg-white'} min-h-screen flex flex-col`}>
-      {/* Top Section - Logo centered */}
-      <div className="w-full flex justify-center pt-6 sm:pt-8 pb-4">
-        <div className="flex items-center gap-3">
-          {logoError ? (
-            <div className="w-12 h-12 rounded-full" style={{ backgroundColor: isDark ? lightBrown : brown }} />
-          ) : (
-            <img
-              src="/afroslang-logo.png"
-              alt="Afroslang logo"
-              className="w-12 h-12 rounded-full object-contain"
-              onError={() => setLogoError(true)}
-            />
-          )}
-          <span className="text-3xl sm:text-4xl font-extrabold" style={{ color: green }}>
-            Afroslang
-          </span>
-          {/* Theme toggle - small in corner */}
-          <button
-            onClick={() => setIsDark((v) => !v)}
-            className={`ml-4 p-2 rounded-full transition-colors ${
-              isDark ? 'text-white hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100'
-            }`}
-            aria-label="Toggle theme"
-          >
-            {isDark ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Middle Section - Logo and Country Facts */}
-      <div className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
-        <div className="w-full max-w-5xl flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-          {/* Left: Logo */}
-          <div className="flex-shrink-0 flex items-center justify-center">
+    <div className="afroSocialRoot">
+      <aside className="afroSocialLeft">
+        <div className="afroSideHeader">
+          <div className="afroBrand">
             {logoError ? (
-              <div className="w-48 h-48 sm:w-64 sm:h-64 rounded-full" style={{ backgroundColor: isDark ? lightBrown : brown }} />
+              <div className="afroBrandLogo" aria-hidden />
             ) : (
               <img
                 src="/afroslang-logo.png"
                 alt="Afroslang logo"
-                className="w-48 h-48 sm:w-64 sm:h-64 rounded-full object-contain"
+                className="afroBrandLogo"
+                onError={() => setLogoError(true)}
+              />
+            )}
+            <div>
+              <div className="afroBrandName">Afroslang</div>
+              <div className="afroBeta">Beta v1.0 • Parent: Sonoaac</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="afroSideSection">
+          <div className="afroSideTitle">MENU</div>
+          <div className="afroMenu">
+            <button type="button" className="afroMenuButton afroMenuButtonActive">
+              <Home className="afroMenuIcon" />
+              Home
+            </button>
+            <button type="button" className="afroMenuButton">
+              <Newspaper className="afroMenuIcon" />
+              Latest News
+            </button>
+            <button type="button" className="afroMenuButton">
+              <Compass className="afroMenuIcon" />
+              Explore
+            </button>
+            <button type="button" className="afroMenuButton">
+              <BookOpen className="afroMenuIcon" />
+              Learn
+            </button>
+          </div>
+        </div>
+
+        <div className="afroSideSection" style={{ marginTop: 'auto' }}>
+          <div className="afroSideTitle">AFROSLANG</div>
+          <div className="afroSmallText">
+            The free, fun, and effective way to learn African languages.
+          </div>
+        </div>
+      </aside>
+
+      <main className="afroSocialMain">
+        <div className="afroTopBar">
+          <div className="afroSearch" role="search">
+            <Search className="afroMenuIcon" />
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search languages"
+              aria-label="Search languages"
+            />
+          </div>
+          <button type="button" className="afroIconButton" onClick={handleGetStarted} aria-label="Get started">
+            <BookOpen className="afroMenuIcon" />
+          </button>
+        </div>
+
+        <div className="afroMainScroll">
+          <section className="afroProfile">
+            <div className="afroProfileCover" aria-hidden />
+            <div className="afroProfileHeader">
+              <div className="afroProfileAvatar">
+                {logoError ? (
+                  <div className="afroAvatarImg" aria-hidden />
+                ) : (
+                  <img
+                    src="/afroslang-logo.png"
+                    alt="Afroslang logo"
+                    className="afroAvatarImg"
+                    onError={() => setLogoError(true)}
+                  />
+                )}
+                <div>
+                  <div className="afroProfileName">Afroslang</div>
+                  <div className="afroProfileTagline">African language learning • Social profile beta</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="afroProfileMenu" role="tablist" aria-label="Profile navigation">
+              <button
+                type="button"
+                className={`afroProfileTab ${activeTab === 'timeline' ? 'afroProfileTabActive' : ''}`}
+                onClick={() => setActiveTab('timeline')}
+                role="tab"
+                aria-selected={activeTab === 'timeline'}
+              >
+                Timeline
+              </button>
+              <button
+                type="button"
+                className={`afroProfileTab ${activeTab === 'about' ? 'afroProfileTabActive' : ''}`}
+                onClick={() => setActiveTab('about')}
+                role="tab"
+                aria-selected={activeTab === 'about'}
+              >
+                About
+              </button>
+              <button
+                type="button"
+                className={`afroProfileTab ${activeTab === 'languages' ? 'afroProfileTabActive' : ''}`}
+                onClick={() => setActiveTab('languages')}
+                role="tab"
+                aria-selected={activeTab === 'languages'}
+              >
+                Languages
+              </button>
+            </div>
+          </section>
+
+          <section className="afroTimeline">
+            <div>
+              <div className="afroBox">
+                <div className="afroBoxTitle">Introduction</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 12 }}>
+                  <span className="afroPill">Afroslang</span>
+                  <span className="afroPill">Beta v1.0</span>
+                  <span className="afroPill">Parent: Sonoaac</span>
+                </div>
+                <div style={{ display: 'grid', gap: 10 }}>
+                  <div className="afroSmallText">
+                    🌍 Africa is home to over <strong>2,000 languages</strong>, making it the most linguistically diverse continent on Earth.
+                  </div>
+                  <div className="afroSmallText">
+                    Nigeria alone has over <strong>500 languages</strong>, with Hausa, Yoruba, and Igbo among the most widely spoken.
+                  </div>
+                  <div className="afroSmallText">
+                    Swahili is spoken by over <strong>200 million</strong> people across East Africa and is one of the official languages of the African Union.
+                  </div>
+                </div>
+              </div>
+
+              <div className="afroBox" style={{ marginTop: 16 }}>
+                <div className="afroBoxTitle">Featured Languages</div>
+                <div className="afroLanguageGrid" aria-label="Featured languages">
+                  {visibleLanguages.slice(0, 15).map((language) => {
+                    const displayName = language.name.split('(')[0].trim();
+                    return (
+                      <div key={language.id} className="afroLangChip">
+                        <FlagIcon country={language.flags[0]} size="sm" />
+                        <span title={displayName}>{displayName.toUpperCase()}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                {visibleLanguages.length > 15 && (
+                  <div className="afroSmallText" style={{ marginTop: 10 }}>
+                    Showing 15 of {visibleLanguages.length} • use search to filter
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <div className="afroBox">
+                <div className="afroBoxTitle">Get started</div>
+                <div className="afroSmallText">
+                  The free, fun, and effective way to learn African languages.
+                </div>
+                <div className="afroCtaRow">
+                  <button type="button" className="afroPrimaryButton" onClick={handleGetStarted}>
+                    GET STARTED
+                  </button>
+                  <button type="button" className="afroSecondaryButton" onClick={handleLogin}>
+                    I ALREADY HAVE AN ACCOUNT
+                  </button>
+                </div>
+              </div>
+
+              <div className="afroBox" style={{ marginTop: 16 }}>
+                <div className="afroBoxTitle">What you’ll do</div>
+                <div style={{ display: 'grid', gap: 10 }}>
+                  <div className="afroSmallText">Pick a language (Hausa, Yoruba, Igbo, Swahili…)</div>
+                  <div className="afroSmallText">Follow a learning path with quick lessons</div>
+                  <div className="afroSmallText">Build streaks, earn XP, and track progress</div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <aside className="afroSocialRight">
+        <div className="afroRightSection">
+          <div className="afroAccountLine">
+            <div>
+              <div className="afroAccountName">Afroslang</div>
+              <div className="afroSmallText">Landing • Interface select</div>
+            </div>
+            {logoError ? (
+              <div className="afroBrandLogo" aria-hidden />
+            ) : (
+              <img
+                src="/afroslang-logo.png"
+                alt="Afroslang logo"
+                className="afroBrandLogo"
                 onError={() => setLogoError(true)}
               />
             )}
           </div>
-
-          {/* Right: Country Facts Oval Box */}
-          <div className={`flex-1 w-full lg:max-w-md ${isDark ? 'bg-gray-800' : 'bg-white'} rounded-full px-6 py-5 sm:px-8 sm:py-6 lg:px-10 lg:py-8 shadow-lg border-2 ${isDark ? 'border-gray-700' : 'border-gray-200'} flex flex-col`}>
-            <h2 className={`text-lg sm:text-xl lg:text-2xl font-bold mb-3 sm:mb-4 ${isDark ? 'text-white' : 'text-gray-900'} text-center`}>
-              Did You Know?
-            </h2>
-            <div className="space-y-2 sm:space-y-2.5 lg:space-y-3 flex-1 flex flex-col justify-center">
-              <p className={`text-xs sm:text-sm lg:text-base leading-tight ${isDark ? 'text-gray-300' : 'text-gray-700'} text-center`}>
-                <span className="font-semibold">🌍 Africa</span> is home to over <span className="font-bold">2,000 languages</span>, making it the most linguistically diverse continent on Earth.
-              </p>
-              <p className={`text-xs sm:text-sm lg:text-base leading-tight ${isDark ? 'text-gray-300' : 'text-gray-700'} text-center`}>
-                <span className="font-semibold">Nigeria</span> alone has over <span className="font-bold">500 languages</span>, with Hausa, Yoruba, and Igbo among the most widely spoken.
-              </p>
-              <p className={`text-xs sm:text-sm lg:text-base leading-tight ${isDark ? 'text-gray-300' : 'text-gray-700'} text-center`}>
-                <span className="font-semibold">Swahili</span> is spoken by over <span className="font-bold">200 million</span> people across East Africa and is one of the official languages of the African Union.
-              </p>
-            </div>
+        </div>
+        <div className="afroRightSection">
+          <div className="afroSideTitle">DID YOU KNOW?</div>
+          <div className="afroSmallText" style={{ display: 'grid', gap: 10 }}>
+            <div>🌍 Africa has over 2,000 languages.</div>
+            <div>🇳🇬 Nigeria has over 500 languages.</div>
+            <div>🇰🇪 Swahili is spoken by 200M+.</div>
           </div>
         </div>
-      </div>
-
-      {/* Headline Text Section */}
-      <div className="px-4 pb-4">
-        <div className="text-center max-w-2xl mx-auto">
-          <h1 className={`text-3xl sm:text-4xl md:text-5xl font-bold leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            The free, fun, and effective way to
-            <br />
-            <span className="font-extrabold">learn African languages!</span>
-          </h1>
+        <div className="afroRightSection" style={{ borderBottom: 'none' }}>
+          <div className="afroSideTitle">QUICK ACTION</div>
+          <button type="button" className="afroPrimaryButton" onClick={handleGetStarted} style={{ width: '100%' }}>
+            START NOW
+          </button>
         </div>
-      </div>
-
-      {/* Call-to-Action Buttons Section */}
-      <div className="px-4 pb-8">
-        <div className="flex flex-col items-center gap-4 pt-4">
-            {/* Primary Button - GET STARTED (bright green like Duolingo) */}
-            <button
-              onClick={handleGetStarted}
-              className="w-full max-w-xs py-4 px-8 rounded-lg font-bold text-lg text-white uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-offset-2"
-              style={{
-                backgroundColor: green,
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.boxShadow = `0 0 0 4px ${green}40`;
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.boxShadow = '';
-              }}
-            >
-              GET STARTED
-            </button>
-
-            {/* Secondary Button - I ALREADY HAVE AN ACCOUNT */}
-            <button
-              onClick={handleLogin}
-              className={`w-full max-w-xs py-4 px-8 rounded-lg font-bold text-lg uppercase tracking-wide border-2 transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-offset-2 ${
-                isDark 
-                  ? 'bg-transparent border-white/30 text-white hover:border-white/50' 
-                  : 'bg-white border-gray-300 text-blue-600 hover:border-gray-400'
-              }`}
-            >
-              I ALREADY HAVE AN ACCOUNT
-            </button>
-        </div>
-      </div>
-
-      {/* Bottom Section - Language Selector Bar */}
-      <div className={`w-full ${isDark ? 'bg-gray-900' : 'bg-gray-100'} border-t ${isDark ? 'border-gray-800' : 'border-gray-200'} py-4`}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-8">
-          <div className="relative flex items-center">
-            {/* Left Chevron */}
-            <button
-              onClick={scrollLeft}
-              disabled={!canScrollLeft}
-              aria-label="Previous languages"
-              className={`flex-shrink-0 p-2 rounded-full transition-all ${
-                canScrollLeft
-                  ? isDark
-                    ? 'text-white hover:bg-white/10'
-                    : 'text-gray-600 hover:bg-gray-200'
-                  : 'opacity-30 cursor-not-allowed'
-              }`}
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-
-            {/* Scrollable Languages List */}
-            <div
-              ref={scrollContainerRef}
-              className="flex-1 overflow-x-auto scrollbar-hide scroll-smooth mx-4"
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-                WebkitOverflowScrolling: 'touch',
-              }}
-              onScroll={updateScrollButtons}
-            >
-              <div className="flex items-center gap-4 sm:gap-6 py-2">
-                {languages.map((language) => {
-                  const displayName = language.name.split('(')[0].trim();
-                  return (
-                    <button
-                      key={language.id}
-                      className="flex items-center gap-2 sm:gap-3 flex-shrink-0 hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-lg px-2"
-                    >
-                      <FlagIcon country={language.flags[0]} size="sm" />
-                      <span className={`text-sm sm:text-base font-semibold whitespace-nowrap ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                        {displayName.toUpperCase()}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Right Chevron */}
-            <button
-              onClick={scrollRight}
-              disabled={!canScrollRight}
-              aria-label="Next languages"
-              className={`flex-shrink-0 p-2 rounded-full transition-all ${
-                canScrollRight
-                  ? isDark
-                    ? 'text-white hover:bg-white/10'
-                    : 'text-gray-600 hover:bg-gray-200'
-                  : 'opacity-30 cursor-not-allowed'
-              }`}
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
-      </div>
+      </aside>
     </div>
   );
 }
