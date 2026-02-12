@@ -113,6 +113,9 @@
     border-right: 0;
     border-bottom: 1px solid rgba(0,0,0,.08);
     border-radius: 18px 18px 0 0;
+    transform: none;
+    writing-mode: horizontal-tb;
+    align-items: flex-start;
   }
 
   .afroStackSectionHeader h2{

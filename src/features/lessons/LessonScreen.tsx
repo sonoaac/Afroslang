@@ -410,29 +410,21 @@ export function LessonScreen({
   return (
     <div className="min-h-screen flex flex-col touch-manipulation" style={{ background: 'var(--app-bg)' }}>
         {/* Header */}
-        <div className="bg-white/95 backdrop-blur-md game-border border-b-0 px-0.5 sm:px-6 py-0.5 sm:py-4 sticky top-0 z-10">
+        <div className="bg-white/95 backdrop-blur-md game-border border-b-0 px-3 sm:px-6 py-2 sm:py-4 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto">
           {/* Mobile Layout */}
-          <div className="flex flex-col sm:hidden space-y-1">
-            {/* Top Row - Exit and Progress */}
-            <div className="flex items-center justify-between">
-              <button
-                onClick={onExit}
-                className="w-9 h-9 flex items-center justify-center bg-[#FF1493] hover:bg-[#FF69B4] rounded-lg transition-all retro-shadow-sm touch-manipulation"
-                aria-label="Exit lesson"
-              >
-                <X className="w-4 h-4 text-white" strokeWidth={3} />
-              </button>
-              
-              <div className="bg-gradient-to-r from-[#FFD700] to-[#FF6B35] px-2 py-1 rounded-lg game-border retro-shadow-sm">
-                <span className="text-white text-xs font-bold">
-                  {correctAnswers}/{totalQuestions}
-                </span>
-              </div>
-            </div>
-
+          <div className="flex sm:hidden items-center justify-between gap-2">
+            {/* Exit */}
+            <button
+              onClick={onExit}
+              className="w-8 h-8 flex-shrink-0 flex items-center justify-center bg-[#FF1493] hover:bg-[#FF69B4] rounded-lg transition-all retro-shadow-sm touch-manipulation"
+              aria-label="Exit lesson"
+            >
+              <X className="w-4 h-4 text-white" strokeWidth={3} />
+            </button>
+            
             {/* Progress Bar */}
-            <div className="h-2 bg-[#2D2D2D] rounded-full overflow-hidden game-border p-0.5">
+            <div className="flex-1 h-2.5 bg-[#2D2D2D] rounded-full overflow-hidden game-border p-0.5">
               <div 
                 className="h-full bg-gradient-to-r from-[#00FF94] via-[#7FFF00] to-[#FFD700] rounded-full transition-all duration-500 relative overflow-hidden"
                 style={{ width: `${progress}%` }}
@@ -441,24 +433,30 @@ export function LessonScreen({
               </div>
             </div>
 
-            {/* Hearts and Home */}
-            <div className="flex items-center justify-between">
-              <div className="flex gap-0 scale-90 sm:scale-100 origin-left">
-                {heartsData ? (
-                  <HeartsTimer heartsData={heartsData} isSubscribed={isSubscribed} />
-                ) : (
-                  renderHearts()
-                )}
-              </div>
-              
-              <button
-                onClick={onBackToLanguageSelect}
-                className="w-9 h-9 flex items-center justify-center bg-gradient-to-r from-[#9D4EDD] to-[#FFB6D9] hover:scale-110 rounded-lg transition-all retro-shadow-sm touch-manipulation"
-                aria-label="Back to language selection"
-              >
-                <Home className="w-4 h-4 text-white" strokeWidth={3} />
-              </button>
+            {/* Counter */}
+            <div className="bg-gradient-to-r from-[#FFD700] to-[#FF6B35] px-2 py-1 rounded-lg game-border retro-shadow-sm flex-shrink-0">
+              <span className="text-white text-xs font-bold">
+                {correctAnswers}/{totalQuestions}
+              </span>
             </div>
+
+            {/* Hearts */}
+            <div className="flex gap-0.5 scale-75 origin-right flex-shrink-0">
+              {heartsData ? (
+                <HeartsTimer heartsData={heartsData} isSubscribed={isSubscribed} />
+              ) : (
+                renderHearts()
+              )}
+            </div>
+            
+            {/* Home */}
+            <button
+              onClick={onBackToLanguageSelect}
+              className="w-8 h-8 flex-shrink-0 flex items-center justify-center bg-gradient-to-r from-[#9D4EDD] to-[#FFB6D9] hover:scale-110 rounded-lg transition-all retro-shadow-sm touch-manipulation"
+              aria-label="Back to language selection"
+            >
+              <Home className="w-4 h-4 text-white" strokeWidth={3} />
+            </button>
           </div>
 
           {/* Desktop Layout */}
@@ -510,7 +508,7 @@ export function LessonScreen({
       </div>
 
         {/* Exercise Content */}
-        <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 max-w-5xl mx-auto w-full overflow-y-auto">
+        <div className="flex-1 flex flex-col items-center justify-start sm:justify-center p-4 sm:p-8 pb-[30vh] sm:pb-8 max-w-5xl mx-auto w-full overflow-y-auto">
         {/* XP & Type indicator */}
         <div className="mb-4 sm:mb-8 flex flex-col sm:flex-row items-center gap-2 sm:gap-4 flex-shrink-0">
           <div className="bg-white px-3 sm:px-8 py-2 sm:py-3 rounded-lg sm:rounded-2xl game-border retro-shadow-sm flex items-center gap-2 sm:gap-3">
@@ -537,7 +535,7 @@ export function LessonScreen({
         </div>
 
         {/* Question Box */}
-        <div className="w-full bg-white rounded-lg sm:rounded-3xl p-4 sm:p-10 game-border retro-shadow-lg mb-4 sm:mb-10">
+        <div className="w-full max-w-3xl mx-auto bg-white rounded-lg sm:rounded-3xl p-4 sm:p-10 game-border retro-shadow-lg mb-4 sm:mb-10">
           <h2 className="text-xl sm:text-4xl text-center text-[#1A1A1A] leading-tight font-semibold">
             {isEnglish ? currentExercise.question : currentExercise.questionFr}
           </h2>
@@ -550,7 +548,7 @@ export function LessonScreen({
 
         {/* Multiple Choice */}
         {currentExercise.type === 'multiple-choice' && currentExercise.options && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 w-full max-w-3xl mx-auto">
             {getOptions().map((option, index) => {
               const isSelected = userAnswer === option;
               const isCorrectAnswer = option === getCorrectAnswer();
@@ -575,7 +573,7 @@ export function LessonScreen({
                       ${showFeedback ? 'cursor-not-allowed' : 'sm:hover:retro-shadow-lg active:retro-shadow-lg'}
                     `}
                   style={{
-                    backgroundColor: !isSelected && !showCorrect && !showIncorrect ? answerColors[index % 4] + '20' : undefined
+                    backgroundColor: !isSelected && !showCorrect && !showIncorrect ? answerColors[index % 4] + '33' : undefined
                   }}
                 >
                   <span className={`text-base sm:text-2xl font-semibold ${showCorrect || showIncorrect || isSelected ? 'text-white' : 'text-[#1A1A1A]'}`}>
@@ -607,7 +605,7 @@ export function LessonScreen({
               disabled={showFeedback}
               placeholder={isEnglish ? 'Type your answer...' : 'Tapez votre réponse...'}
               className={`
-                w-full p-4 sm:p-8 rounded-xl sm:rounded-3xl game-border text-base sm:text-2xl text-center transition-all min-h-[56px] sm:min-h-auto font-semibold
+                w-full p-3 sm:p-8 rounded-xl sm:rounded-3xl game-border text-base sm:text-2xl text-center transition-all min-h-[52px] sm:min-h-auto font-semibold
                 ${showFeedback
                   ? isCorrect
                     ? 'bg-gradient-to-r from-[#00FF94] to-[#7FFF00] text-white retro-shadow-lg'
