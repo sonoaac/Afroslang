@@ -431,3 +431,99 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+@media (max-width: 768px) {
+  .afroSocialRoot {
+    flex-direction: column;
+  }
+
+  .afroSocialLeft,
+  .afroSocialRight {
+    width: 100%;
+    border: 0;
+  }
+
+  .afroSideHeader {
+    position: static;
+  }
+
+  .afroMenu {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .afroMenuButton {
+    flex: 1 1 calc(50% - 10px);
+    justify-content: center;
+  }
+
+  .afroTopBar {
+    height: auto;
+    flex-wrap: wrap;
+    padding: 12px 14px;
+  }
+
+  .afroSearch {
+    width: 100%;
+  }
+
+  .afroMainScroll {
+    padding: 14px;
+  }
+
+  .afroProfileHeader {
+    height: 200px;
+  }
+
+  .afroProfileAvatar {
+    left: 14px;
+    bottom: 12px;
+    gap: 10px;
+  }
+
+  .afroAvatarImg {
+    width: 72px;
+    height: 72px;
+  }
+
+  .afroProfileName {
+    font-size: 20px;
+  }
+
+  .afroProfileTagline {
+    font-size: 12px;
+  }
+
+  .afroProfileMenu {
+    flex-wrap: wrap;
+  }
+
+  .afroProfileTab {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .afroMenuButton {
+    flex: 1 1 100%;
+  }
+
+  .afroLanguageGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .afroCtaRow {
+    flex-direction: column;
+  }
+
+  .afroPrimaryButton,
+  .afroSecondaryButton {
+    width: 100%;
+    text-align: center;
+  }
+
+  .afroBox {
+    padding: 14px;
+  }
+}

@@ -18,7 +18,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-6xl mx-auto px-6 py-8 sm:py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
         {/* Header */}
         <div className="mb-8">
           <button
@@ -36,10 +36,10 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
         </div>
 
         {/* Currency Display */}
-        <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-xl p-6 mb-8 border-2 border-amber-200">
-          <div className="flex items-center justify-around">
+        <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-xl p-4 sm:p-6 mb-8 border-2 border-amber-200">
+          <div className="flex flex-col sm:flex-row items-center justify-around gap-6 sm:gap-0">
             {/* Gems */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-center">
               <div className="bg-white rounded-full p-3 shadow-lg">
                 <Gem className="w-8 h-8 text-blue-500" />
               </div>
@@ -54,10 +54,10 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
             </div>
 
             {/* Divider */}
-            <div className="w-px h-16 bg-amber-300"></div>
+            <div className="hidden sm:block w-px h-16 bg-amber-300"></div>
 
             {/* Sandbits */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-center">
               <div className="bg-white rounded-full p-3 shadow-lg">
                 <SandbitsIcon size={32} className="text-amber-700" />
               </div>
@@ -74,7 +74,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
         </div>
 
         {/* Shop Items */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Example Shop Items */}
           <div className="bg-white rounded-xl border-2 border-gray-200 p-6 hover:border-blue-500 transition-all hover:shadow-lg">
             <div className="text-center">
@@ -132,7 +132,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
         </div>
 
         {/* Info Section */}
-        <div className="mt-12 bg-gray-50 rounded-xl p-6 border border-gray-200">
+        <div className="mt-12 bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-200">
           <h2 className="text-xl font-bold text-gray-900 mb-4">
             {isEnglish ? 'About Currencies' : 'À Propos des Devises'}
           </h2>

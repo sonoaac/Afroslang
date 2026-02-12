@@ -110,6 +110,20 @@
   }
 }
 
+@media (max-width: 640px) {
+  .afroCard3d {
+    --w: 13.5em;
+  }
+
+  .afroCardTitle {
+    font-size: 0.95em;
+  }
+
+  .afroCardSubtitle {
+    font-size: 0.85em;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .afroA3d {
     animation-duration: 120s;

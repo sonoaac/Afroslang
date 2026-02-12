@@ -123,22 +123,22 @@ export function LanguageSelectionScreen({
         logoSrc="/afrolingologo.png"
       />
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-6 py-8 sm:py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
         {/* Logo and Site Language Selector - moved from header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
           {/* Left: Logo */}
           <div className="flex items-center gap-3">
             {logoError ? (
-              <div className="w-10 h-10 rounded-full" style={{ backgroundColor: brown }} />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full" style={{ backgroundColor: brown }} />
             ) : (
               <img
                 src="/afroslang-logo.png"
                 alt="Afroslang logo"
-                className="w-10 h-10 rounded-full object-contain"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-contain"
                 onError={() => setLogoError(true)}
               />
             )}
-            <span className="text-2xl font-bold text-gray-900">
+            <span className="text-xl sm:text-2xl font-bold text-gray-900">
               afroslang
             </span>
           </div>
@@ -149,7 +149,7 @@ export function LanguageSelectionScreen({
               onClick={() => setShowSiteLanguageDropdown(!showSiteLanguageDropdown)}
               className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100"
             >
-              <span className="text-sm font-medium">
+              <span className="text-[11px] sm:text-sm font-medium tracking-wide max-w-[200px] sm:max-w-none">
                 {isEnglish ? 'SITE LANGUAGE: ENGLISH' : 'LANGUE DU SITE: FRANÇAIS'}
               </span>
               <ChevronDown className="w-4 h-4" />
@@ -185,7 +185,7 @@ export function LanguageSelectionScreen({
           </div>
         </div>
         {/* Heading */}
-        <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-gray-900 mb-8 text-center">
+        <h1 className="text-3xl sm:text-6xl font-black tracking-tight text-gray-900 mb-6 sm:mb-8 text-center">
           {isEnglish ? 'Choose an African language to begin' : 'Choisissez une langue africaine pour commencer'}
         </h1>
 
@@ -196,7 +196,7 @@ export function LanguageSelectionScreen({
           </div>
         </div>
 
-        <div className="afroScene py-10" ref={carouselRef}>
+        <div className="afroScene py-6 sm:py-10" ref={carouselRef}>
           <div className="afroA3d" style={{ ['--n' as any]: languages.length }}>
             {languages.map((language, index) => (
               <LanguageCarouselCard

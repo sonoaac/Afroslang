@@ -418,13 +418,13 @@ export function LessonScreen({
             <div className="flex items-center justify-between">
               <button
                 onClick={onExit}
-                className="p-1 bg-[#FF1493] hover:bg-[#FF69B4] rounded-lg transition-all retro-shadow-sm touch-manipulation"
+                className="w-9 h-9 flex items-center justify-center bg-[#FF1493] hover:bg-[#FF69B4] rounded-lg transition-all retro-shadow-sm touch-manipulation"
                 aria-label="Exit lesson"
               >
-                <X className="w-3 h-3 text-white" strokeWidth={3} />
+                <X className="w-4 h-4 text-white" strokeWidth={3} />
               </button>
               
-              <div className="bg-gradient-to-r from-[#FFD700] to-[#FF6B35] px-1 py-0.5 rounded-lg game-border retro-shadow-sm">
+              <div className="bg-gradient-to-r from-[#FFD700] to-[#FF6B35] px-2 py-1 rounded-lg game-border retro-shadow-sm">
                 <span className="text-white text-xs font-bold">
                   {correctAnswers}/{totalQuestions}
                 </span>
@@ -443,7 +443,7 @@ export function LessonScreen({
 
             {/* Hearts and Home */}
             <div className="flex items-center justify-between">
-              <div className="flex gap-0">
+              <div className="flex gap-0 scale-90 sm:scale-100 origin-left">
                 {heartsData ? (
                   <HeartsTimer heartsData={heartsData} isSubscribed={isSubscribed} />
                 ) : (
@@ -453,10 +453,10 @@ export function LessonScreen({
               
               <button
                 onClick={onBackToLanguageSelect}
-                className="p-1 bg-gradient-to-r from-[#9D4EDD] to-[#FFB6D9] hover:scale-110 rounded-lg transition-all retro-shadow-sm touch-manipulation"
+                className="w-9 h-9 flex items-center justify-center bg-gradient-to-r from-[#9D4EDD] to-[#FFB6D9] hover:scale-110 rounded-lg transition-all retro-shadow-sm touch-manipulation"
                 aria-label="Back to language selection"
               >
-                <Home className="w-3 h-3 text-white" strokeWidth={3} />
+                <Home className="w-4 h-4 text-white" strokeWidth={3} />
               </button>
             </div>
           </div>
