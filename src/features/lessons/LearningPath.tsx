@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { InterfaceLanguage, Stage, Lesson, UserProgress } from '../../types';
 import { Home, Trophy as TrophyIcon, Store, User, Settings, Star, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -46,6 +46,13 @@ export function LearningPath({
   >('learn');
   const [guidebookStage, setGuidebookStage] = useState<number | null>(null);
   const { user, userData, isGuest } = useAuth();
+  const mainRef = useRef<HTMLElement>(null);
+
+  // Scroll to top on mount
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
 
   const currentLanguage = currentLanguageId ? getLanguageById(currentLanguageId) : null;
   const langName = currentLanguage?.name ?? currentLanguageId ?? '';
@@ -279,7 +286,7 @@ export function LearningPath({
         </header>
 
         {/* Lesson path */}
-        <main className="lp-main">
+        <main className="lp-main" ref={mainRef}>
           <div className="lp-path-col">
 
             {Array.from({ length: 7 }).map((_, stageIndex) => {
