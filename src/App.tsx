@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { InterfaceLanguage, AfricanLanguage, UserProgress, Lesson } from './types';
 import { AfroslangIntro } from './components/intro/AfroslangIntro';
 import { LandingPage } from './components/landing/LandingPage';
+import { SplashScreen } from './components/splash/SplashScreen';
 import { InterfaceLanguageSelector } from './features/language-select/InterfaceLanguageSelector';
 import { LanguageSelectionScreen } from './features/language-select/LanguageSelectionScreen';
 import { LearningPath } from './features/lessons/LearningPath';
@@ -24,13 +25,22 @@ type Screen = 'auth' | 'interface-select' | 'language-select' | 'path' | 'lesson
 function App() {
   const { user, userData, isGuest, loading } = useAuth();
   const [currentScreen, setCurrentScreen] = useState<Screen>('auth');
-  // Show intro once per session; after it completes show landing page
+  // Show intro once per session; after it completes show splash
   const [showIntro, setShowIntro] = useState<boolean>(
     () => sessionStorage.getItem('afro_intro_seen') !== '1'
   );
   const handleIntroComplete = useCallback(() => {
     sessionStorage.setItem('afro_intro_seen', '1');
     setShowIntro(false);
+  }, []);
+
+  // Show splash (shattering text) once per session, after auth resolves
+  const [showSplash, setShowSplash] = useState(false);
+  const splashSeen = sessionStorage.getItem('afro_splash_seen') === '1';
+  const handleSplashComplete = useCallback(() => {
+    sessionStorage.setItem('afro_splash_seen', '1');
+    setShowSplash(false);
+    setCurrentScreen('interface-select');
   }, []);
   const [interfaceLanguage, setInterfaceLanguage] = useState<InterfaceLanguage>('en');
   const [currentLanguage, setCurrentLanguage] = useState<AfricanLanguage | null>(null);
@@ -330,16 +340,25 @@ function App() {
     };
   };
 
-  // Handle authentication state changes
+  // Handle authentication state changes → show splash first (once per session)
   useEffect(() => {
     if (!loading && (user || isGuest) && currentScreen === 'auth') {
-      setCurrentScreen('interface-select');
+      if (!splashSeen) {
+        setShowSplash(true);
+      } else {
+        setCurrentScreen('interface-select');
+      }
     }
-  }, [user, isGuest, loading, currentScreen]);
+  }, [user, isGuest, loading, currentScreen, splashSeen]);
 
-  // Intro splash (plays once per session, on top of everything)
+  // 1. Logo intro (once per session)
   if (showIntro) {
     return <AfroslangIntro onComplete={handleIntroComplete} />;
+  }
+
+  // 2. Shattering text splash (once per session, after auth)
+  if (showSplash) {
+    return <SplashScreen onComplete={handleSplashComplete} />;
   }
 
   // Show loading screen while checking authentication

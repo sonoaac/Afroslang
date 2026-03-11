@@ -1,0 +1,147 @@
+/* ═══════════════════════════════════════════
+   Afroslang · Splash Screen
+   Shattering text assembly animation
+   Black × Red · Times New Roman
+   ═══════════════════════════════════════════ */
+
+.sp-root {
+  position: fixed;
+  inset: 0;
+  background: #080808;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+/* ── Idle state (before play is tapped) ── */
+.sp-idle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.4rem;
+  animation: sp-fadein 0.6s ease both;
+}
+
+@keyframes sp-fadein {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.sp-wordmark {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: clamp(2rem, 10vw, 5.5rem);
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  color: #fff;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.sp-wordmark span {
+  color: #b00020;
+}
+
+.sp-tagline {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: clamp(0.68rem, 2vw, 0.88rem);
+  letter-spacing: 0.35em;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  margin-top: -1.4rem;
+}
+
+.sp-play-btn {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #b00020;
+  border: none;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  animation: sp-pulse 2.4s ease-in-out infinite;
+  margin-top: 0.5rem;
+  flex-shrink: 0;
+}
+.sp-play-btn:hover  { background: #e53935; transform: scale(1.1); }
+.sp-play-btn:active { transform: scale(0.95); }
+
+@keyframes sp-pulse {
+  0%, 100% { box-shadow: 0 0 0 0   rgba(176,0,32,0.55); }
+  50%       { box-shadow: 0 0 0 26px rgba(176,0,32,0);   }
+}
+
+/* ── Phrase counter dots ── */
+.sp-dots {
+  display: flex;
+  gap: 8px;
+  margin-top: 0.5rem;
+}
+.sp-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  transition: background 0.3s, transform 0.3s;
+}
+.sp-dot--active {
+  background: #b00020;
+  transform: scale(1.4);
+}
+
+/* ── Stage (animated text) ── */
+.sp-stage {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  max-width: min(88vw, 740px);
+  padding: 0 1rem;
+  gap: 0;
+  line-height: 1.35;
+}
+
+.sp-space {
+  display: inline-block;
+  width: 0.32em;
+}
+
+/* Each character glyph */
+.sp-glyph {
+  display: inline-block;
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: clamp(1.6rem, 5.5vw, 3.2rem);
+  font-weight: 900;
+  color: #fff;
+  /* Default: scattered / invisible */
+  transform: translate(var(--gx), var(--gy)) rotate(var(--gr)) scale(0);
+  opacity: 0;
+  transition:
+    transform 0.72s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity   0.5s  ease;
+  transition-delay: var(--gd);
+  will-change: transform, opacity;
+}
+
+/* Assembled: fly to center */
+.sp-glyph--in {
+  transform: translate(0, 0) rotate(0deg) scale(1);
+  opacity: 1;
+}
+
+/* Exiting: scatter back out */
+.sp-glyph--out {
+  transform: translate(var(--gx), var(--gy)) rotate(var(--gr)) scale(0);
+  opacity: 0;
+  transition-delay: var(--god);
+}
+
+/* Last phrase gets a red highlight on key word */
+.sp-glyph--accent {
+  color: #e53935;
+}
