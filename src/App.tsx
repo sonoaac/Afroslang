@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { InterfaceLanguage, AfricanLanguage, UserProgress, Lesson } from './types';
 import { AfroslangIntro } from './components/intro/AfroslangIntro';
 import { LandingPage } from './components/landing/LandingPage';
@@ -34,11 +34,13 @@ function App() {
     setShowIntro(false);
   }, []);
 
-  // Show splash (shattering text) once per session, after auth resolves
+  // Show splash (shattering text) once per session, ONLY after user explicitly
+  // chooses sign up / log in / guest on the LandingPage
   const [showSplash, setShowSplash] = useState(false);
-  const splashSeen = sessionStorage.getItem('afro_splash_seen') === '1';
+  // Track whether the user was already authenticated when the app loaded
+  // (returning user — they don't go through LandingPage so no splash)
+  const wasAuthOnLoad = useRef<boolean | null>(null);
   const handleSplashComplete = useCallback(() => {
-    sessionStorage.setItem('afro_splash_seen', '1');
     setShowSplash(false);
     setCurrentScreen('interface-select');
   }, []);
@@ -340,16 +342,28 @@ function App() {
     };
   };
 
-  // Handle authentication state changes → show splash first (once per session)
+  // Record whether the user was already authenticated when the app first loaded.
+  // This runs once after Firebase resolves the initial auth state.
+  useEffect(() => {
+    if (!loading && wasAuthOnLoad.current === null) {
+      wasAuthOnLoad.current = !!(user || isGuest);
+    }
+  }, [loading, user, isGuest]);
+
+  // Handle authentication state changes:
+  // — If they were ALREADY auth'd on load (returning user) → skip splash, go straight to interface-select
+  // — If they just chose sign up / log in / guest this session → show splash first
   useEffect(() => {
     if (!loading && (user || isGuest) && currentScreen === 'auth') {
-      if (!splashSeen) {
+      if (wasAuthOnLoad.current === false) {
+        // User just authenticated this session (came through LandingPage)
         setShowSplash(true);
       } else {
+        // Returning user — already auth'd on load
         setCurrentScreen('interface-select');
       }
     }
-  }, [user, isGuest, loading, currentScreen, splashSeen]);
+  }, [user, isGuest, loading, currentScreen]);
 
   // 1. Logo intro (once per session)
   if (showIntro) {
