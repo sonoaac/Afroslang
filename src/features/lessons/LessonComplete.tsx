@@ -1,5 +1,5 @@
 import { InterfaceLanguage } from '../../types';
-import { Trophy, Star, Flame, Award, Sparkles, Zap, Home } from 'lucide-react';
+import { Trophy, Star, Flame, Award, Zap, Home } from 'lucide-react';
 
 interface LessonCompleteProps {
   interfaceLanguage: InterfaceLanguage;
@@ -8,138 +8,248 @@ interface LessonCompleteProps {
   onBackToLanguageSelect: () => void;
 }
 
+const lcStyle: Record<string, React.CSSProperties> = {
+  page: {
+    minHeight: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '1.5rem',
+    background: '#080808',
+    fontFamily: "'Times New Roman', Georgia, serif",
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  glow: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '600px',
+    height: '600px',
+    background: 'radial-gradient(circle, rgba(176,0,32,0.08) 0%, transparent 70%)',
+    pointerEvents: 'none',
+  },
+  wrapper: {
+    maxWidth: '700px',
+    width: '100%',
+    position: 'relative',
+    zIndex: 1,
+  },
+  homeRow: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginBottom: '1.5rem',
+  },
+  homeBtn: {
+    background: '#111',
+    border: '1px solid rgba(255,255,255,0.08)',
+    color: '#fff',
+    width: 44,
+    height: 44,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    transition: 'border-color 0.2s',
+  },
+  card: {
+    background: '#111',
+    border: '1px solid rgba(255,255,255,0.08)',
+    padding: '2.5rem 2rem',
+    textAlign: 'center',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  cardTopLine: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '2px',
+    background: '#b00020',
+  },
+  trophyWrap: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginBottom: '2rem',
+  },
+  trophyCircle: {
+    width: 96,
+    height: 96,
+    background: 'transparent',
+    border: '1px solid rgba(176,0,32,0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  completeLabel: {
+    fontFamily: "'Times New Roman', Georgia, serif",
+    fontSize: 'clamp(2rem, 6vw, 4rem)',
+    fontWeight: 'bold',
+    color: '#ffffff',
+    textTransform: 'uppercase',
+    letterSpacing: '0.12em',
+    marginBottom: '0.5rem',
+  },
+  subtitle: {
+    fontFamily: "'Times New Roman', Georgia, serif",
+    fontSize: '1.1rem',
+    color: 'rgba(255,255,255,0.6)',
+    marginBottom: '2rem',
+    letterSpacing: '0.05em',
+  },
+  xpBox: {
+    background: '#080808',
+    border: '1px solid rgba(176,0,32,0.4)',
+    padding: '1.5rem',
+    marginBottom: '2rem',
+    display: 'inline-block',
+    width: '100%',
+  },
+  xpLabel: {
+    fontFamily: "'Times New Roman', Georgia, serif",
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: '0.8rem',
+    textTransform: 'uppercase',
+    letterSpacing: '0.2em',
+    marginBottom: '0.5rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.5rem',
+  },
+  xpValue: {
+    fontFamily: "'Times New Roman', Georgia, serif",
+    fontSize: 'clamp(3rem, 10vw, 6rem)',
+    fontWeight: 'bold',
+    color: '#b00020',
+    lineHeight: 1,
+  },
+  statsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '0.75rem',
+    marginBottom: '2rem',
+  },
+  statCard: {
+    background: '#080808',
+    border: '1px solid rgba(255,255,255,0.06)',
+    padding: '1rem 0.5rem',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    gap: '0.4rem',
+  },
+  statLabel: {
+    fontFamily: "'Times New Roman', Georgia, serif",
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: '0.7rem',
+    textTransform: 'uppercase',
+    letterSpacing: '0.1em',
+  },
+  continueBtn: {
+    width: '100%',
+    background: '#b00020',
+    border: 'none',
+    color: '#fff',
+    fontFamily: "'Times New Roman', Georgia, serif",
+    fontSize: 'clamp(1rem, 3vw, 1.4rem)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.15em',
+    padding: '1.1rem 2rem',
+    cursor: 'pointer',
+    transition: 'background 0.2s',
+    marginBottom: '1.25rem',
+  },
+  motiveLine: {
+    fontFamily: "'Times New Roman', Georgia, serif",
+    color: 'rgba(255,255,255,0.35)',
+    fontSize: '0.85rem',
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+  },
+};
+
 export function LessonComplete({ interfaceLanguage, xpEarned, onContinue, onBackToLanguageSelect }: LessonCompleteProps) {
   const isEnglish = interfaceLanguage === 'en';
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-8 relative overflow-hidden" style={{ background: 'var(--app-bg)' }}>
-      {/* Animated Celebration Confetti */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(30)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute text-5xl animate-float"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 2}s`,
-              animationDuration: `${2 + Math.random() * 3}s`
-            }}
-          >
-            {['🎉', '⭐', '🌟', '✨', '🎊', '💫', '🏆', '🔥', '💎'][Math.floor(Math.random() * 9)]}
-          </div>
-        ))}
-      </div>
+    <div style={lcStyle.page}>
+      {/* Subtle red glow */}
+      <div style={lcStyle.glow} />
 
-      {/* Rotating background shapes */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 left-20 w-64 h-64 bg-[#FF1493] rounded-full opacity-30 blur-3xl animate-float"></div>
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-[#00FF94] rounded-full opacity-30 blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#FFD700] rounded-full opacity-20 blur-3xl animate-pulse"></div>
-      </div>
-
-      <div className="max-w-4xl w-full relative z-10">
-        {/* Home Button - Top Right */}
-        <div className="flex justify-end mb-6 animate-fadeIn">
+      <div style={lcStyle.wrapper}>
+        {/* Home Button */}
+        <div style={lcStyle.homeRow}>
           <button
             onClick={onBackToLanguageSelect}
-            className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-r from-[#9D4EDD] to-[#FFB6D9] game-border retro-shadow flex items-center justify-center hover:scale-110 hover:retro-shadow-lg transition-all group"
+            style={lcStyle.homeBtn}
             aria-label="Back to language selection"
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#b00020'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.08)'; }}
           >
-            <Home className="w-6 h-6 sm:w-8 sm:h-8 text-white" strokeWidth={3} />
+            <Home style={{ width: 20, height: 20 }} strokeWidth={2} />
           </button>
         </div>
 
-        <div className="bg-white rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-16 retro-shadow-lg game-border text-center space-y-8 sm:space-y-10 animate-fadeIn">
-          {/* Trophy Animation */}
-          <div className="flex justify-center">
-            <div className="relative">
-              <div className="w-28 h-28 sm:w-40 sm:h-40 bg-gradient-to-br from-[#FFD700] via-[#FF6B35] to-[#FF1493] rounded-full flex items-center justify-center retro-shadow-lg game-border animate-bounce">
-                <Trophy className="w-14 h-14 sm:w-20 sm:h-20 text-white" strokeWidth={3} />
-              </div>
-              <div className="absolute -top-5 -right-5 sm:-top-6 sm:-right-6 w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-br from-[#00FF94] to-[#7FFF00] rounded-full flex items-center justify-center retro-shadow game-border animate-pulse">
-                <Star className="w-8 h-8 sm:w-12 sm:h-12 text-white fill-white" />
-              </div>
-              <div className="absolute -bottom-3 -left-3 sm:-bottom-4 sm:-left-4 w-14 h-14 sm:w-20 sm:h-20 bg-gradient-to-br from-[#9D4EDD] to-[#FF69B4] rounded-full flex items-center justify-center retro-shadow game-border animate-pulse" style={{ animationDelay: '0.5s' }}>
-                <Sparkles className="w-7 h-7 sm:w-10 sm:h-10 text-white" />
-              </div>
+        <div style={lcStyle.card}>
+          <div style={lcStyle.cardTopLine} />
+
+          {/* Trophy */}
+          <div style={lcStyle.trophyWrap}>
+            <div style={lcStyle.trophyCircle}>
+              <Trophy style={{ width: 48, height: 48, color: '#b00020' }} strokeWidth={1.5} />
             </div>
           </div>
 
-          {/* Success Message */}
-          <div className="space-y-6">
-            <h1 className="text-4xl sm:text-6xl text-transparent bg-gradient-to-r from-[#FF1493] via-[#9D4EDD] to-[#00FF94] bg-clip-text uppercase tracking-wider animate-pulse">
-              {isEnglish ? '🎊 VICTORY! 🎊' : '🎊 VICTOIRE! 🎊'}
-            </h1>
-            <h2 className="text-2xl sm:text-4xl text-[#1A1A1A]">
-              {isEnglish ? 'Lesson Complete!' : 'Leçon Terminée!'}
-            </h2>
-            <p className="text-base sm:text-2xl text-[#4A4A4A] max-w-2xl mx-auto leading-relaxed">
-              {isEnglish 
-                ? 'You absolutely CRUSHED it! Keep that momentum going! 🚀'
-                : 'Vous avez TOUT DÉCHIRÉ! Gardez cet élan! 🚀'}
-            </p>
+          {/* Heading */}
+          <h1 style={lcStyle.completeLabel}>
+            {isEnglish ? 'Complete' : 'Terminé'}
+          </h1>
+          <p style={lcStyle.subtitle}>
+            {isEnglish ? 'Lesson complete' : 'Leçon terminée'}
+          </p>
+
+          {/* XP Display */}
+          <div style={lcStyle.xpBox}>
+            <div style={lcStyle.xpLabel}>
+              <Zap style={{ width: 14, height: 14, color: '#b00020' }} />
+              {isEnglish ? 'XP Earned' : 'XP Gagné'}
+              <Zap style={{ width: 14, height: 14, color: '#b00020' }} />
+            </div>
+            <div style={lcStyle.xpValue}>+{xpEarned}</div>
           </div>
 
-          {/* XP Display - Big and Bold */}
-          <div className="relative">
-            <div className="bg-gradient-to-r from-[#FFD700] via-[#FF6B35] to-[#FFD700] rounded-3xl p-6 sm:p-10 game-border retro-shadow-lg animate-neonGlow">
-              <div className="flex items-center justify-center gap-6 mb-4">
-                <Zap className="w-10 h-10 sm:w-14 sm:h-14 text-white animate-pulse" />
-                <p className="text-lg sm:text-3xl text-white uppercase tracking-wider">
-                  {isEnglish ? 'XP EARNED' : 'XP GAGNÉ'}
-                </p>
-                <Zap className="w-10 h-10 sm:w-14 sm:h-14 text-white animate-pulse" style={{ animationDelay: '0.5s' }} />
-              </div>
-              <div className="relative">
-                <p className="text-5xl sm:text-8xl text-white drop-shadow-lg">
-                  +{xpEarned}
-                </p>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-full h-full bg-white/20 blur-xl rounded-full animate-pulse"></div>
-                </div>
-              </div>
+          {/* Stats row */}
+          <div style={lcStyle.statsGrid}>
+            <div style={lcStyle.statCard}>
+              <Flame style={{ width: 20, height: 20, color: '#b00020' }} strokeWidth={1.5} />
+              <span style={lcStyle.statLabel}>{isEnglish ? 'On Fire' : 'En Feu'}</span>
             </div>
-          </div>
-
-          {/* Stats & Achievements */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-            <div className="bg-gradient-to-br from-[#FF1493] to-[#FF69B4] rounded-2xl p-6 game-border retro-shadow transform hover:scale-105 transition-all">
-              <div className="flex flex-col items-center gap-3 text-white">
-                <Flame className="w-12 h-12" />
-                <p className="text-base sm:text-xl uppercase tracking-wider">{isEnglish ? 'ON FIRE!' : 'EN FEU!'}</p>
-              </div>
+            <div style={lcStyle.statCard}>
+              <Star style={{ width: 20, height: 20, color: '#b00020' }} strokeWidth={1.5} />
+              <span style={lcStyle.statLabel}>{isEnglish ? 'Star' : 'Étoile'}</span>
             </div>
-            
-            <div className="bg-gradient-to-br from-[#9D4EDD] to-[#FFB6D9] rounded-2xl p-6 game-border retro-shadow transform hover:scale-105 transition-all">
-              <div className="flex flex-col items-center gap-3 text-white">
-                <Star className="w-12 h-12 fill-white" />
-                <p className="text-base sm:text-xl uppercase tracking-wider">{isEnglish ? 'SUPERSTAR!' : 'SUPERSTAR!'}</p>
-              </div>
-            </div>
-            
-            <div className="bg-gradient-to-br from-[#00FF94] to-[#7FFF00] rounded-2xl p-6 game-border retro-shadow transform hover:scale-105 transition-all">
-              <div className="flex flex-col items-center gap-3 text-white">
-                <Award className="w-12 h-12" />
-                <p className="text-base sm:text-xl uppercase tracking-wider">{isEnglish ? 'CHAMPION!' : 'CHAMPION!'}</p>
-              </div>
+            <div style={lcStyle.statCard}>
+              <Award style={{ width: 20, height: 20, color: '#b00020' }} strokeWidth={1.5} />
+              <span style={lcStyle.statLabel}>{isEnglish ? 'Champion' : 'Champion'}</span>
             </div>
           </div>
 
-          {/* Continue Button - BIG */}
+          {/* Continue Button */}
           <button
             onClick={onContinue}
-            className="w-full py-5 sm:py-8 rounded-3xl bg-gradient-to-r from-[#00FF94] via-[#7FFF00] to-[#00FF94] text-white game-border retro-shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 text-2xl sm:text-4xl uppercase tracking-wider animate-pulse hover:animate-none"
+            style={lcStyle.continueBtn}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#e53935'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#b00020'; }}
           >
-            {isEnglish ? '🚀 CONTINUE →' : '🚀 CONTINUER →'}
+            {isEnglish ? 'Continue →' : 'Continuer →'}
           </button>
 
-          {/* Fun Motivational Message */}
-          <div className="pt-4">
-            <p className="text-base sm:text-2xl text-[#4A4A4A] animate-bounce">
-              {isEnglish ? '⚡ You\'re unstoppable! ⚡' : '⚡ Vous êtes imbattable! ⚡'}
-            </p>
-          </div>
+          <p style={lcStyle.motiveLine}>
+            {isEnglish ? "You're unstoppable" : 'Vous êtes imbattable'}
+          </p>
         </div>
       </div>
     </div>

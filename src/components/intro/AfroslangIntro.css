@@ -1,0 +1,335 @@
+/* ─────────────────────────────────────────────
+   Afroslang Intro  –  Netflix-inspired, green/black
+   ───────────────────────────────────────────── */
+
+.afro-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── Fade out whole screen when done ── */
+.afro-intro--fadeout {
+  animation: introFadeOut 0.7s ease-in forwards;
+}
+
+@keyframes introFadeOut {
+  to { opacity: 0; pointer-events: none; }
+}
+
+/* ── Zoom effect (Netflix-style) ── */
+.afro-intro--zoom .afro-intro-stage {
+  animation: introZoom 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes introZoom {
+  0%   { transform: scale(1);  opacity: 1; }
+  70%  { transform: scale(9);  opacity: 1; }
+  100% { transform: scale(9);  opacity: 0; }
+}
+
+/* ── Background rain streaks ── */
+.afro-intro-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.18;
+}
+
+.afro-intro-bg::before,
+.afro-intro-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      168deg,
+      transparent 0px,
+      transparent 3px,
+      rgba(34,197,94,0.4) 3px,
+      rgba(34,197,94,0.4) 4px,
+      transparent 4px,
+      transparent 44px
+    );
+  animation: bgRainDrift 1.8s linear infinite;
+}
+
+.afro-intro-bg::after {
+  opacity: 0.5;
+  background-image:
+    repeating-linear-gradient(
+      168deg,
+      transparent 0px,
+      transparent 7px,
+      rgba(74,222,128,0.3) 7px,
+      rgba(74,222,128,0.3) 8px,
+      transparent 8px,
+      transparent 60px
+    );
+  animation-duration: 2.6s;
+  animation-delay: -0.9s;
+}
+
+@keyframes bgRainDrift {
+  from { transform: translateY(-80px); }
+  to   { transform: translateY(80px); }
+}
+
+/* ── Stage: bird + text together ── */
+.afro-intro-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  transform-origin: center center;
+}
+
+/* ── Bird ── */
+.afro-intro-bird {
+  width: clamp(90px, 20vw, 160px);
+  height: clamp(90px, 20vw, 160px);
+  position: relative;
+  animation: birdFlyIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.15s;
+  opacity: 0;
+  filter: drop-shadow(0 0 0px rgba(34,197,94,0));
+}
+
+.afro-intro-bird img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Phase 2: bird glow after landing */
+.afro-intro-bird--glowing {
+  animation:
+    birdFlyIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.15s,
+    birdGlowPulse 0.8s ease-out forwards 1.3s,
+    birdHover 3s ease-in-out infinite 2s;
+}
+
+@keyframes birdFlyIn {
+  0% {
+    opacity: 0;
+    transform: translate(280px, -180px) rotate(-35deg) scale(0.25);
+    filter: blur(3px) drop-shadow(0 0 0 transparent);
+  }
+  20% { opacity: 1; filter: blur(0); }
+  55% { transform: translate(-25px, 12px) rotate(10deg) scale(1.08); }
+  72% { transform: translate(12px, -8px) rotate(-4deg) scale(0.96); }
+  86% { transform: translate(-4px,  4px) rotate( 2deg) scale(1.02); }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    filter: drop-shadow(0 0 0px transparent);
+  }
+}
+
+@keyframes birdGlowPulse {
+  0%   { filter: drop-shadow(0 0  0px rgba(34,197,94,0)); }
+  40%  { filter: drop-shadow(0 0 28px rgba(34,197,94,0.95)) drop-shadow(0 0 60px rgba(34,197,94,0.5)); }
+  100% { filter: drop-shadow(0 0 12px rgba(34,197,94,0.45)); }
+}
+
+@keyframes birdHover {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-7px); }
+}
+
+/* ── Title: AFROSLANG ── */
+.afro-intro-title {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(2px, 0.8vw, 6px);
+  margin-top: -6px;
+  position: relative;
+}
+
+/* The green sweep bar – moves up behind all letters */
+.afro-intro-sweep {
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  height: 120%;
+  bottom: -10%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.afro-intro-sweep::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  bottom: -110%;
+  height: 110%;
+  background: linear-gradient(
+    to top,
+    transparent 0%,
+    rgba(34,197,94,0.06) 30%,
+    rgba(34,197,94,0.22) 50%,
+    rgba(34,197,94,0.06) 70%,
+    transparent 100%
+  );
+  animation: sweepBar 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation-delay: 0.85s;
+}
+
+@keyframes sweepBar {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-220%); }
+}
+
+/* Each letter wrapper – clips the reveal */
+.afro-intro-letter-wrap {
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: bottom;
+  line-height: 1;
+}
+
+/* The character itself slides up into view */
+.afro-intro-char {
+  display: inline-block;
+  font-family: 'Times New Roman', Georgia, serif;
+  font-weight: 900;
+  font-size: clamp(2.6rem, 10vw, 7rem);
+  letter-spacing: 0.02em;
+  color: #fff;
+  transform: translateY(110%);
+  animation: charReveal 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: var(--char-delay);
+  text-shadow: none;
+  line-height: 1;
+}
+
+@keyframes charReveal {
+  0% {
+    transform: translateY(110%);
+    color: #4ade80;
+    text-shadow: 0 0 40px rgba(34,197,94,0.9), 0 0 80px rgba(34,197,94,0.4);
+  }
+  45% {
+    color: #86efac;
+    text-shadow: 0 0 25px rgba(34,197,94,0.6);
+  }
+  100% {
+    transform: translateY(0%);
+    color: #fff;
+    text-shadow: 0 0 12px rgba(34,197,94,0.2);
+  }
+}
+
+/* ── Tagline ── */
+.afro-intro-tagline {
+  margin-top: 14px;
+  font-family: 'Times New Roman', serif;
+  font-size: clamp(0.65rem, 2vw, 0.95rem);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0);
+  text-shadow: none;
+  animation: taglineReveal 0.6s ease-out forwards;
+  animation-delay: 2s;
+}
+
+@keyframes taglineReveal {
+  0%   { color: rgba(255,255,255,0); letter-spacing: 0.6em; }
+  100% { color: rgba(74,222,128,0.8); letter-spacing: 0.35em; }
+}
+
+/* ── Green glow ground line ── */
+.afro-intro-ground {
+  width: 0%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #22c55e, transparent);
+  margin-top: 10px;
+  animation: groundExpand 0.5s ease-out forwards;
+  animation-delay: 1.75s;
+  box-shadow: 0 0 8px rgba(34,197,94,0.6);
+}
+
+@keyframes groundExpand {
+  0%   { width: 0%; }
+  100% { width: 90%; }
+}
+
+/* ── Circle pulse when bird lands ── */
+.afro-intro-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0px;
+  height: 0px;
+  border-radius: 50%;
+  border: 2px solid rgba(34,197,94,0);
+  transform: translate(-50%, -50%);
+  animation: pulsOut 0.9s ease-out forwards;
+  animation-delay: 1.1s;
+  pointer-events: none;
+}
+
+.afro-intro-pulse:nth-child(2) { animation-delay: 1.3s; }
+.afro-intro-pulse:nth-child(3) { animation-delay: 1.5s; }
+
+@keyframes pulsOut {
+  0%   { width: 20px; height: 20px; border-color: rgba(34,197,94,0.8); opacity: 1; }
+  100% { width: 200px; height: 200px; border-color: rgba(34,197,94,0); opacity: 0; }
+}
+
+/* ── Skip button ── */
+.afro-intro-skip {
+  position: absolute;
+  bottom: 32px;
+  right: 32px;
+  background: none;
+  border: 1px solid rgba(34,197,94,0.3);
+  border-radius: 999px;
+  padding: 8px 20px;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(34,197,94,0.6);
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0;
+  animation: skipAppear 0.4s ease forwards;
+  animation-delay: 1s;
+}
+
+.afro-intro-skip:hover {
+  background: rgba(34,197,94,0.1);
+  color: #4ade80;
+  border-color: rgba(34,197,94,0.6);
+}
+
+@keyframes skipAppear {
+  to { opacity: 1; }
+}
+
+/* ── Responsive: smaller screens ── */
+@media (max-width: 480px) {
+  .afro-intro-bird {
+    width: 80px;
+    height: 80px;
+  }
+
+  .afro-intro-tagline {
+    letter-spacing: 0.2em;
+    font-size: 0.6rem;
+  }
+
+  .afro-intro-skip {
+    bottom: 24px;
+    right: 20px;
+  }
+}

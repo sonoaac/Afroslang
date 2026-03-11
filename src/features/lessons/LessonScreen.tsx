@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { InterfaceLanguage, Lesson, Exercise } from '../../types';
-import { X, Heart, CheckCircle2, XCircle, Lightbulb, Zap, RotateCcw, Home } from 'lucide-react';
+import { X, Heart, CheckCircle2, XCircle, Lightbulb, RotateCcw, Home } from 'lucide-react';
 import { checkIgboAnswer } from '../../utils/igboTextUtils';
 import { HeartsTimer } from '../../components/ui/HeartsTimer';
 import { HeartsOutModal } from '../../components/ui/HeartsOutModal';
 import { GuestLimitModal } from '../../components/ui/GuestLimitModal';
 import { HeartsData, updateHearts, updateGuestHearts } from '../../utils/heartsTimer';
+import './LessonPremium.css';
 
 interface LessonScreenProps {
   interfaceLanguage: InterfaceLanguage;
@@ -96,23 +97,35 @@ export function LessonScreen({
     setShowFeedback(false);
   }, [currentExercise?.id]);
 
+  // Shuffle options once per exercise so correct answer isn't always in the same position
+  const shuffledOptions = useMemo(() => {
+    if (!currentExercise) return [];
+    const opts = (!isEnglish && currentExercise.optionsFr)
+      ? currentExercise.optionsFr
+      : (currentExercise.options || []);
+    const arr = [...opts];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentExercise?.id, isEnglish]);
+
   if (!currentExercise) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-8" style={{ background: 'var(--app-bg)' }}>
-        <div className="text-center space-y-6 bg-white rounded-3xl p-12 retro-shadow-lg game-border max-w-2xl">
-          <div className="text-8xl mb-6 animate-bounce">📚</div>
-          <h2 className="text-[#1A1A1A] text-4xl">
+      <div className="ls-root" style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center', padding: '2rem', maxWidth: 400 }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📚</div>
+          <h2 style={{ fontFamily: "'Times New Roman', Georgia, serif", color: '#fff', marginBottom: '0.75rem' }}>
             {isEnglish ? 'No lessons available yet' : 'Aucune leçon disponible pour le moment'}
           </h2>
-          <p className="text-[#4A4A4A] text-xl max-w-md mx-auto leading-relaxed">
-            {isEnglish 
+          <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '1.5rem', fontFamily: "'Times New Roman', Georgia, serif" }}>
+            {isEnglish
               ? 'More lessons are coming soon for this language! Check back later.'
               : 'Plus de leçons arrivent bientôt pour cette langue! Revenez plus tard.'}
           </p>
-          <button
-            onClick={onExit}
-            className="mt-8 px-12 py-5 rounded-2xl bg-gradient-to-r from-[#FF1493] to-[#9D4EDD] text-white retro-shadow-lg game-border hover:scale-110 transition-all duration-300 text-xl uppercase tracking-wider"
-          >
+          <button onClick={onExit} className="ls-btn-check">
             {isEnglish ? '← Go Back' : '← Retour'}
           </button>
         </div>
@@ -128,13 +141,7 @@ export function LessonScreen({
     return currentExercise.correctAnswer;
   };
 
-  // Get options based on interface language
-  const getOptions = () => {
-    if (!isEnglish && currentExercise.optionsFr) {
-      return currentExercise.optionsFr;
-    }
-    return currentExercise.options || [];
-  };
+  // (getOptions kept for potential future use — currently options resolved via shuffledOptions)
 
   const handleSubmit = () => {
     // Check if user has hearts (for non-subscribers)
@@ -237,170 +244,105 @@ export function LessonScreen({
     return icons[lesson.type];
   };
 
-  const answerColors = ['#FF1493', '#9D4EDD', '#FFD700', '#00FF94'];
 
   // Render hearts with half heart support and infinity for subscribers
   const renderHearts = () => {
-    const hearts = [];
-    
+    const heartItems = [];
+
     // If subscribed, show infinity symbol
     if (isSubscribed) {
       return (
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-[#FF1493] to-[#FF69B4] scale-110 retro-shadow-sm game-border">
-            <Heart className="w-6 h-6 fill-white text-white" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <div style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#b00020' }}>
+            <Heart style={{ width: 16, height: 16, fill: 'white', color: 'white' }} />
           </div>
-          <span className="text-2xl text-white font-bold">∞</span>
+          <span style={{ fontSize: '1.1rem', color: '#fff', fontFamily: "'Times New Roman', Georgia, serif" }}>∞</span>
         </div>
       );
     }
-    
+
     // For non-subscribers, show regular hearts
     const fullHearts = Math.floor(currentHearts);
     const hasHalfHeart = currentHearts % 1 !== 0;
-    
+
     for (let i = 0; i < 5; i++) {
       const isFull = i < fullHearts;
       const isHalf = i === fullHearts && hasHalfHeart;
-      
-      hearts.push(
+      heartItems.push(
         <div
           key={i}
-          className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
-            isFull || isHalf
-              ? 'bg-gradient-to-br from-[#FF1493] to-[#FF69B4] scale-110 retro-shadow-sm' 
-              : 'bg-gray-300'
-          } game-border`}
+          style={{
+            width: 28,
+            height: 28,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: isFull || isHalf ? '#b00020' : 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.08)',
+          }}
         >
           {isHalf ? (
-            <div className="relative w-6 h-6">
-              <Heart className="absolute w-6 h-6 text-gray-300" />
-              <div className="absolute inset-0 overflow-hidden" style={{ clipPath: 'polygon(0 0, 50% 0, 50% 100%, 0 100%)' }}>
-                <Heart className="w-6 h-6 fill-white text-white" />
+            <div style={{ position: 'relative', width: 16, height: 16 }}>
+              <Heart style={{ position: 'absolute', width: 16, height: 16, color: 'rgba(255,255,255,0.2)' }} />
+              <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', clipPath: 'polygon(0 0, 50% 0, 50% 100%, 0 100%)' }}>
+                <Heart style={{ width: 16, height: 16, fill: 'white', color: 'white' }} />
               </div>
             </div>
           ) : (
-            <Heart
-              className={`w-6 h-6 ${
-                isFull 
-                  ? 'fill-white text-white' 
-                  : 'text-gray-400'
-              }`}
-            />
+            <Heart style={{ width: 16, height: 16, fill: isFull ? 'white' : 'none', color: isFull ? 'white' : 'rgba(255,255,255,0.25)' }} />
           )}
         </div>
       );
     }
-    
-    return hearts;
+
+    return heartItems;
   };
 
   const isRedemption = currentExercise.wasWrong && !currentExercise.hasRetried;
 
-  const brown = '#6B4F3A'; // dark brown
-  const lightBrown = '#A67B5B';
-  const green = '#10B981';
-
   // Lesson Intro Modal
   if (showLessonIntro) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div 
-          className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden"
-          style={{
-            background: `linear-gradient(135deg, ${brown} 0%, ${lightBrown} 100%)`,
-          }}
-        >
-          {/* Pattern overlay */}
-          <div 
-            className="absolute inset-0 opacity-10"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2v2H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2z'/%3E%3C/g%3E%3C/svg%3E")`,
-            }}
-          />
+      <div className="ls-intro-overlay">
+        <div className="ls-intro-card">
+          <div className="ls-intro-eyebrow">
+            {isEnglish
+              ? `Stage ${stageNumber} · Lesson ${lesson.lessonNumber}`
+              : `Étape ${stageNumber} · Leçon ${lesson.lessonNumber}`}
+          </div>
 
-          <div className="relative z-10 p-8 sm:p-12">
-            {/* Top: Unit and Lesson */}
-            <div className="text-white/90 text-sm sm:text-base mb-4">
-              {isEnglish 
-                ? `Unit ${stageNumber} • Lesson ${lesson.lessonNumber}`
-                : `Unité ${stageNumber} • Leçon ${lesson.lessonNumber}`}
-            </div>
+          <h1 className="ls-intro-title">
+            {isEnglish ? lesson.title : lesson.titleFr}
+          </h1>
 
-            {/* Title */}
-            <h1 className="text-3xl sm:text-5xl font-bold text-white mb-6 sm:mb-8 uppercase tracking-wide">
-              {isEnglish ? lesson.title : lesson.titleFr}
-            </h1>
+          <span className="ls-intro-icon">
+            {lesson.type === 'vocabulary' ? '📚' :
+             lesson.type === 'grammar' ? '📝' :
+             lesson.type === 'writing' ? '✍️' : '🎭'}
+          </span>
 
-            {/* Progress Indicator */}
-            <div className="flex items-center gap-2 mb-8 sm:mb-12">
-              {[...Array(totalSteps)].map((_, idx) => (
-                <div
-                  key={idx}
-                  className={`h-2 flex-1 rounded-full transition-all ${
-                    idx < currentStep 
-                      ? 'bg-white' 
-                      : 'bg-white/30'
-                  }`}
-                />
-              ))}
-            </div>
-            <div className="text-white/80 text-xs sm:text-sm mb-6 sm:mb-8">
-              {currentStep} / {totalSteps}
-            </div>
+          <p className="ls-intro-desc">
+            {isEnglish
+              ? `Learn essential ${lesson.type === 'vocabulary' ? 'vocabulary' : lesson.type === 'grammar' ? 'grammar' : lesson.type === 'writing' ? 'writing' : 'culture'} in ${languageName}`
+              : `Apprenez ${lesson.type === 'vocabulary' ? 'le vocabulaire essentiel' : lesson.type === 'grammar' ? 'la grammaire' : lesson.type === 'writing' ? "l'écriture" : 'la culture'} en ${languageName}`}
+          </p>
+          <p className="ls-intro-count">
+            {lesson.exercises.length} {isEnglish ? 'exercises' : 'exercices'}
+          </p>
 
-            {/* Main Content - Illustration/Text */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 sm:p-10 mb-8 sm:mb-12 border border-white/20">
-              <div className="text-center space-y-4 sm:space-y-6">
-                {/* Illustration */}
-                <div className="text-6xl sm:text-8xl mb-4">
-                  {lesson.type === 'vocabulary' ? '📚' : 
-                   lesson.type === 'grammar' ? '📝' : 
-                   lesson.type === 'writing' ? '✍️' : '🎭'}
-                </div>
-                
-                {/* Lesson description */}
-                <p className="text-white text-lg sm:text-2xl font-medium">
-                  {isEnglish 
-                    ? `Learn essential ${lesson.type === 'vocabulary' ? 'vocabulary' : lesson.type === 'grammar' ? 'grammar' : lesson.type === 'writing' ? 'writing' : 'culture'} in ${languageName}`
-                    : `Apprenez ${lesson.type === 'vocabulary' ? 'le vocabulaire essentiel' : lesson.type === 'grammar' ? 'la grammaire' : lesson.type === 'writing' ? 'l\'écriture' : 'la culture'} en ${languageName}`}
-                </p>
-                
-                {/* Exercise count */}
-                <p className="text-white/80 text-sm sm:text-lg">
-                  {lesson.exercises.length} {isEnglish ? 'exercises' : 'exercices'}
-                </p>
-              </div>
-            </div>
+          <div className="ls-intro-progress">
+            {[...Array(totalSteps)].map((_, idx) => (
+              <div key={idx} className={`ls-intro-prog-bar${idx < currentStep ? ' ls-intro-prog-bar--active' : ''}`} />
+            ))}
+          </div>
 
-            {/* Bottom Actions */}
-            <div className="flex items-center justify-between">
-              <button
-                onClick={() => setShowLessonIntro(false)}
-                className="px-6 sm:px-10 py-3 sm:py-4 bg-white text-gray-900 font-bold rounded-lg sm:rounded-xl hover:bg-gray-100 transition-all text-sm sm:text-lg uppercase shadow-lg"
-                style={{
-                  backgroundColor: green,
-                  color: 'white'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#059669';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = green;
-                }}
-              >
-                {isEnglish ? 'Continue' : 'Continuer'}
-              </button>
-              <button
-                onClick={() => {
-                  setShowLessonIntro(false);
-                  // Could add skip functionality
-                }}
-                className="text-white/80 hover:text-white text-sm sm:text-base underline transition-colors"
-              >
-                {isEnglish ? 'Skip' : 'Passer'}
-              </button>
-            </div>
+          <div className="ls-intro-actions">
+            <button onClick={() => setShowLessonIntro(false)} className="ls-intro-skip">
+              {isEnglish ? 'Skip' : 'Passer'}
+            </button>
+            <button onClick={() => setShowLessonIntro(false)} className="ls-btn-check" style={{ flex: 1 }}>
+              {isEnglish ? 'BEGIN' : 'COMMENCER'}
+            </button>
           </div>
         </div>
       </div>
@@ -408,187 +350,76 @@ export function LessonScreen({
   }
 
   return (
-    <div className="min-h-screen flex flex-col touch-manipulation" style={{ background: 'var(--app-bg)' }}>
-        {/* Header */}
-        <div className="bg-white/95 backdrop-blur-md game-border border-b-0 px-3 sm:px-6 py-2 sm:py-4 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto">
-          {/* Mobile Layout */}
-          <div className="flex sm:hidden items-center justify-between gap-2">
-            {/* Exit */}
-            <button
-              onClick={onExit}
-              className="w-8 h-8 flex-shrink-0 flex items-center justify-center bg-[#FF1493] hover:bg-[#FF69B4] rounded-lg transition-all retro-shadow-sm touch-manipulation"
-              aria-label="Exit lesson"
-            >
-              <X className="w-4 h-4 text-white" strokeWidth={3} />
-            </button>
-            
-            {/* Progress Bar */}
-            <div className="flex-1 h-2.5 bg-[#2D2D2D] rounded-full overflow-hidden game-border p-0.5">
-              <div 
-                className="h-full bg-gradient-to-r from-[#00FF94] via-[#7FFF00] to-[#FFD700] rounded-full transition-all duration-500 relative overflow-hidden"
-                style={{ width: `${progress}%` }}
-              >
-                <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
-              </div>
-            </div>
-
-            {/* Counter */}
-            <div className="bg-gradient-to-r from-[#FFD700] to-[#FF6B35] px-2 py-1 rounded-lg game-border retro-shadow-sm flex-shrink-0">
-              <span className="text-white text-xs font-bold">
-                {correctAnswers}/{totalQuestions}
-              </span>
-            </div>
-
-            {/* Hearts */}
-            <div className="flex gap-0.5 scale-75 origin-right flex-shrink-0">
-              {heartsData ? (
-                <HeartsTimer heartsData={heartsData} isSubscribed={isSubscribed} />
-              ) : (
-                renderHearts()
-              )}
-            </div>
-            
-            {/* Home */}
-            <button
-              onClick={onBackToLanguageSelect}
-              className="w-8 h-8 flex-shrink-0 flex items-center justify-center bg-gradient-to-r from-[#9D4EDD] to-[#FFB6D9] hover:scale-110 rounded-lg transition-all retro-shadow-sm touch-manipulation"
-              aria-label="Back to language selection"
-            >
-              <Home className="w-4 h-4 text-white" strokeWidth={3} />
-            </button>
+    <div className="ls-root">
+      {/* ── Header ── */}
+      <div className="ls-header">
+        <div className="ls-header-inner">
+          <button onClick={onExit} className="ls-exit-btn" aria-label="Exit lesson">
+            <X style={{ width: 18, height: 18 }} strokeWidth={2.5} />
+          </button>
+          <div className="ls-progress-track">
+            <div className="ls-progress-fill" style={{ width: `${progress}%` }} />
           </div>
-
-          {/* Desktop Layout */}
-          <div className="hidden sm:flex items-center gap-4 lg:gap-6">
-            <button
-              onClick={onExit}
-              className="p-3 bg-[#FF1493] hover:bg-[#FF69B4] rounded-xl transition-all hover:scale-110 retro-shadow-sm"
-              aria-label="Exit lesson"
-            >
-              <X className="w-6 h-6 text-white" strokeWidth={3} />
-            </button>
-
-            {/* Progress Bar */}
-            <div className="flex-1 h-8 bg-[#2D2D2D] rounded-full overflow-hidden game-border p-1">
-              <div 
-                className="h-full bg-gradient-to-r from-[#00FF94] via-[#7FFF00] to-[#FFD700] rounded-full transition-all duration-500 relative overflow-hidden"
-                style={{ width: `${progress}%` }}
-              >
-                <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
-              </div>
-            </div>
-
-            {/* Question Counter */}
-            <div className="bg-gradient-to-r from-[#FFD700] to-[#FF6B35] px-6 py-2 rounded-xl game-border retro-shadow-sm">
-              <span className="text-white text-xl uppercase tracking-wider">
-                {correctAnswers}/{totalQuestions}
-              </span>
-            </div>
-
-            {/* Hearts */}
-            <div className="flex gap-2">
-              {heartsData ? (
-                <HeartsTimer heartsData={heartsData} isSubscribed={isSubscribed} />
-              ) : (
-                renderHearts()
-              )}
-            </div>
-            
-            {/* Home Button */}
-            <button
-              onClick={onBackToLanguageSelect}
-              className="p-3 bg-gradient-to-r from-[#9D4EDD] to-[#FFB6D9] hover:scale-110 rounded-xl transition-all retro-shadow-sm group"
-              aria-label="Back to language selection"
-            >
-              <Home className="w-6 h-6 text-white" strokeWidth={3} />
-            </button>
+          <div className="ls-counter">{correctAnswers}/{totalQuestions}</div>
+          <div style={{ display: 'flex', gap: 3 }}>
+            {heartsData ? (
+              <HeartsTimer heartsData={heartsData} isSubscribed={isSubscribed} />
+            ) : (
+              renderHearts()
+            )}
           </div>
+          <button onClick={onBackToLanguageSelect} className="ls-home-btn" aria-label="Home">
+            <Home style={{ width: 18, height: 18 }} strokeWidth={2} />
+          </button>
         </div>
       </div>
 
-        {/* Exercise Content */}
-        <div className="flex-1 flex flex-col items-center justify-start sm:justify-center p-4 sm:p-8 pb-[30vh] sm:pb-8 max-w-5xl mx-auto w-full overflow-y-auto">
-        {/* XP & Type indicator */}
-        <div className="mb-4 sm:mb-8 flex flex-col sm:flex-row items-center gap-2 sm:gap-4 flex-shrink-0">
-          <div className="bg-white px-3 sm:px-8 py-2 sm:py-3 rounded-lg sm:rounded-2xl game-border retro-shadow-sm flex items-center gap-2 sm:gap-3">
-            <span className="text-2xl sm:text-4xl">{getLessonIcon()}</span>
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 sm:w-6 sm:h-6 text-[#FFD700]" />
-              <span className="text-sm sm:text-2xl text-[#1A1A1A] font-semibold">
-                {correctAnswers}/{totalQuestions} ✓
-              </span>
-            </div>
+      {/* ── Body ── */}
+      <div className="ls-body">
+        {/* Meta row */}
+        <div className="ls-meta-row">
+          <div className="ls-type-badge">
+            <span>{getLessonIcon()}</span>
+            <span style={{ textTransform: 'capitalize' }}>{lesson.type}</span>
           </div>
-          
-          {/* Redemption Badge */}
           {isRedemption && !showFeedback && (
-            <div className="bg-gradient-to-r from-[#9D4EDD] to-[#FFB6D9] px-3 sm:px-8 py-2 sm:py-3 rounded-lg sm:rounded-2xl game-border retro-shadow-sm animate-pulse flex-shrink-0">
-              <div className="flex items-center gap-2 sm:gap-3 text-white">
-                <RotateCcw className="w-4 h-4 sm:w-6 sm:h-6" />
-                <span className="text-xs sm:text-xl uppercase tracking-wider font-semibold">
-                  {isEnglish ? 'REDEMPTION!' : 'RÉDEMPTION!'}
-                </span>
-              </div>
+            <div className="ls-redemption-badge">
+              <RotateCcw style={{ width: 12, height: 12, display: 'inline', marginRight: 4 }} />
+              {isEnglish ? 'REDEMPTION' : 'RÉDEMPTION'}
             </div>
           )}
         </div>
 
-        {/* Question Box */}
-        <div className="w-full max-w-3xl mx-auto bg-white rounded-lg sm:rounded-3xl p-4 sm:p-10 game-border retro-shadow-lg mb-4 sm:mb-10">
-          <h2 className="text-xl sm:text-4xl text-center text-[#1A1A1A] leading-tight font-semibold">
+        {/* Question */}
+        <div className="ls-question-box">
+          <p className="ls-question-text">
             {isEnglish ? currentExercise.question : currentExercise.questionFr}
-          </h2>
+          </p>
           {isRedemption && !showFeedback && (
-            <p className="text-center text-xs sm:text-2xl text-[#9D4EDD] mt-1 sm:mt-6">
-              💜 {isEnglish ? 'Get half a heart back!' : 'Récupérez un demi-cœur!'}
+            <p className="ls-redemption-hint">
+              {isEnglish ? '♥ Get half a heart back!' : '♥ Récupérez un demi-cœur!'}
             </p>
           )}
         </div>
 
         {/* Multiple Choice */}
         {currentExercise.type === 'multiple-choice' && currentExercise.options && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 w-full max-w-3xl mx-auto">
-            {getOptions().map((option, index) => {
+          <div className="ls-options-grid">
+            {shuffledOptions.map((option, index) => {
               const isSelected = userAnswer === option;
               const isCorrectAnswer = option === getCorrectAnswer();
               const showCorrect = showFeedback && isCorrectAnswer;
               const showIncorrect = showFeedback && isSelected && !isCorrect;
-              
-                  return (
-                  <button
-                    key={index}
-                    onClick={() => setUserAnswer(option)}
-                    disabled={showFeedback}
-                    className={`
-                      p-4 sm:p-8 rounded-lg sm:rounded-2xl game-border transition-all text-left flex items-center justify-between min-h-[56px] sm:min-h-[120px] touch-manipulation w-full
-                      ${showCorrect
-                        ? 'bg-gradient-to-br from-[#00FF94] to-[#7FFF00] retro-shadow-lg scale-105 animate-pop'
-                        : showIncorrect
-                        ? 'bg-gradient-to-br from-[#FF1493] to-[#FF69B4] retro-shadow-lg'
-                        : isSelected
-                        ? 'bg-gradient-to-br from-[#FFD700] to-[#FF6B35] retro-shadow-lg scale-105'
-                        : 'bg-white active:bg-gradient-to-br active:from-[#FFB6D9] active:to-[#9D4EDD] sm:hover:bg-gradient-to-br sm:hover:from-[#FFB6D9] sm:hover:to-[#9D4EDD] retro-shadow active:scale-105 sm:hover:scale-105'
-                      }
-                      ${showFeedback ? 'cursor-not-allowed' : 'sm:hover:retro-shadow-lg active:retro-shadow-lg'}
-                    `}
-                  style={{
-                    backgroundColor: !isSelected && !showCorrect && !showIncorrect ? answerColors[index % 4] + '33' : undefined
-                  }}
+              return (
+                <button
+                  key={index}
+                  onClick={() => setUserAnswer(option)}
+                  disabled={showFeedback}
+                  className={`ls-option-btn${showCorrect ? ' ls-option-btn--correct' : showIncorrect ? ' ls-option-btn--wrong' : isSelected ? ' ls-option-btn--selected' : ''}`}
                 >
-                  <span className={`text-base sm:text-2xl font-semibold ${showCorrect || showIncorrect || isSelected ? 'text-white' : 'text-[#1A1A1A]'}`}>
-                    {option}
-                  </span>
-                  {showCorrect && (
-                    <div className="bg-white rounded-full p-1 sm:p-2 flex-shrink-0">
-                      <CheckCircle2 className="w-5 h-5 sm:w-8 sm:h-8 text-[#00FF94]" />
-                    </div>
-                  )}
-                  {showIncorrect && (
-                    <div className="bg-white rounded-full p-0.5 sm:p-2">
-                      <XCircle className="w-3 h-3 sm:w-8 sm:h-8 text-[#FF1493]" />
-                    </div>
-                  )}
+                  <span>{option}</span>
+                  {showCorrect && <CheckCircle2 style={{ width: 18, height: 18, flexShrink: 0 }} />}
+                  {showIncorrect && <XCircle style={{ width: 18, height: 18, flexShrink: 0 }} />}
                 </button>
               );
             })}
@@ -597,110 +428,75 @@ export function LessonScreen({
 
         {/* Type Answer */}
         {(currentExercise.type === 'type-answer' || currentExercise.type === 'translate' || currentExercise.type === 'fill-blank') && (
-          <div className="w-full max-w-3xl">
-            <input
-              type="text"
-              value={userAnswer}
-              onChange={(e) => setUserAnswer(e.target.value)}
-              disabled={showFeedback}
-              placeholder={isEnglish ? 'Type your answer...' : 'Tapez votre réponse...'}
-              className={`
-                w-full p-3 sm:p-8 rounded-xl sm:rounded-3xl game-border text-base sm:text-2xl text-center transition-all min-h-[52px] sm:min-h-auto font-semibold
-                ${showFeedback
-                  ? isCorrect
-                    ? 'bg-gradient-to-r from-[#00FF94] to-[#7FFF00] text-white retro-shadow-lg'
-                    : 'bg-gradient-to-r from-[#FF1493] to-[#FF69B4] text-white retro-shadow-lg'
-                  : 'bg-white text-black placeholder:text-gray-400 focus:retro-shadow-lg focus:outline-none focus:scale-105'
-                }
-              `}
-              autoFocus
-            />
-          </div>
+          <input
+            type="text"
+            value={userAnswer}
+            onChange={(e) => setUserAnswer(e.target.value)}
+            disabled={showFeedback}
+            placeholder={isEnglish ? 'Type your answer…' : 'Tapez votre réponse…'}
+            className={`ls-type-input${showFeedback ? (isCorrect ? ' ls-type-input--correct' : ' ls-type-input--wrong') : ''}`}
+            autoFocus
+          />
         )}
 
         {/* Hint */}
         {currentExercise.hint && !showFeedback && (
-          <div className="mt-4 sm:mt-8 p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-white game-border retro-shadow w-full max-w-3xl">
-            <div className="flex items-start gap-3 sm:gap-4">
-              <div className="bg-gradient-to-br from-[#FFD700] to-[#FF6B35] p-2 sm:p-3 rounded-xl flex-shrink-0">
-                <Lightbulb className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
-              </div>
-              <p className="text-sm sm:text-xl text-[#1A1A1A] flex-1">
-                {isEnglish ? currentExercise.hint : currentExercise.hintFr}
-              </p>
+          <div className="ls-hint">
+            <div className="ls-hint-icon">
+              <Lightbulb style={{ width: 14, height: 14, color: '#e53935' }} />
             </div>
+            <p className="ls-hint-text">
+              {isEnglish ? currentExercise.hint : currentExercise.hintFr}
+            </p>
           </div>
         )}
 
         {/* Feedback */}
         {showFeedback && (
-          <div className="mt-4 sm:mt-8 w-full max-w-3xl">
-            <div className={`
-              p-4 sm:p-8 rounded-xl sm:rounded-3xl game-border retro-shadow-lg animate-fadeIn
-              ${isCorrect 
-                ? 'bg-gradient-to-r from-[#00FF94] to-[#7FFF00]' 
-                : 'bg-gradient-to-r from-[#FF1493] to-[#FF69B4]'
-              }
-            `}>
-              <div className="flex items-center gap-3 sm:gap-6">
-                <div className="bg-white rounded-xl sm:rounded-2xl p-2 sm:p-4 flex-shrink-0">
-                  {isCorrect ? (
-                    <CheckCircle2 className="w-8 h-8 sm:w-12 sm:h-12 text-[#00FF94]" />
-                  ) : (
-                    <XCircle className="w-8 h-8 sm:w-12 sm:h-12 text-[#FF1493]" />
+          <div className={`ls-feedback${isCorrect ? ' ls-feedback--correct' : ' ls-feedback--wrong'}`}>
+            <div className="ls-feedback-icon">
+              {isCorrect
+                ? <CheckCircle2 style={{ width: 22, height: 22, color: '#4ade80' }} />
+                : <XCircle style={{ width: 22, height: 22, color: '#fca5a5' }} />}
+            </div>
+            <div className="ls-feedback-body">
+              <p className="ls-feedback-title">
+                {isCorrect
+                  ? isRedemption
+                    ? (isEnglish ? 'REDEEMED! +0.5 ♥' : 'RÉDEMPTÉ! +0.5 ♥')
+                    : (isEnglish ? 'CORRECT!' : 'CORRECT!')
+                  : (isEnglish ? 'Correct answer:' : 'Bonne réponse:')}
+              </p>
+              {!isCorrect && (
+                <>
+                  <p className="ls-feedback-answer">{getCorrectAnswer()}</p>
+                  {!isRedemption && (
+                    <p className="ls-feedback-note">
+                      {isEnglish ? "You'll get a chance to redeem yourself later." : 'Vous aurez une chance de vous racheter plus tard.'}
+                    </p>
                   )}
-                </div>
-                <div className="flex-1 text-white">
-                  <p className="text-lg sm:text-3xl mb-2 font-bold">
-                    {isCorrect 
-                      ? isRedemption
-                        ? (isEnglish ? '💜 REDEEMED! +0.5 ❤️' : '💜 RÉDEMPTÉ! +0.5 ❤️')
-                        : (isEnglish ? '🎉 AMAZING!' : '🎉 INCROYABLE!')
-                      : (isEnglish ? 'Correct answer:' : 'Bonne réponse:')}
-                  </p>
-                  {!isCorrect && (
-                    <>
-                      <p className="text-base sm:text-2xl mb-2 font-semibold">{getCorrectAnswer()}</p>
-                      {!isRedemption && (
-                        <p className="text-sm sm:text-xl opacity-90">
-                          💡 {isEnglish ? 'You\'ll get a chance to redeem yourself later!' : 'Vous aurez une chance de vous racheter plus tard!'}
-                        </p>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
+                </>
+              )}
             </div>
           </div>
         )}
       </div>
 
-      {/* Bottom Button Area */}
-      <div className="bg-white/95 backdrop-blur-md game-border border-t-0 p-1 sm:p-8 max-w-5xl mx-auto w-full">
-        {!showFeedback ? (
-          <button
-            onClick={handleSubmit}
-            disabled={!userAnswer}
-              className={`
-              w-full py-4 sm:py-6 rounded-lg sm:rounded-2xl game-border transition-all text-base sm:text-3xl uppercase tracking-wider retro-shadow-lg touch-manipulation min-h-[56px] sm:min-h-auto font-bold
-              ${userAnswer
-                ? 'bg-gradient-to-r from-[#00FF94] to-[#7FFF00] text-white active:scale-105 sm:hover:scale-105 active:retro-shadow-lg sm:hover:retro-shadow-lg animate-pulse'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }
-            `}
-          >
-            {isEnglish ? '✓ CHECK' : '✓ VÉRIFIER'}
-          </button>
-        ) : (
-          <button
-            onClick={handleNext}
-            className="w-full py-4 sm:py-6 rounded-lg sm:rounded-2xl bg-gradient-to-r from-[#FFD700] to-[#FF6B35] text-white game-border retro-shadow-lg active:scale-105 sm:hover:scale-105 transition-all text-base sm:text-3xl uppercase tracking-wider touch-manipulation min-h-[56px] sm:min-h-auto font-bold"
-          >
-            {exerciseQueue.length > 1
-              ? (isEnglish ? 'NEXT →' : 'SUIVANT →')
-              : (isEnglish ? '🏆 FINISH' : '🏆 TERMINER')}
-          </button>
-        )}
+      {/* ── Bottom bar ── */}
+      <div className="ls-bottom">
+        <div className="ls-bottom-inner">
+          {!showFeedback ? (
+            <button onClick={handleSubmit} disabled={!userAnswer} className="ls-btn-check">
+              {isEnglish ? '✓ CHECK' : '✓ VÉRIFIER'}
+            </button>
+          ) : (
+            <button onClick={handleNext} className="ls-btn-next">
+              {exerciseQueue.length > 1
+                ? (isEnglish ? 'NEXT →' : 'SUIVANT →')
+                : (isEnglish ? 'FINISH' : 'TERMINER')}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Hearts Out Modal */}

@@ -45,7 +45,7 @@ export const amharicLessons: Lesson[] = [
         questionFr: 'Comment dit-on "Bonjour" (matin) en Amharique?',
         correctAnswer: 'Endemin aderu',
         correctAnswerFr: 'Endemin aderu',
-        options: ['Endemin aderu', 'Endemin amesh', 'Endemin aderu', 'Selam']
+        options: ['Endemin aderu', 'Endemin amesh', 'Endemin adersh', 'Selam']
       },
       {
         id: 'am-v1-1-5',
@@ -133,7 +133,7 @@ export const amharicLessons: Lesson[] = [
         questionFr: 'Comment dit-on "Bonsoir" en Amharique?',
         correctAnswer: 'Endemin amesh',
         correctAnswerFr: 'Endemin amesh',
-        options: ['Endemin amesh', 'Endemin aderu', 'Endemin aderu', 'Selam']
+        options: ['Endemin amesh', 'Endemin aderu', 'Endemin adersh', 'Selam']
       },
       {
         id: 'am-v1-1-15',

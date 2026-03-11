@@ -98,7 +98,7 @@ export const wolofLessons: Lesson[] = [
         questionFr: 'Comment dit-on "Désolé" en Wolof?',
         correctAnswer: 'Baal ma',
         correctAnswerFr: 'Baal ma',
-        options: ['Baal ma', 'Jërejëf', 'Baal ma', 'Mangi dem']
+        options: ['Baal ma', 'Jërejëf', 'Waaw', 'Mangi dem']
       },
       {
         id: 'wo-v1-1-11',
@@ -124,7 +124,7 @@ export const wolofLessons: Lesson[] = [
         questionFr: 'Comment dit-on "De rien" en Wolof?',
         correctAnswer: 'Jërejëf',
         correctAnswerFr: 'Jërejëf',
-        options: ['Jërejëf', 'Baal ma', 'Baal ma', 'Salaam aleekum']
+        options: ['Jërejëf', 'Baal ma', 'Waaw', 'Salaam aleekum']
       },
       {
         id: 'wo-v1-1-14',

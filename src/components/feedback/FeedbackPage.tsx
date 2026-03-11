@@ -152,118 +152,119 @@ export const FeedbackPage: React.FC<FeedbackPageProps> = ({ onBack }) => {
     return '🎯';
   };
 
+  const fbFont = "'Times New Roman', Georgia, serif";
+  const fbBg = '#080808';
+  const fbSurface = '#111111';
+  const fbBorder = 'rgba(255,255,255,0.08)';
+  const fbRed = '#b00020';
+  const fbText = '#ffffff';
+  const fbMuted = 'rgba(255,255,255,0.6)';
+  const fbDim = 'rgba(255,255,255,0.35)';
+
+  const getAccuracyColor = (pct: number) => {
+    if (pct >= 90) return '#86efac';
+    if (pct >= 80) return '#fde68a';
+    if (pct >= 70) return '#fdba74';
+    return '#fca5a5';
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--app-bg)' }}>
-        <div className="text-center">
-          <div className="animate-spin w-12 h-12 border-4 border-white/30 border-t-white rounded-full mx-auto mb-4"></div>
-          <p className="text-white text-xl">Loading your feedback...</p>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: fbBg, fontFamily: fbFont }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ width: 32, height: 32, border: `2px solid rgba(255,255,255,0.1)`, borderTopColor: fbRed, borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 1rem' }} />
+          <p style={{ color: fbMuted, fontFamily: fbFont, fontSize: '1rem' }}>Loading your analytics...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-6" style={{ background: 'var(--app-bg)' }}>
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={onBack}
-            className="flex items-center gap-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-xl px-6 py-3 transition-all"
-          >
-            <ChevronLeft className="w-5 h-5 text-white" />
-            <span className="text-white font-medium">Back</span>
-          </button>
-        </div>
+    <div style={{ minHeight: '100vh', background: fbBg, padding: '1.5rem', fontFamily: fbFont }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
 
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <BarChart3 className="w-16 h-16 text-white" />
-            <h1 className="text-5xl font-bold text-white">Your Learning Analytics</h1>
+        {/* Back */}
+        <button
+          onClick={onBack}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: fbSurface, border: `1px solid ${fbBorder}`, color: fbMuted, padding: '0.6rem 1.2rem', cursor: 'pointer', fontFamily: fbFont, fontSize: '0.9rem', transition: 'border-color 0.2s, color 0.2s', marginBottom: '2rem' }}
+          onMouseEnter={(e) => { const el = e.currentTarget as HTMLButtonElement; el.style.borderColor = fbRed; el.style.color = fbText; }}
+          onMouseLeave={(e) => { const el = e.currentTarget as HTMLButtonElement; el.style.borderColor = fbBorder; el.style.color = fbMuted; }}
+        >
+          <ChevronLeft style={{ width: 18, height: 18 }} strokeWidth={2} />
+          Back
+        </button>
+
+        <div style={{ height: '2px', background: fbRed, marginBottom: '2.5rem', opacity: 0.7 }} />
+
+        {/* Hero */}
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+            <BarChart3 style={{ width: 32, height: 32, color: fbRed }} strokeWidth={1.5} />
+            <h1 style={{ color: fbText, fontFamily: fbFont, fontSize: 'clamp(1.3rem, 4vw, 2.5rem)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>
+              Your Learning Analytics
+            </h1>
           </div>
-          <p className="text-xl text-white/80">
+          <p style={{ color: fbMuted, fontFamily: fbFont, fontSize: '1rem' }}>
             Personalized insights to help you improve faster
           </p>
         </div>
 
         {/* Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
-            <div className="flex items-center justify-center gap-3 mb-3">
-              <Zap className="w-8 h-8 text-yellow-400" />
-              <h3 className="text-2xl font-bold text-white">Total XP</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+          {[
+            { Icon: Zap, label: 'Total XP', value: totalXP.toLocaleString(), sub: 'Experience Points' },
+            { Icon: BookOpen, label: 'Lessons', value: totalLessons, sub: 'Completed' },
+            { Icon: Target, label: 'Accuracy', value: `${totalLessons > 0 ? Math.round(((totalLessons * 10 - totalMistakes) / (totalLessons * 10)) * 100) : 100}%`, sub: 'Overall Performance' },
+          ].map(({ Icon, label, value, sub }) => (
+            <div key={label} style={{ background: fbSurface, border: `1px solid ${fbBorder}`, padding: '1.25rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: fbRed, opacity: 0.6 }} />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <Icon style={{ width: 18, height: 18, color: fbRed }} strokeWidth={1.5} />
+                <span style={{ color: fbMuted, fontFamily: fbFont, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{label}</span>
+              </div>
+              <div style={{ color: fbText, fontFamily: fbFont, fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>{value}</div>
+              <p style={{ color: fbDim, fontFamily: fbFont, fontSize: '0.72rem', margin: 0 }}>{sub}</p>
             </div>
-            <div className="text-4xl font-bold text-white">{totalXP.toLocaleString()}</div>
-            <p className="text-white/60">Experience Points Earned</p>
-          </div>
-
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
-            <div className="flex items-center justify-center gap-3 mb-3">
-              <BookOpen className="w-8 h-8 text-blue-400" />
-              <h3 className="text-2xl font-bold text-white">Lessons</h3>
-            </div>
-            <div className="text-4xl font-bold text-white">{totalLessons}</div>
-            <p className="text-white/60">Lessons Completed</p>
-          </div>
-
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
-            <div className="flex items-center justify-center gap-3 mb-3">
-              <Target className="w-8 h-8 text-green-400" />
-              <h3 className="text-2xl font-bold text-white">
-                {totalLessons > 0 ? Math.round(((totalLessons * 10 - totalMistakes) / (totalLessons * 10)) * 100) : 100}%
-              </h3>
-            </div>
-            <div className="text-2xl font-bold text-white">Accuracy</div>
-            <p className="text-white/60">Overall Performance</p>
-          </div>
+          ))}
         </div>
 
         {/* Language Progress */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-12">
-          <h2 className="text-3xl font-bold text-white mb-6 text-center">Language Progress</h2>
-          
+        <div style={{ background: fbSurface, border: `1px solid ${fbBorder}`, padding: '1.5rem', marginBottom: '2rem' }}>
+          <h2 style={{ color: fbText, fontFamily: fbFont, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.12em', textAlign: 'center', marginBottom: '1.25rem', marginTop: 0 }}>
+            Language Progress
+          </h2>
+
           {Object.keys(userProgress).length === 0 ? (
-            <div className="text-center py-12">
-              <BookOpen className="w-16 h-16 text-white/50 mx-auto mb-4" />
-              <p className="text-white/80 text-lg">Start learning to see your progress here!</p>
+            <div style={{ textAlign: 'center', padding: '3rem 0' }}>
+              <BookOpen style={{ width: 36, height: 36, color: fbDim, margin: '0 auto 1rem', display: 'block' }} strokeWidth={1.5} />
+              <p style={{ color: fbMuted, fontFamily: fbFont }}>Start learning to see your progress here!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem' }}>
               {Object.entries(userProgress).map(([languageId, progress]) => {
-                const accuracy = progress.lessonsCompleted > 0 
+                const accuracy = progress.lessonsCompleted > 0
                   ? Math.round(((progress.lessonsCompleted * 10 - progress.mistakeCount) / (progress.lessonsCompleted * 10)) * 100)
                   : 100;
-                
                 return (
-                  <div key={languageId} className="bg-white/5 rounded-xl p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-xl font-bold text-white">{getLanguageName(languageId)}</h3>
-                      <span className="text-2xl">{getPerformanceIcon(accuracy)}</span>
+                  <div key={languageId} style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${fbBorder}`, borderLeft: `3px solid rgba(176,0,32,0.4)`, padding: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                      <h3 style={{ color: fbText, fontFamily: fbFont, fontSize: '0.95rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>{getLanguageName(languageId)}</h3>
+                      <span style={{ fontSize: '1rem' }}>{getPerformanceIcon(accuracy)}</span>
                     </div>
-                    
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-white/80">XP:</span>
-                        <span className="text-white font-bold">{progress.xp}</span>
-                      </div>
-                      
-                      <div className="flex justify-between">
-                        <span className="text-white/80">Level:</span>
-                        <span className="text-white font-bold">{progress.level}</span>
-                      </div>
-                      
-                      <div className="flex justify-between">
-                        <span className="text-white/80">Lessons:</span>
-                        <span className="text-white font-bold">{progress.lessonsCompleted}</span>
-                      </div>
-                      
-                      <div className="flex justify-between">
-                        <span className="text-white/80">Accuracy:</span>
-                        <span className={`font-bold ${getPerformanceColor(accuracy)}`}>
-                          {accuracy}%
-                        </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      {[
+                        { label: 'XP', val: progress.xp },
+                        { label: 'Level', val: progress.level },
+                        { label: 'Lessons', val: progress.lessonsCompleted },
+                      ].map(({ label, val }) => (
+                        <div key={label} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span style={{ color: fbMuted, fontFamily: fbFont, fontSize: '0.78rem' }}>{label}</span>
+                          <span style={{ color: fbText, fontFamily: fbFont, fontSize: '0.78rem', fontWeight: 'bold' }}>{val}</span>
+                        </div>
+                      ))}
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: fbMuted, fontFamily: fbFont, fontSize: '0.78rem' }}>Accuracy</span>
+                        <span style={{ color: getAccuracyColor(accuracy), fontFamily: fbFont, fontSize: '0.78rem', fontWeight: 'bold' }}>{accuracy}%</span>
                       </div>
                     </div>
                   </div>
@@ -273,34 +274,34 @@ export const FeedbackPage: React.FC<FeedbackPageProps> = ({ onBack }) => {
           )}
         </div>
 
-        {/* Weak Areas Analysis */}
+        {/* Weak Areas */}
         {weakAreas.length > 0 && (
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
-            <h2 className="text-3xl font-bold text-white mb-6 text-center">Areas for Improvement</h2>
-            
-            <div className="space-y-6">
+          <div style={{ background: fbSurface, border: `1px solid ${fbBorder}`, padding: '1.5rem', marginBottom: '2rem' }}>
+            <h2 style={{ color: fbText, fontFamily: fbFont, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.12em', textAlign: 'center', marginBottom: '1.25rem', marginTop: 0 }}>
+              Areas for Improvement
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {weakAreas.map((area, index) => (
-                <div key={index} className="bg-white/5 rounded-xl p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{getPerformanceIcon(area.percentage)}</span>
+                <div key={index} style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${fbBorder}`, borderLeft: `3px solid ${fbRed}`, padding: '1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <span style={{ fontSize: '1.2rem' }}>{getPerformanceIcon(area.percentage)}</span>
                       <div>
-                        <h3 className="text-xl font-bold text-white">{area.category} - {area.language}</h3>
-                        <p className="text-white/60">Accuracy: {area.percentage.toFixed(1)}%</p>
+                        <h3 style={{ color: fbText, fontFamily: fbFont, fontSize: '0.9rem', fontWeight: 'bold', margin: 0, marginBottom: '0.2rem' }}>{area.category} — {area.language}</h3>
+                        <p style={{ color: fbMuted, fontFamily: fbFont, fontSize: '0.75rem', margin: 0 }}>Accuracy: {area.percentage.toFixed(1)}%</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-white font-bold">{area.mistakes} mistakes</div>
-                      <div className="text-white/60 text-sm">out of {area.total} questions</div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ color: fbText, fontFamily: fbFont, fontSize: '0.85rem', fontWeight: 'bold' }}>{area.mistakes} mistakes</div>
+                      <div style={{ color: fbDim, fontFamily: fbFont, fontSize: '0.72rem' }}>of {area.total} questions</div>
                     </div>
                   </div>
-                  
-                  <div className="bg-white/10 rounded-lg p-4">
-                    <div className="flex items-center gap-3 mb-2">
-                      <Lightbulb className="w-5 h-5 text-yellow-400" />
-                      <span className="text-white font-semibold">Improvement Tip:</span>
+                  <div style={{ background: 'rgba(176,0,32,0.06)', border: `1px solid rgba(176,0,32,0.2)`, padding: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                      <Lightbulb style={{ width: 14, height: 14, color: fbRed }} strokeWidth={2} />
+                      <span style={{ color: fbText, fontFamily: fbFont, fontSize: '0.78rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Improvement Tip</span>
                     </div>
-                    <p className="text-white/80">{area.improvement}</p>
+                    <p style={{ color: fbMuted, fontFamily: fbFont, fontSize: '0.78rem', lineHeight: 1.5, margin: 0 }}>{area.improvement}</p>
                   </div>
                 </div>
               ))}
@@ -309,37 +310,38 @@ export const FeedbackPage: React.FC<FeedbackPageProps> = ({ onBack }) => {
         )}
 
         {/* Recommendations */}
-        <div className="mt-12 bg-white/10 backdrop-blur-sm rounded-2xl p-8">
-          <h2 className="text-3xl font-bold text-white mb-6 text-center">Recommendations</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white/5 rounded-xl p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <TrendingUp className="w-8 h-8 text-green-400" />
-                <h3 className="text-xl font-bold text-white">Keep Learning!</h3>
+        <div style={{ background: fbSurface, border: `1px solid ${fbBorder}`, padding: '1.5rem' }}>
+          <h2 style={{ color: fbText, fontFamily: fbFont, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.12em', textAlign: 'center', marginBottom: '1.25rem', marginTop: 0 }}>
+            Recommendations
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
+            <div style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${fbBorder}`, borderLeft: `3px solid rgba(176,0,32,0.4)`, padding: '1.25rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                <TrendingUp style={{ width: 20, height: 20, color: fbRed }} strokeWidth={1.5} />
+                <h3 style={{ color: fbText, fontFamily: fbFont, fontSize: '0.9rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>Keep Learning</h3>
               </div>
-              <p className="text-white/80 mb-4">
+              <p style={{ color: fbMuted, fontFamily: fbFont, fontSize: '0.82rem', lineHeight: 1.5, marginBottom: '0.75rem' }}>
                 You're making great progress! Continue with your current learning routine.
               </p>
-              <div className="text-green-400 font-semibold">
-                💡 Try completing 3-5 lessons per day for optimal progress
+              <div style={{ color: '#86efac', fontFamily: fbFont, fontSize: '0.78rem', letterSpacing: '0.04em' }}>
+                Try completing 3–5 lessons per day for optimal progress
               </div>
             </div>
-            
-            <div className="bg-white/5 rounded-xl p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Award className="w-8 h-8 text-yellow-400" />
-                <h3 className="text-xl font-bold text-white">Challenge Yourself</h3>
+            <div style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${fbBorder}`, borderLeft: `3px solid rgba(176,0,32,0.4)`, padding: '1.25rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                <Award style={{ width: 20, height: 20, color: fbRed }} strokeWidth={1.5} />
+                <h3 style={{ color: fbText, fontFamily: fbFont, fontSize: '0.9rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>Challenge Yourself</h3>
               </div>
-              <p className="text-white/80 mb-4">
+              <p style={{ color: fbMuted, fontFamily: fbFont, fontSize: '0.82rem', lineHeight: 1.5, marginBottom: '0.75rem' }}>
                 Ready for the next level? Try more advanced lessons and new languages.
               </p>
-              <div className="text-yellow-400 font-semibold">
-                🎯 Aim for 90%+ accuracy to unlock advanced content
+              <div style={{ color: '#fde68a', fontFamily: fbFont, fontSize: '0.78rem', letterSpacing: '0.04em' }}>
+                Aim for 90%+ accuracy to unlock advanced content
               </div>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );

@@ -1390,7 +1390,7 @@ export const zuluLessons: Lesson[] = [
         question: 'Complete: "Ngi___ okuthile" (I am writing something)',
         questionFr: 'Compléter: "Ngi___ okuthile" (J\'écris quelque chose)',
         correctAnswer: 'bhala',
-        options: ['bhala', 'funda', 'pheka', 'funda']
+        options: ['bhala', 'funda', 'pheka', 'dla']
       },
       {
         id: 'zu-v168',

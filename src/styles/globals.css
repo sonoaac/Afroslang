@@ -10,10 +10,10 @@
   --brand-red: #b00020;
   --brand-green: #35b729;
 
-  /* Theme tokens */
-  --primary: var(--brand-green);
-  --secondary: var(--brand-red);
-  --accent: var(--brand-green);
+  /* Theme tokens — Black × Red */
+  --primary: var(--brand-red);
+  --secondary: var(--brand-green);
+  --accent: var(--brand-red);
 
   --background: #000000;
   --surface: #0b0b0b;

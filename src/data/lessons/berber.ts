@@ -45,7 +45,7 @@ export const berberLessons: Lesson[] = [
         questionFr: 'Comment dit-on "Bonjour" (matin) en Berbère?',
         correctAnswer: 'Azul fell-awen',
         correctAnswerFr: 'Azul fell-awen',
-        options: ['Azul fell-awen', 'Azul fell-awen', 'Ar tufat', 'Tanemmirt']
+        options: ['Azul fell-awen', 'Azul', 'Ar tufat', 'Tanemmirt']
       },
       {
         id: 'ber-v1-1-5',
@@ -133,7 +133,7 @@ export const berberLessons: Lesson[] = [
         questionFr: 'Comment dit-on "Bonsoir" en Berbère?',
         correctAnswer: 'Azul fell-awen',
         correctAnswerFr: 'Azul fell-awen',
-        options: ['Azul fell-awen', 'Azul fell-awen', 'Ar tufat', 'Tanemmirt']
+        options: ['Azul fell-awen', 'Azul', 'Ar tufat', 'Tanemmirt']
       },
       {
         id: 'ber-v1-1-15',
@@ -422,9 +422,9 @@ export const berberLessons: Lesson[] = [
         type: 'multiple-choice',
         question: 'What is "pen" in Berber?',
         questionFr: 'Comment dit-on "stylo" en Berbère?',
-        correctAnswer: 'Aman',
-        correctAnswerFr: 'Aman',
-        options: ['Aman', 'Tasdawit', 'Taddart', 'Tiremt']
+        correctAnswer: 'Aqlem',
+        correctAnswerFr: 'Aqlem',
+        options: ['Aqlem', 'Tasdawit', 'Taddart', 'Tiremt']
       },
       {
         id: 'ber-v1-3-6',
@@ -703,44 +703,44 @@ export const berberLessons: Lesson[] = [
         type: 'multiple-choice',
         question: 'What is "cheap" in Berber?',
         questionFr: 'Comment dit-on "bon marché" en Berbère?',
-        correctAnswer: 'Aɣezzaf',
-        correctAnswerFr: 'Aɣezzaf',
-        options: ['Aɣezzaf', 'Aɣezzaf', 'Aḥerran', 'Aḥes']
+        correctAnswer: 'Arxis',
+        correctAnswerFr: 'Arxis',
+        options: ['Arxis', 'Aɣezzaf', 'Aḥerran', 'Aḥes']
       },
       {
         id: 'ber-v1-4-17',
         type: 'multiple-choice',
         question: 'What is "clean" in Berber?',
         questionFr: 'Comment dit-on "propre" en Berbère?',
-        correctAnswer: 'Amellal',
-        correctAnswerFr: 'Amellal',
-        options: ['Amellal', 'Aɣezzaf', 'Aɣezzaf', 'Aḥerran']
+        correctAnswer: 'Iṣafaḍen',
+        correctAnswerFr: 'Iṣafaḍen',
+        options: ['Iṣafaḍen', 'Arxis', 'Aɣezzaf', 'Aḥerran']
       },
       {
         id: 'ber-v1-4-18',
         type: 'type-answer',
         question: 'Type "dirty" in Berber',
         questionFr: 'Tapez "sale" en Berbère',
-        correctAnswer: 'Aɣezzaf',
-        correctAnswerFr: 'Aɣezzaf'
+        correctAnswer: 'Aberkan',
+        correctAnswerFr: 'Aberkan'
       },
       {
         id: 'ber-v1-4-19',
         type: 'multiple-choice',
         question: 'What is "full" in Berber?',
         questionFr: 'Comment dit-on "plein" en Berbère?',
-        correctAnswer: 'Aɣezzaf',
-        correctAnswerFr: 'Aɣezzaf',
-        options: ['Aɣezzaf', 'Aɣezzaf', 'Amellal', 'Aɣezzaf']
+        correctAnswer: 'Iččan',
+        correctAnswerFr: 'Iččan',
+        options: ['Iččan', 'Iferrahen', 'Amellal', 'Arxis']
       },
       {
         id: 'ber-v1-4-20',
         type: 'multiple-choice',
         question: 'What is "empty" in Berber?',
         questionFr: 'Comment dit-on "vide" en Berbère?',
-        correctAnswer: 'Aɣezzaf',
-        correctAnswerFr: 'Aɣezzaf',
-        options: ['Aɣezzaf', 'Aɣezzaf', 'Amellal', 'Aɣezzaf']
+        correctAnswer: 'Iferrahen',
+        correctAnswerFr: 'Iferrahen',
+        options: ['Iferrahen', 'Iččan', 'Amellal', 'Arxis']
       }
     ]
   },
@@ -846,17 +846,17 @@ export const berberLessons: Lesson[] = [
         type: 'multiple-choice',
         question: 'What is "red" in Berber?',
         questionFr: 'Comment dit-on "rouge" en Berbère?',
-        correctAnswer: 'Azegzaw',
-        correctAnswerFr: 'Azegzaw',
-        options: ['Azegzaw', 'Azegzaw', 'Azegzaw', 'Azegzaw']
+        correctAnswer: 'Azeggaɣ',
+        correctAnswerFr: 'Azeggaɣ',
+        options: ['Azeggaɣ', 'Azegzaw', 'Amellal', 'Aberkan']
       },
       {
         id: 'ber-v1-5-12',
         type: 'type-answer',
         question: 'Type "blue" in Berber',
         questionFr: 'Tapez "bleu" en Berbère',
-        correctAnswer: 'Azegzaw',
-        correctAnswerFr: 'Azegzaw'
+        correctAnswer: 'Azuggaɣ',
+        correctAnswerFr: 'Azuggaɣ'
       },
       {
         id: 'ber-v1-5-13',
@@ -865,7 +865,7 @@ export const berberLessons: Lesson[] = [
         questionFr: 'Comment dit-on "vert" en Berbère?',
         correctAnswer: 'Azegzaw',
         correctAnswerFr: 'Azegzaw',
-        options: ['Azegzaw', 'Azegzaw', 'Azegzaw', 'Azegzaw']
+        options: ['Azegzaw', 'Azeggaɣ', 'Amellal', 'Aberkan']
       },
       {
         id: 'ber-v1-5-14',
@@ -874,7 +874,7 @@ export const berberLessons: Lesson[] = [
         questionFr: 'Comment dit-on "blanc" en Berbère?',
         correctAnswer: 'Amellal',
         correctAnswerFr: 'Amellal',
-        options: ['Amellal', 'Azegzaw', 'Azegzaw', 'Azegzaw']
+        options: ['Amellal', 'Azegzaw', 'Azeggaɣ', 'Aberkan']
       },
       {
         id: 'ber-v1-5-15',
@@ -898,35 +898,35 @@ export const berberLessons: Lesson[] = [
         type: 'multiple-choice',
         question: 'What is "orange" in Berber?',
         questionFr: 'Comment dit-on "orange" en Berbère?',
-        correctAnswer: 'Azegzaw',
-        correctAnswerFr: 'Azegzaw',
-        options: ['Azegzaw', 'Awraɣ', 'Aberkan', 'Amellal']
+        correctAnswer: 'Awraɣ-azeggaɣ',
+        correctAnswerFr: 'Awraɣ-azeggaɣ',
+        options: ['Awraɣ-azeggaɣ', 'Awraɣ', 'Aberkan', 'Amellal']
       },
       {
         id: 'ber-v1-5-18',
         type: 'type-answer',
         question: 'Type "purple" in Berber',
         questionFr: 'Tapez "violet" en Berbère',
-        correctAnswer: 'Azegzaw',
-        correctAnswerFr: 'Azegzaw'
+        correctAnswer: 'Anmiregan',
+        correctAnswerFr: 'Anmiregan'
       },
       {
         id: 'ber-v1-5-19',
         type: 'multiple-choice',
         question: 'What is "brown" in Berber?',
         questionFr: 'Comment dit-on "marron" en Berbère?',
-        correctAnswer: 'Azegzaw',
-        correctAnswerFr: 'Azegzaw',
-        options: ['Azegzaw', 'Azegzaw', 'Azegzaw', 'Awraɣ']
+        correctAnswer: 'Aberkan-awraɣ',
+        correctAnswerFr: 'Aberkan-awraɣ',
+        options: ['Aberkan-awraɣ', 'Awraɣ', 'Amellal', 'Azegzaw']
       },
       {
         id: 'ber-v1-5-20',
         type: 'multiple-choice',
         question: 'What is "gray" in Berber?',
         questionFr: 'Comment dit-on "gris" en Berbère?',
-        correctAnswer: 'Azegzaw',
-        correctAnswerFr: 'Azegzaw',
-        options: ['Azegzaw', 'Azegzaw', 'Azegzaw', 'Azegzaw']
+        correctAnswer: 'Amellal-aberkan',
+        correctAnswerFr: 'Amellal-aberkan',
+        options: ['Amellal-aberkan', 'Awraɣ', 'Azegzaw', 'Azeggaɣ']
       }
     ]
   }

@@ -675,16 +675,16 @@ export const igboLessons: Lesson[] = [
         type: 'multiple-choice',
         question: 'How do you say "You\'re welcome"?',
         questionFr: 'Comment dit-on "De rien"?',
-        correctAnswer: 'Kedu ka ị mere',
-        options: ['Kedu ka ị mere', 'Daalụ', 'Ndewo', 'Biko']
+        correctAnswer: 'Ọ dị mma',
+        options: ['Ọ dị mma', 'Daalụ', 'Ndewo', 'Biko']
       },
       {
         id: 'ig-l20-q20',
         type: 'multiple-choice',
         question: 'What is "Good evening" in Igbo?',
         questionFr: 'Qu\'est-ce que "Bonsoir" en Igbo?',
-        correctAnswer: 'Ehihie ọma',
-        options: ['Ehihie ọma', 'Ụtụtụ ọma', 'Abalị ọma', 'Ndewo']
+        correctAnswer: 'Abalị ọma',
+        options: ['Abalị ọma', 'Ụtụtụ ọma', 'Ehihie ọma', 'Ndewo']
       }
     ]
   }

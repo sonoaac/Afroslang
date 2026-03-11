@@ -5,8 +5,12 @@ import { useAuth } from '../../contexts/AuthContext';
 import { getLanguageById } from '../../data/languages';
 import { FlagIcon } from '../language-select/FlagIcon';
 import { Exercise } from '../../types';
+import { RainCanvas } from '../../components/rain/RainCanvas';
+import { MascotFactCard } from '../../components/rain/MascotFactCard';
+import { RAIN_LANGUAGES } from '../../data/culturalFacts';
 
-import './StackedLessonCards.css';
+import './HomeFeed.css';
+import '../../components/rain/MascotFactCard.css';
 
 interface LearningPathProps {
   interfaceLanguage: InterfaceLanguage;
@@ -157,6 +161,13 @@ export function LearningPath({
   };
 
   const currentLessonInfo = getCurrentLesson();
+  const showRain = currentLanguageId ? RAIN_LANGUAGES.has(currentLanguageId) : false;
+
+  const STAGE_COLORS = ['#b00020','#cc0028','#e53935','#9b0019','#d32f2f','#c62828','#bf360c'];
+  const TYPE_ICONS: Record<string, string> = { vocabulary:'🔤', grammar:'⚡', culture:'🌍', writing:'✍️' };
+  const xpPercent = Math.min(100, ((progress.xp ?? 0) % 100));
+  const userName = (userData as any)?.username || (isGuest ? (isEnglish ? 'Guest' : 'Invité') : 'You');
+  const initials = userName.slice(0, 2).toUpperCase();
 
   const getStageForIndex = (stageIndex: number): Stage => {
     const real = stages[stageIndex];
@@ -194,282 +205,265 @@ export function LearningPath({
   // Safety check
   if (!stages || stages.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center space-y-8">
-          <div className="text-8xl animate-bounce">📚</div>
-          <h2 className="text-5xl text-gray-900 mb-4">
+      <div style={{ minHeight:'100svh', display:'flex', alignItems:'center', justifyContent:'center', background:'#080808' }}>
+        <div style={{ textAlign:'center' }}>
+          <div style={{ fontSize:'4rem' }}>📚</div>
+          <p style={{ color:'#4ade80', fontFamily:'Times New Roman', fontSize:'1.2rem', marginTop:16 }}>
             {isEnglish ? 'Lessons Coming Soon!' : 'Leçons à venir!'}
-          </h2>
+          </p>
         </div>
       </div>
     );
   }
 
+  const NAV_ITEMS = [
+    { key:'learn',        icon:<Home className="w-5 h-5"/>,       label: isEnglish?'Learn':'Apprendre' },
+    { key:'leaderboard',  icon:<TrophyIcon className="w-5 h-5"/>, label: isEnglish?'Ranks':'Classements' },
+    { key:'shop',         icon:<Store className="w-5 h-5"/>,      label: isEnglish?'Shop':'Boutique' },
+    { key:'latest-news',  icon:<Newspaper className="w-5 h-5"/>,  label: isEnglish?'News':'Actualités' },
+    { key:'profile',      icon:<User className="w-5 h-5"/>,       label: isEnglish?'Profile':'Profil' },
+  ] as const;
+
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      {/* Left Sidebar - Hidden on mobile */}
-      <div className="hidden md:flex w-20 flex-shrink-0 bg-gray-50 border-r border-gray-200 flex flex-col items-center py-6">
-        {/* Logo at top */}
-        <button
-          onClick={() => handleSidebarClick('learn')}
-          className="mb-6 w-14 h-14 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
-        >
-          {logoError ? (
-            <div className="w-12 h-12 rounded-full bg-green-500" />
-          ) : (
-            <img
-              src="/afroslang-logo.png"
-              alt="Afroslang logo"
-              className="w-12 h-12 rounded-full object-contain animate-bounce hover:scale-110 transition-transform"
-              onError={() => setLogoError(true)}
-            />
-          )}
-        </button>
+    <div className="hf-page">
+      {showRain && <RainCanvas intensity="heavy" />}
 
-        {/* Navigation Icons */}
-        <div className="flex flex-col gap-4 flex-1">
-          {/* Learn (active when on this page) */}
-          <div className="relative group">
-            <button
-              onClick={() => handleSidebarClick('learn')}
-              className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all ${
-                activeSidebarItem === 'learn'
-                  ? 'bg-green-500 text-white shadow-lg'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-              aria-label="Learn"
-            >
-              <Home className="w-6 h-6" />
-            </button>
-            <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-              {isEnglish ? 'Learn' : 'Apprendre'}
-            </div>
-          </div>
-
-          {/* Leaderboards */}
-          <div className="relative group">
-            <button
-              onClick={() => handleSidebarClick('leaderboard')}
-              className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all ${
-                activeSidebarItem === 'leaderboard'
-                  ? 'bg-yellow-400 text-white shadow-lg'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-              aria-label="Leaderboards"
-            >
-              <TrophyIcon className="w-6 h-6" />
-            </button>
-            <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-              {isEnglish ? 'Leaderboards' : 'Classements'}
-            </div>
-          </div>
-
-          {/* Quests */}
-          <div className="relative group">
-            <button
-              onClick={() => handleSidebarClick('quests')}
-              className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all ${
-                activeSidebarItem === 'quests'
-                  ? 'bg-blue-500 text-white shadow-lg'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-              aria-label="Quests"
-            >
-              <Shield className="w-6 h-6" />
-            </button>
-            <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-              {isEnglish ? 'Quests' : 'Quêtes'}
-            </div>
-          </div>
-
-          {/* Shop */}
-          <div className="relative group">
-            <button
-              onClick={() => handleSidebarClick('shop')}
-              className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all ${
-                activeSidebarItem === 'shop'
-                  ? 'bg-purple-500 text-white shadow-lg'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-              aria-label="Shop"
-            >
-              <Store className="w-6 h-6" />
-            </button>
-            <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-              {isEnglish ? 'Shop' : 'Boutique'}
-            </div>
-          </div>
-
-          {/* Latest News */}
-          <div className="relative group">
-            <button
-              onClick={() => handleSidebarClick('latest-news')}
-              className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all ${
-                activeSidebarItem === 'latest-news'
-                  ? 'bg-orange-500 text-white shadow-lg'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-              aria-label="Latest News"
-            >
-              <Newspaper className="w-6 h-6" />
-            </button>
-            <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-              {isEnglish ? 'Latest News' : 'Dernières Actualités'}
-            </div>
-          </div>
-
-          {/* Profile */}
-          <div className="relative group">
-            <button
-              onClick={() => handleSidebarClick('profile')}
-              className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all ${
-                activeSidebarItem === 'profile'
-                  ? 'bg-red-500 text-white shadow-lg'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-              aria-label="Profile"
-            >
-              <User className="w-6 h-6" />
-            </button>
-            <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-              {isEnglish ? 'Profile' : 'Profil'}
-            </div>
-          </div>
-
-          {/* Settings */}
-          <div className="relative group">
-            <button
-              onClick={() => handleSidebarClick('settings')}
-              className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all ${
-                activeSidebarItem === 'settings'
-                  ? 'bg-gray-700 text-white shadow-lg'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-              aria-label="Settings"
-            >
-              <Settings className="w-6 h-6" />
-            </button>
-            <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-              {isEnglish ? 'Settings' : 'Paramètres'}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Central Content Area */}
-      <div className="flex-1 flex flex-col overflow-y-auto min-w-0">
-        {/* Mobile Header - Only visible on mobile */}
-        <div className="md:hidden bg-gray-900 text-white px-4 py-4 flex items-center justify-between sticky top-0 z-40">
+      {/* ── Desktop sidebar ── */}
+      <nav className="hf-sidebar">
+        {logoError ? (
+          <div style={{ width:40,height:40,borderRadius:'50%',background:'#b00020',marginBottom:16 }}/>
+        ) : (
+          <img
+            className="hf-sidebar-logo"
+            src="/Afroslang.png"
+            alt="Afroslang"
+            onError={() => setLogoError(true)}
+            onClick={() => handleSidebarClick('learn')}
+          />
+        )}
+        {NAV_ITEMS.map(item => (
           <button
-            onClick={onBackToLanguageSelect}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            key={item.key}
+            className={`hf-sidebar-btn${activeSidebarItem === item.key ? ' hf-sidebar-btn--active' : ''}`}
+            onClick={() => handleSidebarClick(item.key as any)}
+            aria-label={item.label}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            {item.icon}
+            <span className="hf-sidebar-tooltip">{item.label}</span>
           </button>
-          {currentLanguage && currentLanguage.flags && currentLanguage.flags.length > 0 && (
-            <FlagIcon country={currentLanguage.flags[0]} size="md" />
-          )}
-          <div className="flex items-center gap-2">
-            <Heart className="w-5 h-5 fill-white" />
-            <span className="font-semibold">{progress.hearts}</span>
+        ))}
+        <button
+          className={`hf-sidebar-btn${activeSidebarItem === 'settings' ? ' hf-sidebar-btn--active' : ''}`}
+          onClick={() => handleSidebarClick('settings')}
+          aria-label={isEnglish ? 'Settings' : 'Paramètres'}
+          style={{ marginTop:'auto' }}
+        >
+          <Settings className="w-5 h-5"/>
+          <span className="hf-sidebar-tooltip">{isEnglish ? 'Settings' : 'Paramètres'}</span>
+        </button>
+      </nav>
+
+      {/* ── Main feed ── */}
+      <main className="hf-feed">
+
+        {/* Top bar */}
+        <header className="hf-topbar">
+          <div className="hf-topbar-brand" onClick={() => handleSidebarClick('learn')}>
+            {logoError ? (
+              <span style={{ fontSize:'1.4rem' }}>🐦</span>
+            ) : (
+              <img className="hf-topbar-logo" src="/Afroslang.png" alt="" onError={() => setLogoError(true)} />
+            )}
+            <span className="hf-topbar-name">Afroslang</span>
           </div>
-        </div>
 
-        {/* Lesson Stacks */}
-        <div className="flex-1 px-3 sm:px-6 py-4 sm:py-6">
-          <div className="afroStackedWrap">
-            <div className="space-y-6">
-              {Array.from({ length: 7 }).map((_, stageIndex) => {
-                const stage = getStageForIndex(stageIndex);
-                const stageTitle = isEnglish ? stage.title : stage.titleFr;
+          <div className="hf-topbar-lang">
+            {currentLanguage?.flags?.[0] && (
+              <FlagIcon country={currentLanguage.flags[0]} size="sm" />
+            )}
+            <span className="hf-topbar-langname">
+              {currentLanguage?.name ?? (currentLanguageId ?? '')}
+            </span>
+          </div>
 
-                return (
-                  <section
-                    key={stage.id}
-                    className="afroStackedCards"
-                    aria-label={isEnglish ? `Stage ${stageIndex + 1} lessons` : `Étape ${stageIndex + 1} leçons`}
-                  >
-                    <div className="afroStackSectionHeader">
-                      <h2>{(stageTitle || (isEnglish ? 'Lessons' : 'Leçons')).trim()}</h2>
-                      <p>{isEnglish ? '7 lessons • 20 questions each' : '7 leçons • 20 questions chacune'}</p>
-                    </div>
+          <div className="hf-topbar-right">
+            <span className="hf-topbar-stat">❤️ {progress.hearts}</span>
+            <span className="hf-topbar-stat">🔥 {progress.streak ?? 0}</span>
+          </div>
+        </header>
 
-                    <div className="afroStackGrid">
-                      <div className="afroStackRow">
-                        {Array.from({ length: 7 }).map((_, slotIndex) => {
-                          const { lesson, isReal } = getLessonForSlot(stageIndex, slotIndex);
-                          const unlocked = isReal ? isLessonUnlocked(lesson) : false;
-                          const completed = isReal ? isLessonCompleted(lesson.id) : false;
-                          const heartsBlocked = progress.hearts === 0 && !isGuest && !userData?.subscription?.active && !completed;
-                          const label = isReal
-                            ? (isEnglish ? lesson.title : (lesson.titleFr || lesson.title))
-                            : (isEnglish ? `Lesson ${slotIndex + 1}` : `Leçon ${slotIndex + 1}`);
+        <div className="hf-feed-body">
 
-                          return (
-                            <article key={lesson.id} className="afroStackCard" tabIndex={0}>
-                              <div className="afroStackMeta">
-                                {isEnglish ? `Lesson ${slotIndex + 1}` : `Leçon ${slotIndex + 1}`} • {
-                                  !isReal
-                                    ? (isEnglish ? 'Coming soon' : 'Bientôt')
-                                    : completed
-                                      ? (isEnglish ? 'Completed' : 'Terminé')
-                                      : unlocked
-                                        ? (isEnglish ? 'Ready' : 'Prêt')
-                                        : (isEnglish ? 'Locked' : 'Verrouillé')
-                                }
-                              </div>
-                              <h3>{label}</h3>
-                              <p className="afroStackDesc">
-                                {!isReal
-                                  ? (isEnglish ? 'More content is coming for this stage.' : 'Plus de contenu arrive pour cette étape.')
-                                  : (isEnglish ? '20 questions. Keep your hearts to continue.' : '20 questions. Gardez vos cœurs pour continuer.')}
-                              </p>
-
-                              <div className="afroStackFooter">
-                                <button
-                                  type="button"
-                                  className="afroStackButton"
-                                  onClick={() => {
-                                    if (!isReal) return;
-                                    if (!unlocked) return;
-                                    if (heartsBlocked) return;
-                                    startLessonWithTwentyQuestions(lesson);
-                                  }}
-                                  disabled={!isReal || !unlocked || heartsBlocked}
-                                >
-                                  {!isReal
-                                    ? (isEnglish ? 'Soon' : 'Bientôt')
-                                    : completed
-                                      ? (isEnglish ? 'Review' : 'Réviser')
-                                      : isEnglish
-                                        ? 'Start'
-                                        : 'Démarrer'}
-                                </button>
-
-                                <span className="afroStackPill">
-                                  {!isReal
-                                    ? (isEnglish ? '⏳ Soon' : '⏳ Bientôt')
-                                    : completed
-                                      ? (isEnglish ? '★ Done' : '★ Fait')
-                                      : unlocked
-                                        ? (isEnglish ? '✓ Unlocked' : '✓ Débloqué')
-                                        : (isEnglish ? '🔒 Locked' : '🔒 Verrouillé')}
-                                </span>
-                              </div>
-                            </article>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </section>
-                );
-              })}
+          {/* Profile / XP strip */}
+          <div className="hf-profile-strip">
+            <div className="hf-avatar">{initials}</div>
+            <div className="hf-profile-info">
+              <div className="hf-profile-name">{userName}</div>
+              <div className="hf-profile-level">
+                {isEnglish ? `Level ${progress.level ?? 1}` : `Niveau ${progress.level ?? 1}`}
+              </div>
+              <div className="hf-xp-bar-track">
+                <div className="hf-xp-bar-fill" style={{ width: `${xpPercent}%` }} />
+              </div>
+            </div>
+            <div className="hf-profile-badges">
+              <span className="hf-badge">⚡ {progress.xp ?? 0} XP</span>
+              <span className="hf-badge">
+                {(progress.completedLessons?.length ?? 0)} {isEnglish ? 'done' : 'faits'}
+              </span>
             </div>
           </div>
-        </div>
-      </div>
+
+          {/* Continue card */}
+          {currentLessonInfo && (
+            <div className="hf-continue-card">
+              <div className="hf-continue-icon">
+                {TYPE_ICONS[currentLessonInfo.lesson.type] ?? '📖'}
+              </div>
+              <div className="hf-continue-text">
+                <div className="hf-continue-label">
+                  {isEnglish ? `Stage ${currentLessonInfo.stage.stageNumber} · Continue` : `Étape ${currentLessonInfo.stage.stageNumber} · Continuer`}
+                </div>
+                <div className="hf-continue-title">
+                  {isEnglish ? currentLessonInfo.lesson.title : (currentLessonInfo.lesson.titleFr || currentLessonInfo.lesson.title)}
+                </div>
+              </div>
+              <button
+                className="hf-continue-btn"
+                onClick={() => startLessonWithTwentyQuestions(currentLessonInfo.lesson)}
+              >
+                {isEnglish ? 'Go' : 'Aller'}
+              </button>
+            </div>
+          )}
+
+          {/* Cultural fact card */}
+          {currentLanguageId && (
+            <div className="hf-fact-wrap">
+              <MascotFactCard languageId={currentLanguageId} isEnglish={isEnglish} />
+            </div>
+          )}
+
+          {/* Stage sections */}
+          {Array.from({ length: 7 }).map((_, stageIndex) => {
+            const stage = getStageForIndex(stageIndex);
+            const stageTitle = isEnglish ? stage.title : stage.titleFr;
+            const accent = STAGE_COLORS[stageIndex] ?? '#22c55e';
+
+            return (
+              <div key={stage.id}>
+                {stageIndex > 0 && <div className="hf-stage-divider" />}
+
+                <section
+                  className="hf-stage-section"
+                  aria-label={`Stage ${stageIndex + 1}`}
+                >
+                  {/* Stage header */}
+                  <div className="hf-stage-header">
+                    <span className="hf-stage-dot" style={{ color: accent, background: accent }} />
+                    <span className="hf-stage-num">
+                      {isEnglish ? `Stage ${stageIndex + 1}` : `Étape ${stageIndex + 1}`}
+                    </span>
+                    <span className="hf-stage-title">
+                      {(stageTitle || (isEnglish ? 'Lessons' : 'Leçons')).trim()}
+                    </span>
+                    <span className="hf-stage-count">7 · 20Q</span>
+                  </div>
+
+                  {/* Lessons horizontal row */}
+                  <div className="hf-lessons-row">
+                    {Array.from({ length: 7 }).map((_, slotIndex) => {
+                      const { lesson, isReal } = getLessonForSlot(stageIndex, slotIndex);
+                      const unlocked  = isReal ? isLessonUnlocked(lesson)  : false;
+                      const completed = isReal ? isLessonCompleted(lesson.id) : false;
+                      const heartsBlocked = progress.hearts === 0 && !isGuest && !userData?.subscription?.active && !completed;
+                      const title = isReal
+                        ? (isEnglish ? lesson.title : (lesson.titleFr || lesson.title))
+                        : (isEnglish ? `Lesson ${slotIndex + 1}` : `Leçon ${slotIndex + 1}`);
+
+                      const cardState = !isReal ? 'soon'
+                        : completed  ? 'done'
+                        : unlocked   ? 'active'
+                        : 'locked';
+
+                      const btnClass = `hf-card-btn hf-card-btn--${cardState === 'done' ? 'review' : cardState}`;
+
+                      return (
+                        <article
+                          key={lesson.id}
+                          className={`hf-lesson-card hf-lesson-card--${cardState}`}
+                          style={{ '--stage-color': accent } as React.CSSProperties}
+                          tabIndex={unlocked && isReal ? 0 : -1}
+                          onClick={() => {
+                            if (!isReal || !unlocked || heartsBlocked) return;
+                            startLessonWithTwentyQuestions(lesson);
+                          }}
+                        >
+                          <div className="hf-card-top">
+                            <span className="hf-card-num">
+                              {isEnglish ? `#${slotIndex + 1}` : `#${slotIndex + 1}`}
+                            </span>
+                            <span className="hf-card-status">
+                              {cardState === 'done' ? '✅'
+                                : cardState === 'active' ? '▶️'
+                                : cardState === 'locked' ? '🔒'
+                                : '⏳'}
+                            </span>
+                          </div>
+
+                          <div className="hf-card-type-icon">
+                            {isReal ? (TYPE_ICONS[lesson.type] ?? '📖') : '🕐'}
+                          </div>
+
+                          <div className="hf-card-title">{title}</div>
+
+                          <div className="hf-card-meta">
+                            {isReal && <span className="hf-card-xp">⚡{lesson.xpReward ?? 10} XP</span>}
+                            <span className="hf-card-type-label">
+                              {isReal ? lesson.type : (isEnglish ? 'Soon' : 'Bientôt')}
+                            </span>
+                          </div>
+
+                          <button
+                            type="button"
+                            className={btnClass}
+                            disabled={!isReal || !unlocked || heartsBlocked}
+                            onClick={e => {
+                              e.stopPropagation();
+                              if (!isReal || !unlocked || heartsBlocked) return;
+                              startLessonWithTwentyQuestions(lesson);
+                            }}
+                          >
+                            {cardState === 'soon'   ? (isEnglish ? 'Soon' : 'Bientôt')
+                             : cardState === 'done'  ? (isEnglish ? 'Review' : 'Réviser')
+                             : cardState === 'locked'? (isEnglish ? 'Locked' : 'Verrouillé')
+                             : (isEnglish ? 'Start' : 'Démarrer')}
+                          </button>
+                        </article>
+                      );
+                    })}
+                  </div>
+                </section>
+              </div>
+            );
+          })}
+
+        </div>{/* end hf-feed-body */}
+      </main>
+
+      {/* ── Mobile bottom nav ── */}
+      <nav className="hf-bottom-nav">
+        {NAV_ITEMS.map(item => (
+          <button
+            key={item.key}
+            className={`hf-bnav-btn${activeSidebarItem === item.key ? ' hf-bnav-btn--active' : ''}`}
+            onClick={() => handleSidebarClick(item.key as any)}
+          >
+            {item.icon}
+            <span className="hf-bnav-label">{item.label}</span>
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }

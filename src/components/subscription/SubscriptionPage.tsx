@@ -59,45 +59,52 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({ onBack }) =>
 
   const isSubscribed = userData?.subscription?.active;
 
+  const subFont = "'Times New Roman', Georgia, serif";
+  const subBg = '#080808';
+  const subSurface = '#111111';
+  const subBorder = 'rgba(255,255,255,0.08)';
+  const subRed = '#b00020';
+  const subText = '#ffffff';
+  const subMuted = 'rgba(255,255,255,0.6)';
+  const subDim = 'rgba(255,255,255,0.35)';
+
+  const BackBtn = () => (
+    <button
+      onClick={onBack}
+      style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: subSurface, border: `1px solid ${subBorder}`, color: subMuted, padding: '0.6rem 1.2rem', cursor: 'pointer', fontFamily: subFont, fontSize: '0.9rem', transition: 'border-color 0.2s, color 0.2s', marginBottom: '2rem' }}
+      onMouseEnter={(e) => { const el = e.currentTarget as HTMLButtonElement; el.style.borderColor = subRed; el.style.color = subText; }}
+      onMouseLeave={(e) => { const el = e.currentTarget as HTMLButtonElement; el.style.borderColor = subBorder; el.style.color = subMuted; }}
+    >
+      <ChevronLeft style={{ width: 18, height: 18 }} strokeWidth={2} />
+      Back
+    </button>
+  );
+
   // Show message for guest users
   if (isGuest) {
     return (
-      <div className="min-h-screen p-6" style={{ background: 'var(--app-bg)' }}>
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center gap-4 mb-8">
-            <button
-              onClick={onBack}
-              className="flex items-center gap-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-xl px-6 py-3 transition-all"
-            >
-              <ChevronLeft className="w-5 h-5 text-white" />
-              <span className="text-white font-medium">Back</span>
-            </button>
-          </div>
-
-          {/* Guest Message */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 text-center">
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <Crown className="w-12 h-12 text-yellow-400" />
-              <h1 className="text-4xl font-bold text-white">Create Account to Subscribe</h1>
-            </div>
-            
-            <p className="text-white/80 text-xl mb-8">
+      <div style={{ minHeight: '100vh', background: subBg, padding: '1.5rem', fontFamily: subFont }}>
+        <div style={{ maxWidth: 600, margin: '0 auto' }}>
+          <BackBtn />
+          <div style={{ height: '2px', background: subRed, marginBottom: '2rem', opacity: 0.7 }} />
+          <div style={{ background: subSurface, border: `1px solid ${subBorder}`, padding: '2.5rem 2rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: subRed }} />
+            <Crown style={{ width: 40, height: 40, color: subRed, margin: '0 auto 1rem', display: 'block' }} strokeWidth={1.5} />
+            <h1 style={{ color: subText, fontFamily: subFont, fontSize: 'clamp(1.3rem, 4vw, 2rem)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '1rem' }}>
+              Create Account to Subscribe
+            </h1>
+            <p style={{ color: subMuted, fontFamily: subFont, fontSize: '1rem', lineHeight: 1.6, marginBottom: '2rem' }}>
               To subscribe to Afroslang Premium, please create an account first. This ensures your subscription is properly linked and you can access all premium features.
             </p>
-
-            <div className="space-y-4">
-              <button
-                onClick={() => {
-                  // This would trigger sign up modal
-                  alert('Please use the profile menu to sign up for an account first.');
-                }}
-                className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold py-4 px-8 rounded-2xl transition-all hover:scale-105 flex items-center justify-center gap-3"
-              >
-                <Crown className="w-5 h-5" />
-                Create Account to Subscribe
-              </button>
-            </div>
+            <button
+              onClick={() => { alert('Please use the profile menu to sign up for an account first.'); }}
+              style={{ background: subRed, border: 'none', color: subText, fontFamily: subFont, fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.1em', padding: '0.9rem 2rem', cursor: 'pointer', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', transition: 'background 0.2s' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#e53935'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = subRed; }}
+            >
+              <Crown style={{ width: 18, height: 18 }} strokeWidth={2} />
+              Create Account to Subscribe
+            </button>
           </div>
         </div>
       </div>
@@ -106,38 +113,27 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({ onBack }) =>
 
   if (isSubscribed) {
     return (
-      <div className="min-h-screen p-6" style={{ background: 'var(--app-bg)' }}>
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center gap-4 mb-8">
-            <button
-              onClick={onBack}
-              className="flex items-center gap-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-xl px-6 py-3 transition-all"
-            >
-              <ChevronLeft className="w-5 h-5 text-white" />
-              <span className="text-white font-medium">Back</span>
-            </button>
-          </div>
-
-          {/* Premium Status */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 text-center">
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <Crown className="w-12 h-12 text-yellow-400" />
-              <h1 className="text-4xl font-bold text-white">Premium Active!</h1>
-            </div>
-            
-            <p className="text-white/80 text-xl mb-8">
+      <div style={{ minHeight: '100vh', background: subBg, padding: '1.5rem', fontFamily: subFont }}>
+        <div style={{ maxWidth: 800, margin: '0 auto' }}>
+          <BackBtn />
+          <div style={{ height: '2px', background: subRed, marginBottom: '2rem', opacity: 0.7 }} />
+          <div style={{ background: subSurface, border: `1px solid ${subBorder}`, padding: '2.5rem 2rem', textAlign: 'center', position: 'relative', overflow: 'hidden', marginBottom: '1.5rem' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: subRed }} />
+            <Crown style={{ width: 40, height: 40, color: subRed, margin: '0 auto 1rem', display: 'block' }} strokeWidth={1.5} />
+            <h1 style={{ color: subText, fontFamily: subFont, fontSize: 'clamp(1.5rem, 4vw, 2.2rem)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>
+              Premium Active
+            </h1>
+            <p style={{ color: subMuted, fontFamily: subFont, fontSize: '1rem', marginBottom: '2rem' }}>
               You're enjoying all premium features
             </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem', textAlign: 'left' }}>
               {PREMIUM_FEATURES.map((feature, index) => (
-                <div key={index} className="bg-white/10 rounded-2xl p-6 text-left">
-                  <div className="flex items-center gap-4 mb-3">
-                    <span className="text-3xl">{feature.icon}</span>
-                    <h3 className="text-xl font-bold text-white">{feature.title}</h3>
+                <div key={index} style={{ background: 'rgba(176,0,32,0.06)', border: `1px solid rgba(176,0,32,0.2)`, borderLeft: `3px solid ${subRed}`, padding: '1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                    <span style={{ fontSize: '1.4rem' }}>{feature.icon}</span>
+                    <h3 style={{ color: subText, fontFamily: subFont, fontSize: '0.9rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>{feature.title}</h3>
                   </div>
-                  <p className="text-white/80">{feature.description}</p>
+                  <p style={{ color: subMuted, fontFamily: subFont, fontSize: '0.82rem', lineHeight: 1.4, margin: 0 }}>{feature.description}</p>
                 </div>
               ))}
             </div>
@@ -148,162 +144,127 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({ onBack }) =>
   }
 
   return (
-    <div className="min-h-screen p-6" style={{ background: 'var(--app-bg)' }}>
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={onBack}
-            className="flex items-center gap-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-xl px-6 py-3 transition-all"
-          >
-            <ChevronLeft className="w-5 h-5 text-white" />
-            <span className="text-white font-medium">Back</span>
-          </button>
-        </div>
+    <div style={{ minHeight: '100vh', background: subBg, padding: '1.5rem', fontFamily: subFont }}>
+      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        <BackBtn />
+        <div style={{ height: '2px', background: subRed, marginBottom: '2.5rem', opacity: 0.7 }} />
 
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <Crown className="w-16 h-16 text-yellow-400" />
-            <h1 className="text-6xl font-bold text-white">Afroslang Premium</h1>
-          </div>
-          <p className="text-2xl text-white/80 mb-8">
+        {/* Hero */}
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <Crown style={{ width: 48, height: 48, color: subRed, margin: '0 auto 1rem', display: 'block' }} strokeWidth={1.5} />
+          <h1 style={{ color: subText, fontFamily: subFont, fontSize: 'clamp(1.8rem, 5vw, 3.5rem)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem', margin: '0 0 0.75rem 0' }}>
+            Afroslang Premium
+          </h1>
+          <p style={{ color: subMuted, fontFamily: subFont, fontSize: '1.1rem' }}>
             Unlock unlimited learning potential with premium features
           </p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem', marginBottom: '2.5rem' }}>
           {PREMIUM_FEATURES.map((feature, index) => (
-            <div key={index} className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6">
-              <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
-                <span className="text-3xl sm:text-4xl">{feature.icon}</span>
-                <h3 className="text-lg sm:text-xl font-bold text-white">{feature.title}</h3>
+            <div key={index} style={{ background: subSurface, border: `1px solid ${subBorder}`, padding: '1.25rem', borderLeft: `3px solid rgba(176,0,32,0.4)` }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                <span style={{ fontSize: '1.5rem' }}>{feature.icon}</span>
+                <h3 style={{ color: subText, fontFamily: subFont, fontSize: '0.9rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>{feature.title}</h3>
               </div>
-              <p className="text-sm sm:text-base text-white/80">{feature.description}</p>
+              <p style={{ color: subMuted, fontFamily: subFont, fontSize: '0.82rem', lineHeight: 1.4, margin: 0 }}>{feature.description}</p>
             </div>
           ))}
         </div>
 
         {/* Pricing Plans */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white text-center mb-6 sm:mb-8">
+        <div style={{ background: subSurface, border: `1px solid ${subBorder}`, padding: '2rem', marginBottom: '2rem', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: subRed }} />
+          <h2 style={{ color: subText, fontFamily: subFont, fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.15em', textAlign: 'center', marginBottom: '1.5rem', marginTop: 0 }}>
             Choose Your Plan
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-            {/* Monthly Plan */}
-            <div className={`bg-white/10 rounded-xl sm:rounded-2xl p-6 sm:p-8 transition-all ${
-              selectedPlan === 'monthly' ? 'ring-2 ring-white/50' : ''
-            }`}>
-              <div className="text-center">
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Monthly</h3>
-                <div className="text-3xl sm:text-4xl font-bold text-white mb-2">$5.99</div>
-                <div className="text-white/60 mb-2 text-sm sm:text-base">per month</div>
-                <div className="bg-green-500 text-white text-xs sm:text-sm px-3 py-1 rounded-full mb-4 font-semibold">
-                  7-day FREE trial
-                </div>
-                
-                <button
-                  onClick={() => setSelectedPlan('monthly')}
-                  className={`w-full py-3 px-6 rounded-xl font-medium transition-all ${
-                    selectedPlan === 'monthly'
-                      ? 'bg-white text-purple-600'
-                      : 'bg-white/20 text-white hover:bg-white/30'
-                  }`}
-                >
-                  {selectedPlan === 'monthly' ? 'Selected' : 'Select Monthly'}
-                </button>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+            {/* Monthly */}
+            <div
+              onClick={() => setSelectedPlan('monthly')}
+              style={{ background: selectedPlan === 'monthly' ? 'rgba(176,0,32,0.12)' : 'rgba(255,255,255,0.02)', border: selectedPlan === 'monthly' ? `1px solid ${subRed}` : `1px solid ${subBorder}`, padding: '1.5rem', textAlign: 'center', cursor: 'pointer', transition: 'border-color 0.2s, background 0.2s' }}
+            >
+              <h3 style={{ color: subText, fontFamily: subFont, fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem', marginTop: 0 }}>Monthly</h3>
+              <div style={{ color: subText, fontFamily: subFont, fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>$5.99</div>
+              <div style={{ color: subMuted, fontSize: '0.82rem', fontFamily: subFont, marginBottom: '0.75rem' }}>per month</div>
+              <div style={{ background: 'rgba(176,0,32,0.2)', border: `1px solid rgba(176,0,32,0.4)`, color: '#fca5a5', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0.3rem 0.75rem', display: 'inline-block', marginBottom: '1rem', fontFamily: subFont }}>
+                7-day FREE trial
+              </div>
+              <div style={{ background: selectedPlan === 'monthly' ? subRed : 'transparent', border: `1px solid ${selectedPlan === 'monthly' ? subRed : subBorder}`, color: subText, fontFamily: subFont, fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0.5rem 1rem', cursor: 'pointer', transition: 'all 0.2s' }}>
+                {selectedPlan === 'monthly' ? 'Selected' : 'Select Monthly'}
               </div>
             </div>
 
-            {/* Yearly Plan */}
-            <div className={`bg-gradient-to-r from-yellow-400/20 to-yellow-500/20 rounded-xl sm:rounded-2xl p-6 sm:p-8 transition-all relative ${
-              selectedPlan === 'yearly' ? 'ring-2 ring-yellow-400/50' : ''
-            }`}>
-              <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-yellow-400 text-black px-3 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-bold">
-                  BEST VALUE
-                </div>
+            {/* Yearly */}
+            <div
+              onClick={() => setSelectedPlan('yearly')}
+              style={{ background: selectedPlan === 'yearly' ? 'rgba(176,0,32,0.12)' : 'rgba(255,255,255,0.02)', border: selectedPlan === 'yearly' ? `1px solid ${subRed}` : `1px solid ${subBorder}`, padding: '1.5rem', textAlign: 'center', cursor: 'pointer', transition: 'border-color 0.2s, background 0.2s', position: 'relative' }}
+            >
+              <div style={{ position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%)', background: subRed, color: subText, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.12em', padding: '0.25rem 0.75rem', fontFamily: subFont, whiteSpace: 'nowrap' }}>
+                Best Value
               </div>
-              
-              <div className="text-center">
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Yearly</h3>
-                <div className="text-3xl sm:text-4xl font-bold text-white mb-2">$39.99</div>
-                <div className="text-white/60 mb-2 text-sm sm:text-base">per year</div>
-                <div className="bg-green-500 text-white text-xs sm:text-sm px-3 py-1 rounded-full mb-2 font-semibold">
-                  7-day FREE trial
-                </div>
-                <div className="text-green-400 font-bold mb-4 sm:mb-6 text-sm sm:text-base">Save $32.89/year!</div>
-                
-                <button
-                  onClick={() => setSelectedPlan('yearly')}
-                  className={`w-full py-3 px-6 rounded-xl font-medium transition-all ${
-                    selectedPlan === 'yearly'
-                      ? 'bg-yellow-400 text-black'
-                      : 'bg-yellow-400/20 text-white hover:bg-yellow-400/30'
-                  }`}
-                >
-                  {selectedPlan === 'yearly' ? 'Selected' : 'Select Yearly'}
-                </button>
+              <h3 style={{ color: subText, fontFamily: subFont, fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem', marginTop: '0.75rem' }}>Yearly</h3>
+              <div style={{ color: subText, fontFamily: subFont, fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>$39.99</div>
+              <div style={{ color: subMuted, fontSize: '0.82rem', fontFamily: subFont, marginBottom: '0.5rem' }}>per year</div>
+              <div style={{ background: 'rgba(176,0,32,0.2)', border: `1px solid rgba(176,0,32,0.4)`, color: '#fca5a5', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0.3rem 0.75rem', display: 'inline-block', marginBottom: '0.5rem', fontFamily: subFont }}>
+                7-day FREE trial
+              </div>
+              <div style={{ color: '#86efac', fontSize: '0.82rem', fontFamily: subFont, marginBottom: '1rem' }}>Save $32.89/year</div>
+              <div style={{ background: selectedPlan === 'yearly' ? subRed : 'transparent', border: `1px solid ${selectedPlan === 'yearly' ? subRed : subBorder}`, color: subText, fontFamily: subFont, fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0.5rem 1rem', cursor: 'pointer', transition: 'all 0.2s' }}>
+                {selectedPlan === 'yearly' ? 'Selected' : 'Select Yearly'}
               </div>
             </div>
           </div>
 
-          {/* Subscribe Button */}
-          <div className="text-center mt-6 sm:mt-8">
+          {/* Subscribe CTA */}
+          <div style={{ textAlign: 'center' }}>
             <button
               onClick={() => handleSubscribe(selectedPlan)}
               disabled={loading !== null}
-              className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold text-lg sm:text-xl px-8 sm:px-12 py-3 sm:py-4 rounded-xl sm:rounded-2xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+              style={{ background: subRed, border: 'none', color: subText, fontFamily: subFont, fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.15em', padding: '1rem 3rem', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1, transition: 'background 0.2s', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}
+              onMouseEnter={(e) => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = '#e53935'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = subRed; }}
             >
               {loading ? (
-                <div className="flex items-center justify-center gap-2 sm:gap-3">
-                  <div className="animate-spin w-5 h-5 sm:w-6 sm:h-6 border-2 border-black/30 border-t-black rounded-full"></div>
-                  <span className="text-sm sm:text-base">Processing...</span>
-                </div>
+                <>
+                  <div style={{ width: 16, height: 16, border: `2px solid rgba(255,255,255,0.3)`, borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                  Processing...
+                </>
               ) : (
-                <div className="flex items-center justify-center gap-2 sm:gap-3">
-                  <Crown className="w-5 h-5 sm:w-6 sm:h-6" />
-                  <span className="text-sm sm:text-base">Subscribe to Premium</span>
-                </div>
+                <>
+                  <Crown style={{ width: 18, height: 18 }} strokeWidth={2} />
+                  Subscribe to Premium
+                </>
               )}
             </button>
-            
-            <p className="text-white/60 text-xs sm:text-sm mt-3 sm:mt-4">
+            <p style={{ color: subDim, fontSize: '0.75rem', fontFamily: subFont, margin: 0, letterSpacing: '0.04em' }}>
               Cancel anytime. Secure payment powered by Stripe.
             </p>
           </div>
         </div>
 
-        {/* FAQ Section */}
-        <div className="mt-12 bg-white/10 backdrop-blur-sm rounded-3xl p-8">
-          <h3 className="text-2xl font-bold text-white text-center mb-6">
+        {/* FAQ */}
+        <div style={{ background: subSurface, border: `1px solid ${subBorder}`, padding: '2rem' }}>
+          <h3 style={{ color: subText, fontFamily: subFont, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.15em', textAlign: 'center', marginBottom: '1.5rem', marginTop: 0 }}>
             Frequently Asked Questions
           </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-bold text-white mb-2">What happens to my progress?</h4>
-              <p className="text-white/80 text-sm">All your learning progress is saved and will continue to be available.</p>
-            </div>
-            
-            <div>
-              <h4 className="font-bold text-white mb-2">Can I cancel anytime?</h4>
-              <p className="text-white/80 text-sm">Yes! You can cancel your subscription at any time from your account settings.</p>
-            </div>
-            
-            <div>
-              <h4 className="font-bold text-white mb-2">What payment methods do you accept?</h4>
-              <p className="text-white/80 text-sm">We accept all major credit cards, debit cards, and digital wallets through Stripe.</p>
-            </div>
-            
-            <div>
-              <h4 className="font-bold text-white mb-2">Is there a free trial?</h4>
-              <p className="text-white/80 text-sm">New users get 3 free hearts to try the app. Premium features require a subscription.</p>
-            </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1.25rem' }}>
+            {[
+              { q: 'What happens to my progress?', a: 'All your learning progress is saved and will continue to be available.' },
+              { q: 'Can I cancel anytime?', a: 'Yes! You can cancel your subscription at any time from your account settings.' },
+              { q: 'What payment methods do you accept?', a: 'We accept all major credit cards, debit cards, and digital wallets through Stripe.' },
+              { q: 'Is there a free trial?', a: 'New users get 3 free hearts to try the app. Premium features require a subscription.' },
+            ].map((item) => (
+              <div key={item.q} style={{ borderLeft: `2px solid rgba(176,0,32,0.4)`, paddingLeft: '0.75rem' }}>
+                <h4 style={{ color: subText, fontFamily: subFont, fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.35rem', marginTop: 0 }}>{item.q}</h4>
+                <p style={{ color: subMuted, fontFamily: subFont, fontSize: '0.78rem', lineHeight: 1.5, margin: 0 }}>{item.a}</p>
+              </div>
+            ))}
           </div>
         </div>
+
       </div>
     </div>
   );

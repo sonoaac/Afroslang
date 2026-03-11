@@ -139,7 +139,6 @@ export const AuthSplit: React.FC<AuthSplitProps> = ({
           <div className={backboxLoginMsgClass}>
             <div className="authSplitTextContent">
               <p className="authSplitTitle">Don't have an account?</p>
-              <p>Sign up to save all your graph.</p>
               <button type="button" className="authSplitSwitchBtn" onClick={handleSwitchToSignup}>
                 Sign Up
               </button>
@@ -149,7 +148,6 @@ export const AuthSplit: React.FC<AuthSplitProps> = ({
           <div className={backboxSignupMsgClass}>
             <div className="authSplitTextContent">
               <p className="authSplitTitle">Have an account?</p>
-              <p>Log in to see all your collection.</p>
               <button type="button" className="authSplitSwitchBtn" onClick={handleSwitchToLogin}>
                 LOG IN
               </button>
@@ -161,6 +159,10 @@ export const AuthSplit: React.FC<AuthSplitProps> = ({
           <div className={`authSplitLogin ${showLogin ? '' : 'authSplitHide'}`.trim()}>
             <h2>LOG IN</h2>
             <form onSubmit={handleLogin}>
+              <div className="authSplitMobileSwitch">
+                <span>No account? </span>
+                <button type="button" onClick={handleSwitchToSignup}>Sign Up</button>
+              </div>
               <div className="authSplitInputbox">
                 <input
                   className="authSplitInput"
@@ -204,6 +206,10 @@ export const AuthSplit: React.FC<AuthSplitProps> = ({
           <div className={`authSplitSignup ${showLogin ? 'authSplitHide' : ''}`.trim()}>
             <h2>SIGN UP</h2>
             <form onSubmit={handleSignup}>
+              <div className="authSplitMobileSwitch">
+                <span>Have an account? </span>
+                <button type="button" onClick={handleSwitchToLogin}>Log In</button>
+              </div>
               <div className="authSplitInputbox">
                 <input
                   className="authSplitInput"

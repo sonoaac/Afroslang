@@ -45,7 +45,7 @@ export const chichewaLessons: Lesson[] = [
         questionFr: 'Comment dit-on "Bonjour" (matin) en Chichewa?',
         correctAnswer: 'Moni',
         correctAnswerFr: 'Moni',
-        options: ['Moni', 'Moni', 'Pitani bwino', 'Zikomo']
+        options: ['Moni', 'Mwaswera bwanji', 'Pitani bwino', 'Zikomo']
       },
       {
         id: 'ny-v1-1-5',
@@ -133,7 +133,7 @@ export const chichewaLessons: Lesson[] = [
         questionFr: 'Comment dit-on "Bonsoir" en Chichewa?',
         correctAnswer: 'Moni',
         correctAnswerFr: 'Moni',
-        options: ['Moni', 'Moni', 'Pitani bwino', 'Zikomo']
+        options: ['Moni', 'Mwaswera bwanji', 'Pitani bwino', 'Zikomo']
       },
       {
         id: 'ny-v1-1-15',

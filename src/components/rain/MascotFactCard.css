@@ -1,0 +1,133 @@
+.mascot-fact-card {
+  background: rgba(18, 4, 8, 0.85);
+  border: 1px solid rgba(176, 0, 32, 0.25);
+  border-radius: 18px;
+  padding: 16px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(176,0,32,0.1);
+  margin-bottom: 16px;
+  transition: border-color 0.3s;
+}
+
+.mascot-fact-card:hover {
+  border-color: rgba(176, 0, 32, 0.45);
+}
+
+/* ── Header ── */
+.mascot-fact-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.mascot-fact-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #1a0a0e;
+  border: 2px solid #b00020;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mascot-fact-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.mascot-fact-name {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #e53935;
+  letter-spacing: 0.03em;
+}
+
+.mascot-fact-label {
+  display: block;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mascot-fact-badge {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+/* ── Body ── */
+.mascot-fact-body {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.88);
+  margin: 0 0 12px;
+  font-style: italic;
+}
+
+/* ── Language tag ── */
+.mascot-fact-tag {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(176, 0, 32, 0.12);
+  border: 1px solid rgba(176, 0, 32, 0.28);
+  border-radius: 999px;
+  padding: 3px 10px;
+  margin-bottom: 12px;
+}
+
+.mascot-fact-tag span {
+  font-size: 0.72rem;
+  color: #e53935;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* ── Social row ── */
+.mascot-fact-social {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.mascot-fact-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  min-height: 32px;
+}
+
+.mascot-fact-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.mascot-fact-btn--liked {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+.mascot-fact-btn--share {
+  color: #e53935;
+  border-color: rgba(176, 0, 32, 0.35);
+  margin-left: auto;
+}
+
+.mascot-fact-btn--next {
+  color: #e53935;
+  border-color: rgba(176, 0, 32, 0.3);
+}

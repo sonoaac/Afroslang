@@ -1,0 +1,304 @@
+/* ─────────────────────────────────────────────
+   Afroslang Landing Page
+   Full-screen dark + rain. Auth as bottom sheet.
+   ───────────────────────────────────────────── */
+
+.landing-page {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  background: #000;
+  overflow: hidden;
+  animation: landingFadeIn 0.6s ease-out forwards;
+}
+
+@keyframes landingFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Central hero ── */
+.landing-hero {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 220px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.landing-mascot {
+  width: clamp(100px, 24vw, 180px);
+  height: clamp(100px, 24vw, 180px);
+  object-fit: contain;
+  filter: drop-shadow(0 0 22px rgba(34,197,94,0.5));
+  animation: mascotFloat 4s ease-in-out infinite;
+}
+
+@keyframes mascotFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+.landing-title {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-weight: 900;
+  font-size: clamp(2.4rem, 9vw, 5.5rem);
+  color: #fff;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 40px rgba(34,197,94,0.25), 0 2px 0 rgba(0,0,0,0.5);
+  margin-top: 10px;
+  line-height: 1;
+}
+
+.landing-title span {
+  color: #22c55e;
+}
+
+.landing-tagline {
+  font-family: 'Times New Roman', serif;
+  font-size: clamp(0.62rem, 1.8vw, 0.82rem);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(74,222,128,0.7);
+  margin-top: 10px;
+}
+
+/* ── Bottom panel (auth CTAs) ── */
+.landing-bottom {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 420px;
+  padding: 24px 24px 32px;
+  background: linear-gradient(to top, rgba(0,0,0,0.98) 70%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Primary CTA - Sign Up */
+.landing-btn-primary {
+  width: 100%;
+  padding: 15px;
+  background: #22c55e;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Times New Roman', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #000;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(34,197,94,0.35);
+}
+
+.landing-btn-primary:hover,
+.landing-btn-primary:active {
+  background: #4ade80;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(34,197,94,0.5);
+}
+
+/* Secondary CTA - Log In */
+.landing-btn-secondary {
+  width: 100%;
+  padding: 15px;
+  background: transparent;
+  border: 2px solid rgba(34,197,94,0.5);
+  border-radius: 14px;
+  font-family: 'Times New Roman', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #22c55e;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.landing-btn-secondary:hover,
+.landing-btn-secondary:active {
+  background: rgba(34,197,94,0.1);
+  border-color: #22c55e;
+}
+
+/* Guest link */
+.landing-btn-guest {
+  background: none;
+  border: none;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.38);
+  cursor: pointer;
+  padding: 6px 0;
+  transition: color 0.2s;
+}
+
+.landing-btn-guest:hover {
+  color: rgba(255,255,255,0.65);
+}
+
+/* ── Auth bottom sheet ── */
+.auth-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 50;
+  animation: backdropIn 0.25s ease forwards;
+}
+
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.auth-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 51;
+  max-width: 480px;
+  margin: 0 auto;
+  background: #0a0a0a;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  border-top: 1px solid rgba(34,197,94,0.2);
+  padding: 0 24px 32px;
+  padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+  animation: sheetSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes sheetSlideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* Drag handle */
+.auth-sheet-handle {
+  width: 40px;
+  height: 4px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 999px;
+  margin: 14px auto 20px;
+}
+
+/* Tab switcher inside sheet */
+.auth-sheet-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.auth-sheet-tab {
+  flex: 1;
+  padding: 12px 0;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family: 'Times New Roman', serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.38);
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: -1px;
+}
+
+.auth-sheet-tab--active {
+  color: #22c55e;
+  border-bottom-color: #22c55e;
+}
+
+/* Form inside sheet */
+.auth-sheet-input {
+  display: block;
+  width: 100%;
+  padding: 13px 14px;
+  margin-bottom: 12px;
+  background: #141414;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.auth-sheet-input::placeholder { color: #444; }
+.auth-sheet-input:focus { border-color: #22c55e; }
+
+.auth-sheet-submit {
+  width: 100%;
+  padding: 14px;
+  margin-top: 4px;
+  background: #22c55e;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Times New Roman', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #000;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(34,197,94,0.3);
+}
+
+.auth-sheet-submit:hover { background: #4ade80; }
+.auth-sheet-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.auth-sheet-forgot {
+  display: block;
+  text-align: center;
+  margin-top: 14px;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: rgba(34,197,94,0.6);
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.auth-sheet-forgot:hover { color: #22c55e; }
+
+.auth-sheet-error {
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  color: #f87171;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.auth-sheet-success {
+  background: rgba(34,197,94,0.12);
+  border: 1px solid rgba(34,197,94,0.3);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  color: #4ade80;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* ── Scrollbar ── */
+.auth-sheet::-webkit-scrollbar { width: 0; }

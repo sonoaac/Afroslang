@@ -251,7 +251,7 @@ export const hausaLessons: Lesson[] = [
         question: 'How do you say "Where do you live?" in Hausa?',
         questionFr: 'Comment dit-on "Où habitez-vous?" en Hausa?',
         correctAnswer: 'Ina zaune?',
-        options: ['Ina zaune?', 'Daga ina kake?', 'Ina zaune?', 'Ina zaune?']
+        options: ['Ina zaune?', 'Daga ina kake?', 'Menene sunanka?', 'Ina shekara?']
       },
       {
         id: 'ha-v31',

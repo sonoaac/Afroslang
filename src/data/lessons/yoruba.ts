@@ -251,7 +251,7 @@ export const yorubaLessons: Lesson[] = [
         question: 'How do you say "Where do you live?" in Yoruba?',
         questionFr: 'Comment dit-on "Où habitez-vous?" en Yoruba?',
         correctAnswer: 'Nibo ni o ngbe?',
-        options: ['Nibo ni o ngbe?', 'Nibo ni o wa?', 'Nibo ni o nlo?', 'Nibo ni o wa?']
+        options: ['Nibo ni o ngbe?', 'Nibo ni o wa?', 'Nibo ni o nlo?', 'Kini orukọ rẹ?']
       },
       {
         id: 'yo-v31',

@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { InterfaceLanguage, AfricanLanguage, UserProgress, Lesson } from './types';
+import { AfroslangIntro } from './components/intro/AfroslangIntro';
+import { LandingPage } from './components/landing/LandingPage';
 import { InterfaceLanguageSelector } from './features/language-select/InterfaceLanguageSelector';
 import { LanguageSelectionScreen } from './features/language-select/LanguageSelectionScreen';
 import { LearningPath } from './features/lessons/LearningPath';
 import { LessonScreen } from './features/lessons/LessonScreen';
 import { LessonComplete } from './features/lessons/LessonComplete';
-import { AuthScreen } from './components/auth/AuthScreen';
 import { LeaderboardScreen } from './components/leaderboard/LeaderboardScreen';
 import { SubscriptionPage } from './components/subscription/SubscriptionPage';
 import { FeedbackPage } from './components/feedback/FeedbackPage';
@@ -23,6 +24,14 @@ type Screen = 'auth' | 'interface-select' | 'language-select' | 'path' | 'lesson
 function App() {
   const { user, userData, isGuest, loading } = useAuth();
   const [currentScreen, setCurrentScreen] = useState<Screen>('auth');
+  // Show intro once per session; after it completes show landing page
+  const [showIntro, setShowIntro] = useState<boolean>(
+    () => sessionStorage.getItem('afro_intro_seen') !== '1'
+  );
+  const handleIntroComplete = useCallback(() => {
+    sessionStorage.setItem('afro_intro_seen', '1');
+    setShowIntro(false);
+  }, []);
   const [interfaceLanguage, setInterfaceLanguage] = useState<InterfaceLanguage>('en');
   const [currentLanguage, setCurrentLanguage] = useState<AfricanLanguage | null>(null);
   const [userProgressMap, setUserProgressMap] = useState<Record<string, UserProgress>>({});
@@ -328,6 +337,11 @@ function App() {
     }
   }, [user, isGuest, loading, currentScreen]);
 
+  // Intro splash (plays once per session, on top of everything)
+  if (showIntro) {
+    return <AfroslangIntro onComplete={handleIntroComplete} />;
+  }
+
   // Show loading screen while checking authentication
   if (loading) {
     return (
@@ -340,15 +354,21 @@ function App() {
     );
   }
 
-  // Show authentication screen if not logged in and not in guest mode
+  // Landing page replaces the old auth screen
   if (!user && !isGuest && currentScreen === 'auth') {
-    return <AuthScreen />;
+    return <LandingPage />;
   }
 
   return (
     <>
       {currentScreen === 'interface-select' && (
-        <InterfaceLanguageSelector onSelect={handleInterfaceLanguageSelect} />
+        <InterfaceLanguageSelector
+          onSelect={handleInterfaceLanguageSelect}
+          onSelectLanguage={(languageId) => {
+            setInterfaceLanguage('en');
+            handleLanguageToLearnSelect(languageId);
+          }}
+        />
       )}
 
       {currentScreen === 'language-select' && (
