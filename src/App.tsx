@@ -4,7 +4,6 @@ import { AfroslangIntro } from './components/intro/AfroslangIntro';
 import { LandingPage } from './components/landing/LandingPage';
 import { SplashScreen } from './components/splash/SplashScreen';
 import { InterfaceLanguageSelector } from './features/language-select/InterfaceLanguageSelector';
-import { LanguageSelectionScreen } from './features/language-select/LanguageSelectionScreen';
 import { LearningPath } from './features/lessons/LearningPath';
 import { LessonScreen } from './features/lessons/LessonScreen';
 import { LessonComplete } from './features/lessons/LessonComplete';
@@ -20,10 +19,10 @@ import { getStagesForLanguage, getLessonById } from './data/lessons';
 import { saveUserProgress } from './utils/userData';
 import { addWeeklyXP, getCurrentWeekIdFromDB, getUserLeague } from './utils/leaderboardUtils';
 
-type Screen = 'auth' | 'interface-select' | 'language-select' | 'path' | 'lesson' | 'complete' | 'leaderboard' | 'subscription' | 'feedback' | 'shop' | 'latest-news';
+type Screen = 'auth' | 'interface-select' | 'path' | 'lesson' | 'complete' | 'leaderboard' | 'subscription' | 'feedback' | 'shop' | 'latest-news';
 
 function App() {
-  const { user, userData, isGuest, loading } = useAuth();
+  const { user, userData, isGuest, loading, logout, setGuestMode } = useAuth();
   const [currentScreen, setCurrentScreen] = useState<Screen>('auth');
   // Show intro once per session; after it completes show splash
   const [showIntro, setShowIntro] = useState<boolean>(
@@ -44,6 +43,7 @@ function App() {
     setShowSplash(false);
     setCurrentScreen('interface-select');
   }, []);
+  const [authSheet, setAuthSheet] = useState<'login' | 'signup' | null>(null);
   const [interfaceLanguage, setInterfaceLanguage] = useState<InterfaceLanguage>('en');
   const [currentLanguage, setCurrentLanguage] = useState<AfricanLanguage | null>(null);
   const [userProgressMap, setUserProgressMap] = useState<Record<string, UserProgress>>({});
@@ -108,7 +108,21 @@ function App() {
 
   const handleInterfaceLanguageSelect = (lang: InterfaceLanguage) => {
     setInterfaceLanguage(lang);
-    setCurrentScreen('language-select');
+    // Stay on interface-select — language grid is already on this page
+  };
+
+  const handleGoToSignIn = async () => {
+    if (user) await logout();
+    else setGuestMode(false);
+    setAuthSheet('login');
+    setCurrentScreen('auth');
+  };
+
+  const handleGoToSignUp = async () => {
+    if (user) await logout();
+    else setGuestMode(false);
+    setAuthSheet('signup');
+    setCurrentScreen('auth');
   };
 
   const handleLanguageToLearnSelect = (languageId: string) => {
@@ -288,7 +302,7 @@ function App() {
   };
 
   const handleBackToLanguageSelect = () => {
-    setCurrentScreen('language-select');
+    setCurrentScreen('interface-select');
   };
 
   const handleExitLesson = () => {
@@ -389,7 +403,7 @@ function App() {
 
   // Landing page replaces the old auth screen
   if (!user && !isGuest && currentScreen === 'auth') {
-    return <LandingPage />;
+    return <LandingPage initialSheet={authSheet} />;
   }
 
   return (
@@ -401,15 +415,8 @@ function App() {
             setInterfaceLanguage('en');
             handleLanguageToLearnSelect(languageId);
           }}
-        />
-      )}
-
-      {currentScreen === 'language-select' && (
-        <LanguageSelectionScreen
-          interfaceLanguage={interfaceLanguage}
-          onSelectLanguage={handleLanguageToLearnSelect}
-          onBack={() => setCurrentScreen('interface-select')}
-          onInterfaceLanguageChange={(lang) => setInterfaceLanguage(lang)}
+          onSignIn={handleGoToSignIn}
+          onSignUp={handleGoToSignUp}
         />
       )}
 
@@ -419,7 +426,7 @@ function App() {
           stages={getStagesForLanguage(currentLanguage)}
           progress={getCurrentProgress()}
           onStartLesson={handleStartLesson}
-          onBackToLanguageSelect={() => setCurrentScreen('language-select')}
+          onBackToLanguageSelect={() => setCurrentScreen('interface-select')}
           onNavigate={(screen) => {
             if (screen === 'leaderboard') {
               setCurrentScreen('leaderboard');
@@ -451,7 +458,7 @@ function App() {
             isGuest={isGuest}
             onComplete={handleLessonComplete}
             onExit={handleExitLesson}
-            onBackToLanguageSelect={() => setCurrentScreen('language-select')}
+            onBackToLanguageSelect={() => setCurrentScreen('interface-select')}
           />
         )}
 
@@ -460,7 +467,7 @@ function App() {
           interfaceLanguage={interfaceLanguage}
           xpEarned={lastCompletedXP}
           onContinue={handleContinueAfterComplete}
-          onBackToLanguageSelect={() => setCurrentScreen('language-select')}
+          onBackToLanguageSelect={() => setCurrentScreen('interface-select')}
         />
       )}
 

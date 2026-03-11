@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './SplashScreen.css';
 
 const PHRASES = [
@@ -8,102 +8,88 @@ const PHRASES = [
   'Ready for your fyLp?',
 ];
 
-// Words to highlight red in the final phrase
 const ACCENT_WORDS = new Set(['fyLp?']);
+const LAST_IDX = PHRASES.length - 1;
 
 const rand = (lo: number, hi: number) => Math.random() * (hi - lo) + lo;
 
-interface Glyph {
+interface GlyphData {
   ch: string;
-  gx: number;
-  gy: number;
-  gr: number;
-  gd: number;   // assemble delay (ms) — forward stagger
-  god: number;  // scatter delay (ms) — forward stagger (first char shatters first)
+  gx: number; gy: number; gz: number;
+  rx: number; ry: number; rz: number;
+  gd: number;
   accent: boolean;
 }
 
-interface WordGroup {
-  glyphs: Glyph[];
+interface PhraseData {
+  words: { glyphs: GlyphData[] }[];
+  charCount: number;
 }
 
-// Build per-word groups — words never break; only wrapping between words
-function buildWordGroups(text: string, phraseIdx: number): WordGroup[] {
-  const words = text.split(' ');
-  let charI = 0;
-
-  return words.map((word) => {
-    const isAccent = phraseIdx === PHRASES.length - 1 && ACCENT_WORDS.has(word);
-    const glyphs: Glyph[] = word.split('').map((ch) => {
-      const i = charI++;
-      return {
-        ch,
-        gx: rand(-520, 520),
-        gy: rand(-360, 360),
-        gr: rand(-660, 660),
-        gd:  i * 10,   // fast assembly stagger
-        god: i * 25,   // slow scatter stagger
-        accent: isAccent,
-      };
+function buildAllPhrases(): PhraseData[] {
+  return PHRASES.map((text, pi) =>  {
+    let charI = 0;
+    const words = text.split(' ').map(word => {
+      const isAccent = pi === LAST_IDX && ACCENT_WORDS.has(word);
+      const glyphs: GlyphData[] = word.split('').map(ch => {
+        const i = charI++;
+        return {
+          ch,
+          gx:  rand(-380, 380),
+          gy:  rand(-180, 180),
+          gz:  rand(-900, -120),  // start deep behind screen
+          rx:  rand(-130, 130),
+          ry:  rand(-160, 160),
+          rz:  rand(-28,  28),
+          gd:  i * 14,            // 14 ms stagger per char
+          accent: isAccent,
+        };
+      });
+      return { glyphs };
     });
-    return { glyphs };
+    const charCount = words.reduce((s, w) => s + w.glyphs.length, 0);
+    return { words, charCount };
   });
 }
 
-type Phase = 'idle' | 'in' | 'hold' | 'out';
+const TRANSITION_MS        = 520;
+const STAGGER_PER_CHAR_MS  = 14;
+const GAP_BETWEEN_MS       = 280;
+const FINAL_HOLD_MS        = 1800;
+
+function assembleTime(charCount: number) {
+  return charCount * STAGGER_PER_CHAR_MS + TRANSITION_MS;
+}
 
 interface SplashScreenProps {
   onComplete: () => void;
 }
 
 export function SplashScreen({ onComplete }: SplashScreenProps) {
-  const [started, setStarted]         = useState(false);
-  const [phraseIdx, setPhraseIdx]     = useState(0);
-  const [wordGroups, setWordGroups]   = useState<WordGroup[]>([]);
-  const [phase, setPhase]             = useState<Phase>('idle');
-  const tref = useRef<ReturnType<typeof setTimeout>[]>([]);
-
-  const sched = (fn: () => void, ms: number) => {
-    const id = setTimeout(fn, ms);
-    tref.current.push(id);
-  };
+  const [started, setStarted]           = useState(false);
+  const [activatedCount, setActivated]  = useState(0);
+  const tref          = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const allPhraseData = useRef<PhraseData[]>(buildAllPhrases()).current;
 
   useEffect(() => () => { tref.current.forEach(clearTimeout); }, []);
 
-  const runPhrase = useCallback((idx: number) => {
-    if (idx >= PHRASES.length) { onComplete(); return; }
+  const handleStart = () => {
+    setStarted(true);
 
-    const groups = buildWordGroups(PHRASES[idx], idx);
-    const nonSpaceCount = groups.reduce((s, w) => s + w.glyphs.length, 0);
+    let t = 0;
+    allPhraseData.forEach((pd, i) => {
+      const id = setTimeout(() => setActivated(i + 1), t);
+      tref.current.push(id);
+      t += assembleTime(pd.charCount) + GAP_BETWEEN_MS;
+    });
 
-    setPhraseIdx(idx);
-    setWordGroups(groups);
-    setPhase('in');
-
-    // Assemble: last char at nonSpaceCount*10ms + 500ms transition
-    const assembleMs = nonSpaceCount * 10 + 550;
-    // Scatter:  last char at nonSpaceCount*25ms + 1100ms transition
-    const scatterMs  = nonSpaceCount * 25 + 1200;
-
-    sched(() => {
-      setPhase('hold');
-      sched(() => {
-        setPhase('out');
-        sched(() => runPhrase(idx + 1), scatterMs);
-      }, 2000);
-    }, assembleMs);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onComplete]);
-
-  const handleStart = () => { setStarted(true); runPhrase(0); };
-
-  const isAssembled = phase === 'in' || phase === 'hold';
-  const isExiting   = phase === 'out';
+    tref.current.push(setTimeout(onComplete, t + FINAL_HOLD_MS));
+  };
 
   return (
     <div className="sp-root">
 
-      {/* ── Idle screen ── */}
+      {/* ── Idle ── */}
       {!started && (
         <div className="sp-idle">
           <div className="sp-wordmark">AFRO<em>SLANG</em></div>
@@ -114,50 +100,45 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
               <path d="M8 5v14l11-7z" />
             </svg>
           </button>
-          <div className="sp-dots">
-            {PHRASES.map((_, i) => <div key={i} className="sp-dot" />)}
-          </div>
         </div>
       )}
 
-      {/* ── Animating phrases ── */}
+      {/* ── All phrases stacked, each assembles from 3-D shatter ── */}
       {started && (
-        <>
-          {/* Each word is an atomic block — never breaks mid-word */}
-          <div className="sp-stage" key={phraseIdx}>
-            {wordGroups.map((wg, wi) => (
-              <span key={wi} className="sp-word">
-                {wg.glyphs.map((g, ci) => (
-                  <span
-                    key={ci}
-                    className={[
-                      'sp-glyph',
-                      isAssembled ? 'sp-glyph--in'     : '',
-                      isExiting   ? 'sp-glyph--out'    : '',
-                      g.accent    ? 'sp-glyph--accent' : '',
-                    ].filter(Boolean).join(' ')}
-                    style={{
-                      '--gx':  `${g.gx}px`,
-                      '--gy':  `${g.gy}px`,
-                      '--gr':  `${g.gr}deg`,
-                      '--gd':  `${g.gd}ms`,
-                      '--god': `${g.god}ms`,
-                    } as React.CSSProperties}
-                  >
-                    {g.ch}
+        <div className="sp-stack">
+          {allPhraseData.map((pd, pi) => {
+            const active = activatedCount > pi;
+            return (
+              <div key={pi} className="sp-line">
+                {pd.words.map((wd, wi) => (
+                  <span key={wi} className="sp-word">
+                    {wd.glyphs.map((g, ci) => (
+                      <span
+                        key={ci}
+                        className={[
+                          'sp-glyph',
+                          active    ? 'sp-glyph--in'     : '',
+                          g.accent  ? 'sp-glyph--accent' : '',
+                        ].filter(Boolean).join(' ')}
+                        style={{
+                          '--gx': `${g.gx}px`,
+                          '--gy': `${g.gy}px`,
+                          '--gz': `${g.gz}px`,
+                          '--rx': `${g.rx}deg`,
+                          '--ry': `${g.ry}deg`,
+                          '--rz': `${g.rz}deg`,
+                          '--gd': `${g.gd}ms`,
+                        } as React.CSSProperties}
+                      >
+                        {g.ch}
+                      </span>
+                    ))}
                   </span>
                 ))}
-              </span>
-            ))}
-          </div>
-
-          {/* Phrase progress dots */}
-          <div className="sp-dots sp-dots--bottom">
-            {PHRASES.map((_, i) => (
-              <div key={i} className={`sp-dot${i === phraseIdx ? ' sp-dot--active' : ''}`} />
-            ))}
-          </div>
-        </>
+              </div>
+            );
+          })}
+        </div>
       )}
 
     </div>

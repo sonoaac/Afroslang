@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════════
    Afroslang · Splash Screen
-   Shattering text animation
    Black × Red · Times New Roman
    ═══════════════════════════════════════════════ */
 
@@ -71,95 +70,81 @@
 .sp-play-btn:active { transform: scale(0.94); }
 
 @keyframes sp-pulse {
-  0%, 100% { box-shadow: 0 0 0 0   rgba(176,0,32,0.6); }
-  50%       { box-shadow: 0 0 0 28px rgba(176,0,32,0); }
+  0%, 100% { box-shadow: 0 0 0 0    rgba(176,0,32,0.6); }
+  50%       { box-shadow: 0 0 0 28px rgba(176,0,32,0);   }
 }
 
-/* ── Dots ── */
-.sp-dots {
+/* ── Stack: all phrases on one screen ── */
+.sp-stack {
   display: flex;
-  gap: 9px;
-}
-.sp-dots--bottom {
-  position: absolute;
-  bottom: 7vh;
-}
-.sp-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.13);
-  transition: background 0.35s, transform 0.35s;
-}
-.sp-dot--active {
-  background: #b00020;
-  transform: scale(1.5);
-  box-shadow: 0 0 8px rgba(176,0,32,0.7);
-}
-
-/* ── Stage ── */
-.sp-stage {
-  display: flex;
-  flex-wrap: wrap;          /* allows multi-line */
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  /* column-gap = word spacing; row-gap = line spacing */
-  column-gap: 0.38em;
-  row-gap: 0.75em;
-  max-width: min(90vw, 780px);
-  padding: 0 1.5rem;
+  gap: 1.6rem;
+  padding: 0 2rem;
   text-align: center;
+  max-width: min(92vw, 700px);
+
+  /* Establishes the 3-D perspective for every glyph beneath it */
+  perspective: 900px;
 }
 
-/* Each word is a flex item that NEVER breaks internally */
+/* Each phrase row — must preserve-3d so glyphs see the perspective */
+.sp-line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.32em;
+  row-gap: 0.4em;
+  transform-style: preserve-3d;
+}
+
+/* Word block — never breaks mid-word */
 .sp-word {
   display: inline-flex;
-  white-space: nowrap;     /* prevents mid-word line breaks */
-  flex-shrink: 0;
+  white-space: nowrap;
+  transform-style: preserve-3d;
 }
 
 /* ── Individual character glyph ── */
 .sp-glyph {
   display: inline-block;
   font-family: 'Times New Roman', Georgia, serif;
-  font-size: clamp(1.7rem, 5.5vw, 3.4rem);
+  font-size: clamp(1.25rem, 3.8vw, 2.3rem);
   font-weight: 900;
   color: #fff;
-  line-height: 1.2;
+  line-height: 1.3;
 
-  /* Default: scattered / invisible */
-  transform: translate(var(--gx), var(--gy)) rotate(var(--gr)) scale(0);
+  /* Scattered: deep behind screen, tumbling */
+  transform:
+    translate3d(var(--gx), var(--gy), var(--gz))
+    rotateX(var(--rx))
+    rotateY(var(--ry))
+    rotateZ(var(--rz))
+    scale(0.15);
   opacity: 0;
 
-  /* Assembly transition — fast */
+  /* Assembly: spring-like ease */
   transition:
-    transform 0.48s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity   0.36s ease;
+    transform 0.52s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity   0.38s ease;
   transition-delay: var(--gd);
+
   will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
-/* Assembled: fly to center position */
+/* Assembled: land exactly in place */
 .sp-glyph--in {
-  transform: translate(0, 0) rotate(0deg) scale(1);
+  transform:
+    translate3d(0, 0, 0)
+    rotateX(0deg)
+    rotateY(0deg)
+    rotateZ(0deg)
+    scale(1);
   opacity: 1;
 }
 
-/* Shattering out — slow, travels 2.5× further */
-.sp-glyph--out {
-  transform:
-    translate(calc(var(--gx) * 2.5), calc(var(--gy) * 2.5))
-    rotate(calc(var(--gr) * 2))
-    scale(0);
-  opacity: 0;
-  /* Override delays and use slow exit transition */
-  transition:
-    transform 1.1s cubic-bezier(0.55, 0, 1, 0.45),
-    opacity   0.8s ease-in;
-  transition-delay: var(--god);
-}
-
-/* Red accent for fyLp */
+/* Red accent for "fyLp?" */
 .sp-glyph--accent {
   color: #e53935;
 }

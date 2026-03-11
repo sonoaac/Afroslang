@@ -8,9 +8,13 @@ import './LandingPage.css';
 
 type SheetMode = 'login' | 'signup' | null;
 
-export function LandingPage() {
+interface LandingPageProps {
+  initialSheet?: SheetMode;
+}
+
+export function LandingPage({ initialSheet }: LandingPageProps) {
   const { setGuestMode } = useAuth();
-  const [sheet, setSheet] = useState<SheetMode>(null);
+  const [sheet, setSheet] = useState<SheetMode>(initialSheet ?? null);
   const [logoError, setLogoError] = useState(false);
 
   // Login state

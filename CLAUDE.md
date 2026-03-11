@@ -28,11 +28,17 @@ Node 22.x is required.
 App is a single-page app with no router. Navigation is a `currentScreen` state string that switches between rendered screen components:
 
 ```
-auth → interface-select → language-select → path → lesson → complete
-                                                  ↘ leaderboard / shop / latest-news
+AfroslangIntro (logo animation, once per session)
+  → LandingPage (unauthenticated) → SplashScreen (after auth, once per session)
+  → interface-select → path → lesson → complete
+                            ↘ leaderboard / shop / latest-news / subscription / feedback
 ```
 
-`userProgressMap` (keyed by `AfricanLanguage`) is the primary client-side state. It persists to `localStorage` (keys: `afroslang_progress`, `afroslang_interface`). XP/streaks only count for authenticated (non-guest) users.
+Returning authenticated users skip the `LandingPage` and `SplashScreen` and go straight to `interface-select`. The `currentLanguage` is intentionally **not** restored on load — users always choose their language fresh each session.
+
+`userProgressMap` (keyed by `AfricanLanguage`) is the primary client-side state. It persists to `localStorage` (keys: `afroslang_progress`, `afroslang_interface`, `afroslang_current_language`). XP/streaks only count for authenticated (non-guest) users.
+
+`sessionStorage` keys: `afro_intro_seen` (logo intro shown) — splash is controlled via the `showSplash` React state flag set when a user authenticates for the first time in a session.
 
 ### Authentication (`src/contexts/AuthContext.tsx`)
 
@@ -57,6 +63,15 @@ Exercise types: `multiple-choice | fill-blank | match | translate | type-answer`
 - `UserProgress` — per-language client state (xp, level, hearts, streak, completedLessons[])
 - `Stage` → `Lesson` → `Exercise` — the content hierarchy
 - Hearts: max 5, reset after 7 hours when depleted; subscribers get 999 (unlimited)
+- Guest lesson cap: 3 completions before `GuestLimitModal` prompts sign-up; XP/streaks do not persist for guests
+
+### Design System
+
+Dark luxury theme defined in `src/styles/globals.css`:
+- **Brand colors:** `--brand-black: #000000`, `--brand-red: #b00020`, `--brand-green: #35b729`
+- **Background:** `--app-bg` is a radial gradient (dark black + subtle red glow)
+- **Font:** Roboto (loaded via Google Fonts)
+- **Component library:** shadcn/ui in `src/components/ui/` — **do not modify these files directly**
 
 ### Firebase / Backend (`src/firebase.ts`, `src/utils/`)
 
@@ -66,11 +81,18 @@ Exercise types: `multiple-choice | fill-blank | match | translate | type-answer`
 - Firebase emulators can be enabled via `VITE_USE_FIREBASE_EMULATOR=true`
 - Stripe integration: `src/api/create-checkout-session.ts`, `src/api/stripe-webhook.ts`
 
-### UI Components
+### UI Components & Screen Modules
 
 - `src/components/ui/` — shadcn/ui component library (do not modify these files)
 - `src/features/` — feature-level screens: `language-select/`, `lessons/`, `store/`
-- `src/components/` — shared components: auth, layout, leaderboard, subscription, debug
+- `src/components/intro/` — `AfroslangIntro` (animated logo reveal, plays once per session)
+- `src/components/splash/` — `SplashScreen` (3D shattering text animation, plays once per session after auth)
+- `src/components/landing/` — `LandingPage` with login/signup bottom sheets and `RainCanvas` animated background
+- `src/components/` — shared components: auth, layout, leaderboard, subscription, streak, mascot, debug
+
+### Duplicate / Legacy Data Files
+
+`src/data/` contains legacy copies of some lesson files (e.g. `src/data/swahili.ts`, `hausa.ts`, `yoruba.ts`, `zulu.ts`). The canonical source is `src/data/lessons/<language>.ts`. Do not add new content to the legacy files in `src/data/`.
 
 ### Adding a New Language
 

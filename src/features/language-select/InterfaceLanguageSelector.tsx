@@ -9,6 +9,8 @@ import './InterfaceLanguageSelectorSocial.css';
 interface InterfaceLanguageSelectorProps {
   onSelect: (language: InterfaceLanguage) => void;
   onSelectLanguage?: (languageId: string) => void;
+  onSignIn?: () => void;
+  onSignUp?: () => void;
 }
 
 const REGION_LABELS: Record<string, string> = {
@@ -19,7 +21,7 @@ const REGION_LABELS: Record<string, string> = {
   southern: 'Southern Africa',
 };
 
-export function InterfaceLanguageSelector({ onSelect, onSelectLanguage }: InterfaceLanguageSelectorProps) {
+export function InterfaceLanguageSelector({ onSelect, onSelectLanguage, onSignIn, onSignUp }: InterfaceLanguageSelectorProps) {
   const [activeTab, setActiveTab] = useState<'languages' | 'timeline' | 'about'>('languages');
   const [searchQuery, setSearchQuery] = useState('');
   const [interfaceLang, setInterfaceLang] = useState<InterfaceLanguage>('en');
@@ -78,7 +80,7 @@ export function InterfaceLanguageSelector({ onSelect, onSelectLanguage }: Interf
               onClick={() => setInterfaceLang('fr')}
             >FR</button>
           </div>
-          <button type="button" className="afroSignInBtn" onClick={handleGetStarted}>
+          <button type="button" className="afroSignInBtn" onClick={onSignIn ?? handleGetStarted}>
             {isEnglish ? 'Sign In' : 'Connexion'}
           </button>
         </div>
@@ -109,10 +111,10 @@ export function InterfaceLanguageSelector({ onSelect, onSelectLanguage }: Interf
           </p>
 
           <div className="afroHeroActions">
-            <button type="button" className="afroHeroCta" onClick={handleGetStarted}>
+            <button type="button" className="afroHeroCta" onClick={onSignUp ?? handleGetStarted}>
               {isEnglish ? 'Get Started →' : 'Commencer →'}
             </button>
-            <button type="button" className="afroHeroGhost" onClick={handleGetStarted}>
+            <button type="button" className="afroHeroGhost" onClick={onSignIn ?? handleGetStarted}>
               {isEnglish ? 'I have an account' : 'J\'ai un compte'}
             </button>
           </div>
@@ -285,7 +287,7 @@ export function InterfaceLanguageSelector({ onSelect, onSelectLanguage }: Interf
           <button type="button" className="afroHeroGhost" style={{ padding:'10px 20px', fontSize:'0.75rem' }} onClick={handleGetStarted}>
             {isEnglish ? 'Continue as Guest' : 'Continuer en invité'}
           </button>
-          <button type="button" className="afroHeroCta" style={{ padding:'10px 20px', fontSize:'0.75rem' }} onClick={handleGetStarted}>
+          <button type="button" className="afroHeroCta" style={{ padding:'10px 20px', fontSize:'0.75rem' }} onClick={onSignUp ?? handleGetStarted}>
             {isEnglish ? 'Create Account' : 'Créer un compte'}
           </button>
         </div>
