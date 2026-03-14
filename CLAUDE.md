@@ -88,11 +88,22 @@ Dark luxury theme defined in `src/styles/globals.css`:
 - `src/components/intro/` — `AfroslangIntro` (animated logo reveal, plays once per session)
 - `src/components/splash/` — `SplashScreen` (3D shattering text animation, plays once per session after auth)
 - `src/components/landing/` — `LandingPage` with login/signup bottom sheets and `RainCanvas` animated background
+- `src/components/rain/` — `RainCanvas` (animated rain background) and `MascotFactCard` (cultural facts carousel shown on `LearningPath` for languages in `RAIN_LANGUAGES`)
 - `src/components/` — shared components: auth, layout, leaderboard, subscription, streak, mascot, debug
 
-### Duplicate / Legacy Data Files
+### Cultural Facts & Rain Background
 
-`src/data/` contains legacy copies of some lesson files (e.g. `src/data/swahili.ts`, `hausa.ts`, `yoruba.ts`, `zulu.ts`). The canonical source is `src/data/lessons/<language>.ts`. Do not add new content to the legacy files in `src/data/`.
+`src/data/culturalFacts.ts` exports:
+- `culturalFacts` — per-language arrays of `CulturalFact` objects (each with `text`, `textFr`, `emoji`)
+- `RAIN_LANGUAGES` — a `Set` of language IDs that display the rain canvas + mascot fact card on the `LearningPath` screen (tropical/high-rainfall region languages)
+
+When adding a new language, add cultural facts here and decide whether it belongs in `RAIN_LANGUAGES`.
+
+### Duplicate / Legacy Files
+
+- `src/data/` contains legacy copies of some lesson files (e.g. `src/data/swahili.ts`, `hausa.ts`, `yoruba.ts`, `zulu.ts`). The canonical source is `src/data/lessons/<language>.ts`. Do not add new content to the legacy files in `src/data/`.
+- `src/firebase.js` and `src/firebase.ts` both exist — use only `src/firebase.ts`. The `.js` file is a legacy artifact.
+- `src/main.tsx.backup` is a backup file — ignore it.
 
 ### Adding a New Language
 

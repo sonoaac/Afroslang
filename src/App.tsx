@@ -18,11 +18,12 @@ import { getLanguageById } from './data/languages';
 import { getStagesForLanguage, getLessonById } from './data/lessons';
 import { saveUserProgress } from './utils/userData';
 import { addWeeklyXP, getCurrentWeekIdFromDB, getUserLeague } from './utils/leaderboardUtils';
+import { calcGemsEarned, awardGems, isXpBoostActive, purchaseHeartsRefill } from './utils/currencyUtils';
 
 type Screen = 'auth' | 'interface-select' | 'path' | 'lesson' | 'complete' | 'leaderboard' | 'subscription' | 'feedback' | 'shop' | 'latest-news';
 
 function App() {
-  const { user, userData, isGuest, loading, logout, setGuestMode } = useAuth();
+  const { user, userData, setUserData, isGuest, loading, logout, setGuestMode } = useAuth();
   const [currentScreen, setCurrentScreen] = useState<Screen>('auth');
   // Show intro once per session; after it completes show splash
   const [showIntro, setShowIntro] = useState<boolean>(
@@ -170,13 +171,13 @@ function App() {
     // Save to Firebase if user is authenticated
     if (user && !isGuest) {
       await saveUserProgress(user.uid, currentLanguage, activeLesson.id, xpEarned, heartsLost);
-      
+
       // Add XP to leaderboard
       try {
         const weekId = await getCurrentWeekIdFromDB();
         const userLeague = await getUserLeague(user.uid, weekId);
         const league = userLeague || 'Copper'; // Default to Copper if no league found
-        
+
         await addWeeklyXP(
           user.uid,
           league,
@@ -187,6 +188,19 @@ function App() {
         );
       } catch (error) {
         console.error('Error adding XP to leaderboard:', error);
+      }
+
+      // Award gems for completing the lesson
+      try {
+        const currentProgress = userProgressMap[currentLanguage];
+        const isFirstTime = !currentProgress?.completedLessons?.includes(activeLesson.id);
+        const gemsEarned = calcGemsEarned(heartsLost, isFirstTime);
+        await awardGems(user.uid, gemsEarned);
+        if (userData) {
+          setUserData({ ...userData, gems: (userData.gems ?? 0) + gemsEarned });
+        }
+      } catch (error) {
+        console.error('Error awarding gems:', error);
       }
     }
 
@@ -307,6 +321,20 @@ function App() {
 
   const handleExitLesson = () => {
     setCurrentScreen('path');
+  };
+
+  const handleRefillHeartsWithGems = async (): Promise<boolean> => {
+    if (!user || !userData) return false;
+    try {
+      const result = await purchaseHeartsRefill(user.uid, userData);
+      if (result) {
+        setUserData({ ...userData, ...result });
+        return true;
+      }
+    } catch (error) {
+      console.error('Error refilling hearts with gems:', error);
+    }
+    return false;
   };
 
   const getCurrentProgress = (): UserProgress => {
@@ -442,6 +470,8 @@ function App() {
               // Add quests screen if needed
             }
           }}
+          onSignUp={handleGoToSignUp}
+          onSignIn={handleGoToSignIn}
           currentLanguageId={currentLanguage}
         />
       )}
@@ -454,11 +484,16 @@ function App() {
             hearts={getCurrentProgress().hearts}
             heartsData={userData?.heartsData}
             isSubscribed={userData?.subscription?.active || false}
+            xpBoostActive={isXpBoostActive(userData)}
+            currentGems={userData?.gems ?? 0}
+            onRefillWithGems={handleRefillHeartsWithGems}
             userId={user?.uid}
             isGuest={isGuest}
             onComplete={handleLessonComplete}
             onExit={handleExitLesson}
             onBackToLanguageSelect={() => setCurrentScreen('interface-select')}
+            onGoToSignUp={handleGoToSignUp}
+            onGoToSubscription={() => setCurrentScreen('subscription')}
           />
         )}
 
@@ -473,7 +508,7 @@ function App() {
 
       {currentScreen === 'leaderboard' && (
         <LeaderboardScreen
-          onBack={() => setCurrentScreen('interface-select')}
+          onBack={() => setCurrentScreen(currentLanguage ? 'path' : 'interface-select')}
         />
       )}
 

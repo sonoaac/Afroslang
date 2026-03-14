@@ -10,6 +10,7 @@ export interface UserData {
   xp: number;
   gems?: number;
   sandbits?: number;
+  xpBoostExpiry?: number; // ms timestamp — 2× XP boost active until this time
   subscription: {
     active: boolean;
     plan: string | null;

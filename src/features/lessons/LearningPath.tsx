@@ -19,6 +19,8 @@ interface LearningPathProps {
   onStartLesson: (lesson: Lesson) => void;
   onBackToLanguageSelect: () => void;
   onNavigate?: (screen: 'leaderboard' | 'shop' | 'profile' | 'settings' | 'quests' | 'latest-news') => void;
+  onSignUp?: () => void;
+  onSignIn?: () => void;
   currentLanguageId?: string;
 }
 
@@ -36,6 +38,8 @@ export function LearningPath({
   onStartLesson,
   onBackToLanguageSelect,
   onNavigate,
+  onSignUp,
+  onSignIn,
   currentLanguageId
 }: LearningPathProps) {
   const isEnglish = interfaceLanguage === 'en';
@@ -502,10 +506,10 @@ export function LearningPath({
         {(isGuest || !user) && (
           <div className="lp-widget">
             <h3 className="lp-widget-title">🔐 {isEnglish ? 'Save Your Progress!' : 'Sauvegardez vos progrès!'}</h3>
-            <button className="lp-btn-primary" onClick={() => handleSidebarClick('profile')}>
+            <button className="lp-btn-primary" onClick={onSignUp ?? (() => handleSidebarClick('profile'))}>
               {isEnglish ? 'CREATE PROFILE' : 'CRÉER UN PROFIL'}
             </button>
-            <button className="lp-btn-secondary" onClick={() => handleSidebarClick('profile')}>
+            <button className="lp-btn-secondary" onClick={onSignIn ?? (() => handleSidebarClick('profile'))}>
               {isEnglish ? 'SIGN IN' : 'SE CONNECTER'}
             </button>
           </div>

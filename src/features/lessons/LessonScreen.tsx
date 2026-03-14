@@ -15,11 +15,16 @@ interface LessonScreenProps {
   hearts: number;
   heartsData?: HeartsData;
   isSubscribed?: boolean;
+  xpBoostActive?: boolean;
+  currentGems?: number;
+  onRefillWithGems?: () => Promise<boolean>;
   userId?: string;
   isGuest?: boolean;
   onComplete: (xpEarned: number, heartsLost: number, heartsGained: number) => void;
   onExit: () => void;
   onBackToLanguageSelect: () => void;
+  onGoToSignUp?: () => void;
+  onGoToSubscription?: () => void;
 }
 
 interface ExerciseWithState extends Exercise {
@@ -27,18 +32,23 @@ interface ExerciseWithState extends Exercise {
   hasRetried?: boolean; // Track if redemption was attempted
 }
 
-export function LessonScreen({ 
-  interfaceLanguage, 
+export function LessonScreen({
+  interfaceLanguage,
   lesson,
   languageName,
   hearts,
   heartsData,
   isSubscribed = false,
+  xpBoostActive = false,
+  currentGems = 0,
+  onRefillWithGems,
   userId,
   isGuest = false,
   onComplete,
   onExit,
-  onBackToLanguageSelect
+  onBackToLanguageSelect,
+  onGoToSignUp,
+  onGoToSubscription,
 }: LessonScreenProps) {
   const isEnglish = interfaceLanguage === 'en';
   
@@ -227,9 +237,10 @@ export function LessonScreen({
       setUserAnswer('');
       setShowFeedback(false);
     } else {
-      // Lesson complete - XP based only on correct answers
+      // Lesson complete - XP based only on correct answers, boosted if active
       const xpPerCorrect = Math.floor(lesson.xpReward / totalQuestions);
-      const xpEarned = Math.max(correctAnswers * xpPerCorrect, 5);
+      const baseXp = Math.max(correctAnswers * xpPerCorrect, 5);
+      const xpEarned = xpBoostActive ? baseXp * 2 : baseXp;
       onComplete(xpEarned, totalHeartsLost, totalHeartsGained);
     }
   };
@@ -376,6 +387,19 @@ export function LessonScreen({
 
       {/* ── Body ── */}
       <div className="ls-body">
+        {/* XP Boost indicator */}
+        {xpBoostActive && (
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: '0.4rem', marginBottom: '0.75rem',
+            background: 'rgba(255,214,10,0.1)', border: '1px solid rgba(255,214,10,0.3)',
+            borderRadius: 8, padding: '6px 14px', fontSize: '0.8rem',
+            color: '#ffd60a', fontWeight: 'bold',
+          }}>
+            ⚡ {isEnglish ? '2× XP BOOST ACTIVE' : 'BOOST 2× XP ACTIF'}
+          </div>
+        )}
+
         {/* Meta row */}
         <div className="ls-meta-row">
           <div className="ls-type-badge">
@@ -505,11 +529,17 @@ export function LessonScreen({
         onClose={() => setShowHeartsOutModal(false)}
         onSubscribe={() => {
           setShowHeartsOutModal(false);
-          // Navigate to subscription page - this would need to be passed as a prop
-          // For now, just close the modal
+          if (isGuest) onGoToSignUp?.();
+          else onGoToSubscription?.();
         }}
         heartsData={heartsData || { currentHearts: 0, lastResetTime: Date.now(), maxHearts: 5 }}
         isGuest={isGuest}
+        currentGems={currentGems}
+        onRefillWithGems={onRefillWithGems ? async () => {
+          const ok = await onRefillWithGems();
+          if (ok) setCurrentHearts(5);
+          return ok;
+        } : undefined}
       />
 
       {/* Guest Limit Modal */}
@@ -518,8 +548,7 @@ export function LessonScreen({
         onClose={() => setShowGuestLimitModal(false)}
         onSignUp={() => {
           setShowGuestLimitModal(false);
-          // Navigate to sign up - this would need to be passed as a prop
-          // For now, just close the modal
+          onGoToSignUp?.();
         }}
         lessonsCompleted={3}
       />

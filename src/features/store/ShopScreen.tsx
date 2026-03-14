@@ -1,7 +1,18 @@
+import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Gem, Heart, Zap } from 'lucide-react';
 import { SandbitsIcon } from '../../components/ui/SandbitsIcon';
 import { InterfaceLanguage } from '../../types';
+import {
+  purchaseHeartsRefill,
+  purchaseSandbitsPack,
+  purchaseXpBoost,
+  isXpBoostActive,
+  xpBoostRemainingMs,
+  COST_HEARTS_REFILL,
+  COST_SANDBITS_PACK,
+  COST_XP_BOOST,
+} from '../../utils/currencyUtils';
 
 interface ShopScreenProps {
   interfaceLanguage: InterfaceLanguage;
@@ -9,12 +20,63 @@ interface ShopScreenProps {
 }
 
 export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
-  const { userData } = useAuth();
+  const { userData, setUserData, user } = useAuth();
   const isEnglish = interfaceLanguage === 'en';
-  
+  const [purchasing, setPurchasing] = useState<number | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
   // Get currency values (with defaults)
-  const gems = userData?.gems || 500;
-  const sandbits = userData?.sandbits || 0;
+  const gems     = userData?.gems     ?? 0;
+  const sandbits = userData?.sandbits ?? 0;
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2800);
+  };
+
+  const handlePurchase = async (index: number) => {
+    if (!user || !userData) {
+      showToast(isEnglish ? 'Sign in to purchase items.' : 'Connectez-vous pour acheter.');
+      return;
+    }
+    setPurchasing(index);
+    try {
+      let result: Partial<typeof userData> | null = null;
+      if (index === 0) {
+        if (gems < COST_HEARTS_REFILL) {
+          showToast(isEnglish ? `Need ${COST_HEARTS_REFILL} Gems (you have ${gems})` : `Il faut ${COST_HEARTS_REFILL} Gemmes (vous en avez ${gems})`);
+          return;
+        }
+        result = await purchaseHeartsRefill(user.uid, userData);
+        if (result) showToast(isEnglish ? '❤️ Hearts refilled to 5!' : '❤️ Cœurs rechargés à 5!');
+      } else if (index === 1) {
+        if (gems < COST_SANDBITS_PACK) {
+          showToast(isEnglish ? `Need ${COST_SANDBITS_PACK} Gems (you have ${gems})` : `Il faut ${COST_SANDBITS_PACK} Gemmes (vous en avez ${gems})`);
+          return;
+        }
+        result = await purchaseSandbitsPack(user.uid, userData);
+        if (result) showToast(isEnglish ? '✨ +500 Sandbits added!' : '✨ +500 Sablebits ajoutés!');
+      } else if (index === 2) {
+        if (isXpBoostActive(userData)) {
+          showToast(isEnglish ? '⚡ XP Boost already active!' : '⚡ Boost XP déjà actif!');
+          return;
+        }
+        if (sandbits < COST_XP_BOOST) {
+          showToast(isEnglish ? `Need ${COST_XP_BOOST} Sandbits (you have ${sandbits})` : `Il faut ${COST_XP_BOOST} Sablebits (vous en avez ${sandbits})`);
+          return;
+        }
+        result = await purchaseXpBoost(user.uid, userData);
+        if (result) showToast(isEnglish ? '⚡ 2× XP Boost active for 1 hour!' : '⚡ Boost 2× XP actif pendant 1 heure!');
+      }
+      if (result) {
+        setUserData({ ...userData, ...result });
+      }
+    } catch {
+      showToast(isEnglish ? 'Purchase failed. Try again.' : 'Achat échoué. Réessayez.');
+    } finally {
+      setPurchasing(null);
+    }
+  };
 
   const spFont = "'Times New Roman', Georgia, serif";
   const spBg = '#080808';
@@ -24,35 +86,56 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
   const spText = '#ffffff';
   const spMuted = 'rgba(255,255,255,0.6)';
 
+  const boostActive = isXpBoostActive(userData);
+  const boostMs = xpBoostRemainingMs(userData);
+  const boostMinutes = Math.ceil(boostMs / 60000);
+
   const shopItems = [
     {
       icon: <Heart style={{ width: 36, height: 36, color: spRed }} strokeWidth={1.5} />,
-      title: isEnglish ? 'Extra Hearts' : 'Cœurs Supplémentaires',
-      desc: isEnglish ? 'Get 5 extra hearts' : 'Obtenez 5 cœurs supplémentaires',
-      price: 100,
-      currency: 'Gems',
+      title: isEnglish ? 'Refill Hearts' : 'Recharger les Cœurs',
+      desc: isEnglish ? 'Restore all 5 hearts instantly' : 'Restaurez les 5 cœurs instantanément',
+      price: COST_HEARTS_REFILL,
+      currency: isEnglish ? 'Gems' : 'Gemmes',
       CurrencyIcon: <Gem style={{ width: 16, height: 16, color: spRed }} strokeWidth={2} />,
+      canAfford: gems >= COST_HEARTS_REFILL,
     },
     {
       icon: <SandbitsIcon size={36} className="" />,
       title: isEnglish ? 'Sandbits Pack' : 'Pack de Sablebits',
-      desc: isEnglish ? 'Get 500 Sandbits' : 'Obtenez 500 Sablebits',
-      price: 250,
-      currency: 'Gems',
+      desc: isEnglish ? '+500 Sandbits (premium currency)' : '+500 Sablebits (devise premium)',
+      price: COST_SANDBITS_PACK,
+      currency: isEnglish ? 'Gems' : 'Gemmes',
       CurrencyIcon: <Gem style={{ width: 16, height: 16, color: spRed }} strokeWidth={2} />,
+      canAfford: gems >= COST_SANDBITS_PACK,
     },
     {
-      icon: <Zap style={{ width: 36, height: 36, color: spRed }} strokeWidth={1.5} />,
-      title: isEnglish ? 'XP Boost' : 'Boost XP',
-      desc: isEnglish ? '2× XP for 1 hour' : '2× XP pendant 1 heure',
-      price: 150,
-      currency: 'Sandbits',
+      icon: <Zap style={{ width: 36, height: 36, color: boostActive ? '#ffd60a' : spRed }} strokeWidth={1.5} />,
+      title: isEnglish ? 'XP Boost 2×' : 'Boost XP 2×',
+      desc: boostActive
+        ? (isEnglish ? `Active — ${boostMinutes}m remaining` : `Actif — ${boostMinutes}m restantes`)
+        : (isEnglish ? '2× XP earned for 1 hour' : '2× XP gagné pendant 1 heure'),
+      price: COST_XP_BOOST,
+      currency: isEnglish ? 'Sandbits' : 'Sablebits',
       CurrencyIcon: <SandbitsIcon size={16} />,
+      canAfford: sandbits >= COST_XP_BOOST,
     },
   ];
 
   return (
     <div style={{ minHeight: '100vh', background: spBg, fontFamily: spFont }}>
+      {/* Toast notification */}
+      {toast && (
+        <div style={{
+          position: 'fixed', top: 24, left: '50%', transform: 'translateX(-50%)',
+          background: '#111', border: '1px solid rgba(176,0,32,0.5)',
+          color: '#fff', padding: '12px 24px', borderRadius: 8,
+          fontSize: '0.9rem', fontWeight: 'bold', zIndex: 9999,
+          boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
+        }}>
+          {toast}
+        </div>
+      )}
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '1.5rem 1rem' }}>
 
         {/* Header */}
@@ -104,7 +187,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
           {shopItems.map((item, i) => (
             <div
               key={i}
-              style={{ background: spSurface, border: `1px solid ${spBorder}`, padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', transition: 'border-color 0.2s', cursor: 'pointer', position: 'relative', overflow: 'hidden' }}
+              style={{ background: spSurface, border: `1px solid ${spBorder}`, padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', transition: 'border-color 0.2s', position: 'relative', overflow: 'hidden' }}
               onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(176,0,32,0.5)'; }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = spBorder; }}
             >
@@ -112,11 +195,28 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
                 {item.icon}
               </div>
               <h3 style={{ color: spText, fontFamily: spFont, fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.5rem', marginTop: 0 }}>{item.title}</h3>
-              <p style={{ color: spMuted, fontSize: '0.82rem', fontFamily: spFont, marginBottom: '1.25rem', lineHeight: 1.4 }}>{item.desc}</p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(176,0,32,0.12)', border: `1px solid rgba(176,0,32,0.3)`, padding: '0.4rem 0.85rem' }}>
-                {item.CurrencyIcon}
-                <span style={{ color: spText, fontFamily: spFont, fontSize: '1.1rem', fontWeight: 'bold' }}>{item.price}</span>
-              </div>
+              <p style={{ color: spMuted, fontSize: '0.82rem', fontFamily: spFont, marginBottom: '1.25rem', lineHeight: 1.4, flex: 1 }}>{item.desc}</p>
+              <button
+                onClick={() => handlePurchase(i)}
+                disabled={purchasing === i || (i === 2 && boostActive)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.4rem',
+                  background: item.canAfford && !(i === 2 && boostActive)
+                    ? 'rgba(176,0,32,0.18)'
+                    : 'rgba(80,80,80,0.18)',
+                  border: `1px solid ${item.canAfford && !(i === 2 && boostActive) ? 'rgba(176,0,32,0.5)' : 'rgba(80,80,80,0.3)'}`,
+                  padding: '0.5rem 1rem', borderRadius: 6, cursor: purchasing === i || (i === 2 && boostActive) ? 'not-allowed' : 'pointer',
+                  fontFamily: spFont, color: spText, fontWeight: 'bold', fontSize: '1rem',
+                  opacity: purchasing === i ? 0.6 : 1, transition: 'all 0.15s',
+                }}
+              >
+                {purchasing === i ? '…' : (
+                  <>
+                    {item.CurrencyIcon}
+                    <span>{i === 2 && boostActive ? (isEnglish ? 'Active' : 'Actif') : item.price}</span>
+                  </>
+                )}
+              </button>
             </div>
           ))}
         </div>
