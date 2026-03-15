@@ -10,9 +10,16 @@
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "logo:transparent": "node scripts/make-logo-transparent.mjs",
-    "validate:lessons": "tsx scripts/validate-lessons.ts"
+    "validate:lessons": "tsx scripts/validate-lessons.ts",
+    "build:android": "npm run build && npx cap sync android && npx cap open android",
+    "build:ios": "npm run build && npx cap sync ios && npx cap open ios",
+    "cap:sync": "npm run build && npx cap sync"
   },
   "dependencies": {
+    "@capacitor/android": "^8.2.0",
+    "@capacitor/cli": "^8.2.0",
+    "@capacitor/core": "^8.2.0",
+    "@capacitor/ios": "^8.2.0",
     "@stripe/stripe-js": "^8.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
