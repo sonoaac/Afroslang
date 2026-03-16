@@ -147,7 +147,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
               <path d="M8 5v14l11-7z" />
             </svg>
           </button>
-          <div className="sp-hint">auto-starts in 3s</div>
+          <div className="sp-hint">starts in 3s</div>
         </div>
       )}
 
