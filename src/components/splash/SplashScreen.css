@@ -14,100 +14,158 @@
   overflow: hidden;
 }
 
-/* ── Atmospheric colour blobs (blurred) ── */
+/* ── Atmospheric colour blobs (blurred) — green only ── */
 .sp-bg-blur {
   position: absolute;
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 60% 40% at 15% 25%,  rgba(176,0,32,0.18)   0%, transparent 70%),
-    radial-gradient(ellipse 55% 45% at 85% 75%,  rgba(53,183,41,0.14)  0%, transparent 70%),
-    radial-gradient(ellipse 50% 35% at 50% 55%,  rgba(245,200,66,0.10) 0%, transparent 65%),
-    radial-gradient(ellipse 70% 60% at 80% 20%,  rgba(229,57,53,0.08)  0%, transparent 70%);
-  filter: blur(48px);
+    radial-gradient(ellipse 60% 45% at 20% 30%,  rgba(40,160,32,0.14)  0%, transparent 70%),
+    radial-gradient(ellipse 55% 40% at 80% 70%,  rgba(30,120,24,0.12)  0%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 50% 50%,  rgba(20,100,16,0.08)  0%, transparent 65%);
+  filter: blur(52px);
   z-index: 0;
 }
 
-/* ══════════════════════════════════════════
-   Flying mascot birds  (Duolingo-style)
-   3 layers:
-     1. sp-bird-fly    — horizontal travel
-     2. sp-bird-bounce — body bob + squash/stretch + head tilt
-     3. sp-bird-img    — wing-flap (scaleX pulse)
-   ══════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════
+   Flying mascot birds — true 3D z-depth flight
+   ─────────────────────────────────────────────────────
+   Layer 1  sp-bird-fly           z-depth arc (far → near → far)
+   Layer 2  sp-bird-bounce        squash / stretch / head-tilt
+   Layer 3  sp-bird-img           wing-flap with perspective rotateX
+   ══════════════════════════════════════════════════════ */
 
+/* perspective container — all translate3d on children uses this */
 .sp-birds {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
   z-index: 1;
+  perspective: 520px;
+  perspective-origin: 50% 46%;
 }
 
-/* ── 1. Fly across the screen ── */
+/* ────────────────────────────────────────────
+   Layer 1 — 3D flight path
+   Bird is anchored at left:50vw (h-center).
+   translate3d moves it:
+     x: sweeps from off-screen-left to off-screen-right
+     z: starts deep behind screen, passes close, recedes
+   With perspective:520px on parent, translateZ(-700px)
+   makes element appear at ~43% of its natural size.
+   At translateZ(+100px) it appears at ~134% — a dramatic
+   size surge as the mascot "flies through" the camera.
+   ──────────────────────────────────────────── */
 .sp-bird-fly {
   position: absolute;
-  left: -18%;
+  left: 50vw;
   opacity: 0;
-  animation: spBirdFly linear infinite;
-  /* duration & delay set inline */
+  animation: linear infinite;   /* name overridden by depth variant */
+  will-change: transform, opacity;
 }
 
-@keyframes spBirdFly {
-  0%   { left: -18%; opacity: 0;   transform: translateY(0px); }
-  5%   {              opacity: 0.82; }
-  28%  {                            transform: translateY(-10px); }
-  55%  {                            transform: translateY(7px); }
-  78%  {                            transform: translateY(-6px); }
-  95%  {              opacity: 0.82; }
-  100% { left: 118%;  opacity: 0;   transform: translateY(0px); }
+/* depth variants — controls the z-peak (closest pass) */
+.sp-bird-fly--close { animation-name: spFlyClose; }
+.sp-bird-fly--mid   { animation-name: spFlyMid;   }
+.sp-bird-fly--far   { animation-name: spFlyFar;   }
+
+/*
+  Maths check (perspective 520px):
+    translateZ(-700) → scale 520/1220 ≈ 0.43  (tiny speck in distance)
+    translateZ( 100) → scale 520/ 420 ≈ 1.24  (large, close pass)
+    translateZ(   0) → scale 1.0               (natural size)
+    translateZ(-220) → scale 520/ 740 ≈ 0.70  (medium distance)
+
+  translateX at z=-700: apparent offset = tx × 0.43
+    → need tx ≈ -120vw so apparent left-edge ≈ -120×0.43+50 = −2vw  ✓
+    → need tx ≈ +120vw so apparent right-edge ≈ 120×0.43+50 = 102vw ✓
+*/
+
+/* Close: peak at z=+100 — large, dramatic sweep */
+@keyframes spFlyClose {
+  0%   { transform: translate3d(-120vw, 0,    -700px); opacity: 0;   }
+  6%   { opacity: 0.90; }
+  42%  { transform: translate3d(  -6vw, -2vh,  100px); }
+  58%  { transform: translate3d(   6vw,  1vh,   80px); }
+  94%  { opacity: 0.90; }
+  100% { transform: translate3d( 120vw, 0,    -700px); opacity: 0;   }
 }
 
-/* ── 2. Body bounce + squash/stretch + head tilt ── */
+/* Mid: peak at z=0 — natural size pass */
+@keyframes spFlyMid {
+  0%   { transform: translate3d(-120vw, 0,    -700px); opacity: 0;   }
+  6%   { opacity: 0.80; }
+  42%  { transform: translate3d(  -6vw, -1vh,    0px); }
+  58%  { transform: translate3d(   6vw,  1vh,    0px); }
+  94%  { opacity: 0.80; }
+  100% { transform: translate3d( 120vw, 0,    -700px); opacity: 0;   }
+}
+
+/* Far: peak at z=-220 — stays in background */
+@keyframes spFlyFar {
+  0%   { transform: translate3d(-110vw, 0,    -650px); opacity: 0;   }
+  6%   { opacity: 0.60; }
+  42%  { transform: translate3d(  -6vw,  0,   -220px); }
+  58%  { transform: translate3d(   6vw,  0,   -220px); }
+  94%  { opacity: 0.60; }
+  100% { transform: translate3d( 110vw, 0,    -650px); opacity: 0;   }
+}
+
+/* ────────────────────────────────────────────
+   Layer 2 — Duo-style body bounce
+   Pure squash / stretch / tilt — no translateY
+   (the z-arc already handles depth movement)
+   ──────────────────────────────────────────── */
 .sp-bird-bounce {
+  display: inline-block;
+  transform-origin: center bottom;
   animation: spBirdBounce var(--bounce-dur, 0.65s) ease-in-out infinite;
   animation-delay: var(--bounce-offset, 0s);
-  transform-origin: center bottom;
-  display: inline-block;
 }
 
 @keyframes spBirdBounce {
-  /*  0% — resting, slight squash on landing  */
-  0%   { transform: translateY(0px)   scaleX(1.05) scaleY(0.95) rotate(0deg); }
-  /*  launch — begin stretch  */
-  10%  { transform: translateY(-5px)  scaleX(1.00) scaleY(1.02) rotate(3deg); }
-  /*  rising — full stretch + tilt right  */
-  28%  { transform: translateY(-16px) scaleX(0.93) scaleY(1.10) rotate(6deg); }
-  /*  peak  */
-  42%  { transform: translateY(-18px) scaleX(0.92) scaleY(1.12) rotate(4deg); }
-  /*  tilt swaps at peak  */
-  50%  { transform: translateY(-17px) scaleX(0.93) scaleY(1.10) rotate(-1deg); }
-  /*  falling — tilt left  */
-  64%  { transform: translateY(-8px)  scaleX(0.97) scaleY(1.04) rotate(-6deg); }
-  /*  land squash  */
-  78%  { transform: translateY(0px)   scaleX(1.08) scaleY(0.93) rotate(-3deg); }
-  /*  small secondary bounce  */
-  88%  { transform: translateY(-7px)  scaleX(0.96) scaleY(1.05) rotate(2deg); }
-  /*  settle  */
-  100% { transform: translateY(0px)   scaleX(1.05) scaleY(0.95) rotate(0deg); }
+  0%   { transform: scaleX(1.05) scaleY(0.95) rotate(  0deg); } /* squash land   */
+  12%  { transform: scaleX(1.00) scaleY(1.02) rotate(  3deg); } /* launch        */
+  30%  { transform: scaleX(0.93) scaleY(1.11) rotate(  6deg); } /* rising+tilt R */
+  48%  { transform: scaleX(0.92) scaleY(1.13) rotate(  3deg); } /* peak          */
+  52%  { transform: scaleX(0.93) scaleY(1.11) rotate( -2deg); } /* tilt swaps    */
+  68%  { transform: scaleX(0.97) scaleY(1.05) rotate( -6deg); } /* falling+tilt L*/
+  80%  { transform: scaleX(1.08) scaleY(0.93) rotate( -3deg); } /* squash land   */
+  90%  { transform: scaleX(0.96) scaleY(1.06) rotate(  2deg); } /* small bounce  */
+  100% { transform: scaleX(1.05) scaleY(0.95) rotate(  0deg); } /* settle        */
 }
 
-/* ── 3. Wing-flap — scaleX widens/narrows the mascot ── */
+/* ────────────────────────────────────────────
+   Layer 3 — Wing flap with true 3D perspective
+   rotateX tilts the mascot image on its
+   horizontal axis — combined with perspective()
+   this gives the top (wings) a foreshortening
+   effect: wings appear to sweep upward BEHIND
+   the body, then forward and DOWN in front.
+   scaleX amplifies the spread/tuck visually.
+   ──────────────────────────────────────────── */
 .sp-bird-img {
   display: block;
-  animation: spBirdWingFlap var(--flap-dur, 0.42s) ease-in-out infinite;
-  animation-delay: var(--flap-offset, 0s);
   transform-origin: center center;
-  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.55));
+  animation: spBirdWingFlap var(--flap-dur, 0.40s) ease-in-out infinite;
+  animation-delay: var(--flap-offset, 0s);
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.65));
 }
 
 @keyframes spBirdWingFlap {
-  0%   { transform: scaleX(1.00); }
-  22%  { transform: scaleX(1.18); }   /* wings spread wide  */
-  44%  { transform: scaleX(0.84); }   /* wings tuck in      */
-  66%  { transform: scaleX(1.13); }   /* spread again       */
-  88%  { transform: scaleX(0.90); }   /* slight tuck        */
-  100% { transform: scaleX(1.00); }
+  /* ── up-stroke: wings sweep back and upward ── */
+  0%   { transform: perspective(320px) rotateX(  0deg) scaleX(1.00); }
+  18%  { transform: perspective(320px) rotateX(-30deg) scaleX(1.16); }
+  /* ── top of stroke: wings fully back ── */
+  32%  { transform: perspective(320px) rotateX(-36deg) scaleX(1.20); }
+  /* ── down-stroke: wings sweep forward ── */
+  52%  { transform: perspective(320px) rotateX( 24deg) scaleX(0.82); }
+  /* ── bottom of stroke: wings tucked forward ── */
+  64%  { transform: perspective(320px) rotateX( 28deg) scaleX(0.78); }
+  /* ── recovery ── */
+  82%  { transform: perspective(320px) rotateX(-18deg) scaleX(1.10); }
+  100% { transform: perspective(320px) rotateX(  0deg) scaleX(1.00); }
 }
 
 /* ── Idle ── */
@@ -261,43 +319,26 @@
   opacity: 1;
 }
 
-/* ── Brand colour classes ── */
-.sp-glyph--cr {
-  color: #ff5252;
-  text-shadow:
-    1px 1px 0 #8b0000,
-    2px 2px 0 #5c0000,
-    3px 3px 0 rgba(91,0,0,0.4),
-    0 0 20px rgba(229,57,53,0.5),
-    0 0 50px rgba(229,57,53,0.2);
-}
-
-.sp-glyph--cg {
-  color: #69f542;
-  text-shadow:
-    1px 1px 0 #1a5c00,
-    2px 2px 0 #0f3d00,
-    3px 3px 0 rgba(15,61,0,0.4),
-    0 0 20px rgba(53,183,41,0.55),
-    0 0 50px rgba(53,183,41,0.22);
-}
-
+/* ── All glyphs: dark green + black drop-shadow depth ── */
+.sp-glyph--cr,
+.sp-glyph--cg,
 .sp-glyph--cy {
-  color: #ffe83d;
+  color: #2eb82e;
   text-shadow:
-    1px 1px 0 #7a6000,
-    2px 2px 0 #524000,
-    3px 3px 0 rgba(82,64,0,0.4),
-    0 0 20px rgba(245,200,66,0.55),
-    0 0 50px rgba(245,200,66,0.22);
+    1px 1px 0 #000,
+    2px 2px 0 #000,
+    3px 3px 0 rgba(0,0,0,0.6),
+    4px 4px 0 rgba(0,0,0,0.3),
+    0 0 18px rgba(30,140,20,0.20);
 }
 
-/* Accent word override (fyLp?) */
+/* Accent word (fyLp) — slightly brighter green, stronger glow */
 .sp-glyph--accent {
-  color: #ff4444;
+  color: #44e832;
   text-shadow:
-    1px 1px 0 #800000,
-    2px 2px 0 #500000,
-    0 0 24px rgba(255,68,68,0.8),
-    0 0 60px rgba(255,68,68,0.4);
+    1px 1px 0 #000,
+    2px 2px 0 #000,
+    3px 3px 0 rgba(0,0,0,0.6),
+    0 0 22px rgba(53,183,41,0.55),
+    0 0 50px rgba(53,183,41,0.22);
 }

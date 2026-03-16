@@ -2,19 +2,19 @@ import { useState, useEffect, useRef } from 'react';
 import './SplashScreen.css';
 
 const PHRASES = [
-  'Welcome to Afroslang',
-  'Ready to learn?',
-  'Our unique style will leave you doom scrolling',
-  'Ready for your fyLp?',
+  'TALK LOUD',
+  'GO DEEP',
+  'STAY SHARP',
+  'fyLp NOW',
 ];
 
-const ACCENT_WORDS = new Set(['fyLp?']);
+const ACCENT_WORDS = new Set(['fyLp']);
 const LAST_IDX = PHRASES.length - 1;
 
 const rand = (lo: number, hi: number) => Math.random() * (hi - lo) + lo;
 
-// 0=red, 1=green, 2=yellow — cycling per character
-const COLOR_CLASSES = ['sp-glyph--cr', 'sp-glyph--cg', 'sp-glyph--cy'] as const;
+// All glyphs use the same dark-green class
+const COLOR_CLASSES = ['sp-glyph--cg', 'sp-glyph--cg', 'sp-glyph--cg'] as const;
 
 interface GlyphData {
   ch: string;
@@ -62,16 +62,16 @@ const STAGGER_PER_CHAR_MS = 8;
 const GAP_BETWEEN_MS      = 160;
 const FINAL_HOLD_MS       = 1400;
 
-// 8 flying mascot birds — larger so the character reads clearly
+// Birds fly in from z-depth — 3 depth tiers so some pass close, others stay back
 const BIRDS = [
-  { size: 54, top: '10%',  delay: '0s',    dur: '7s',   bounceDur: '0.64s', flapDur: '0.40s' },
-  { size: 42, top: '25%',  delay: '1.4s',  dur: '9s',   bounceDur: '0.72s', flapDur: '0.44s' },
-  { size: 64, top: '40%',  delay: '2.8s',  dur: '7.5s', bounceDur: '0.58s', flapDur: '0.37s' },
-  { size: 38, top: '55%',  delay: '0.7s',  dur: '8.5s', bounceDur: '0.78s', flapDur: '0.46s' },
-  { size: 58, top: '68%',  delay: '3.5s',  dur: '6.8s', bounceDur: '0.61s', flapDur: '0.42s' },
-  { size: 46, top: '80%',  delay: '1.9s',  dur: '9.5s', bounceDur: '0.70s', flapDur: '0.35s' },
-  { size: 52, top: '8%',   delay: '4.2s',  dur: '8s',   bounceDur: '0.67s', flapDur: '0.43s' },
-  { size: 40, top: '90%',  delay: '5.1s',  dur: '7.2s', bounceDur: '0.75s', flapDur: '0.38s' },
+  { size: 54, top: '12%',  delay: '0s',    dur: '8.0s',  bounceDur: '0.62s', flapDur: '0.38s', depth: 'close' },
+  { size: 48, top: '28%',  delay: '2.3s',  dur: '10.5s', bounceDur: '0.70s', flapDur: '0.43s', depth: 'mid'   },
+  { size: 60, top: '42%',  delay: '4.8s',  dur: '8.5s',  bounceDur: '0.57s', flapDur: '0.36s', depth: 'close' },
+  { size: 38, top: '56%',  delay: '1.5s',  dur: '11.0s', bounceDur: '0.76s', flapDur: '0.45s', depth: 'far'   },
+  { size: 52, top: '68%',  delay: '6.2s',  dur: '9.0s',  bounceDur: '0.64s', flapDur: '0.40s', depth: 'mid'   },
+  { size: 44, top: '80%',  delay: '3.4s',  dur: '10.0s', bounceDur: '0.68s', flapDur: '0.44s', depth: 'mid'   },
+  { size: 56, top: '8%',   delay: '7.0s',  dur: '8.0s',  bounceDur: '0.60s', flapDur: '0.39s', depth: 'close' },
+  { size: 36, top: '90%',  delay: '5.2s',  dur: '11.5s', bounceDur: '0.80s', flapDur: '0.46s', depth: 'far'   },
 ];
 
 function assembleTime(charCount: number) {
@@ -120,10 +120,10 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       {/* ── Flying mascot birds in the background ── */}
       <div className="sp-birds" aria-hidden="true">
         {BIRDS.map((b, i) => (
-          // Outer: fly left→right across the screen
+          // Outer: 3D flight path — depth variant controls closest z-pass
           <div
             key={i}
-            className="sp-bird-fly"
+            className={`sp-bird-fly sp-bird-fly--${b.depth}`}
             style={{
               top: b.top,
               animationDuration: b.dur,
