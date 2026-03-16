@@ -32,11 +32,11 @@ export const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue }) => {
 
           {/* Success Message */}
           <h1 className="text-5xl font-bold text-white mb-6">
-            Welcome to Premium! 🎉
+            Welcome to AfroSlang Plus! 🎉
           </h1>
           
           <p className="text-xl text-white/80 mb-12">
-            You now have access to all premium features. Let's start learning!
+            You now have access to all Plus features. Let's start learning!
           </p>
 
           {/* Premium Features Showcase */}

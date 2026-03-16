@@ -7,24 +7,21 @@ export interface HeartsData {
   maxHearts: number;
 }
 
-export const HEARTS_RESET_HOURS = 7;
+export const HEARTS_REFILL_HOURS = 5; // 1 heart every 5 hours (AfroSlang Plus style)
 export const MAX_HEARTS = 5;
 
+// Keep old export alias so existing callers don't break
+export const HEARTS_RESET_HOURS = HEARTS_REFILL_HOURS;
+
 /**
- * Calculate how many hearts should be restored based on time elapsed
+ * Calculate how many hearts should be restored based on time elapsed.
+ * Returns the number of hearts to ADD (not the new total).
+ * 1 heart per 5 hours, up to MAX_HEARTS.
  */
 export const calculateHeartsFromTime = (lastResetTime: number, currentTime: number = Date.now()): number => {
   const timeElapsed = currentTime - lastResetTime;
-  const hoursElapsed = timeElapsed / (1000 * 60 * 60); // Convert ms to hours
-  
-  // Calculate how many full resets have occurred
-  const fullResets = Math.floor(hoursElapsed / HEARTS_RESET_HOURS);
-  
-  if (fullResets > 0) {
-    return MAX_HEARTS; // Full hearts restored
-  }
-  
-  return 0; // No hearts restored yet
+  const hoursElapsed = timeElapsed / (1000 * 60 * 60);
+  return Math.min(Math.floor(hoursElapsed / HEARTS_REFILL_HOURS), MAX_HEARTS);
 };
 
 /**
@@ -42,23 +39,24 @@ export const getCurrentHeartsStatus = async (userId: string): Promise<HeartsData
       if (heartsData) {
         const currentTime = Date.now();
         const heartsToRestore = calculateHeartsFromTime(heartsData.lastResetTime, currentTime);
-        
-        if (heartsToRestore > 0) {
-          // Update hearts in database
+
+        if (heartsToRestore > 0 && heartsData.currentHearts < MAX_HEARTS) {
+          // Add hearts incrementally — 1 per 5 hours up to MAX
+          const newHearts = Math.min(heartsData.currentHearts + heartsToRestore, MAX_HEARTS);
           const newHeartsData: HeartsData = {
-            currentHearts: MAX_HEARTS,
+            currentHearts: newHearts,
             lastResetTime: currentTime,
-            maxHearts: MAX_HEARTS
+            maxHearts: MAX_HEARTS,
           };
-          
+
           await updateDoc(userRef, {
-            hearts: MAX_HEARTS,
-            heartsData: newHeartsData
+            hearts: newHearts,
+            heartsData: newHeartsData,
           });
-          
+
           return newHeartsData;
         }
-        
+
         return heartsData;
       }
     }
@@ -133,19 +131,17 @@ export const updateHearts = async (userId: string, heartsLost: number): Promise<
 };
 
 /**
- * Get time until next hearts reset
+ * Get time (ms) until the NEXT single heart refill.
+ * Each heart takes 5 hours. This shows the countdown to +1 heart.
  */
 export const getTimeUntilNextReset = (lastResetTime: number): number => {
   const currentTime = Date.now();
   const timeElapsed = currentTime - lastResetTime;
   const hoursElapsed = timeElapsed / (1000 * 60 * 60);
-  
-  if (hoursElapsed >= HEARTS_RESET_HOURS) {
-    return 0; // Hearts should be reset
-  }
-  
-  const timeRemaining = HEARTS_RESET_HOURS - hoursElapsed;
-  return timeRemaining * 60 * 60 * 1000; // Convert to milliseconds
+  const heartsAlreadyRestored = Math.floor(hoursElapsed / HEARTS_REFILL_HOURS);
+  // Time until the next heart arrives
+  const msForNextHeart = ((heartsAlreadyRestored + 1) * HEARTS_REFILL_HOURS * 3_600_000) - timeElapsed;
+  return Math.max(0, msForNextHeart);
 };
 
 /**
@@ -176,11 +172,12 @@ export const getGuestHeartsStatus = (): HeartsData => {
       const currentTime = Date.now();
       const heartsToRestore = calculateHeartsFromTime(heartsData.lastResetTime, currentTime);
       
-      if (heartsToRestore > 0) {
+      if (heartsToRestore > 0 && heartsData.currentHearts < MAX_HEARTS) {
+        const newHearts = Math.min(heartsData.currentHearts + heartsToRestore, MAX_HEARTS);
         const newHeartsData: HeartsData = {
-          currentHearts: MAX_HEARTS,
+          currentHearts: newHearts,
           lastResetTime: currentTime,
-          maxHearts: MAX_HEARTS
+          maxHearts: MAX_HEARTS,
         };
         localStorage.setItem('afroslang_guest_hearts', JSON.stringify(newHeartsData));
         return newHeartsData;

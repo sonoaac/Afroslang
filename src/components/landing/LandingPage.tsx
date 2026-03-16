@@ -97,13 +97,15 @@ export function LandingPage({ initialSheet }: LandingPageProps) {
         {logoError ? (
           <span style={{ fontSize: '5rem' }}>🐦</span>
         ) : (
-          <img
-            className="landing-mascot"
-            src="/Afroslang.png"
-            alt="Afroslang mascot"
-            onError={() => setLogoError(true)}
-            draggable={false}
-          />
+          <div className="landing-mascot-wrap">
+            <img
+              className="landing-mascot"
+              src="/Afroslang.png"
+              alt="Afroslang mascot"
+              onError={() => setLogoError(true)}
+              draggable={false}
+            />
+          </div>
         )}
         <h1 className="landing-title">
           Afro<span>slang</span>
@@ -114,7 +116,7 @@ export function LandingPage({ initialSheet }: LandingPageProps) {
       {/* Bottom CTA panel */}
       <div className="landing-bottom">
         <button className="landing-btn-primary" onClick={() => setSheet('signup')}>
-          Get Started — Sign Up
+          Get Started
         </button>
         <button className="landing-btn-secondary" onClick={() => setSheet('login')}>
           Log In

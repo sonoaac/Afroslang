@@ -237,10 +237,14 @@ export function LessonScreen({
       setUserAnswer('');
       setShowFeedback(false);
     } else {
-      // Lesson complete - XP based only on correct answers, boosted if active
+      // Lesson complete — XP based on correct answers + perfect bonus
       const xpPerCorrect = Math.floor(lesson.xpReward / totalQuestions);
       const baseXp = Math.max(correctAnswers * xpPerCorrect, 5);
-      const xpEarned = xpBoostActive ? baseXp * 2 : baseXp;
+      const isPerfect = totalHeartsLost === 0;
+      const perfectBonus = isPerfect ? 5 : 0; // +5 XP for zero mistakes (Duolingo style)
+      const xpEarned = xpBoostActive
+        ? (baseXp + perfectBonus) * 2   // Plus: 2× everything
+        : baseXp + perfectBonus;         // Free: base + perfect bonus
       onComplete(xpEarned, totalHeartsLost, totalHeartsGained);
     }
   };

@@ -12,6 +12,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   setUserData: (data: UserData) => void;
   setGuestMode: (isGuest: boolean) => void;
+  refreshUserData: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -98,6 +99,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const refreshUserData = async () => {
+    if (!user) return;
+    const data = await loadUserData(user.uid);
+    if (!data) return;
+    if (!data.subscription?.active) {
+      const heartsStatus = await getCurrentHeartsStatus(user.uid);
+      setUserData({ ...data, hearts: heartsStatus.currentHearts, heartsData: heartsStatus });
+    } else {
+      setUserData(data);
+    }
+  };
+
   const handleSetGuestMode = (guestMode: boolean) => {
     setIsGuest(guestMode);
     if (guestMode) {
@@ -117,6 +130,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     setUserData: handleSetUserData,
     setGuestMode: handleSetGuestMode,
+    refreshUserData,
   };
 
   return (

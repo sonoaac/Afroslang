@@ -20,7 +20,7 @@ export const SUBSCRIPTION_PLANS = {
     priceId: 'price_monthly_5_99', // Replace with your actual Stripe price ID
     amount: 599, // $5.99 in cents
     interval: 'month',
-    name: 'Monthly Premium',
+    name: 'Monthly Plus',
     description: 'Unlimited hearts, XP boost, feedback page, and more!',
     paymentLink: 'https://buy.stripe.com/bJefZafrV09L96Vezj24001',
     trialDays: 7
@@ -29,15 +29,15 @@ export const SUBSCRIPTION_PLANS = {
     priceId: 'price_yearly_39_99', // Replace with your actual Stripe price ID
     amount: 3999, // $39.99 in cents
     interval: 'year',
-    name: 'Yearly Premium',
-    description: 'Save 44%! All premium features for a full year',
+    name: 'Yearly Plus',
+    description: 'Save 44%! All Plus features for a full year',
     savings: 'Save $32.89/year',
     paymentLink: 'https://buy.stripe.com/aFabIUfrV6y9cj7gHr24000',
     trialDays: 7
   }
 } as const;
 
-// Premium features
+// Plus features
 export const PREMIUM_FEATURES = [
   {
     icon: '❤️',
