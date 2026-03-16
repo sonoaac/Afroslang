@@ -28,7 +28,7 @@
   z-index: 0;
 }
 
-/* ── Flying bird logos ── */
+/* ── Flying 3D birds ── */
 .sp-birds {
   position: absolute;
   inset: 0;
@@ -37,20 +37,51 @@
   z-index: 1;
 }
 
-.sp-bird {
+/* Fly-across wrapper */
+.sp-bird3d {
   position: absolute;
-  left: -8%;
+  left: -25%;
   opacity: 0;
-  object-fit: contain;
   animation: spBirdFly 8s linear infinite;
-  filter: drop-shadow(0 0 4px rgba(229,57,53,0.4));
+  filter: drop-shadow(0 2px 6px rgba(229,57,53,0.45));
 }
 
 @keyframes spBirdFly {
-  0%   { left: -8%;  transform: rotate(-8deg) scaleY(0.9); opacity: 0; }
-  6%   { opacity: 0.55; }
-  92%  { opacity: 0.55; }
-  100% { left: 108%; transform: rotate(-8deg) scaleY(0.9); opacity: 0; }
+  0%   { left: -25%; opacity: 0;    transform: translateY(0px)    rotate(-4deg); }
+  5%   {              opacity: 0.7; }
+  30%  {                            transform: translateY(-8px)   rotate(-4deg); }
+  60%  {                            transform: translateY(5px)    rotate(-3deg); }
+  90%  {              opacity: 0.7; transform: translateY(-4px)   rotate(-4deg); }
+  100% { left: 115%;  opacity: 0;   transform: translateY(0px)    rotate(-4deg); }
+}
+
+/* Perspective scene wrapper around the SVG */
+.sp-bird3d-scene {
+  perspective: 360px;
+  perspective-origin: 60% 50%;
+}
+
+/* ── Wing 3D animations ── */
+.sp-wing-top {
+  transform-box: fill-box;
+  transform-origin: right center;
+  animation: spWingUp var(--flap-dur, 0.42s) ease-in-out infinite alternate;
+}
+
+.sp-wing-bot {
+  transform-box: fill-box;
+  transform-origin: right center;
+  animation: spWingDown var(--flap-dur, 0.42s) ease-in-out infinite alternate-reverse;
+}
+
+@keyframes spWingUp {
+  0%   { transform: perspective(280px) rotateX(-42deg); filter: brightness(0.78); }
+  100% { transform: perspective(280px) rotateX(18deg);  filter: brightness(1.35); }
+}
+
+@keyframes spWingDown {
+  0%   { transform: perspective(280px) rotateX(42deg);  filter: brightness(0.55); }
+  100% { transform: perspective(280px) rotateX(-18deg); filter: brightness(0.88); }
 }
 
 /* ── Idle ── */

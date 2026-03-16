@@ -64,15 +64,82 @@ const FINAL_HOLD_MS       = 1400;
 
 // 8 flying birds spread across the screen
 const BIRDS = [
-  { size: 20, top: '12%',  delay: '0s',    dur: '7s'  },
-  { size: 16, top: '24%',  delay: '1.4s',  dur: '9s'  },
-  { size: 24, top: '38%',  delay: '2.8s',  dur: '7.5s'},
-  { size: 14, top: '55%',  delay: '0.7s',  dur: '8.5s'},
-  { size: 22, top: '68%',  delay: '3.5s',  dur: '6.8s'},
-  { size: 18, top: '80%',  delay: '1.9s',  dur: '9.5s'},
-  { size: 20, top: '8%',   delay: '4.2s',  dur: '8s'  },
-  { size: 15, top: '90%',  delay: '5.1s',  dur: '7.2s'},
+  { size: 20, top: '12%',  delay: '0s',    dur: '7s',   flapDur: '0.42s' },
+  { size: 16, top: '24%',  delay: '1.4s',  dur: '9s',   flapDur: '0.38s' },
+  { size: 24, top: '38%',  delay: '2.8s',  dur: '7.5s', flapDur: '0.45s' },
+  { size: 14, top: '55%',  delay: '0.7s',  dur: '8.5s', flapDur: '0.35s' },
+  { size: 22, top: '68%',  delay: '3.5s',  dur: '6.8s', flapDur: '0.40s' },
+  { size: 18, top: '80%',  delay: '1.9s',  dur: '9.5s', flapDur: '0.44s' },
+  { size: 20, top: '8%',   delay: '4.2s',  dur: '8s',   flapDur: '0.36s' },
+  { size: 15, top: '90%',  delay: '5.1s',  dur: '7.2s', flapDur: '0.41s' },
 ];
+
+interface BirdProps { size: number; idx: number; flapDur: string; }
+
+function Bird3D({ size, idx, flapDur }: BirdProps) {
+  const gTop = `bgt${idx}`;
+  const gBot = `bgb${idx}`;
+  const w = size * 5;
+  const h = size * 2.5;
+  return (
+    <div className="sp-bird3d-scene" style={{ width: w, height: h }}>
+      <svg viewBox="0 0 200 100" width={w} height={h} style={{ overflow: 'visible' }}>
+        <defs>
+          <linearGradient id={gTop} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#ff8a80" />
+            <stop offset="60%" stopColor="#e53935" />
+            <stop offset="100%" stopColor="#c62828" />
+          </linearGradient>
+          <linearGradient id={gBot} x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#7f0000" />
+            <stop offset="50%" stopColor="#b71c1c" />
+            <stop offset="100%" stopColor="#c62828" />
+          </linearGradient>
+        </defs>
+
+        {/* Bottom wing — behind body */}
+        <g className="sp-wing-bot" style={{ '--flap-dur': flapDur } as React.CSSProperties}>
+          <path
+            d="M105 56 C88 64 66 73 42 83 C27 90 11 93 3 90 C14 85 30 78 52 69 C74 60 93 55 105 56 Z"
+            fill={`url(#${gBot})`}
+          />
+        </g>
+
+        {/* Body */}
+        <ellipse cx="122" cy="52" rx="26" ry="11" fill="#c62828" />
+
+        {/* Tail */}
+        <path d="M96,52 L76,43 L80,52 L76,61 Z" fill="#b71c1c" />
+
+        {/* Head */}
+        <circle cx="144" cy="43" r="13" fill="#c62828" />
+
+        {/* Beak */}
+        <path d="M157,42 L174,46 L157,49 Z" fill="#f9a825" />
+
+        {/* Eye */}
+        <circle cx="147" cy="41" r="3" fill="white" />
+        <circle cx="148.5" cy="41" r="1.5" fill="#111" />
+
+        {/* Top wing — in front of body */}
+        <g className="sp-wing-top" style={{ '--flap-dur': flapDur } as React.CSSProperties}>
+          <path
+            d="M105 48 C88 40 66 31 42 21 C27 14 11 11 3 14 C14 19 30 26 52 35 C74 44 93 49 105 48 Z"
+            fill={`url(#${gTop})`}
+          />
+          {/* Leading-edge highlight */}
+          <path
+            d="M105 48 C90 43 72 37 52 30 C38 25 22 19 10 15"
+            fill="none"
+            stroke="rgba(255,180,170,0.35)"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </g>
+      </svg>
+    </div>
+  );
+}
 
 function assembleTime(charCount: number) {
   return charCount * STAGGER_PER_CHAR_MS + TRANSITION_MS;
@@ -117,22 +184,20 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       {/* ── Blurred atmospheric colour blobs ── */}
       <div className="sp-bg-blur" aria-hidden="true" />
 
-      {/* ── Flying bird logos in the background ── */}
+      {/* ── Flying 3D birds in the background ── */}
       <div className="sp-birds" aria-hidden="true">
         {BIRDS.map((b, i) => (
-          <img
+          <div
             key={i}
-            src="/Afroslang.png"
-            className="sp-bird"
-            alt=""
+            className="sp-bird3d"
             style={{
-              width: b.size,
-              height: b.size,
               top: b.top,
               animationDuration: b.dur,
               animationDelay: b.delay,
             }}
-          />
+          >
+            <Bird3D size={b.size} idx={i} flapDur={b.flapDur} />
+          </div>
         ))}
       </div>
 
