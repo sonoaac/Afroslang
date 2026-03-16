@@ -48,9 +48,6 @@ export function AfroslangIntro({ onComplete }: AfroslangIntroProps) {
 
         {/* Expanding pulse rings when bird lands */}
         <div style={{ position: 'relative' }}>
-          <div className="afro-intro-pulse" aria-hidden="true" />
-          <div className="afro-intro-pulse" aria-hidden="true" />
-          <div className="afro-intro-pulse" aria-hidden="true" />
 
           {/* Bird mascot */}
           <div className={`afro-intro-bird${birdGlowing ? ' afro-intro-bird--glowing' : ''}`}>
