@@ -28,7 +28,14 @@
   z-index: 0;
 }
 
-/* ── Flying 3D birds ── */
+/* ══════════════════════════════════════════
+   Flying mascot birds  (Duolingo-style)
+   3 layers:
+     1. sp-bird-fly    — horizontal travel
+     2. sp-bird-bounce — body bob + squash/stretch + head tilt
+     3. sp-bird-img    — wing-flap (scaleX pulse)
+   ══════════════════════════════════════════ */
+
 .sp-birds {
   position: absolute;
   inset: 0;
@@ -37,51 +44,70 @@
   z-index: 1;
 }
 
-/* Fly-across wrapper */
-.sp-bird3d {
+/* ── 1. Fly across the screen ── */
+.sp-bird-fly {
   position: absolute;
-  left: -25%;
+  left: -18%;
   opacity: 0;
-  animation: spBirdFly 8s linear infinite;
-  filter: drop-shadow(0 2px 6px rgba(229,57,53,0.45));
+  animation: spBirdFly linear infinite;
+  /* duration & delay set inline */
 }
 
 @keyframes spBirdFly {
-  0%   { left: -25%; opacity: 0;    transform: translateY(0px)    rotate(-4deg); }
-  5%   {              opacity: 0.7; }
-  30%  {                            transform: translateY(-8px)   rotate(-4deg); }
-  60%  {                            transform: translateY(5px)    rotate(-3deg); }
-  90%  {              opacity: 0.7; transform: translateY(-4px)   rotate(-4deg); }
-  100% { left: 115%;  opacity: 0;   transform: translateY(0px)    rotate(-4deg); }
+  0%   { left: -18%; opacity: 0;   transform: translateY(0px); }
+  5%   {              opacity: 0.82; }
+  28%  {                            transform: translateY(-10px); }
+  55%  {                            transform: translateY(7px); }
+  78%  {                            transform: translateY(-6px); }
+  95%  {              opacity: 0.82; }
+  100% { left: 118%;  opacity: 0;   transform: translateY(0px); }
 }
 
-/* Perspective scene wrapper around the SVG */
-.sp-bird3d-scene {
-  perspective: 360px;
-  perspective-origin: 60% 50%;
+/* ── 2. Body bounce + squash/stretch + head tilt ── */
+.sp-bird-bounce {
+  animation: spBirdBounce var(--bounce-dur, 0.65s) ease-in-out infinite;
+  animation-delay: var(--bounce-offset, 0s);
+  transform-origin: center bottom;
+  display: inline-block;
 }
 
-/* ── Wing 3D animations ── */
-.sp-wing-top {
-  transform-box: fill-box;
-  transform-origin: right center;
-  animation: spWingUp var(--flap-dur, 0.42s) ease-in-out infinite alternate;
+@keyframes spBirdBounce {
+  /*  0% — resting, slight squash on landing  */
+  0%   { transform: translateY(0px)   scaleX(1.05) scaleY(0.95) rotate(0deg); }
+  /*  launch — begin stretch  */
+  10%  { transform: translateY(-5px)  scaleX(1.00) scaleY(1.02) rotate(3deg); }
+  /*  rising — full stretch + tilt right  */
+  28%  { transform: translateY(-16px) scaleX(0.93) scaleY(1.10) rotate(6deg); }
+  /*  peak  */
+  42%  { transform: translateY(-18px) scaleX(0.92) scaleY(1.12) rotate(4deg); }
+  /*  tilt swaps at peak  */
+  50%  { transform: translateY(-17px) scaleX(0.93) scaleY(1.10) rotate(-1deg); }
+  /*  falling — tilt left  */
+  64%  { transform: translateY(-8px)  scaleX(0.97) scaleY(1.04) rotate(-6deg); }
+  /*  land squash  */
+  78%  { transform: translateY(0px)   scaleX(1.08) scaleY(0.93) rotate(-3deg); }
+  /*  small secondary bounce  */
+  88%  { transform: translateY(-7px)  scaleX(0.96) scaleY(1.05) rotate(2deg); }
+  /*  settle  */
+  100% { transform: translateY(0px)   scaleX(1.05) scaleY(0.95) rotate(0deg); }
 }
 
-.sp-wing-bot {
-  transform-box: fill-box;
-  transform-origin: right center;
-  animation: spWingDown var(--flap-dur, 0.42s) ease-in-out infinite alternate-reverse;
+/* ── 3. Wing-flap — scaleX widens/narrows the mascot ── */
+.sp-bird-img {
+  display: block;
+  animation: spBirdWingFlap var(--flap-dur, 0.42s) ease-in-out infinite;
+  animation-delay: var(--flap-offset, 0s);
+  transform-origin: center center;
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.55));
 }
 
-@keyframes spWingUp {
-  0%   { transform: perspective(280px) rotateX(-42deg); filter: brightness(0.78); }
-  100% { transform: perspective(280px) rotateX(18deg);  filter: brightness(1.35); }
-}
-
-@keyframes spWingDown {
-  0%   { transform: perspective(280px) rotateX(42deg);  filter: brightness(0.55); }
-  100% { transform: perspective(280px) rotateX(-18deg); filter: brightness(0.88); }
+@keyframes spBirdWingFlap {
+  0%   { transform: scaleX(1.00); }
+  22%  { transform: scaleX(1.18); }   /* wings spread wide  */
+  44%  { transform: scaleX(0.84); }   /* wings tuck in      */
+  66%  { transform: scaleX(1.13); }   /* spread again       */
+  88%  { transform: scaleX(0.90); }   /* slight tuck        */
+  100% { transform: scaleX(1.00); }
 }
 
 /* ── Idle ── */
