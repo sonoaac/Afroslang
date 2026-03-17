@@ -411,6 +411,7 @@ export function AfroslangIntro({ onComplete }: AfroslangIntroProps) {
       <div className={`afro-africa-stage${africaVisible ? ' afro-africa-stage--visible' : ''}`}>
         <canvas ref={africaRef} className="afro-africa-canvas" />
         <div className={`afro-globe-title-block${titleVisible ? ' afro-globe-title-block--show' : ''}`}>
+          <img src="/Afroslang.png" alt="" className="afro-title-logo-bg" aria-hidden="true" />
           <h1 className="afro-globe-title">AFROSLANG</h1>
           <p className="afro-globe-tagline">Start Your Journey Now · Learn Your Roots</p>
         </div>

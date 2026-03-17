@@ -101,8 +101,22 @@
   transform: scale(0.7);
   transition: opacity 0.9s ease, transform 0.9s ease;
   pointer-events: none;
-  /* Sits in upper-center, above where auth panel will appear */
   margin-bottom: 180px;
+}
+
+/* Bird logo watermark behind the title text */
+.afro-title-logo-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(160px, 36vw, 320px);
+  height: auto;
+  opacity: 0.13;
+  filter: drop-shadow(0 0 24px rgba(176, 0, 32, 0.5));
+  pointer-events: none;
+  user-select: none;
+  z-index: -1;
 }
 
 .afro-globe-title-block--show {
@@ -110,7 +124,7 @@
   transform: scale(1);
 }
 
-/* ── 3D green title ── */
+/* ── 3D green-to-darkred title ── */
 .afro-globe-title {
   font-family: 'Arial Black', Impact, sans-serif;
   font-size: clamp(42px, 8.5vw, 92px);
@@ -119,18 +133,19 @@
   letter-spacing: 8px;
   text-transform: uppercase;
   line-height: 1;
+  /* Layers: bright green face → green → dark green → dark red → near-black */
   text-shadow:
     1px  1px 0 #00e04c,
-    2px  2px 0 #00c042,
-    3px  3px 0 #00a038,
-    4px  4px 0 #00802e,
-    5px  5px 0 #006022,
-    6px  6px 0 #004016,
-    7px  7px 0 #00280e,
-    8px  8px 0 #001506,
-    10px 10px 16px rgba(0,0,0,0.95),
-    0 0 50px rgba(0,255,80,0.55),
-    0 0 100px rgba(0,200,60,0.28);
+    2px  2px 0 #00c040,
+    3px  3px 0 #009030,
+    4px  4px 0 #5a1a10,
+    5px  5px 0 #7a0e18,
+    6px  6px 0 #5c080f,
+    7px  7px 0 #3a0408,
+    8px  8px 0 #1e0204,
+    10px 10px 18px rgba(0,0,0,0.97),
+    0 0 50px rgba(0,255,80,0.5),
+    0 0 90px rgba(176,0,32,0.22);
   transform: perspective(600px) rotateX(8deg);
   animation: titleGlow 2.8s infinite ease-in-out;
 }
@@ -144,25 +159,26 @@
   text-transform: uppercase;
   font-weight: 700;
   text-shadow:
-    0 0 14px rgba(0,255,120,0.7),
-    1px 2px 0 #004d20,
-    2px 3px 0 #003015;
+    0 0 14px rgba(0,255,120,0.65),
+    1px 2px 0 #4a1008,
+    2px 3px 0 #2e0805,
+    0 0 30px rgba(176,0,32,0.18);
 }
 
 @keyframes titleGlow {
   0%, 100% {
     text-shadow:
-      1px 1px 0 #00e04c, 2px 2px 0 #00c042, 3px 3px 0 #00a038,
-      4px 4px 0 #00802e, 5px 5px 0 #006022, 6px 6px 0 #004016,
-      7px 7px 0 #00280e, 8px 8px 0 #001506, 10px 10px 16px rgba(0,0,0,.95),
-      0 0 50px rgba(0,255,80,.55), 0 0 100px rgba(0,200,60,.28);
+      1px 1px 0 #00e04c, 2px 2px 0 #00c040, 3px 3px 0 #009030,
+      4px 4px 0 #5a1a10, 5px 5px 0 #7a0e18, 6px 6px 0 #5c080f,
+      7px 7px 0 #3a0408, 8px 8px 0 #1e0204, 10px 10px 18px rgba(0,0,0,.97),
+      0 0 50px rgba(0,255,80,.5), 0 0 90px rgba(176,0,32,.22);
   }
   50% {
     text-shadow:
-      1px 1px 0 #00e04c, 2px 2px 0 #00c042, 3px 3px 0 #00a038,
-      4px 4px 0 #00802e, 5px 5px 0 #006022, 6px 6px 0 #004016,
-      7px 7px 0 #00280e, 8px 8px 0 #001506, 10px 10px 16px rgba(0,0,0,.95),
-      0 0 80px rgba(0,255,80,.85), 0 0 160px rgba(0,200,60,.5);
+      1px 1px 0 #00e04c, 2px 2px 0 #00c040, 3px 3px 0 #009030,
+      4px 4px 0 #5a1a10, 5px 5px 0 #7a0e18, 6px 6px 0 #5c080f,
+      7px 7px 0 #3a0408, 8px 8px 0 #1e0204, 10px 10px 18px rgba(0,0,0,.97),
+      0 0 80px rgba(0,255,80,.80), 0 0 140px rgba(176,0,32,.40);
   }
 }
 

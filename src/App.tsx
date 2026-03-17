@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { InterfaceLanguage, AfricanLanguage, UserProgress, Lesson } from './types';
 import { AfroslangIntro } from './components/intro/AfroslangIntro';
 import { LandingPage } from './components/landing/LandingPage';
-import { SplashScreen } from './components/splash/SplashScreen';
+
 import { InterfaceLanguageSelector } from './features/language-select/InterfaceLanguageSelector';
 import { LearningPath } from './features/lessons/LearningPath';
 import { LessonScreen } from './features/lessons/LessonScreen';
@@ -35,9 +35,6 @@ function App() {
     setShowIntro(false);
   }, []);
 
-  // Show splash (shattering text) once per session, ONLY after user explicitly
-  // chooses sign up / log in / guest on the LandingPage
-  const [showSplash, setShowSplash] = useState(false);
   // Detect Stripe payment redirect: ?payment_success=1
   const [paymentSuccessReturn] = useState<boolean>(
     () => new URLSearchParams(window.location.search).has('payment_success')
@@ -46,10 +43,6 @@ function App() {
   // Track whether the user was already authenticated when the app loaded
   // (returning user — they don't go through LandingPage so no splash)
   const wasAuthOnLoad = useRef<boolean | null>(null);
-  const handleSplashComplete = useCallback(() => {
-    setShowSplash(false);
-    setCurrentScreen('interface-select');
-  }, []);
   const [authSheet, setAuthSheet] = useState<'login' | 'signup' | null>(null);
   const [interfaceLanguage, setInterfaceLanguage] = useState<InterfaceLanguage>('en');
   const [currentLanguage, setCurrentLanguage] = useState<AfricanLanguage | null>(null);
@@ -407,8 +400,8 @@ function App() {
       if (paymentSuccessReturn) {
         setCurrentScreen('payment-success');
       } else if (wasAuthOnLoad.current === false) {
-        // User just authenticated this session (came through LandingPage)
-        setShowSplash(true);
+        // User just authenticated this session — go straight to interface-select
+        setCurrentScreen('interface-select');
       } else {
         // Returning user — already auth'd on load
         setCurrentScreen('interface-select');
@@ -419,11 +412,6 @@ function App() {
   // 1. Logo intro (once per session)
   if (showIntro) {
     return <AfroslangIntro onComplete={handleIntroComplete} />;
-  }
-
-  // 2. Shattering text splash (once per session, after auth)
-  if (showSplash) {
-    return <SplashScreen onComplete={handleSplashComplete} />;
   }
 
   // Show loading screen while checking authentication
