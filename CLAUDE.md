@@ -17,6 +17,10 @@ npm run preview      # Preview production build locally
 npm run typecheck    # TypeScript check (no emit)
 npm run lint         # ESLint (zero warnings threshold)
 npm run validate:lessons  # Validate all lesson data integrity
+
+# Firebase Cloud Functions (Stripe webhook)
+cd functions && npm install   # Install function dependencies
+firebase deploy --only functions  # Deploy the webhook to Firebase
 ```
 
 Node 22.x is required.
@@ -31,7 +35,7 @@ App is a single-page app with no router. Navigation is a `currentScreen` state s
 AfroslangIntro (logo animation, once per session)
   → LandingPage (unauthenticated) → SplashScreen (after auth, once per session)
   → interface-select → path → lesson → complete
-                            ↘ leaderboard / shop / latest-news / subscription / feedback
+                            ↘ leaderboard / shop / latest-news / subscription / payment-success / feedback
 ```
 
 Returning authenticated users skip the `LandingPage` and `SplashScreen` and go straight to `interface-select`. The `currentLanguage` is intentionally **not** restored on load — users always choose their language fresh each session.
@@ -73,13 +77,18 @@ Dark luxury theme defined in `src/styles/globals.css`:
 - **Font:** Roboto (loaded via Google Fonts)
 - **Component library:** shadcn/ui in `src/components/ui/` — **do not modify these files directly**
 
-### Firebase / Backend (`src/firebase.ts`, `src/utils/`)
+### Firebase / Backend (`src/firebase.ts`, `src/utils/`, `functions/`)
 
 - **Firestore collections:** `users/{uid}` for profile/progress, `leaderboard` for weekly XP
 - **Leaderboard leagues** (7 tiers): Copper → Bronze → Silver → Gold → Platinum → Diamond → Stars
 - Firebase config has hardcoded fallback values in `src/firebase.ts`; `.env` vars (`VITE_FIREBASE_*`) take precedence
 - Firebase emulators can be enabled via `VITE_USE_FIREBASE_EMULATOR=true`
-- Stripe integration: `src/api/create-checkout-session.ts`, `src/api/stripe-webhook.ts`
+- **Stripe webhook:** The live handler is a Firebase Cloud Function at `functions/src/index.ts` — NOT `src/api/stripe-webhook.ts` (that file is reference-only). Webhook URL: `https://us-central1-ahamefuna-legacy.cloudfunctions.net/stripeWebhook`. Secrets are set via `firebase functions:secrets:set STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`.
+- **Subscription flow:** `SubscriptionPage` redirects to a Stripe Payment Link with `client_reference_id=uid`. On return (`?payment_success=1`), `SuccessPage` polls Firestore every 2 s (up to 30 s) waiting for the webhook to flip `users/{uid}.subscription.active = true`. Use `src/utils/demoSubscription.ts` to activate/deactivate subscriptions locally for testing.
+
+### Gems & Currency (`src/utils/currencyUtils.ts`)
+
+Two in-app currencies: **Gems** (earned by completing lessons) and **Sandbits** (unused currently). Shop actions: hearts refill (100 gems), XP boost (150 sandbits → 2× XP for 1 hour). XP boost expiry is stored on `userData.xpBoostExpiry` (timestamp). Plus subscribers bypass the hearts system entirely (hearts set to 999).
 
 ### UI Components & Screen Modules
 

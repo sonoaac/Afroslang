@@ -9,6 +9,7 @@ import { LessonScreen } from './features/lessons/LessonScreen';
 import { LessonComplete } from './features/lessons/LessonComplete';
 import { LeaderboardScreen } from './components/leaderboard/LeaderboardScreen';
 import { SubscriptionPage } from './components/subscription/SubscriptionPage';
+import { SuccessPage } from './components/subscription/SuccessPage';
 import { FeedbackPage } from './components/feedback/FeedbackPage';
 import { LatestNews } from './components/layout/LatestNews';
 import { ShopScreen } from './features/store/ShopScreen';
@@ -20,7 +21,7 @@ import { saveUserProgress } from './utils/userData';
 import { addWeeklyXP, getCurrentWeekIdFromDB, getUserLeague } from './utils/leaderboardUtils';
 import { calcGemsEarned, awardGems, isXpBoostActive, purchaseHeartsRefill } from './utils/currencyUtils';
 
-type Screen = 'auth' | 'interface-select' | 'path' | 'lesson' | 'complete' | 'leaderboard' | 'subscription' | 'feedback' | 'shop' | 'latest-news';
+type Screen = 'auth' | 'interface-select' | 'path' | 'lesson' | 'complete' | 'leaderboard' | 'subscription' | 'payment-success' | 'feedback' | 'shop' | 'latest-news';
 
 function App() {
   const { user, userData, setUserData, isGuest, loading, logout, setGuestMode } = useAuth();
@@ -37,6 +38,11 @@ function App() {
   // Show splash (shattering text) once per session, ONLY after user explicitly
   // chooses sign up / log in / guest on the LandingPage
   const [showSplash, setShowSplash] = useState(false);
+  // Detect Stripe payment redirect: ?payment_success=1
+  const [paymentSuccessReturn] = useState<boolean>(
+    () => new URLSearchParams(window.location.search).has('payment_success')
+  );
+
   // Track whether the user was already authenticated when the app loaded
   // (returning user — they don't go through LandingPage so no splash)
   const wasAuthOnLoad = useRef<boolean | null>(null);
@@ -395,9 +401,12 @@ function App() {
   // Handle authentication state changes:
   // — If they were ALREADY auth'd on load (returning user) → skip splash, go straight to interface-select
   // — If they just chose sign up / log in / guest this session → show splash first
+  // — If returning from Stripe payment (?payment_success=1) → show SuccessPage
   useEffect(() => {
     if (!loading && (user || isGuest) && currentScreen === 'auth') {
-      if (wasAuthOnLoad.current === false) {
+      if (paymentSuccessReturn) {
+        setCurrentScreen('payment-success');
+      } else if (wasAuthOnLoad.current === false) {
         // User just authenticated this session (came through LandingPage)
         setShowSplash(true);
       } else {
@@ -405,7 +414,7 @@ function App() {
         setCurrentScreen('interface-select');
       }
     }
-  }, [user, isGuest, loading, currentScreen]);
+  }, [user, isGuest, loading, currentScreen, paymentSuccessReturn]);
 
   // 1. Logo intro (once per session)
   if (showIntro) {
@@ -515,6 +524,12 @@ function App() {
       {currentScreen === 'subscription' && (
         <SubscriptionPage
           onBack={() => setCurrentScreen('interface-select')}
+        />
+      )}
+
+      {currentScreen === 'payment-success' && (
+        <SuccessPage
+          onContinue={() => setCurrentScreen('interface-select')}
         />
       )}
 

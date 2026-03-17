@@ -22,7 +22,7 @@ export const SUBSCRIPTION_PLANS = {
     interval: 'month',
     name: 'Monthly Plus',
     description: 'Unlimited hearts, XP boost, feedback page, and more!',
-    paymentLink: 'https://buy.stripe.com/bJefZafrV09L96Vezj24001',
+    paymentLink: 'https://buy.stripe.com/7sY4gA6vy4tc7FEh2HdjO05',
     trialDays: 7
   },
   yearly: {
@@ -32,7 +32,7 @@ export const SUBSCRIPTION_PLANS = {
     name: 'Yearly Plus',
     description: 'Save 44%! All Plus features for a full year',
     savings: 'Save $32.89/year',
-    paymentLink: 'https://buy.stripe.com/aFabIUfrV6y9cj7gHr24000',
+    paymentLink: 'https://buy.stripe.com/dRm3cw1be7Fo6BA4fVdjO06',
     trialDays: 7
   }
 } as const;

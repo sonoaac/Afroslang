@@ -37,17 +37,16 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({ onBack }) =>
         throw new Error('Payment link not configured for this plan');
       }
       
-      // Redirect to Stripe payment link with user info
-      const paymentUrl = `${plan.paymentLink}?client_reference_id=${user.uid}&prefilled_email=${user.email}&prefilled_name=${userData.username}`;
-      
-      console.log('Full payment URL:', paymentUrl);
-      console.log('User info:', { uid: user.uid, email: user.email, username: userData.username });
-      
-      // Open Stripe payment in new tab
-      window.open(paymentUrl, '_blank');
-      
-      // Show success message
-      alert(`Redirecting to Stripe payment for ${plan.name} with 7-day free trial! Your subscription will be linked to ${userData.username} (${user.email}).`);
+      // Build the return URL so Stripe can redirect back to this app.
+      // In Stripe Dashboard → Payment Link → After payment, set redirect to:
+      //   https://<your-domain>?payment_success=1
+      // We append it here as a hint; for Payment Links the final redirect is
+      // controlled by the Dashboard setting.
+      const returnUrl = `${window.location.origin}?payment_success=1`;
+      const paymentUrl = `${plan.paymentLink}?client_reference_id=${encodeURIComponent(user.uid)}&prefilled_email=${encodeURIComponent(user.email ?? '')}&prefilled_name=${encodeURIComponent(userData.username ?? '')}&redirect_url=${encodeURIComponent(returnUrl)}`;
+
+      // Navigate in the same tab so the success redirect lands back here
+      window.location.href = paymentUrl;
       
     } catch (error) {
       console.error('Subscription error:', error);

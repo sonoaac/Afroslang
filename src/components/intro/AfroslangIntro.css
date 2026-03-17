@@ -1,275 +1,412 @@
-/* ─────────────────────────────────────────────
-   Afroslang Intro  –  Netflix-inspired, green/black
-   ───────────────────────────────────────────── */
+/* ─────────────────────────────────────────
+   Afroslang Globe Intro + Embedded Auth
+   ───────────────────────────────────────── */
 
-.afro-intro {
+.afro-globe-intro {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #000;
   overflow: hidden;
-  user-select: none;
-}
-
-/* ── Fade out whole screen when done ── */
-.afro-intro--fadeout {
-  animation: introFadeOut 0.7s ease-in forwards;
-}
-
-@keyframes introFadeOut {
-  to { opacity: 0; pointer-events: none; }
-}
-
-/* ── Zoom effect (Netflix-style) ── */
-.afro-intro--zoom .afro-intro-stage {
-  animation: introZoom 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-}
-
-@keyframes introZoom {
-  0%   { transform: scale(1);  opacity: 1; }
-  70%  { transform: scale(9);  opacity: 1; }
-  100% { transform: scale(9);  opacity: 0; }
-}
-
-/* ── Background rain streaks ── */
-.afro-intro-bg {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  opacity: 0.18;
-}
-
-.afro-intro-bg::before,
-.afro-intro-bg::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(
-      168deg,
-      transparent 0px,
-      transparent 3px,
-      rgba(34,197,94,0.4) 3px,
-      rgba(34,197,94,0.4) 4px,
-      transparent 4px,
-      transparent 44px
-    );
-  animation: bgRainDrift 1.8s linear infinite;
-}
-
-.afro-intro-bg::after {
-  opacity: 0.5;
-  background-image:
-    repeating-linear-gradient(
-      168deg,
-      transparent 0px,
-      transparent 7px,
-      rgba(74,222,128,0.3) 7px,
-      rgba(74,222,128,0.3) 8px,
-      transparent 8px,
-      transparent 60px
-    );
-  animation-duration: 2.6s;
-  animation-delay: -0.9s;
-}
-
-@keyframes bgRainDrift {
-  from { transform: translateY(-80px); }
-  to   { transform: translateY(80px); }
-}
-
-/* ── Stage: bird + text together ── */
-.afro-intro-stage {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-  transform-origin: center center;
-}
-
-/* ── Bird ── */
-.afro-intro-bird {
-  width: clamp(90px, 20vw, 160px);
-  height: clamp(90px, 20vw, 160px);
-  position: relative;
-  animation: birdFlyIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: 0.15s;
-  opacity: 0;
-  filter: drop-shadow(0 0 0px rgba(34,197,94,0));
-  background: transparent;
-}
-
-.afro-intro-bird img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  background: transparent;
-  display: block;
-}
-
-/* Phase 2: bird glow after landing */
-.afro-intro-bird--glowing {
-  animation:
-    birdFlyIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.15s,
-    birdGlowPulse 0.8s ease-out forwards 1.3s,
-    birdHover 3s ease-in-out infinite 2s;
-}
-
-@keyframes birdFlyIn {
-  0% {
-    opacity: 0;
-    transform: translate(280px, -180px) rotate(-35deg) scale(0.25);
-    filter: blur(3px) drop-shadow(0 0 0 transparent);
-  }
-  20% { opacity: 1; filter: blur(0); }
-  55% { transform: translate(-25px, 12px) rotate(10deg) scale(1.08); }
-  72% { transform: translate(12px, -8px) rotate(-4deg) scale(0.96); }
-  86% { transform: translate(-4px,  4px) rotate( 2deg) scale(1.02); }
-  100% {
-    opacity: 1;
-    transform: translate(0, 0) rotate(0deg) scale(1);
-    filter: drop-shadow(0 0 0px transparent);
-  }
-}
-
-@keyframes birdGlowPulse {
-  0%   { filter: drop-shadow(0 0  0px rgba(34,197,94,0)); }
-  40%  { filter: drop-shadow(0 0 28px rgba(34,197,94,0.95)) drop-shadow(0 0 60px rgba(34,197,94,0.5)); }
-  100% { filter: drop-shadow(0 0 12px rgba(34,197,94,0.45)); }
-}
-
-@keyframes birdHover {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-7px); }
-}
-
-/* ── Title: AFROSLANG ── */
-.afro-intro-title {
-  display: flex;
-  align-items: flex-end;
-  gap: clamp(2px, 0.8vw, 6px);
-  margin-top: -6px;
-  position: relative;
-}
-
-/* The green sweep bar – moves up behind all letters */
-.afro-intro-sweep {
-  position: absolute;
-  left: -4%;
-  right: -4%;
-  height: 120%;
-  bottom: -10%;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.afro-intro-sweep::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0;
-  bottom: -110%;
-  height: 110%;
-  background: linear-gradient(
-    to top,
-    transparent 0%,
-    rgba(34,197,94,0.06) 30%,
-    rgba(34,197,94,0.22) 50%,
-    rgba(34,197,94,0.06) 70%,
-    transparent 100%
-  );
-  animation: sweepBar 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  animation-delay: 0.85s;
-}
-
-@keyframes sweepBar {
-  0%   { transform: translateY(0); }
-  100% { transform: translateY(-220%); }
-}
-
-/* Each letter wrapper – clips the reveal */
-.afro-intro-letter-wrap {
-  overflow: hidden;
-  display: inline-block;
-  vertical-align: bottom;
-  line-height: 1;
-}
-
-/* The character itself slides up into view */
-.afro-intro-char {
-  display: inline-block;
+  background: #000510;
   font-family: 'Times New Roman', Georgia, serif;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.afro-globe-intro--fadeout {
+  animation: globeIntroFadeOut 0.7s ease-in forwards;
+  pointer-events: none;
+}
+
+@keyframes globeIntroFadeOut {
+  to { opacity: 0; }
+}
+
+/* ── Star field ── */
+.afro-globe-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(1px 1px at  5% 10%, #fff, transparent),
+    radial-gradient(1px 1px at 18% 42%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 32%  6%, rgba(255,255,255,.9), transparent),
+    radial-gradient(1px 1px at 48% 72%, #fff, transparent),
+    radial-gradient(1px 1px at 65% 18%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 79% 82%, rgba(255,255,255,.8), transparent),
+    radial-gradient(1px 1px at 12% 86%, #fff, transparent),
+    radial-gradient(1px 1px at 90% 35%, #fff, transparent),
+    radial-gradient(1px 1px at  2% 58%, #fff, transparent),
+    radial-gradient(1px 1px at 44% 94%, #fff, transparent),
+    radial-gradient(1px 1px at 74%  2%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 28% 63%, rgba(255,255,255,.7), transparent),
+    radial-gradient(1px 1px at 57% 48%, #fff, transparent),
+    radial-gradient(1px 1px at 86% 14%, #fff, transparent),
+    radial-gradient(1px 1px at 16% 28%, #fff, transparent),
+    radial-gradient(1px 1px at 93% 60%, #fff, transparent),
+    radial-gradient(1px 1px at 40% 20%, #fff, transparent),
+    radial-gradient(1px 1px at 70% 55%, #fff, transparent),
+    #000510;
+}
+
+/* ── Globe canvas ── */
+.afro-globe-canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  z-index: 2;
+  filter: drop-shadow(0 0 40px rgba(60,140,255,0.55))
+          drop-shadow(0 0 80px rgba(30,80,200,0.25));
+  will-change: transform, opacity;
+  opacity: 0;
+}
+
+/* ── Africa reveal stage ── */
+.afro-africa-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  z-index: 5;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.afro-africa-stage--visible {
+  opacity: 1;
+}
+
+.afro-africa-canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ── Title block ── */
+.afro-globe-title-block {
+  position: relative;
+  z-index: 8;
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+  pointer-events: none;
+  /* Sits in upper-center, above where auth panel will appear */
+  margin-bottom: 180px;
+}
+
+.afro-globe-title-block--show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── 3D green title ── */
+.afro-globe-title {
+  font-family: 'Arial Black', Impact, sans-serif;
+  font-size: clamp(42px, 8.5vw, 92px);
   font-weight: 900;
-  font-size: clamp(2.6rem, 10vw, 7rem);
-  letter-spacing: 0.02em;
-  color: #fff;
-  transform: translateY(110%);
-  animation: charReveal 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: var(--char-delay);
-  text-shadow: none;
-  line-height: 1;
-}
-
-@keyframes charReveal {
-  0% {
-    transform: translateY(110%);
-    color: #4ade80;
-    text-shadow: 0 0 40px rgba(34,197,94,0.9), 0 0 80px rgba(34,197,94,0.4);
-  }
-  45% {
-    color: #86efac;
-    text-shadow: 0 0 25px rgba(34,197,94,0.6);
-  }
-  100% {
-    transform: translateY(0%);
-    color: #fff;
-    text-shadow: 0 0 12px rgba(34,197,94,0.2);
-  }
-}
-
-/* ── Tagline ── */
-.afro-intro-tagline {
-  margin-top: 14px;
-  font-family: 'Times New Roman', serif;
-  font-size: clamp(0.65rem, 2vw, 0.95rem);
-  letter-spacing: 0.35em;
+  color: #00ff55;
+  letter-spacing: 8px;
   text-transform: uppercase;
-  color: rgba(255,255,255,0);
-  text-shadow: none;
-  animation: taglineReveal 0.6s ease-out forwards;
-  animation-delay: 2s;
+  line-height: 1;
+  text-shadow:
+    1px  1px 0 #00e04c,
+    2px  2px 0 #00c042,
+    3px  3px 0 #00a038,
+    4px  4px 0 #00802e,
+    5px  5px 0 #006022,
+    6px  6px 0 #004016,
+    7px  7px 0 #00280e,
+    8px  8px 0 #001506,
+    10px 10px 16px rgba(0,0,0,0.95),
+    0 0 50px rgba(0,255,80,0.55),
+    0 0 100px rgba(0,200,60,0.28);
+  transform: perspective(600px) rotateX(8deg);
+  animation: titleGlow 2.8s infinite ease-in-out;
 }
 
-@keyframes taglineReveal {
-  0%   { color: rgba(255,255,255,0); letter-spacing: 0.6em; }
-  100% { color: rgba(74,222,128,0.8); letter-spacing: 0.35em; }
+.afro-globe-tagline {
+  margin-top: 14px;
+  font-family: 'Arial Black', Impact, sans-serif;
+  font-size: clamp(10px, 2vw, 17px);
+  color: #55ffaa;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  text-shadow:
+    0 0 14px rgba(0,255,120,0.7),
+    1px 2px 0 #004d20,
+    2px 3px 0 #003015;
 }
 
-/* ── Green glow ground line ── */
-.afro-intro-ground {
-  width: 0%;
-  height: 1px;
-  background: linear-gradient(to right, transparent, #22c55e, transparent);
-  margin-top: 10px;
-  animation: groundExpand 0.5s ease-out forwards;
-  animation-delay: 1.75s;
-  box-shadow: 0 0 8px rgba(34,197,94,0.6);
+@keyframes titleGlow {
+  0%, 100% {
+    text-shadow:
+      1px 1px 0 #00e04c, 2px 2px 0 #00c042, 3px 3px 0 #00a038,
+      4px 4px 0 #00802e, 5px 5px 0 #006022, 6px 6px 0 #004016,
+      7px 7px 0 #00280e, 8px 8px 0 #001506, 10px 10px 16px rgba(0,0,0,.95),
+      0 0 50px rgba(0,255,80,.55), 0 0 100px rgba(0,200,60,.28);
+  }
+  50% {
+    text-shadow:
+      1px 1px 0 #00e04c, 2px 2px 0 #00c042, 3px 3px 0 #00a038,
+      4px 4px 0 #00802e, 5px 5px 0 #006022, 6px 6px 0 #004016,
+      7px 7px 0 #00280e, 8px 8px 0 #001506, 10px 10px 16px rgba(0,0,0,.95),
+      0 0 80px rgba(0,255,80,.85), 0 0 160px rgba(0,200,60,.5);
+  }
 }
 
-@keyframes groundExpand {
-  0%   { width: 0%; }
-  100% { width: 90%; }
+/* ── Auth panel — slides up after animation ── */
+.afro-auth-panel {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 420px;
+  padding: 20px 24px 32px;
+  padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: linear-gradient(to top, rgba(0,0,0,0.97) 70%, transparent 100%);
+  transform: translateY(100%);
+  opacity: 0;
+  transition: transform 0.6s cubic-bezier(0.16,1,0.3,1), opacity 0.6s ease;
+  pointer-events: none;
 }
 
-/* pulse rings removed */
+.afro-auth-panel--show {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Primary CTA */
+.afro-btn-primary {
+  width: 100%;
+  padding: 15px;
+  background: #22c55e;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Times New Roman', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #000;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(34,197,94,0.35);
+}
+
+.afro-btn-primary:hover,
+.afro-btn-primary:active {
+  background: #4ade80;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(34,197,94,0.5);
+}
+
+/* Secondary CTA */
+.afro-btn-secondary {
+  width: 100%;
+  padding: 15px;
+  background: transparent;
+  border: 2px solid rgba(34,197,94,0.5);
+  border-radius: 14px;
+  font-family: 'Times New Roman', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #22c55e;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.afro-btn-secondary:hover,
+.afro-btn-secondary:active {
+  background: rgba(34,197,94,0.1);
+  border-color: #22c55e;
+}
+
+/* Guest link */
+.afro-btn-guest {
+  background: none;
+  border: none;
+  font-family: 'Times New Roman', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.38);
+  cursor: pointer;
+  padding: 6px 0;
+  transition: color 0.2s;
+}
+
+.afro-btn-guest:hover {
+  color: rgba(255,255,255,0.65);
+}
+
+/* ── Auth bottom sheet (shared styles) ── */
+.auth-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 50;
+  animation: backdropIn 0.25s ease forwards;
+}
+
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.auth-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 51;
+  max-width: 480px;
+  margin: 0 auto;
+  background: #0a0a0a;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  border-top: 1px solid rgba(34,197,94,0.2);
+  padding: 0 24px 32px;
+  padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+  animation: sheetSlideUp 0.35s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+@keyframes sheetSlideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.auth-sheet-handle {
+  width: 40px;
+  height: 4px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 999px;
+  margin: 14px auto 20px;
+}
+
+.auth-sheet-tabs {
+  display: flex;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.auth-sheet-tab {
+  flex: 1;
+  padding: 12px 0;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family: 'Times New Roman', serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.38);
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: -1px;
+}
+
+.auth-sheet-tab--active {
+  color: #22c55e;
+  border-bottom-color: #22c55e;
+}
+
+.auth-sheet-input {
+  display: block;
+  width: 100%;
+  padding: 13px 14px;
+  margin-bottom: 12px;
+  background: #141414;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.auth-sheet-input::placeholder { color: #444; }
+.auth-sheet-input:focus { border-color: #22c55e; }
+
+.auth-sheet-submit {
+  width: 100%;
+  padding: 14px;
+  margin-top: 4px;
+  background: #22c55e;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Times New Roman', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #000;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(34,197,94,0.3);
+}
+
+.auth-sheet-submit:hover { background: #4ade80; }
+.auth-sheet-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.auth-sheet-forgot {
+  display: block;
+  text-align: center;
+  margin-top: 14px;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: rgba(34,197,94,0.6);
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.auth-sheet-forgot:hover { color: #22c55e; }
+
+.auth-sheet-error {
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  color: #f87171;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.auth-sheet-success {
+  background: rgba(34,197,94,0.12);
+  border: 1px solid rgba(34,197,94,0.3);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  color: #4ade80;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.auth-sheet::-webkit-scrollbar { width: 0; }
 
 /* ── Skip button ── */
-.afro-intro-skip {
+.afro-globe-skip {
   position: absolute;
   bottom: 32px;
   right: 32px;
@@ -277,18 +414,19 @@
   border: 1px solid rgba(34,197,94,0.3);
   border-radius: 999px;
   padding: 8px 20px;
+  font-family: 'Times New Roman', serif;
   font-size: 0.72rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgba(34,197,94,0.6);
   cursor: pointer;
   transition: all 0.2s;
+  z-index: 20;
   opacity: 0;
-  animation: skipAppear 0.4s ease forwards;
-  animation-delay: 1s;
+  animation: skipAppear 0.4s ease forwards 1s;
 }
 
-.afro-intro-skip:hover {
+.afro-globe-skip:hover {
   background: rgba(34,197,94,0.1);
   color: #4ade80;
   border-color: rgba(34,197,94,0.6);
@@ -298,19 +436,11 @@
   to { opacity: 1; }
 }
 
-/* ── Responsive: smaller screens ── */
 @media (max-width: 480px) {
-  .afro-intro-bird {
-    width: 80px;
-    height: 80px;
+  .afro-globe-title-block {
+    margin-bottom: 160px;
   }
-
-  .afro-intro-tagline {
-    letter-spacing: 0.2em;
-    font-size: 0.6rem;
-  }
-
-  .afro-intro-skip {
+  .afro-globe-skip {
     bottom: 24px;
     right: 20px;
   }
