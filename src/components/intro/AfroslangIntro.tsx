@@ -304,20 +304,10 @@ export function AfroslangIntro({ onComplete }: AfroslangIntroProps) {
         AFRICA_FLAT.forEach(([x,y],i) => i===0 ? ac.moveTo(x,y) : ac.lineTo(x,y));
         ac.closePath();
         const alpha = Math.max(0, 0.5*(1-t*1.8));
-        ac.fillStyle = `rgba(0,160,50,${alpha})`; ac.fill();
+        ac.fillStyle = `rgba(0,40,10,${alpha})`; ac.fill();
         const strokeAlpha = Math.max(0, 1-t*0.7);
-        ac.strokeStyle = `rgba(0,255,80,${strokeAlpha})`; ac.lineWidth=3.5; ac.stroke();
+        ac.strokeStyle = `rgba(0,80,22,${strokeAlpha})`; ac.lineWidth=2.5; ac.stroke();
         ac.restore();
-      }
-      if (t > 0.04) {
-        const gW = Math.max(8, shift*1.2);
-        const glow = ac.createLinearGradient(splitX-gW,0,splitX+gW,0);
-        glow.addColorStop(0,    'transparent');
-        glow.addColorStop(0.35, `rgba(0,255,80,${Math.min(0.3,t*0.4)})`);
-        glow.addColorStop(0.5,  `rgba(80,255,140,${Math.min(0.55,t*0.65)})`);
-        glow.addColorStop(0.65, `rgba(0,255,80,${Math.min(0.3,t*0.4)})`);
-        glow.addColorStop(1,    'transparent');
-        ac.fillStyle = glow; ac.fillRect(0,0,VW,VH);
       }
     }
 

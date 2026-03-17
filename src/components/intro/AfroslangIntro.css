@@ -110,10 +110,9 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: clamp(160px, 36vw, 320px);
+  width: clamp(180px, 40vw, 340px);
   height: auto;
-  opacity: 0.13;
-  filter: drop-shadow(0 0 24px rgba(176, 0, 32, 0.5));
+  opacity: 0.32;
   pointer-events: none;
   user-select: none;
   z-index: -1;
@@ -124,62 +123,40 @@
   transform: scale(1);
 }
 
-/* ── 3D green-to-darkred title ── */
+/* ── 3D blackish-green title — no bloom/glow ── */
 .afro-globe-title {
   font-family: 'Arial Black', Impact, sans-serif;
   font-size: clamp(42px, 8.5vw, 92px);
   font-weight: 900;
-  color: #00ff55;
+  color: #3d7a48;
   letter-spacing: 8px;
   text-transform: uppercase;
   line-height: 1;
-  /* Layers: bright green face → green → dark green → dark red → near-black */
+  /* Face: muted forest green → dark green → dark red → near-black depth */
   text-shadow:
-    1px  1px 0 #00e04c,
-    2px  2px 0 #00c040,
-    3px  3px 0 #009030,
-    4px  4px 0 #5a1a10,
-    5px  5px 0 #7a0e18,
-    6px  6px 0 #5c080f,
-    7px  7px 0 #3a0408,
-    8px  8px 0 #1e0204,
-    10px 10px 18px rgba(0,0,0,0.97),
-    0 0 50px rgba(0,255,80,0.5),
-    0 0 90px rgba(176,0,32,0.22);
+    1px  1px 0 #2e5c38,
+    2px  2px 0 #224428,
+    3px  3px 0 #1a3020,
+    4px  4px 0 #58180e,
+    5px  5px 0 #680b14,
+    6px  6px 0 #48060e,
+    7px  7px 0 #2a0308,
+    8px  8px 0 #140102,
+    10px 10px 16px rgba(0,0,0,0.98);
   transform: perspective(600px) rotateX(8deg);
-  animation: titleGlow 2.8s infinite ease-in-out;
 }
 
 .afro-globe-tagline {
   margin-top: 14px;
   font-family: 'Arial Black', Impact, sans-serif;
   font-size: clamp(10px, 2vw, 17px);
-  color: #55ffaa;
+  color: #3a6644;
   letter-spacing: 5px;
   text-transform: uppercase;
   font-weight: 700;
   text-shadow:
-    0 0 14px rgba(0,255,120,0.65),
-    1px 2px 0 #4a1008,
-    2px 3px 0 #2e0805,
-    0 0 30px rgba(176,0,32,0.18);
-}
-
-@keyframes titleGlow {
-  0%, 100% {
-    text-shadow:
-      1px 1px 0 #00e04c, 2px 2px 0 #00c040, 3px 3px 0 #009030,
-      4px 4px 0 #5a1a10, 5px 5px 0 #7a0e18, 6px 6px 0 #5c080f,
-      7px 7px 0 #3a0408, 8px 8px 0 #1e0204, 10px 10px 18px rgba(0,0,0,.97),
-      0 0 50px rgba(0,255,80,.5), 0 0 90px rgba(176,0,32,.22);
-  }
-  50% {
-    text-shadow:
-      1px 1px 0 #00e04c, 2px 2px 0 #00c040, 3px 3px 0 #009030,
-      4px 4px 0 #5a1a10, 5px 5px 0 #7a0e18, 6px 6px 0 #5c080f,
-      7px 7px 0 #3a0408, 8px 8px 0 #1e0204, 10px 10px 18px rgba(0,0,0,.97),
-      0 0 80px rgba(0,255,80,.80), 0 0 140px rgba(176,0,32,.40);
-  }
+    1px 2px 0 #48100a,
+    2px 3px 0 #2c0606;
 }
 
 /* ── Spin phase overlay — title above globe, fact below ── */
@@ -228,7 +205,7 @@
 .afro-spin-fact {
   font-family: 'Arial Black', Impact, sans-serif;
   font-size: clamp(9px, 1.5vw, 14px);
-  color: rgba(85, 255, 170, 0.85);
+  color: #3a6644;
   letter-spacing: 2.5px;
   text-transform: uppercase;
   font-weight: 700;
@@ -236,8 +213,8 @@
   max-width: 500px;
   margin: 0 auto;
   text-shadow:
-    0 0 14px rgba(0, 255, 120, 0.55),
-    1px 2px 0 #004d20;
+    1px 2px 0 #48100a,
+    2px 3px 0 #2c0606;
 }
 
 /* ── Auth panel — slides up after animation ── */
@@ -517,5 +494,34 @@
   .afro-globe-skip {
     bottom: 24px;
     right: 20px;
+  }
+}
+
+/* ── Desktop: center auth buttons below the title ── */
+@media (min-width: 1024px) {
+  .afro-globe-intro {
+    justify-content: center;
+  }
+
+  .afro-globe-title-block {
+    margin-bottom: 240px;
+  }
+
+  .afro-auth-panel {
+    position: absolute;
+    top: 57%;
+    left: 50%;
+    transform: translateX(-50%) translateY(14px);
+    width: 400px;
+    background: transparent;
+    padding: 0;
+    /* Override mobile slide-up with a fade+lift */
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  .afro-auth-panel--show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
   }
 }
