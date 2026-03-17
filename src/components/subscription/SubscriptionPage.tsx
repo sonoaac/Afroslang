@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getStripe, SUBSCRIPTION_PLANS, PREMIUM_FEATURES } from '../../utils/stripeConfig';
-import { activateDemoSubscription } from '../../utils/demoSubscription';
+import { SUBSCRIPTION_PLANS, PREMIUM_FEATURES } from '../../utils/stripeConfig';
 import { Crown, Check, Star, Zap, Heart, BarChart3, Trophy, ChevronLeft } from 'lucide-react';
 
 interface SubscriptionPageProps {

@@ -1,4 +1,4 @@
-import { doc, setDoc, updateDoc, increment, getDoc, collection, query, orderBy, getDocs } from "firebase/firestore";
+import { doc, setDoc, updateDoc, increment, getDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 
 // League system with 7 tiers
@@ -193,7 +193,7 @@ export async function resetWeeklyLeaderboard(): Promise<void> {
 
     for (const league of leagues) {
       const snapshot = await getDocs(collection(db, "leaderboards", currentWeek, league));
-      const users = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const users = snapshot.docs.map((d) => ({ id: d.id, league: league as string, ...d.data() }));
       const total = users.length;
       const top = 7;
       const bottom = Math.floor(total * 0.1);

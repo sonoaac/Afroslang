@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { HeartsData } from "./heartsTimer";
 
@@ -14,6 +14,10 @@ export interface UserData {
   subscription: {
     active: boolean;
     plan: string | null;
+    stripeSubId?: string | null;
+    renewsAt?: number | null;       // ms timestamp
+    stripeCustomerId?: string | null;
+    pastDue?: boolean;
   };
   createdAt: string;
   languages: Record<string, {

@@ -215,7 +215,6 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ onBack }) 
                     justifyContent: 'space-between',
                     padding: '0.85rem 1rem',
                     background: index < 3 ? 'rgba(176,0,32,0.08)' : 'rgba(255,255,255,0.02)',
-                    borderLeft: index < 3 ? `2px solid ${getRankAccent(player.rank)}` : `2px solid transparent`,
                     border: index < 3 ? `1px solid rgba(176,0,32,0.2)` : `1px solid ${lbBorder}`,
                     borderLeft: index < 3 ? `3px solid ${getRankAccent(player.rank)}` : `3px solid transparent`,
                   }}

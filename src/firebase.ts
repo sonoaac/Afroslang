@@ -14,14 +14,6 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-N63XE0SYQY"
 };
 
-// Debug Firebase configuration
-console.log('Firebase Config:', {
-  apiKey: firebaseConfig.apiKey ? 'Set' : 'Missing',
-  authDomain: firebaseConfig.authDomain,
-  projectId: firebaseConfig.projectId,
-  appId: firebaseConfig.appId ? 'Set' : 'Missing'
-});
-
 // Initialize Firebase
 let app;
 if (getApps().length === 0) {

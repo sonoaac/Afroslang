@@ -13,10 +13,10 @@ import { SuccessPage } from './components/subscription/SuccessPage';
 import { FeedbackPage } from './components/feedback/FeedbackPage';
 import { LatestNews } from './components/layout/LatestNews';
 import { ShopScreen } from './features/store/ShopScreen';
-import { FirebaseQuickSetup } from './components/debug/FirebaseQuickSetup';
+
 import { useAuth } from './contexts/AuthContext';
 import { getLanguageById } from './data/languages';
-import { getStagesForLanguage, getLessonById } from './data/lessons';
+import { getStagesForLanguage } from './data/lessons';
 import { saveUserProgress } from './utils/userData';
 import { addWeeklyXP, getCurrentWeekIdFromDB, getUserLeague } from './utils/leaderboardUtils';
 import { calcGemsEarned, awardGems, isXpBoostActive, purchaseHeartsRefill } from './utils/currencyUtils';
@@ -312,10 +312,6 @@ function App() {
 
   const handleContinueAfterComplete = () => {
     setCurrentScreen('path');
-  };
-
-  const handleBackToLanguageSelect = () => {
-    setCurrentScreen('interface-select');
   };
 
   const handleExitLesson = () => {
