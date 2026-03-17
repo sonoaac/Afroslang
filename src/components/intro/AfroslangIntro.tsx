@@ -68,6 +68,9 @@ export function AfroslangIntro({ onComplete }: AfroslangIntroProps) {
   const [africaVisible, setAfricaVisible] = useState(false);
   const [authVisible, setAuthVisible] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
+  const [showSpinOverlay, setShowSpinOverlay] = useState(false);
+  const spinShownRef   = useRef(false);
+  const spinHiddenRef  = useRef(false);
 
   // Auth state (mirrored from LandingPage)
   const [sheet, setSheet] = useState<SheetMode>(null);
@@ -335,6 +338,7 @@ export function AfroslangIntro({ onComplete }: AfroslangIntroProps) {
         if (el > 300) { phase='fast'; phaseStart=ts; }
 
       } else if (phase === 'fast') {
+        if (!spinShownRef.current) { spinShownRef.current = true; setShowSpinOverlay(true); }
         rotLon = (rotLon + speed) % 360;
         drawGlobe(rotLon, rotLat);
         globeCanvas.style.transform = `translate(-50%,-50%) scale(${globeScale})`;
@@ -352,6 +356,7 @@ export function AfroslangIntro({ onComplete }: AfroslangIntroProps) {
 
       } else if (phase === 'zooming') {
         const t = Math.min(el/DUR_ZOOM, 1);
+        if (t > 0.15 && !spinHiddenRef.current) { spinHiddenRef.current = true; setShowSpinOverlay(false); }
         globeScale = 1 + easeInOut(t)*7;
         const fade = t < 0.4 ? 1 : 1 - easeOut((t-0.4)/0.6);
         globeCanvas.style.opacity = String(fade);
@@ -392,12 +397,22 @@ export function AfroslangIntro({ onComplete }: AfroslangIntroProps) {
       {/* Globe canvas */}
       <canvas ref={globeRef} className="afro-globe-canvas" />
 
-      {/* Africa reveal + title */}
+      {/* Spin overlay — title above globe + fact below during spinning */}
+      <div className={`afro-spin-overlay${showSpinOverlay ? ' afro-spin-overlay--show' : ''}`}>
+        <div className="afro-spin-title-top">
+          <h1 className="afro-globe-title">AFROSLANG</h1>
+        </div>
+        <div className="afro-spin-fact-bottom">
+          <p className="afro-spin-fact">Africa is home to approximately one-third of the world's languages</p>
+        </div>
+      </div>
+
+      {/* Africa reveal + title (post-zoom) */}
       <div className={`afro-africa-stage${africaVisible ? ' afro-africa-stage--visible' : ''}`}>
         <canvas ref={africaRef} className="afro-africa-canvas" />
         <div className={`afro-globe-title-block${titleVisible ? ' afro-globe-title-block--show' : ''}`}>
           <h1 className="afro-globe-title">AFROSLANG</h1>
-          <p className="afro-globe-tagline">Where African Slang Lives</p>
+          <p className="afro-globe-tagline">Start Your Journey Now · Learn Your Roots</p>
         </div>
       </div>
 

@@ -166,6 +166,64 @@
   }
 }
 
+/* ── Spin phase overlay — title above globe, fact below ── */
+.afro-spin-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.55s ease;
+}
+
+.afro-spin-overlay--show {
+  opacity: 1;
+}
+
+.afro-spin-title-top {
+  padding-top: 5vh;
+  text-align: center;
+  /* Add subtle entry animation */
+  animation: spinTitleEntry 0.8s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes spinTitleEntry {
+  from { opacity: 0; transform: translateY(-18px) scale(0.88); }
+  to   { opacity: 1; transform: translateY(0)     scale(1); }
+}
+
+.afro-spin-fact-bottom {
+  padding-bottom: 9vh;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  text-align: center;
+  animation: spinFactEntry 1s cubic-bezier(0.16,1,0.3,1) 0.3s both;
+}
+
+@keyframes spinFactEntry {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.afro-spin-fact {
+  font-family: 'Arial Black', Impact, sans-serif;
+  font-size: clamp(9px, 1.5vw, 14px);
+  color: rgba(85, 255, 170, 0.85);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  line-height: 1.6;
+  max-width: 500px;
+  margin: 0 auto;
+  text-shadow:
+    0 0 14px rgba(0, 255, 120, 0.55),
+    1px 2px 0 #004d20;
+}
+
 /* ── Auth panel — slides up after animation ── */
 .afro-auth-panel {
   position: relative;
