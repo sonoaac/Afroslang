@@ -90,7 +90,6 @@ export function InterfaceLanguageSelector({ onSelect, onSelectLanguage, onSignIn
       <section className="afroHero">
         <div className="afroHeroLeft">
           <div className="afroHeroEyebrow">
-            <div className="afroHeroLine" />
             <span className="afroHeroEyebrowText">
               {isEnglish ? 'African Language Learning' : 'Apprentissage des langues africaines'}
             </span>
