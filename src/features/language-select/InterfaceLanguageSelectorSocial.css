@@ -1,12 +1,14 @@
 /* ══════════════════════════════════════════════════
-   Afroslang · Language Selection · Dark Luxury
-   Mobile-first · Black × Red · Times New Roman
+   Afroslang · Interface Language Selector — Gallery
+   Dark luxury. 54-country flag grid. Featured panel.
    ══════════════════════════════════════════════════ */
 
-/* ─── Root ─── */
-.afroRoot {
-  min-height: 100vh;
-  background: #080808;
+/* ── Root ── */
+.ils-root {
+  min-height: 100dvh;
+  background:
+    radial-gradient(900px 450px at 65% 20%, rgba(176, 0, 32, 0.09) 0%, transparent 70%),
+    #080808;
   color: #fff;
   font-family: 'Times New Roman', Georgia, serif;
   display: flex;
@@ -14,52 +16,127 @@
   overflow-x: hidden;
 }
 
-/* ─── Header ─── */
-.afroHeader {
+/* ════════════════════════════════
+   HEADER
+   ════════════════════════════════ */
+.ils-header {
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   padding: 0 16px;
   height: 56px;
-  background: rgba(8,8,8,0.95);
+  background: rgba(8, 8, 8, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.afroHeaderBrand {
+.ils-header-left {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
-.afroHeaderLogo {
+
+.ils-logo {
   width: 30px;
   height: 30px;
   border-radius: 50%;
   object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(176, 0, 32, 0.4));
 }
-.afroHeaderName {
-  font-size: 0.9rem;
+
+.ils-logo-fallback {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #b00020;
+}
+
+.ils-brand {
+  font-size: 0.88rem;
   font-weight: 900;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: #fff;
 }
 
-.afroHeaderRight {
+.ils-header-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex: 1;
+  justify-content: flex-end;
 }
 
+/* Search icon */
+.ils-search-icon-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.38);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s, background 0.2s;
+}
+.ils-search-icon-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* Search bar expanded */
+.ils-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  max-width: 280px;
+  animation: ilsSearchExpand 0.22s ease-out;
+  transform-origin: right center;
+}
+@keyframes ilsSearchExpand {
+  from { opacity: 0; transform: scaleX(0.6); }
+  to   { opacity: 1; transform: scaleX(1);   }
+}
+
+.ils-search-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-family: 'Times New Roman', Georgia, serif;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.ils-search-input::placeholder { color: rgba(255, 255, 255, 0.25); }
+.ils-search-input:focus { border-color: #b00020; }
+
+.ils-search-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.38);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+.ils-search-close:hover { color: #fff; }
+
+/* Reuse existing EN/FR toggle + Sign In styles from the original */
 .afroLangToggle {
   display: flex;
   align-items: center;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
   overflow: hidden;
 }
@@ -70,20 +147,15 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255, 255, 255, 0.4);
   background: transparent;
   border: none;
   cursor: pointer;
   transition: all 0.15s;
   min-height: 32px;
 }
-.afroLangToggleBtn--active {
-  color: #fff;
-  background: #b00020;
-}
-.afroLangToggleBtn:not(.afroLangToggleBtn--active):hover {
-  color: rgba(255,255,255,0.75);
-}
+.afroLangToggleBtn--active { color: #fff; background: #b00020; }
+.afroLangToggleBtn:not(.afroLangToggleBtn--active):hover { color: rgba(255, 255, 255, 0.75); }
 
 .afroSignInBtn {
   font-family: 'Times New Roman', Georgia, serif;
@@ -91,599 +163,721 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 6px;
   padding: 6px 14px;
   cursor: pointer;
   transition: all 0.15s;
   min-height: 32px;
+  white-space: nowrap;
 }
-.afroSignInBtn:hover {
-  color: #fff;
-  border-color: rgba(255,255,255,0.3);
+.afroSignInBtn:hover { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
+
+
+/* ════════════════════════════════
+   HERO BAR
+   ════════════════════════════════ */
+.ils-hero {
+  padding: 28px 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* ─── MOBILE HERO (Duolingo style) ─── */
-/* On mobile: mascot centered top, title, subtitle, then CTA stacked */
-.afroHero {
-  width: 100%;
-  padding: 32px 20px 28px;
+.ils-hero-inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ils-hero-text {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
   gap: 0;
 }
 
-/* Mascot — mobile center, desktop right column */
-.afroHeroRight {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  order: -1; /* mascot above text on mobile */
-}
-
-.afroMascotWrap {
-  position: relative;
-  width: 140px;
-  height: 140px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.afroMascotImg {
-  width: 130px;
-  height: 130px;
-  object-fit: contain;
-  filter: drop-shadow(0 0 28px rgba(176,0,32,0.45));
-  animation: mascotBob 3.5s ease-in-out infinite;
-  position: relative;
-  z-index: 2;
-}
-
-.afroMascotFallback {
-  font-size: 5rem;
-  line-height: 1;
-  animation: mascotBob 3.5s ease-in-out infinite;
-}
-
-.afroMascotGlow {
-  position: absolute;
-  inset: 10px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(176,0,32,0.25) 0%, transparent 70%);
-  animation: glowPulse 3.5s ease-in-out infinite;
-  z-index: 1;
-}
-
-@keyframes mascotBob {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-8px); }
-}
-
-@keyframes glowPulse {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50%       { opacity: 1;   transform: scale(1.12); }
-}
-
-.afroHeroLeft {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-.afroHeroEyebrow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-  justify-content: center;
-}
-.afroHeroLine {
-  width: 24px;
-  height: 2px;
-  background: #b00020;
-}
-.afroHeroEyebrowText {
-  font-size: 0.65rem;
+.ils-hero-eyebrow {
+  font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: #b00020;
+  display: block;
+  margin-bottom: 10px;
 }
 
-.afroHeroTitle {
-  font-size: clamp(2rem, 8vw, 3.4rem);
+.ils-hero-title {
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
   font-weight: 900;
-  line-height: 1.08;
+  line-height: 1.1;
   color: #fff;
   letter-spacing: -0.01em;
-  margin-bottom: 16px;
-  text-align: center;
+  margin: 0 0 10px;
 }
-.afroHeroTitle em {
-  font-style: italic;
-  color: #e53935;
+.ils-hero-title em { font-style: italic; color: #e53935; }
+
+.ils-hero-sub {
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.42);
+  margin: 0 0 18px;
+  max-width: 420px;
 }
 
-.afroHeroSub {
-  font-size: 0.9rem;
-  line-height: 1.65;
-  color: rgba(255,255,255,0.48);
-  max-width: 340px;
-  margin-bottom: 28px;
-  text-align: center;
-}
-
-/* Mobile: CTA stacked full-width */
-.afroHeroActions {
+.ils-hero-actions {
   display: flex;
-  flex-direction: column;
   gap: 10px;
-  width: 100%;
-  max-width: 340px;
+  flex-wrap: wrap;
 }
 
+.ils-hero-mascot {
+  position: relative;
+  flex-shrink: 0;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ils-mascot-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 20px rgba(176, 0, 32, 0.4));
+  animation: ilsMascotBob 3.5s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+}
+
+.ils-mascot-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(176, 0, 32, 0.22) 0%, transparent 70%);
+  animation: ilsGlowPulse 3.5s ease-in-out infinite;
+}
+
+@keyframes ilsMascotBob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-7px); }
+}
+@keyframes ilsGlowPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.1); }
+}
+
+/* Hero CTAs — reuse existing styles */
 .afroHeroCta {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 16px 28px;
+  padding: 13px 22px;
   background: #b00020;
   color: #fff;
   font-family: 'Times New Roman', Georgia, serif;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 24px rgba(176,0,32,0.35);
-  min-height: 52px;
+  box-shadow: 0 4px 20px rgba(176, 0, 32, 0.3);
+  min-height: 44px;
+  white-space: nowrap;
 }
-.afroHeroCta:hover, .afroHeroCta:active {
-  background: #e53935;
-  transform: translateY(-1px);
-  box-shadow: 0 8px 32px rgba(176,0,32,0.5);
-}
+.afroHeroCta:hover { background: #e53935; transform: translateY(-1px); }
 
 .afroHeroGhost {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 15px 28px;
+  padding: 12px 20px;
   background: transparent;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255, 255, 255, 0.48);
   font-family: 'Times New Roman', Georgia, serif;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  border: 1px solid rgba(255,255,255,0.14);
-  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s;
-  min-height: 48px;
+  min-height: 44px;
+  white-space: nowrap;
 }
-.afroHeroGhost:hover, .afroHeroGhost:active {
-  color: #fff;
-  border-color: rgba(255,255,255,0.32);
-}
+.afroHeroGhost:hover { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
 
-/* ─── Divider ─── */
+
+/* ════════════════════════════════
+   DIVIDER
+   ════════════════════════════════ */
 .afroDividerRow {
-  padding: 0 20px;
+  padding: 16px 16px 0;
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 20px;
 }
-.afroDividerLine {
-  flex: 1;
-  height: 1px;
-  background: rgba(255,255,255,0.06);
-}
+.afroDividerLine { flex: 1; height: 1px; background: rgba(255, 255, 255, 0.05); }
 .afroDividerLabel {
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.18);
+  color: rgba(255, 255, 255, 0.16);
   white-space: nowrap;
 }
 
-/* ─── Tabs ─── */
-.afroTabsRow {
-  padding: 0 16px;
+
+/* ════════════════════════════════
+   MAIN LAYOUT
+   ════════════════════════════════ */
+.ils-main {
+  flex: 1;
   display: flex;
-  align-items: center;
-  gap: 0;
-  margin-bottom: 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  overflow-x: auto;
+  align-items: flex-start;
+  position: relative;
+}
+
+
+/* ════════════════════════════════
+   FEATURED PANEL
+   ════════════════════════════════ */
+.ils-panel {
+  width: 260px;
+  flex-shrink: 0;
+  padding: 18px 14px;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  position: sticky;
+  top: 56px;
+  max-height: calc(100dvh - 56px);
+  overflow-y: auto;
   scrollbar-width: none;
 }
-.afroTabsRow::-webkit-scrollbar { display: none; }
+.ils-panel::-webkit-scrollbar { display: none; }
 
-.afroTab {
-  flex-shrink: 0;
-  padding: 10px 16px;
-  font-family: 'Times New Roman', Georgia, serif;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.3);
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  cursor: pointer;
-  transition: all 0.15s;
-  min-height: 44px;
-}
-.afroTab:hover { color: rgba(255,255,255,0.7); }
-.afroTab--active {
-  color: #fff;
-  border-bottom-color: #b00020;
-}
+.ils-panel-handle { display: none; }
 
-/* ─── Search ─── */
-.afroSearchWrap {
-  padding: 0 16px;
-  margin-bottom: 16px;
-}
-.afroSearchInner {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #111;
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 12px;
-  padding: 12px 14px;
-}
-.afroSearchInner input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-family: 'Times New Roman', Georgia, serif;
-  font-size: 0.9rem;
-  outline: none;
-  min-height: 24px;
-}
-.afroSearchInner input::placeholder { color: rgba(255,255,255,0.2); }
-.afroSearchIcon {
-  color: rgba(255,255,255,0.25);
-  flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-}
-
-/* ─── Language Grid — mobile 2col, scales up ─── */
-.afroGrid {
-  padding: 0 16px 120px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-/* ─── Language Card ─── */
-.afroCard {
-  background: #111;
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 14px;
-  padding: 18px 14px 16px;
-  cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.16,1,0.3,1);
+.ils-panel-empty {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  text-align: left;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 36px 0;
+  text-align: center;
+  opacity: 0.35;
+}
+.ils-panel-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+.ils-panel-empty p {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.55;
+}
+
+.ils-panel-inner {
   position: relative;
-  overflow: hidden;
-  min-height: 120px;
-  -webkit-tap-highlight-color: transparent;
-  animation: cardSlideUp 0.4s cubic-bezier(0.16,1,0.3,1) calc(var(--card-i, 0) * 0.03s) both;
+  animation: ilsPanelIn 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+@keyframes ilsPanelIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
 }
 
-@keyframes cardSlideUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Red top accent bar slides in on hover */
-.afroCard::before {
-  content: '';
+.ils-panel-close {
+  display: none;
   position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: #b00020;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.25s ease;
+  top: 0; right: 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.7rem;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
 }
+.ils-panel-close:hover { background: rgba(255, 255, 255, 0.16); color: #fff; }
 
-.afroCard:hover,
-.afroCard:active {
-  border-color: rgba(176,0,32,0.5);
-  background: #181010;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(176,0,32,0.15);
-}
-.afroCard:hover::before,
-.afroCard:active::before {
-  transform: scaleX(1);
-}
-
-.afroCardFlag {
-  font-size: 1.8rem;
+.ils-panel-flag {
+  font-size: 3.2rem;
+  text-align: center;
+  margin-bottom: 8px;
   line-height: 1;
 }
-
-.afroCardName {
-  font-family: 'Times New Roman', Georgia, serif;
-  font-size: 0.85rem;
-  font-weight: 900;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+.ils-panel-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-align: center;
   color: #fff;
-  line-height: 1.2;
+  margin: 0 0 10px;
+}
+.ils-panel-fact {
+  font-size: 0.76rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  padding: 10px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  margin-bottom: 14px;
 }
 
-.afroCardSpeakers {
-  font-family: 'Times New Roman', Georgia, serif;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+.ils-panel-langs { display: flex; flex-direction: column; gap: 9px; }
+
+.ils-lang-label {
+  font-size: 0.64rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.25);
-  margin-top: auto;
+  color: rgba(255, 255, 255, 0.32);
 }
 
-.afroCardRegion {
-  display: inline-block;
+.ils-select-wrap { position: relative; }
+
+.ils-lang-select {
+  width: 100%;
+  padding: 9px 30px 9px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(176, 0, 32, 0.3);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.84rem;
   font-family: 'Times New Roman', Georgia, serif;
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #e53935;
-  background: rgba(176,0,32,0.1);
-  border: 1px solid rgba(176,0,32,0.22);
-  border-radius: 3px;
-  padding: 2px 6px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.2s;
+}
+.ils-lang-select:focus { border-color: #b00020; }
+.ils-lang-select option { background: #111; color: #fff; }
+
+.ils-select-arrow {
+  position: absolute;
+  right: 10px; top: 50%;
+  transform: translateY(-50%);
+  color: rgba(176, 0, 32, 0.7);
+  font-size: 0.65rem;
+  pointer-events: none;
 }
 
-/* ─── About tab ─── */
-.afroAbout {
-  padding: 0 16px 120px;
+.ils-btn-start {
+  width: 100%;
+  padding: 11px;
+  background: #b00020;
+  border: none;
+  border-radius: 9px;
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.18s;
+  box-shadow: 0 4px 16px rgba(176, 0, 32, 0.3);
+}
+.ils-btn-start:hover { background: #e53935; transform: translateY(-1px); }
+
+.ils-coming-soon {
+  text-align: center;
+  padding: 18px 6px;
+  color: rgba(255, 255, 255, 0.38);
+}
+.ils-coming-soon span { font-size: 2rem; display: block; margin-bottom: 6px; }
+.ils-coming-soon p { font-size: 0.76rem; line-height: 1.5; }
+
+
+/* ════════════════════════════════
+   FLAG GRID
+   ════════════════════════════════ */
+.ils-grid-wrap {
+  flex: 1;
+  padding: 14px 14px 120px;
+  min-width: 0;
+}
+
+.ils-flag-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+  align-content: start;
+}
+
+.ils-flag-btn {
+  aspect-ratio: 1;
+  min-height: 44px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 4px 6px;
+  transition: transform 0.22s ease, opacity 0.22s ease, background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  position: relative;
+  z-index: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.afroAboutCard {
-  background: #111;
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 14px;
-  padding: 22px 18px;
+.ils-flag-btn:hover,
+.ils-flag-btn:focus-visible {
+  transform: scale(1.18);
+  z-index: 3;
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(176, 0, 32, 0.4);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.55);
+  outline: none;
 }
 
-.afroAboutCardTitle {
-  font-size: 0.68rem;
+/* Gallery collective-hover: dim non-hovered siblings */
+.ils-flag-grid:has(.ils-flag-btn:hover) .ils-flag-btn:not(:hover):not(.ils-flag-btn--active) {
+  transform: scale(0.88);
+  opacity: 0.55;
+}
+
+.ils-flag-btn--active {
+  border-color: #b00020 !important;
+  background: rgba(176, 0, 32, 0.12) !important;
+  box-shadow: 0 0 0 1px rgba(176, 0, 32, 0.4), 0 4px 16px rgba(176, 0, 32, 0.18) !important;
+  z-index: 1;
+}
+
+.ils-flag-btn--dim { opacity: 0.42; }
+.ils-flag-btn--dim:hover { opacity: 0.7; }
+
+.ils-flag-emoji { font-size: 1.8rem; line-height: 1; display: block; }
+
+.ils-flag-name {
+  font-size: 0.56rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 2px;
+}
+
+/* ── Pagination buttons ── */
+.ils-more-btn,
+.ils-less-btn {
+  aspect-ratio: 1;
+  min-height: 44px;
+  background: rgba(176, 0, 32, 0.06);
+  border: 1px dashed rgba(176, 0, 32, 0.28);
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  line-height: 1;
+  color: #b00020;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+.ils-more-btn:hover, .ils-less-btn:hover {
+  background: rgba(176, 0, 32, 0.14);
+  border-color: #b00020;
+  transform: scale(1.1);
+}
+
+/* ── Flow-from-back animation ── */
+@keyframes ilsFlowFromBack {
+  from {
+    opacity: 0;
+    transform: perspective(500px) translateZ(-100px) scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(500px) translateZ(0) scale(1);
+  }
+}
+
+.ils-flag-btn--flow {
+  opacity: 0;
+  animation: ilsFlowFromBack 0.42s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+}
+
+
+/* ════════════════════════════════
+   INFO SECTIONS
+   ════════════════════════════════ */
+.ils-info {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 16px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 120px; /* clear sticky guest bar */
+}
+
+.ils-info-section {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.ils-info-summary {
+  padding: 13px 16px;
+  cursor: pointer;
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: color 0.2s;
+}
+.ils-info-summary:hover { color: rgba(255, 255, 255, 0.85); }
+.ils-info-summary::-webkit-details-marker { display: none; }
+.ils-info-summary::after {
+  content: '›';
+  font-size: 1.1rem;
+  color: #b00020;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+details[open] .ils-info-summary::after { transform: rotate(90deg); }
+
+.ils-info-body {
+  padding: 0 16px 14px;
+  font-size: 0.79rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.65;
+}
+
+.ils-facts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.ils-fact-card {
+  padding: 10px 11px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+.ils-fact-card strong { color: #b00020; }
+
+.ils-about-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.ils-about-card {
+  padding: 14px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+.ils-about-title {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #b00020;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+}
+.ils-about-card p { font-size: 0.78rem; line-height: 1.6; }
+
+
+/* ════════════════════════════════
+   MOBILE BACKDROP
+   ════════════════════════════════ */
+.ils-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 48;
+  animation: ilsBackdropIn 0.22s ease;
+}
+@keyframes ilsBackdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-.afroAboutCardText {
-  font-size: 0.88rem;
-  line-height: 1.75;
-  color: rgba(255,255,255,0.58);
-}
 
-.afroAboutCardText strong {
-  color: #fff;
-  font-weight: 700;
-}
-
-/* ─── Timeline / Facts ─── */
-.afroTimeline {
-  padding: 0 16px 120px;
-  display: flex;
-  flex-direction: column;
-}
-
-.afroTimelineItem {
-  display: flex;
-  gap: 18px;
-  align-items: flex-start;
-  padding: 20px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-}
-
-.afroTimelineDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #b00020;
-  flex-shrink: 0;
-  margin-top: 7px;
-  box-shadow: 0 0 8px rgba(176,0,32,0.6);
-}
-
-.afroTimelineText {
-  font-size: 0.9rem;
-  line-height: 1.7;
-  color: rgba(255,255,255,0.62);
-}
-
-.afroTimelineText strong { color: #fff; }
-
-/* ─── Sticky bottom guest bar ─── */
+/* ════════════════════════════════
+   STICKY GUEST BAR
+   ════════════════════════════════ */
 .afroGuestBar {
   position: fixed;
   bottom: 0; left: 0; right: 0;
   z-index: 40;
-  background: rgba(8,8,8,0.97);
+  background: rgba(8, 8, 8, 0.97);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255,255,255,0.06);
-  padding: 12px 16px;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 10px 16px;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
-
 .afroGuestBarText {
-  font-size: 0.72rem;
-  color: rgba(255,255,255,0.35);
-  letter-spacing: 0.03em;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.32);
   text-align: center;
 }
-
-.afroGuestBarText strong { color: rgba(255,255,255,0.7); }
-
+.afroGuestBarText strong { color: rgba(255, 255, 255, 0.65); }
 .afroGuestBarActions {
   display: flex;
   gap: 8px;
 }
-
 .afroGuestBarActions .afroHeroGhost,
 .afroGuestBarActions .afroHeroCta {
   flex: 1;
-  padding: 12px 10px;
-  font-size: 0.72rem;
-  min-height: 44px;
-  border-radius: 10px;
+  padding: 10px 8px;
+  font-size: 0.7rem;
+  min-height: 40px;
+  border-radius: 8px;
 }
 
-/* ═══════════════════════════════════════════
-   TABLET — 640px+
-   ═══════════════════════════════════════════ */
-@media (min-width: 640px) {
-  .afroHeader { padding: 0 28px; height: 60px; }
 
-  .afroHero {
-    padding: 48px 28px 36px;
+/* ════════════════════════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════════════════════════ */
+
+/* ── Mobile (< 768px) ── */
+@media (max-width: 767px) {
+  .ils-header { padding: 0 12px; }
+  .ils-brand  { font-size: 0.8rem; }
+  .ils-logo   { width: 26px; height: 26px; }
+
+  .ils-hero { padding: 20px 14px 14px; }
+  .ils-hero-mascot { display: none; } /* hide mascot on small screens */
+  .ils-hero-title  { font-size: 1.5rem; }
+  .ils-hero-sub    { font-size: 0.78rem; margin-bottom: 14px; }
+  .ils-hero-actions { gap: 8px; }
+  .afroHeroCta, .afroHeroGhost { padding: 11px 16px; font-size: 0.74rem; min-height: 42px; }
+
+  /* Panel becomes bottom sheet */
+  .ils-main { flex-direction: column; }
+
+  .ils-panel {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    width: 100%;
+    max-height: 70dvh;
+    height: auto;
+    z-index: 50;
+    border-right: none;
+    border-top: 1px solid rgba(176, 0, 32, 0.2);
+    border-radius: 18px 18px 0 0;
+    padding: 0 18px calc(20px + env(safe-area-inset-bottom, 0px));
+    padding-top: 0;
+    background: rgba(6, 6, 6, 0.97);
+    backdrop-filter: blur(20px);
+    transform: translateY(105%);
+    transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+    top: auto;
+  }
+  .ils-panel--open  { transform: translateY(0); }
+
+  .ils-panel-handle {
+    display: block;
+    width: 34px; height: 4px;
+    background: rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    margin: 12px auto 16px;
+  }
+  .ils-panel-close  { display: flex; }
+
+  .ils-grid-wrap {
+    padding: 12px 12px 120px;
   }
 
-  .afroMascotWrap { width: 170px; height: 170px; }
-  .afroMascotImg  { width: 160px; height: 160px; }
-
-  .afroGrid {
-    grid-template-columns: repeat(3, 1fr);
-    padding: 0 28px 120px;
-    gap: 12px;
+  .ils-flag-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
   }
+  .ils-flag-emoji { font-size: 1.5rem; }
+  .ils-flag-name  { font-size: 0.5rem; }
+
+  .ils-facts-grid  { grid-template-columns: 1fr; }
+  .ils-about-grid  { grid-template-columns: 1fr; }
+
+  .afroSignInBtn { padding: 5px 10px; font-size: 0.66rem; }
+}
+
+/* ── Tablet (768px – 1023px) ── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .ils-panel { width: 230px; }
+  .ils-flag-grid { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); }
+  .ils-facts-grid  { grid-template-columns: repeat(2, 1fr); }
+  .ils-about-grid  { grid-template-columns: repeat(2, 1fr); }
+  .ils-hero-mascot { width: 80px; height: 80px; }
+  .ils-mascot-img  { width: 70px; height: 70px; }
 
   .afroGuestBar {
     flex-direction: row;
     align-items: center;
-    padding: 12px 28px;
-    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    padding: 10px 28px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   }
   .afroGuestBarText { flex: 1; text-align: left; }
   .afroGuestBarActions { flex-shrink: 0; }
   .afroGuestBarActions .afroHeroGhost,
-  .afroGuestBarActions .afroHeroCta {
-    flex: initial;
-    padding: 10px 20px;
-  }
-
-  .afroDividerRow { padding: 0 28px; }
-  .afroTabsRow    { padding: 0 28px; }
-  .afroSearchWrap { padding: 0 28px; }
-  .afroAbout      { padding: 0 28px 120px; }
-  .afroTimeline   { padding: 0 28px 120px; }
+  .afroGuestBarActions .afroHeroCta { flex: initial; padding: 10px 18px; }
 }
 
-/* ═══════════════════════════════════════════
-   DESKTOP — 900px+ (two-column hero)
-   ═══════════════════════════════════════════ */
-@media (min-width: 900px) {
-  .afroHeader { padding: 0 48px; }
+/* ── Desktop (1024px+) ── */
+@media (min-width: 1024px) {
+  .ils-header { padding: 0 40px; }
+  .ils-hero   { padding: 36px 40px 26px; }
+  .ils-hero-inner { max-width: 1100px; margin: 0 auto; }
+  .ils-hero-mascot { width: 110px; height: 110px; }
+  .ils-mascot-img  { width: 100px; height: 100px; }
 
-  .afroHero {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 72px 48px 56px;
-    flex-direction: row;
-    text-align: left;
-    gap: 64px;
-    align-items: center;
-  }
+  .ils-panel { width: 280px; }
+  .ils-flag-grid { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); }
+  .ils-flag-emoji { font-size: 1.95rem; }
+  .ils-flag-name  { font-size: 0.58rem; }
 
-  /* On desktop put mascot back on the right */
-  .afroHeroRight {
-    order: 0;
-    flex-shrink: 0;
-    margin-bottom: 0;
-  }
-
-  .afroMascotWrap { width: 260px; height: 260px; }
-  .afroMascotImg  { width: 240px; height: 240px; }
-
-  .afroHeroLeft {
-    align-items: flex-start;
-    flex: 1;
-  }
-
-  .afroHeroEyebrow { justify-content: flex-start; }
-  .afroHeroTitle   { text-align: left; font-size: clamp(2.6rem, 4vw, 4rem); }
-  .afroHeroSub     { text-align: left; max-width: 420px; }
-
-  .afroHeroActions {
-    flex-direction: row;
-    width: auto;
-    max-width: none;
-  }
-
-  .afroHeroCta  { min-height: 48px; border-radius: 6px; padding: 14px 28px; }
-  .afroHeroGhost { min-height: 48px; border-radius: 6px; padding: 14px 28px; }
-
-  .afroDividerRow { max-width: 1100px; margin: 0 auto 48px; padding: 0 48px; }
-  .afroTabsRow    { max-width: 1100px; margin: 0 auto; padding: 0 48px; }
-  .afroSearchWrap { max-width: 1100px; margin: 0 auto 20px; padding: 0 48px; }
-
-  .afroGrid {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 48px 80px;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 14px;
-  }
-
-  .afroAbout {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 48px 80px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-
-  .afroTimeline {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 48px 80px;
-  }
+  .afroDividerRow { padding: 16px 40px 0; }
+  .ils-grid-wrap  { padding: 14px 14px 120px; }
+  .ils-info       { padding: 16px 40px 120px; }
 
   .afroGuestBar {
-    padding: 14px 48px;
-    padding-bottom: 14px;
+    flex-direction: row;
+    align-items: center;
+    padding: 12px 40px;
+    padding-bottom: 12px;
   }
+  .afroGuestBarText { flex: 1; text-align: left; }
+  .afroGuestBarActions { flex-shrink: 0; }
+  .afroGuestBarActions .afroHeroGhost,
+  .afroGuestBarActions .afroHeroCta { flex: initial; padding: 10px 22px; }
+}
+
+/* ── Large desktop (1440px+) ── */
+@media (min-width: 1440px) {
+  .ils-flag-grid { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
 }
