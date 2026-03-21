@@ -297,7 +297,7 @@ export function InterfaceLanguageSelector({
             <div key={selectedCountry.code} className="ils-panel-inner">
               <button className="ils-panel-close" onClick={() => setPanelOpen(false)}>✕</button>
 
-              <div className="ils-panel-flag">{selectedCountry.flag}</div>
+              <img className="ils-panel-flag" src={`https://flagcdn.com/w80/${selectedCountry.code.toLowerCase()}.png`} alt={selectedCountry.flag} />
               <h2 className="ils-panel-name">{isEn ? selectedCountry.name : selectedCountry.nameFr}</h2>
               <p className="ils-panel-fact">{isEn ? selectedCountry.fact : selectedCountry.factFr}</p>
 
@@ -356,7 +356,7 @@ export function InterfaceLanguageSelector({
                 onClick={() => handleFlagClick(country)}
                 title={isEn ? country.name : country.nameFr}
               >
-                <span className="ils-flag-emoji">{country.flag}</span>
+                <img className="ils-flag-emoji" src={`https://flagcdn.com/w40/${country.code.toLowerCase()}.png`} alt={country.flag} loading="lazy" />
                 <span className="ils-flag-name">{isEn ? country.name : country.nameFr}</span>
               </button>
             ))}
@@ -379,7 +379,7 @@ export function InterfaceLanguageSelector({
                 onClick={() => handleFlagClick(country)}
                 title={isEn ? country.name : country.nameFr}
               >
-                <span className="ils-flag-emoji">{country.flag}</span>
+                <img className="ils-flag-emoji" src={`https://flagcdn.com/w40/${country.code.toLowerCase()}.png`} alt={country.flag} loading="lazy" />
                 <span className="ils-flag-name">{isEn ? country.name : country.nameFr}</span>
               </button>
             ))}
