@@ -345,14 +345,15 @@ export function InterfaceLanguageSelector({
         {/* Flag grid */}
         <div className="ils-grid-wrap">
           <div className="ils-flag-grid">
-            {firstHalf.map(country => (
+            {firstHalf.map((country, idx) => (
               <button
                 key={country.code}
                 className={[
-                  'ils-flag-btn',
+                  'ils-flag-btn ils-flag-btn--flow',
                   selectedCountry?.code === country.code ? 'ils-flag-btn--active' : '',
                   country.languages.length === 0 ? 'ils-flag-btn--dim' : '',
                 ].join(' ')}
+                style={{ animationDelay: `${idx * 28}ms` }}
                 onClick={() => handleFlagClick(country)}
                 title={isEn ? country.name : country.nameFr}
               >
