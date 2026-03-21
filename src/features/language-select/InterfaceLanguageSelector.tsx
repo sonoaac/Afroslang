@@ -428,8 +428,8 @@ export function InterfaceLanguageSelector({
             <div className="ils-about-card">
               <div className="ils-about-title">{isEn ? 'How it works' : 'Comment ça marche'}</div>
               <p>{isEn
-                ? 'Pick a language → follow the 7-stage curriculum → complete lessons → earn XP → climb the leaderboard. Each lesson takes 3 to 5 minutes.'
-                : 'Choisissez une langue → suivez les 7 étapes → complétez les leçons → gagnez des XP. Chaque leçon dure 3 à 5 minutes.'}
+                ? 'Pick a language, follow the 7-stage curriculum, complete lessons, earn XP, and climb the leaderboard. Each lesson takes 3 to 5 minutes.'
+                : 'Choisissez une langue, suivez les 7 étapes, complétez les leçons et gagnez des XP. Chaque leçon dure 3 à 5 minutes.'}
               </p>
             </div>
             <div className="ils-about-card">
