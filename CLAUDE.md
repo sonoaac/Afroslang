@@ -33,23 +33,31 @@ App is a single-page app with no router. Navigation is a `currentScreen` state s
 
 ```
 AfroslangIntro (logo animation, once per session)
-  → LandingPage (unauthenticated) → SplashScreen (after auth, once per session)
+  → LandingPage (unauthenticated)
   → interface-select → path → lesson → complete
                             ↘ leaderboard / shop / latest-news / subscription / payment-success / feedback
 ```
 
-Returning authenticated users skip the `LandingPage` and `SplashScreen` and go straight to `interface-select`. The `currentLanguage` is intentionally **not** restored on load — users always choose their language fresh each session.
+`SplashScreen` (`src/components/splash/SplashScreen.tsx`) exists as a file but is **not currently used** in `App.tsx` — it was removed from the navigation flow. Do not re-add it without intent.
+
+Returning authenticated users skip `LandingPage` and go straight to `interface-select`. The `currentLanguage` is intentionally **not** restored on load — users always choose their language fresh each session.
 
 `userProgressMap` (keyed by `AfricanLanguage`) is the primary client-side state. It persists to `localStorage` (keys: `afroslang_progress`, `afroslang_interface`, `afroslang_current_language`). XP/streaks only count for authenticated (non-guest) users.
 
-`sessionStorage` keys: `afro_intro_seen` (logo intro shown) — splash is controlled via the `showSplash` React state flag set when a user authenticates for the first time in a session.
+`sessionStorage` keys: `afro_intro_seen` (logo intro shown).
 
 ### Authentication (`src/contexts/AuthContext.tsx`)
 
 Firebase Auth via `useAuth()` hook. Three modes:
 - **Authenticated user** — full Firebase Firestore sync
 - **Guest** — progress stored in `localStorage` via `loadGuestProgress`/`saveGuestProgress`
-- **Unauthenticated** — shows `<AuthScreen />`
+- **Unauthenticated** — shows `<LandingPage />`
+
+On every auth state change, `AuthContext` calls `getCurrentHeartsStatus()` from `src/utils/heartsTimer.ts` to recalculate heart regeneration before setting `userData`.
+
+**`UserData` vs `UserProgress`** — these are two distinct types:
+- `UserData` (`src/utils/userData.ts`) — the Firestore document: subscription status, gems, total XP, `heartsData` with server-side regeneration timestamps.
+- `UserProgress` (`src/types/index.ts`) — client-side per-language state in `userProgressMap`: XP, level, streak, `completedLessons[]`. Persisted to `localStorage`.
 
 ### Lesson Data Pipeline (`src/data/lessons/index.ts`)
 
@@ -66,7 +74,7 @@ Exercise types: `multiple-choice | fill-blank | match | translate | type-answer`
 
 - `UserProgress` — per-language client state (xp, level, hearts, streak, completedLessons[])
 - `Stage` → `Lesson` → `Exercise` — the content hierarchy
-- Hearts: max 5, reset after 7 hours when depleted; subscribers get 999 (unlimited)
+- Hearts: max 5, regenerate at **1 heart per 5 hours** (incremental, not a bulk reset). Managed server-side via `src/utils/heartsTimer.ts` for authenticated users, via `localStorage` key `afroslang_guest_hearts` for guests. Subscribers get 999 (unlimited).
 - Guest lesson cap: 3 completions before `GuestLimitModal` prompts sign-up; XP/streaks do not persist for guests
 
 ### Design System
@@ -111,8 +119,11 @@ When adding a new language, add cultural facts here and decide whether it belong
 ### Duplicate / Legacy Files
 
 - `src/data/` contains legacy copies of some lesson files (e.g. `src/data/swahili.ts`, `hausa.ts`, `yoruba.ts`, `zulu.ts`). The canonical source is `src/data/lessons/<language>.ts`. Do not add new content to the legacy files in `src/data/`.
+- `src/data/all-languages.ts` and `src/data/lessons/all-languages.ts` are aggregate files — do not add new lessons here; add to individual language files instead.
+- `src/data/swahili-structured.ts` mirrors `src/data/lessons/swahili-structured.ts` — the `lessons/` version is canonical.
 - `src/firebase.js` and `src/firebase.ts` both exist — use only `src/firebase.ts`. The `.js` file is a legacy artifact.
 - `src/main.tsx.backup` is a backup file — ignore it.
+- `src/components/splash/SplashScreen.tsx` exists but is unused in App.tsx.
 
 ### Adding a New Language
 
@@ -139,8 +150,12 @@ Every user-facing string in lesson/exercise data must have English + French vari
 
 `src/utils/igboTextUtils.ts` exports `checkIgboAnswer()` for diacritic-flexible, case-insensitive answer matching. Use this instead of strict equality when validating Igbo exercise responses.
 
+### Hearts Regeneration (`src/utils/heartsTimer.ts`)
+
+Hearts refill at **1 heart per 5 hours** (up to max 5). The `HeartsData` object (`currentHearts`, `lastResetTime`, `maxHearts`) is stored in `users/{uid}.heartsData` in Firestore for authenticated users and in `localStorage` key `afroslang_guest_hearts` for guests. `AuthContext` calls `getCurrentHeartsStatus()` on login to apply any hearts that regenerated while the user was away and writes the update back to Firestore.
+
 ### Deployment
 
 - **Vercel** is the target host (`vercel.json` in root). No special build config needed — Vite output in `dist/` is served directly.
 - Firebase config is read from `VITE_FIREBASE_*` env vars, with hardcoded fallbacks in `src/firebase.ts` for development without `.env`.
-- Stripe API keys go in `VITE_STRIPE_*` env vars; webhook handler lives in `src/api/stripe-webhook.ts`.
+- Stripe API keys go in `VITE_STRIPE_*` env vars; the live webhook handler is `functions/src/index.ts`, not `src/api/stripe-webhook.ts` (that file is reference-only).
