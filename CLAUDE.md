@@ -18,12 +18,19 @@ npm run typecheck    # TypeScript check (no emit)
 npm run lint         # ESLint (zero warnings threshold)
 npm run validate:lessons  # Validate all lesson data integrity
 
+# Capacitor (native mobile)
+npm run build:android   # Build + sync + open Android Studio
+npm run build:ios       # Build + sync + open Xcode
+npm run cap:sync        # Build + sync without opening IDE
+
 # Firebase Cloud Functions (Stripe webhook)
 cd functions && npm install   # Install function dependencies
 firebase deploy --only functions  # Deploy the webhook to Firebase
 ```
 
 Node 22.x is required.
+
+**No tests exist** — there is no testing infrastructure (no Vitest, Jest, or spec files).
 
 ## Architecture
 
@@ -98,10 +105,19 @@ Dark luxury theme defined in `src/styles/globals.css`:
 
 Two in-app currencies: **Gems** (earned by completing lessons) and **Sandbits** (unused currently). Shop actions: hearts refill (100 gems), XP boost (150 sandbits → 2× XP for 1 hour). XP boost expiry is stored on `userData.xpBoostExpiry` (timestamp). Plus subscribers bypass the hearts system entirely (hearts set to 999).
 
+### Path Aliases
+
+TypeScript path alias `@/*` maps to `./src/*` (configured in `tsconfig.json`). Use `@/components/...`, `@/utils/...`, etc. for imports.
+
+### TypeScript Strictness
+
+`tsconfig.json` enables `strict`, `noUnusedLocals`, and `noUnusedParameters`. `npm run typecheck` (or `tsc --noEmit`) will fail on unused variables — remove them rather than prefixing with `_`.
+
 ### UI Components & Screen Modules
 
 - `src/components/ui/` — shadcn/ui component library (do not modify these files)
-- `src/features/` — feature-level screens: `language-select/`, `lessons/`, `store/`
+- `src/features/` — feature-level screens: `language-select/`, `lessons/`, `store/` (`auth/` and `progress/` subdirs exist but are empty)
+- `src/hooks/` — directory exists but is empty; hook logic lives in components or `src/utils/`
 - `src/components/intro/` — `AfroslangIntro` (animated logo reveal, plays once per session)
 - `src/components/splash/` — `SplashScreen` (3D shattering text animation, plays once per session after auth)
 - `src/components/landing/` — `LandingPage` with login/signup bottom sheets and `RainCanvas` animated background

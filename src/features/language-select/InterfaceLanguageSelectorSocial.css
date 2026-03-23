@@ -821,6 +821,7 @@ details[open] .ils-info-summary::after { transform: rotate(90deg); }
   .ils-panel-close  { display: flex; }
 
   .ils-grid-wrap {
+    width: 100%;
     padding: 12px 12px 120px;
   }
 
@@ -835,6 +836,11 @@ details[open] .ils-info-summary::after { transform: rotate(90deg); }
   .ils-about-grid  { grid-template-columns: 1fr; }
 
   .afroSignInBtn { padding: 5px 10px; font-size: 0.66rem; }
+
+  /* Active flag sits above the backdrop so the user can see their selection */
+  .ils-flag-btn--active {
+    z-index: 49;
+  }
 }
 
 /* ── Tablet (768px – 1023px) ── */
