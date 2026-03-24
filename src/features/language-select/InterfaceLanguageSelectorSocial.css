@@ -557,6 +557,8 @@
 .ils-flag-btn--active {
   border-color: #b00020 !important;
   background: rgba(176, 0, 32, 0.12) !important;
+  animation: none !important;
+  opacity: 1 !important;
   box-shadow: 0 0 0 1px rgba(176, 0, 32, 0.4), 0 4px 16px rgba(176, 0, 32, 0.18) !important;
   z-index: 1;
 }

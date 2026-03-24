@@ -164,7 +164,19 @@ export function buildEnrichedQueue(
 
   // ── Preamble enriched items ──────────────────────────────────────────────
   // Conversation intro (first item before any quiz exercises)
-  const convoScript = getConversationScript(languageId, userName, lessonTitle);
+  const rawScript = getConversationScript(languageId, userName, lessonTitle);
+  // Shuffle options for every user turn so the correct answer isn't always first
+  const convoScript = rawScript.map((turn, i) => {
+    if (turn.speaker !== 'user' || !turn.options || turn.options.length <= 1) return turn;
+    const correctIdx = turn.correctIndex ?? 0;
+    const indices = seededShuffle(turn.options.map((_, j) => j), lessonSeed + i + 37);
+    return {
+      ...turn,
+      options:    indices.map(j => turn.options![j]),
+      optionsFr:  turn.optionsFr ? indices.map(j => turn.optionsFr![j]) : undefined,
+      correctIndex: indices.indexOf(correctIdx),
+    };
+  });
   if (convoScript.length >= 2) {
     queue.push({
       id: 'conversation-intro',
