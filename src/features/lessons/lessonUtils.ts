@@ -1,5 +1,6 @@
-import { Exercise, ConversationTurn, ToneEntry } from '../../types';
+import { Exercise, ToneEntry } from '../../types';
 import { CulturalFact } from '../../data/culturalFacts';
+import { getConversationScript } from './conversationScripts';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -53,23 +54,6 @@ const TONE_DATA: Record<string, ToneEntry[]> = {
   ],
 };
 
-const GREETINGS: Record<string, { phrase: string; translation: string; translationFr: string }> = {
-  igbo:     { phrase: 'Ndewo!',      translation: 'Hello!',   translationFr: 'Bonjour !' },
-  yoruba:   { phrase: 'Ẹ káàárọ̀!',  translation: 'Good morning!', translationFr: 'Bonjour !' },
-  hausa:    { phrase: 'Sannu!',      translation: 'Hello!',   translationFr: 'Bonjour !' },
-  swahili:  { phrase: 'Habari!',     translation: 'How are you?', translationFr: 'Comment ça va ?' },
-  zulu:     { phrase: 'Sawubona!',   translation: 'Hello!',   translationFr: 'Bonjour !' },
-  amharic:  { phrase: 'ሰላም!',       translation: 'Hello!',   translationFr: 'Bonjour !' },
-  wolof:    { phrase: 'Salaam!',     translation: 'Hello!',   translationFr: 'Bonjour !' },
-  twi:      { phrase: 'Akwaaba!',    translation: 'Welcome!', translationFr: 'Bienvenue !' },
-  lingala:  { phrase: 'Mbote!',      translation: 'Hello!',   translationFr: 'Bonjour !' },
-  shona:    { phrase: 'Mhoro!',      translation: 'Hello!',   translationFr: 'Bonjour !' },
-  arabic:   { phrase: 'أهلاً!',      translation: 'Hello!',   translationFr: 'Bonjour !' },
-  berber:   { phrase: 'Azul!',       translation: 'Hello!',   translationFr: 'Bonjour !' },
-  somali:   { phrase: 'Salaan!',     translation: 'Hello!',   translationFr: 'Bonjour !' },
-  moore:    { phrase: 'Nee windiga!',translation: 'Good morning!', translationFr: 'Bonjour !' },
-  chichewa: { phrase: 'Moni!',       translation: 'Hello!',   translationFr: 'Bonjour !' },
-};
 
 // ── Deterministic shuffle (no Math.random so useMemo stays stable) ────────────
 
@@ -122,54 +106,8 @@ function makeToneExercise(languageId: string, seed: number): EnrichedExercise {
 }
 
 // ── Conversation builder ──────────────────────────────────────────────────────
-
-function buildConversationScript(
-  exercises: Exercise[],
-  languageId: string,
-): ConversationTurn[] {
-  const vocab = exercises
-    .filter(ex => ex.type === 'multiple-choice' && ex.correctAnswer.trim())
-    .slice(0, 4);
-
-  if (vocab.length < 2) return [];
-
-  const greeting = GREETINGS[languageId] ?? { phrase: 'Hello!', translation: 'Hello!', translationFr: 'Bonjour !' };
-  const [v1, v2, v3] = vocab;
-
-  return [
-    {
-      speaker: 'guide',
-      text: greeting.phrase,
-      textTranslation: greeting.translation,
-      textTranslationFr: greeting.translationFr,
-    },
-    {
-      speaker: 'user',
-      text: v1.correctAnswer,
-      textTranslation: v1.question,
-      options: seededShuffle(
-        [v1.correctAnswer, v2.correctAnswer, v3?.correctAnswer ?? 'Ọ dị mma'].filter(Boolean),
-        47,
-      ),
-      correctIndex: 0,
-    },
-    {
-      speaker: 'guide',
-      text: v2.correctAnswer,
-      textTranslation: v2.question,
-    },
-    {
-      speaker: 'user',
-      text: v2.correctAnswer,
-      textTranslation: v2.question,
-      options: seededShuffle(
-        [v2.correctAnswer, v1.correctAnswer, v3?.correctAnswer ?? greeting.phrase].filter(Boolean),
-        83,
-      ),
-      correctIndex: 0,
-    },
-  ];
-}
+// Uses per-language greeting scripts from conversationScripts.ts.
+// The user's name (or 'Friend') is injected into the guide's opening line.
 
 // ── Story exercise ────────────────────────────────────────────────────────────
 
@@ -216,6 +154,7 @@ export function buildEnrichedQueue(
   facts: CulturalFact[],
   lessonType: string,
   lessonSeed: number,
+  userName = 'Friend',
 ): EnrichedExercise[] {
   const queue: EnrichedExercise[] = [];
   const isTonal = TONAL_LANGUAGES.has(languageId);
@@ -224,7 +163,7 @@ export function buildEnrichedQueue(
 
   // ── Preamble enriched items ──────────────────────────────────────────────
   // Conversation intro (first item before any quiz exercises)
-  const convoScript = buildConversationScript(exercises, languageId);
+  const convoScript = getConversationScript(languageId, userName);
   if (convoScript.length >= 2) {
     queue.push({
       id: 'conversation-intro',

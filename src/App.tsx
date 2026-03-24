@@ -482,6 +482,7 @@ function App() {
             currentGems={userData?.gems ?? 0}
             onRefillWithGems={handleRefillHeartsWithGems}
             userId={user?.uid}
+            userName={userData?.name || user?.displayName || undefined}
             isGuest={isGuest}
             onComplete={handleLessonComplete}
             onExit={handleExitLesson}

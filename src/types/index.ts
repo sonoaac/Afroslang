@@ -73,6 +73,8 @@ export interface ConversationTurn {
   options?: string[];            // choices for user turns
   optionsFr?: string[];
   correctIndex?: number;         // index into options[] that is correct
+  wrongExplanation?: string;     // shown when user picks wrong answer (EN)
+  wrongExplanationFr?: string;
 }
 
 export interface StoryWord {

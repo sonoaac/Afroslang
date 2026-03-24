@@ -17,10 +17,11 @@ interface ConversationProps {
 export function ConversationExercise({ exercise, interfaceLanguage, onComplete }: ConversationProps) {
   const isEn   = interfaceLanguage === 'en';
   const script = exercise.conversationScript ?? [];
-  const [turnIdx,   setTurnIdx]   = useState(0);
-  const [mistakes,  setMistakes]  = useState(0);
-  const [picked,    setPicked]    = useState<number | null>(null);
+  const [turnIdx,    setTurnIdx]    = useState(0);
+  const [mistakes,   setMistakes]   = useState(0);
+  const [picked,     setPicked]     = useState<number | null>(null);
   const [showReveal, setShowReveal] = useState(false);
+  const [showWrongExp, setShowWrongExp] = useState(false);
 
   if (script.length === 0) {
     onComplete(true);
@@ -28,10 +29,14 @@ export function ConversationExercise({ exercise, interfaceLanguage, onComplete }
   }
 
   const turn = script[turnIdx];
+  const wrongExplanation = isEn
+    ? (turn.wrongExplanation ?? '')
+    : (turn.wrongExplanationFr ?? turn.wrongExplanation ?? '');
 
   const advance = () => {
     setPicked(null);
     setShowReveal(false);
+    setShowWrongExp(false);
     if (turnIdx + 1 >= script.length) {
       onComplete(mistakes === 0);
     } else {
@@ -45,6 +50,7 @@ export function ConversationExercise({ exercise, interfaceLanguage, onComplete }
     setShowReveal(true);
     if (optIdx !== (turn.correctIndex ?? 0)) {
       setMistakes(m => m + 1);
+      setShowWrongExp(true);
     }
   };
 
@@ -124,6 +130,13 @@ export function ConversationExercise({ exercise, interfaceLanguage, onComplete }
           );
         })}
       </div>
+
+      {showReveal && showWrongExp && wrongExplanation && (
+        <div className="ls-convo-wrong-exp">
+          <span className="ls-convo-wrong-exp-icon">💡</span>
+          <p className="ls-convo-wrong-exp-text">{wrongExplanation}</p>
+        </div>
+      )}
 
       {showReveal && (
         <button className="ls-btn-next" style={{ width: '100%', marginTop: 12 }} onClick={advance}>

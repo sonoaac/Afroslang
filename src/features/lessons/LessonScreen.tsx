@@ -36,6 +36,7 @@ interface LessonScreenProps {
   currentGems?: number;
   onRefillWithGems?: () => Promise<boolean>;
   userId?: string;
+  userName?: string;
   isGuest?: boolean;
   onComplete: (xpEarned: number, heartsLost: number, heartsGained: number) => void;
   onExit: () => void;
@@ -58,6 +59,7 @@ export function LessonScreen({
   currentGems = 0,
   onRefillWithGems,
   userId,
+  userName = 'Friend',
   isGuest = false,
   onComplete,
   onExit,
@@ -86,9 +88,9 @@ export function LessonScreen({
   }, [lesson.id]);
 
   const enrichedQueue = useMemo(
-    () => buildEnrichedQueue(lesson.exercises, languageId, facts, lesson.type, lessonSeed),
+    () => buildEnrichedQueue(lesson.exercises, languageId, facts, lesson.type, lessonSeed, userName),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [lesson.id],
+    [lesson.id, userName],
   );
 
   // ── Quiz state ────────────────────────────────────────────────────────────
