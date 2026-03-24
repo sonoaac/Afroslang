@@ -155,6 +155,7 @@ export function buildEnrichedQueue(
   lessonType: string,
   lessonSeed: number,
   userName = 'Friend',
+  lessonTitle = '',
 ): EnrichedExercise[] {
   const queue: EnrichedExercise[] = [];
   const isTonal = TONAL_LANGUAGES.has(languageId);
@@ -163,7 +164,7 @@ export function buildEnrichedQueue(
 
   // ── Preamble enriched items ──────────────────────────────────────────────
   // Conversation intro (first item before any quiz exercises)
-  const convoScript = getConversationScript(languageId, userName);
+  const convoScript = getConversationScript(languageId, userName, lessonTitle);
   if (convoScript.length >= 2) {
     queue.push({
       id: 'conversation-intro',
