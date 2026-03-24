@@ -473,6 +473,7 @@ function App() {
           <LessonScreen
             interfaceLanguage={interfaceLanguage}
             lesson={activeLesson}
+            languageId={currentLanguage}
             languageName={getLanguageById(currentLanguage)?.name || ''}
             hearts={getCurrentProgress().hearts}
             heartsData={userData?.heartsData}

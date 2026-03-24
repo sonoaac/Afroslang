@@ -1,17 +1,34 @@
 import { useState, useEffect, useMemo } from 'react';
-import { InterfaceLanguage, Lesson, Exercise } from '../../types';
+import { InterfaceLanguage, Lesson } from '../../types';
 import { X, Heart, CheckCircle2, XCircle, Lightbulb, RotateCcw, Home } from 'lucide-react';
 import { checkIgboAnswer } from '../../utils/igboTextUtils';
 import { HeartsTimer } from '../../components/ui/HeartsTimer';
 import { HeartsOutModal } from '../../components/ui/HeartsOutModal';
 import { GuestLimitModal } from '../../components/ui/GuestLimitModal';
 import { HeartsData, updateHearts, updateGuestHearts } from '../../utils/heartsTimer';
+import { culturalFacts } from '../../data/culturalFacts';
+import {
+  extractTeachVocab,
+  buildEnrichedQueue,
+  EnrichedExercise,
+} from './lessonUtils';
+import { TeachMode, PreviewPhase } from './IntroPhases';
+import { FlashcardExercise, AudioMatchExercise, WordOrderExercise } from './ExerciseTypes';
+import { CulturalCardExercise, ToneTrainerExercise } from './EnrichedExercises';
+import { ConversationExercise, StoryExercise } from './AdvancedExercises';
 import './LessonPremium.css';
+
+// ── Phase type ────────────────────────────────────────────────────────────────
+
+type LessonPhase = 'intro' | 'teach' | 'preview' | 'quiz';
+
+// ── Props ─────────────────────────────────────────────────────────────────────
 
 interface LessonScreenProps {
   interfaceLanguage: InterfaceLanguage;
   lesson: Lesson;
   languageName: string;
+  languageId: string;
   hearts: number;
   heartsData?: HeartsData;
   isSubscribed?: boolean;
@@ -27,15 +44,13 @@ interface LessonScreenProps {
   onGoToSubscription?: () => void;
 }
 
-interface ExerciseWithState extends Exercise {
-  wasWrong?: boolean; // Track if this was previously answered wrong
-  hasRetried?: boolean; // Track if redemption was attempted
-}
+// ── Component ─────────────────────────────────────────────────────────────────
 
 export function LessonScreen({
   interfaceLanguage,
   lesson,
   languageName,
+  languageId,
   hearts,
   heartsData,
   isSubscribed = false,
@@ -51,220 +66,205 @@ export function LessonScreen({
   onGoToSubscription,
 }: LessonScreenProps) {
   const isEnglish = interfaceLanguage === 'en';
-  
-  // Initialize exercise queue with all exercises
-  const [exerciseQueue, setExerciseQueue] = useState<ExerciseWithState[]>(() => 
-    (lesson.exercises && lesson.exercises.length > 0) 
-      ? [...lesson.exercises].map(ex => ({ ...ex }))
-      : []
-  );
-  const [currentExercise, setCurrentExercise] = useState<ExerciseWithState | null>(
-    exerciseQueue.length > 0 ? exerciseQueue[0] : null
-  );
-  const [correctAnswers, setCorrectAnswers] = useState(0);
-  
-  const [userAnswer, setUserAnswer] = useState('');
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
-  const [totalHeartsLost, setTotalHeartsLost] = useState(0);
-  const [totalHeartsGained, setTotalHeartsGained] = useState(0);
-  const [currentHearts, setCurrentHearts] = useState(hearts);
-  const [showHeartsOutModal, setShowHeartsOutModal] = useState(false);
-  const [showGuestLimitModal, setShowGuestLimitModal] = useState(false);
-  const [showLessonIntro, setShowLessonIntro] = useState(true);
 
-  // Extract stage number from stageId (e.g., "swahili-stage-1" -> 1)
-  const getStageNumber = () => {
-    const match = lesson.stageId.match(/stage-(\d+)/);
-    return match ? parseInt(match[1], 10) : 1;
-  };
+  // ── Lesson phase ───────────────────────────────────────────────────────────
+  const [lessonPhase, setLessonPhase] = useState<LessonPhase>('intro');
 
-  const stageNumber = getStageNumber();
-  const currentStep = 1; // Intro is step 1
-  const totalSteps = 3; // Intro, questions, completion
+  // ── Vocab for teach/preview phases ────────────────────────────────────────
+  const teachVocab = useMemo(() => extractTeachVocab(lesson.exercises), [lesson.exercises]);
 
-  const totalQuestions = lesson.exercises.length;
-  const progress = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
+  // ── Enriched exercise queue ───────────────────────────────────────────────
+  const facts = culturalFacts[languageId] ?? [];
 
-  // Check guest lesson limit
-  useEffect(() => {
-    if (isGuest) {
-      // Get completed lessons count from localStorage
-      const guestProgress = JSON.parse(localStorage.getItem('afroslang_guest_progress') || '{}');
-      const completedLessons = Object.values(guestProgress.languages || {}).reduce((total: number, lang: any) => {
-        return total + (lang.completedLessons?.length || 0);
-      }, 0);
-      
-      if (completedLessons >= 3) {
-        setShowGuestLimitModal(true);
-      }
+  // Stable seed derived from lesson id
+  const lessonSeed = useMemo(() => {
+    let h = 0;
+    for (let i = 0; i < lesson.id.length; i++) {
+      h = (Math.imul(31, h) + lesson.id.charCodeAt(i)) | 0;
     }
+    return Math.abs(h);
+  }, [lesson.id]);
+
+  const enrichedQueue = useMemo(
+    () => buildEnrichedQueue(lesson.exercises, languageId, facts, lesson.type, lessonSeed),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [lesson.id],
+  );
+
+  // ── Quiz state ────────────────────────────────────────────────────────────
+  const [exerciseQueue, setExerciseQueue] = useState<EnrichedExercise[]>(() =>
+    lesson.exercises.length > 0 ? enrichedQueue.map(ex => ({ ...ex })) : [],
+  );
+
+  const [currentExercise, setCurrentExercise] = useState<EnrichedExercise | null>(
+    exerciseQueue.length > 0 ? exerciseQueue[0] : null,
+  );
+
+  // Only count non-enriched exercises toward the score
+  const totalQuestions = useMemo(
+    () => enrichedQueue.filter(ex => !ex.isEnriched).length,
+    [enrichedQueue],
+  );
+
+  const [correctAnswers,    setCorrectAnswers]    = useState(0);
+  const [userAnswer,        setUserAnswer]        = useState('');
+  const [showFeedback,      setShowFeedback]      = useState(false);
+  const [isCorrect,         setIsCorrect]         = useState(false);
+  const [totalHeartsLost,   setTotalHeartsLost]   = useState(0);
+  const [totalHeartsGained, setTotalHeartsGained] = useState(0);
+  const [currentHearts,     setCurrentHearts]     = useState(hearts);
+  const [showHeartsOutModal,  setShowHeartsOutModal]  = useState(false);
+  const [showGuestLimitModal, setShowGuestLimitModal] = useState(false);
+
+  // Stage number for intro eyebrow
+  const stageNumber = useMemo(() => {
+    const m = lesson.stageId.match(/stage-(\d+)/);
+    return m ? parseInt(m[1], 10) : 1;
+  }, [lesson.stageId]);
+
+  // ── Guest limit check ──────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!isGuest) return;
+    const guestProgress = JSON.parse(localStorage.getItem('afroslang_guest_progress') || '{}');
+    const completed = Object.values(guestProgress.languages || {}).reduce(
+      (total: number, lang: unknown) => total + ((lang as { completedLessons?: string[] }).completedLessons?.length ?? 0),
+      0,
+    );
+    if (completed >= 3) setShowGuestLimitModal(true);
   }, [isGuest]);
 
+  // Reset answer when exercise changes
   useEffect(() => {
-    // Reset answer when exercise changes
     setUserAnswer('');
     setShowFeedback(false);
   }, [currentExercise?.id]);
 
-  // Shuffle options once per exercise so correct answer isn't always in the same position
+  // Shuffle options deterministically per exercise
   const shuffledOptions = useMemo(() => {
     if (!currentExercise) return [];
-    const opts = (!isEnglish && currentExercise.optionsFr)
-      ? currentExercise.optionsFr
-      : (currentExercise.options || []);
+    const opts =
+      !isEnglish && currentExercise.optionsFr
+        ? currentExercise.optionsFr
+        : currentExercise.options ?? [];
     const arr = [...opts];
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentExercise?.id, isEnglish]);
 
-  if (!currentExercise) {
-    return (
-      <div className="ls-root" style={{ alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center', padding: '2rem', maxWidth: 400 }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📚</div>
-          <h2 style={{ fontFamily: "'Times New Roman', Georgia, serif", color: '#fff', marginBottom: '0.75rem' }}>
-            {isEnglish ? 'No lessons available yet' : 'Aucune leçon disponible pour le moment'}
-          </h2>
-          <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '1.5rem', fontFamily: "'Times New Roman', Georgia, serif" }}>
-            {isEnglish
-              ? 'More lessons are coming soon for this language! Check back later.'
-              : 'Plus de leçons arrivent bientôt pour cette langue! Revenez plus tard.'}
-          </p>
-          <button onClick={onExit} className="ls-btn-check">
-            {isEnglish ? '← Go Back' : '← Retour'}
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // ── Helpers ───────────────────────────────────────────────────────────────
 
-  // Get the correct answer based on interface language
-  const getCorrectAnswer = () => {
-    if (!isEnglish && currentExercise.correctAnswerFr) {
-      return currentExercise.correctAnswerFr;
+  const getCorrectAnswer = () =>
+    !isEnglish && currentExercise?.correctAnswerFr
+      ? currentExercise.correctAnswerFr
+      : currentExercise?.correctAnswer ?? '';
+
+  const getLessonIcon = () =>
+    ({ vocabulary: '📚', grammar: '📝', writing: '✍️', culture: '🎭' }[lesson.type]);
+
+  const progress = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
+
+  const isRedemption =
+    (currentExercise?.wasWrong ?? false) && !(currentExercise?.hasRetried ?? false);
+
+  // ── Heart / scoring helpers ───────────────────────────────────────────────
+
+  const loseHeart = () => {
+    setTotalHeartsLost(prev => prev + 1);
+    if (currentHearts > 0) {
+      setCurrentHearts(prev => Math.max(0, prev - 1));
+      if (userId && !isGuest) updateHearts(userId, 1);
+      else if (isGuest) updateGuestHearts(1);
     }
-    return currentExercise.correctAnswer;
   };
 
-  // (getOptions kept for potential future use — currently options resolved via shuffledOptions)
+  const gainHalfHeart = () => {
+    setTotalHeartsGained(prev => prev + 0.5);
+    setCurrentHearts(prev => Math.min(5, prev + 0.5));
+  };
+
+  // ── Submit / Next ─────────────────────────────────────────────────────────
 
   const handleSubmit = () => {
-    // Check if user has hearts (for non-subscribers)
     if (!isSubscribed && currentHearts <= 0) {
       setShowHeartsOutModal(true);
       return;
     }
-
     const correctAnswer = getCorrectAnswer();
-    // Use Igbo text utility for better accent handling
     const correct = checkIgboAnswer(userAnswer, correctAnswer);
     setIsCorrect(correct);
     setShowFeedback(true);
 
     if (correct) {
-      setCorrectAnswers(prev => prev + 1);
-      
-      // If this was a redemption, give half heart back
-      if (currentExercise.wasWrong && !currentExercise.hasRetried) {
-        setTotalHeartsGained(prev => prev + 0.5);
-        setCurrentHearts(prev => Math.min(5, prev + 0.5));
-      }
+      if (!currentExercise?.isEnriched) setCorrectAnswers(prev => prev + 1);
+      if (isRedemption) gainHalfHeart();
     } else {
-      // Wrong answer - only lose hearts if not subscribed
       if (!isSubscribed) {
-        if (currentExercise.wasWrong && !currentExercise.hasRetried) {
-          // Failed redemption - lose another heart
-          setTotalHeartsLost(prev => prev + 1);
-          if (currentHearts > 0) {
-            setCurrentHearts(prev => Math.max(0, prev - 1));
-            
-            // Update hearts in database/localStorage
-            if (userId && !isGuest) {
-              updateHearts(userId, 1);
-            } else if (isGuest) {
-              updateGuestHearts(1);
-            }
-          }
-        } else if (!currentExercise.wasWrong) {
-          // First time wrong - lose heart and add back to queue randomly
-          setTotalHeartsLost(prev => prev + 1);
-          if (currentHearts > 0) {
-            setCurrentHearts(prev => Math.max(0, prev - 1));
-            
-            // Update hearts in database/localStorage
-            if (userId && !isGuest) {
-              updateHearts(userId, 1);
-            } else if (isGuest) {
-              updateGuestHearts(1);
-            }
-          }
-        }
+        if (isRedemption || !currentExercise?.wasWrong) loseHeart();
       }
-        
-      // Add this question back to the queue at a random position (not immediately next)
-      const wrongExercise: ExerciseWithState = { 
-        ...currentExercise, 
+      const wrongExercise: EnrichedExercise = {
+        ...currentExercise!,
         wasWrong: true,
-        hasRetried: false
+        hasRetried: false,
       };
-      
-      // Insert at a random position in the remaining queue (at least 2 positions ahead)
-      setExerciseQueue(prevQueue => {
-        const newQueue = [...prevQueue];
-        if (newQueue.length > 2) {
-          const randomPos = Math.floor(Math.random() * (newQueue.length - 2)) + 2;
-          newQueue.splice(randomPos, 0, wrongExercise);
-        } else {
-          newQueue.push(wrongExercise);
-        }
-        return newQueue;
+      setExerciseQueue(prev => {
+        const q = [...prev];
+        const pos = q.length > 2 ? Math.floor(Math.random() * (q.length - 2)) + 2 : q.length;
+        q.splice(pos, 0, wrongExercise);
+        return q;
       });
     }
   };
 
-  const handleNext = () => {
-    // Remove current exercise from queue
+  const advanceQueue = () => {
     const newQueue = exerciseQueue.slice(1);
     setExerciseQueue(newQueue);
-    
     if (newQueue.length > 0) {
       setCurrentExercise(newQueue[0]);
       setUserAnswer('');
       setShowFeedback(false);
     } else {
-      // Lesson complete — XP based on correct answers + perfect bonus
-      const xpPerCorrect = Math.floor(lesson.xpReward / totalQuestions);
-      const baseXp = Math.max(correctAnswers * xpPerCorrect, 5);
-      const isPerfect = totalHeartsLost === 0;
-      const perfectBonus = isPerfect ? 5 : 0; // +5 XP for zero mistakes (Duolingo style)
-      const xpEarned = xpBoostActive
-        ? (baseXp + perfectBonus) * 2   // Plus: 2× everything
-        : baseXp + perfectBonus;         // Free: base + perfect bonus
+      const xpPerCorrect = Math.floor(lesson.xpReward / Math.max(totalQuestions, 1));
+      const baseXp       = Math.max(correctAnswers * xpPerCorrect, 5);
+      const perfectBonus = totalHeartsLost === 0 ? 5 : 0;
+      const xpEarned     = xpBoostActive ? (baseXp + perfectBonus) * 2 : baseXp + perfectBonus;
       onComplete(xpEarned, totalHeartsLost, totalHeartsGained);
     }
   };
 
-  const getLessonIcon = () => {
-    const icons = {
-      vocabulary: '📚',
-      grammar: '📝',
-      writing: '✍️',
-      culture: '🎭'
-    };
-    return icons[lesson.type];
+  const handleNext = () => advanceQueue();
+
+  // ── Word-order answer ─────────────────────────────────────────────────────
+  const handleWordOrderAnswer = (assembled: string) => {
+    if (!isSubscribed && currentHearts <= 0) {
+      setShowHeartsOutModal(true);
+      return;
+    }
+    const correctAnswer = getCorrectAnswer();
+    const correct = assembled.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
+    setUserAnswer(assembled);
+    setIsCorrect(correct);
+    setShowFeedback(true);
+    if (correct) {
+      if (!currentExercise?.isEnriched) setCorrectAnswers(prev => prev + 1);
+      if (isRedemption) gainHalfHeart();
+    } else {
+      if (!isSubscribed) loseHeart();
+      const wrongExercise: EnrichedExercise = { ...currentExercise!, wasWrong: true, hasRetried: false };
+      setExerciseQueue(prev => {
+        const q = [...prev];
+        const pos = q.length > 2 ? Math.floor(Math.random() * (q.length - 2)) + 2 : q.length;
+        q.splice(pos, 0, wrongExercise);
+        return q;
+      });
+    }
   };
 
-
-  // Render hearts with half heart support and infinity for subscribers
+  // ── Hearts renderer ───────────────────────────────────────────────────────
   const renderHearts = () => {
-    const heartItems = [];
-
-    // If subscribed, show infinity symbol
     if (isSubscribed) {
       return (
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
@@ -275,27 +275,13 @@ export function LessonScreen({
         </div>
       );
     }
-
-    // For non-subscribers, show regular hearts
-    const fullHearts = Math.floor(currentHearts);
+    const fullHearts   = Math.floor(currentHearts);
     const hasHalfHeart = currentHearts % 1 !== 0;
-
-    for (let i = 0; i < 5; i++) {
+    return Array.from({ length: 5 }, (_, i) => {
       const isFull = i < fullHearts;
       const isHalf = i === fullHearts && hasHalfHeart;
-      heartItems.push(
-        <div
-          key={i}
-          style={{
-            width: 28,
-            height: 28,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: isFull || isHalf ? '#b00020' : 'rgba(255,255,255,0.06)',
-            border: '1px solid rgba(255,255,255,0.08)',
-          }}
-        >
+      return (
+        <div key={i} style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: isFull || isHalf ? '#b00020' : 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
           {isHalf ? (
             <div style={{ position: 'relative', width: 16, height: 16 }}>
               <Heart style={{ position: 'absolute', width: 16, height: 16, color: 'rgba(255,255,255,0.2)' }} />
@@ -308,15 +294,15 @@ export function LessonScreen({
           )}
         </div>
       );
-    }
-
-    return heartItems;
+    });
   };
 
-  const isRedemption = currentExercise.wasWrong && !currentExercise.hasRetried;
+  // ══════════════════════════════════════════════════════════════════════════
+  // PHASE RENDERING
+  // ══════════════════════════════════════════════════════════════════════════
 
-  // Lesson Intro Modal
-  if (showLessonIntro) {
+  // ── Phase 1: Intro card ───────────────────────────────────────────────────
+  if (lessonPhase === 'intro') {
     return (
       <div className="ls-intro-overlay">
         <div className="ls-intro-card">
@@ -330,33 +316,37 @@ export function LessonScreen({
             {isEnglish ? lesson.title : lesson.titleFr}
           </h1>
 
-          <span className="ls-intro-icon">
-            {lesson.type === 'vocabulary' ? '📚' :
-             lesson.type === 'grammar' ? '📝' :
-             lesson.type === 'writing' ? '✍️' : '🎭'}
-          </span>
+          <span className="ls-intro-icon">{getLessonIcon()}</span>
 
           <p className="ls-intro-desc">
             {isEnglish
-              ? `Learn essential ${lesson.type === 'vocabulary' ? 'vocabulary' : lesson.type === 'grammar' ? 'grammar' : lesson.type === 'writing' ? 'writing' : 'culture'} in ${languageName}`
-              : `Apprenez ${lesson.type === 'vocabulary' ? 'le vocabulaire essentiel' : lesson.type === 'grammar' ? 'la grammaire' : lesson.type === 'writing' ? "l'écriture" : 'la culture'} en ${languageName}`}
+              ? `Learn essential ${lesson.type} in ${languageName}`
+              : `Apprenez ${lesson.type === 'vocabulary' ? 'le vocabulaire' : lesson.type === 'grammar' ? 'la grammaire' : lesson.type === 'writing' ? "l'écriture" : 'la culture'} en ${languageName}`}
           </p>
           <p className="ls-intro-count">
             {lesson.exercises.length} {isEnglish ? 'exercises' : 'exercices'}
           </p>
 
+          {/* Step indicator — all 3 steps shown, step 1 active */}
           <div className="ls-intro-progress">
-            {[...Array(totalSteps)].map((_, idx) => (
-              <div key={idx} className={`ls-intro-prog-bar${idx < currentStep ? ' ls-intro-prog-bar--active' : ''}`} />
-            ))}
+            <div className="ls-intro-prog-bar ls-intro-prog-bar--active" />
+            <div className="ls-intro-prog-bar" />
+            <div className="ls-intro-prog-bar" />
           </div>
+          <p className="ls-intro-step-label">
+            {isEnglish ? 'Step 1 of 3 — Overview' : 'Étape 1 sur 3 — Aperçu'}
+          </p>
 
           <div className="ls-intro-actions">
-            <button onClick={() => setShowLessonIntro(false)} className="ls-intro-skip">
-              {isEnglish ? 'Skip' : 'Passer'}
+            <button className="ls-intro-skip" onClick={() => setLessonPhase('quiz')}>
+              {isEnglish ? 'Skip intro' : 'Passer l\'intro'}
             </button>
-            <button onClick={() => setShowLessonIntro(false)} className="ls-btn-check" style={{ flex: 1 }}>
-              {isEnglish ? 'BEGIN' : 'COMMENCER'}
+            <button
+              className="ls-btn-check"
+              style={{ flex: 1 }}
+              onClick={() => setLessonPhase(teachVocab.length > 0 ? 'teach' : 'quiz')}
+            >
+              {isEnglish ? 'NEXT →' : 'SUIVANT →'}
             </button>
           </div>
         </div>
@@ -364,47 +354,344 @@ export function LessonScreen({
     );
   }
 
-  return (
-    <div className="ls-root">
-      {/* ── Header ── */}
-      <div className="ls-header">
-        <div className="ls-header-inner">
-          <button onClick={onExit} className="ls-exit-btn" aria-label="Exit lesson">
-            <X style={{ width: 18, height: 18 }} strokeWidth={2.5} />
-          </button>
-          <div className="ls-progress-track">
-            <div className="ls-progress-fill" style={{ width: `${progress}%` }} />
-          </div>
-          <div className="ls-counter">{correctAnswers}/{totalQuestions}</div>
-          <div style={{ display: 'flex', gap: 3 }}>
-            {heartsData ? (
-              <HeartsTimer heartsData={heartsData} isSubscribed={isSubscribed} />
-            ) : (
-              renderHearts()
-            )}
-          </div>
-          <button onClick={onBackToLanguageSelect} className="ls-home-btn" aria-label="Home">
-            <Home style={{ width: 18, height: 18 }} strokeWidth={2} />
+  // ── Phase 2: Teach mode ───────────────────────────────────────────────────
+  if (lessonPhase === 'teach') {
+    return (
+      <TeachMode
+        vocab={teachVocab}
+        interfaceLanguage={interfaceLanguage}
+        languageName={languageName}
+        onComplete={() => setLessonPhase('preview')}
+        onSkip={() => setLessonPhase('quiz')}
+      />
+    );
+  }
+
+  // ── Phase 3: Preview flash ────────────────────────────────────────────────
+  if (lessonPhase === 'preview') {
+    return (
+      <PreviewPhase
+        vocab={teachVocab}
+        interfaceLanguage={interfaceLanguage}
+        languageName={languageName}
+        onComplete={() => setLessonPhase('quiz')}
+      />
+    );
+  }
+
+  // ── No exercises guard ────────────────────────────────────────────────────
+  if (!currentExercise) {
+    return (
+      <div className="ls-root" style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center', padding: '2rem', maxWidth: 400 }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📚</div>
+          <h2 style={{ fontFamily: "'Times New Roman', Georgia, serif", color: '#fff', marginBottom: '0.75rem' }}>
+            {isEnglish ? 'No lessons available yet' : 'Aucune leçon disponible'}
+          </h2>
+          <button onClick={onExit} className="ls-btn-check">
+            {isEnglish ? '← Go Back' : '← Retour'}
           </button>
         </div>
       </div>
+    );
+  }
 
-      {/* ── Body ── */}
+  // ══════════════════════════════════════════════════════════════════════════
+  // QUIZ PHASE
+  // ══════════════════════════════════════════════════════════════════════════
+
+  // ── Enriched non-quiz exercises bypass normal submit/next flow ─────────────
+
+  // Cultural card — just show, then advance
+  if (currentExercise.type === 'cultural-card') {
+    return (
+      <div className="ls-root">
+        <div className="ls-header">
+          <div className="ls-header-inner">
+            <button onClick={onExit} className="ls-exit-btn"><X style={{ width: 18, height: 18 }} strokeWidth={2.5} /></button>
+            <div className="ls-progress-track"><div className="ls-progress-fill" style={{ width: `${progress}%` }} /></div>
+            <div className="ls-counter">{correctAnswers}/{totalQuestions}</div>
+            <div style={{ display: 'flex', gap: 3 }}>{heartsData ? <HeartsTimer heartsData={heartsData} isSubscribed={isSubscribed} /> : renderHearts()}</div>
+            <button onClick={onBackToLanguageSelect} className="ls-home-btn"><Home style={{ width: 18, height: 18 }} /></button>
+          </div>
+        </div>
+        <div className="ls-body">
+          <CulturalCardExercise
+            exercise={currentExercise}
+            interfaceLanguage={interfaceLanguage}
+            onContinue={advanceQueue}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Conversation — manages its own turn state, calls back when done
+  if (currentExercise.type === 'conversation') {
+    return (
+      <div className="ls-root">
+        <div className="ls-header">
+          <div className="ls-header-inner">
+            <button onClick={onExit} className="ls-exit-btn"><X style={{ width: 18, height: 18 }} strokeWidth={2.5} /></button>
+            <div className="ls-progress-track"><div className="ls-progress-fill" style={{ width: `${progress}%` }} /></div>
+            <div className="ls-counter">{correctAnswers}/{totalQuestions}</div>
+            <div style={{ display: 'flex', gap: 3 }}>{heartsData ? <HeartsTimer heartsData={heartsData} isSubscribed={isSubscribed} /> : renderHearts()}</div>
+            <button onClick={onBackToLanguageSelect} className="ls-home-btn"><Home style={{ width: 18, height: 18 }} /></button>
+          </div>
+        </div>
+        <div className="ls-body">
+          <ConversationExercise
+            exercise={currentExercise}
+            interfaceLanguage={interfaceLanguage}
+            onComplete={(allCorrect) => {
+              if (!allCorrect && !isSubscribed) loseHeart();
+              advanceQueue();
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Flashcard (enriched) — manages its own flip/rate
+  if (currentExercise.type === 'flashcard') {
+    return (
+      <div className="ls-root">
+        <div className="ls-header">
+          <div className="ls-header-inner">
+            <button onClick={onExit} className="ls-exit-btn"><X style={{ width: 18, height: 18 }} strokeWidth={2.5} /></button>
+            <div className="ls-progress-track"><div className="ls-progress-fill" style={{ width: `${progress}%` }} /></div>
+            <div className="ls-counter">{correctAnswers}/{totalQuestions}</div>
+            <div style={{ display: 'flex', gap: 3 }}>{heartsData ? <HeartsTimer heartsData={heartsData} isSubscribed={isSubscribed} /> : renderHearts()}</div>
+            <button onClick={onBackToLanguageSelect} className="ls-home-btn"><Home style={{ width: 18, height: 18 }} /></button>
+          </div>
+        </div>
+        <div className="ls-body">
+          <FlashcardExercise
+            exercise={currentExercise}
+            interfaceLanguage={interfaceLanguage}
+            callbacks={{
+              onCorrect: advanceQueue,
+              onWrong: () => {
+                if (!isSubscribed) loseHeart();
+                advanceQueue();
+              },
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // ── Shared header (all remaining quiz exercise types) ──────────────────────
+
+  const renderHeader = () => (
+    <div className="ls-header">
+      <div className="ls-header-inner">
+        <button onClick={onExit} className="ls-exit-btn" aria-label="Exit">
+          <X style={{ width: 18, height: 18 }} strokeWidth={2.5} />
+        </button>
+        <div className="ls-progress-track">
+          <div className="ls-progress-fill" style={{ width: `${progress}%` }} />
+        </div>
+        <div className="ls-counter">{correctAnswers}/{totalQuestions}</div>
+        <div style={{ display: 'flex', gap: 3 }}>
+          {heartsData
+            ? <HeartsTimer heartsData={heartsData} isSubscribed={isSubscribed} />
+            : renderHearts()}
+        </div>
+        <button onClick={onBackToLanguageSelect} className="ls-home-btn" aria-label="Home">
+          <Home style={{ width: 18, height: 18 }} strokeWidth={2} />
+        </button>
+      </div>
+    </div>
+  );
+
+  // ── Story exercise ─────────────────────────────────────────────────────────
+  if (currentExercise.type === 'story') {
+    return (
+      <div className="ls-root">
+        {renderHeader()}
+        <div className="ls-body">
+          <StoryExercise
+            exercise={currentExercise}
+            interfaceLanguage={interfaceLanguage}
+            userAnswer={userAnswer}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+            onSelect={(opt) => {
+              setUserAnswer(opt);
+              const correct = checkIgboAnswer(opt, getCorrectAnswer());
+              setIsCorrect(correct);
+              setShowFeedback(true);
+              if (correct) {
+                if (!currentExercise.isEnriched) setCorrectAnswers(p => p + 1);
+              } else {
+                if (!isSubscribed) loseHeart();
+              }
+            }}
+          />
+          {showFeedback && (
+            <div className={`ls-feedback${isCorrect ? ' ls-feedback--correct' : ' ls-feedback--wrong'}`} style={{ marginTop: 12 }}>
+              <div className="ls-feedback-icon">
+                {isCorrect ? <CheckCircle2 style={{ width: 22, height: 22, color: '#4ade80' }} /> : <XCircle style={{ width: 22, height: 22, color: '#fca5a5' }} />}
+              </div>
+              <div className="ls-feedback-body">
+                <p className="ls-feedback-title">{isCorrect ? (isEnglish ? 'CORRECT!' : 'CORRECT !') : (isEnglish ? 'Correct answer:' : 'Bonne réponse :')}</p>
+                {!isCorrect && <p className="ls-feedback-answer">{getCorrectAnswer()}</p>}
+              </div>
+            </div>
+          )}
+        </div>
+        {showFeedback && (
+          <div className="ls-bottom"><div className="ls-bottom-inner">
+            <button onClick={handleNext} className="ls-btn-next">
+              {exerciseQueue.length > 1 ? (isEnglish ? 'NEXT →' : 'SUIVANT →') : (isEnglish ? 'FINISH' : 'TERMINER')}
+            </button>
+          </div></div>
+        )}
+      </div>
+    );
+  }
+
+  // ── Tone trainer ───────────────────────────────────────────────────────────
+  if (currentExercise.type === 'tone-trainer') {
+    return (
+      <div className="ls-root">
+        {renderHeader()}
+        <div className="ls-body">
+          {xpBoostActive && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', marginBottom: '0.75rem', background: 'rgba(255,214,10,0.1)', border: '1px solid rgba(255,214,10,0.3)', borderRadius: 8, padding: '6px 14px', fontSize: '0.8rem', color: '#ffd60a', fontWeight: 'bold' }}>
+              ⚡ {isEnglish ? '2× XP BOOST ACTIVE' : 'BOOST 2× XP ACTIF'}
+            </div>
+          )}
+          <div className="ls-meta-row">
+            <div className="ls-type-badge"><span>🎵</span><span>Tone Trainer</span></div>
+          </div>
+          <ToneTrainerExercise
+            exercise={currentExercise}
+            interfaceLanguage={interfaceLanguage}
+            userAnswer={userAnswer}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+            onSelect={(opt) => setUserAnswer(opt)}
+          />
+          {showFeedback && (
+            <div className={`ls-feedback${isCorrect ? ' ls-feedback--correct' : ' ls-feedback--wrong'}`} style={{ marginTop: 12 }}>
+              <div className="ls-feedback-icon">{isCorrect ? <CheckCircle2 style={{ width: 22, height: 22, color: '#4ade80' }} /> : <XCircle style={{ width: 22, height: 22, color: '#fca5a5' }} />}</div>
+              <div className="ls-feedback-body">
+                <p className="ls-feedback-title">{isCorrect ? (isEnglish ? 'CORRECT!' : 'CORRECT !') : (isEnglish ? 'Correct answer:' : 'Bonne réponse :')}</p>
+                {!isCorrect && <p className="ls-feedback-answer">{getCorrectAnswer()}</p>}
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="ls-bottom"><div className="ls-bottom-inner">
+          {!showFeedback ? (
+            <button onClick={handleSubmit} disabled={!userAnswer} className="ls-btn-check">{isEnglish ? '✓ CHECK' : '✓ VÉRIFIER'}</button>
+          ) : (
+            <button onClick={handleNext} className="ls-btn-next">{exerciseQueue.length > 1 ? (isEnglish ? 'NEXT →' : 'SUIVANT →') : (isEnglish ? 'FINISH' : 'TERMINER')}</button>
+          )}
+        </div></div>
+      </div>
+    );
+  }
+
+  // ── Audio match ────────────────────────────────────────────────────────────
+  if (currentExercise.type === 'audio-match') {
+    return (
+      <div className="ls-root">
+        {renderHeader()}
+        <div className="ls-body">
+          {xpBoostActive && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', marginBottom: '0.75rem', background: 'rgba(255,214,10,0.1)', border: '1px solid rgba(255,214,10,0.3)', borderRadius: 8, padding: '6px 14px', fontSize: '0.8rem', color: '#ffd60a', fontWeight: 'bold' }}>⚡ {isEnglish ? '2× XP BOOST ACTIVE' : 'BOOST 2× XP ACTIF'}</div>}
+          <div className="ls-meta-row">
+            <div className="ls-type-badge"><span>🔊</span><span>{isEnglish ? 'Listen & Match' : 'Écouter et Associer'}</span></div>
+            {isRedemption && !showFeedback && <div className="ls-redemption-badge"><RotateCcw style={{ width: 12, height: 12, display: 'inline', marginRight: 4 }} />{isEnglish ? 'REDEMPTION' : 'RÉDEMPTION'}</div>}
+          </div>
+          <AudioMatchExercise
+            exercise={currentExercise}
+            interfaceLanguage={interfaceLanguage}
+            shuffledOptions={shuffledOptions}
+            userAnswer={userAnswer}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+            onSelect={(opt) => setUserAnswer(opt)}
+          />
+          {showFeedback && (
+            <div className={`ls-feedback${isCorrect ? ' ls-feedback--correct' : ' ls-feedback--wrong'}`}>
+              <div className="ls-feedback-icon">{isCorrect ? <CheckCircle2 style={{ width: 22, height: 22, color: '#4ade80' }} /> : <XCircle style={{ width: 22, height: 22, color: '#fca5a5' }} />}</div>
+              <div className="ls-feedback-body">
+                <p className="ls-feedback-title">{isCorrect ? (isRedemption ? (isEnglish ? 'REDEEMED! +0.5 ♥' : 'RÉDEMPTÉ ! +0.5 ♥') : (isEnglish ? 'CORRECT!' : 'CORRECT !')) : (isEnglish ? 'Correct answer:' : 'Bonne réponse :')}</p>
+                {!isCorrect && <><p className="ls-feedback-answer">{getCorrectAnswer()}</p>{!isRedemption && <p className="ls-feedback-note">{isEnglish ? "You'll get a chance to redeem yourself later." : 'Vous aurez une chance de vous racheter plus tard.'}</p>}</>}
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="ls-bottom"><div className="ls-bottom-inner">
+          {!showFeedback ? (
+            <button onClick={handleSubmit} disabled={!userAnswer} className="ls-btn-check">{isEnglish ? '✓ CHECK' : '✓ VÉRIFIER'}</button>
+          ) : (
+            <button onClick={handleNext} className="ls-btn-next">{exerciseQueue.length > 1 ? (isEnglish ? 'NEXT →' : 'SUIVANT →') : (isEnglish ? 'FINISH' : 'TERMINER')}</button>
+          )}
+        </div></div>
+      </div>
+    );
+  }
+
+  // ── Word order ─────────────────────────────────────────────────────────────
+  if (currentExercise.type === 'word-order') {
+    return (
+      <div className="ls-root">
+        {renderHeader()}
+        <div className="ls-body">
+          {xpBoostActive && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', marginBottom: '0.75rem', background: 'rgba(255,214,10,0.1)', border: '1px solid rgba(255,214,10,0.3)', borderRadius: 8, padding: '6px 14px', fontSize: '0.8rem', color: '#ffd60a', fontWeight: 'bold' }}>⚡ {isEnglish ? '2× XP BOOST ACTIVE' : 'BOOST 2× XP ACTIF'}</div>}
+          <div className="ls-meta-row">
+            <div className="ls-type-badge"><span>🧩</span><span>{isEnglish ? 'Word Order' : 'Ordre des Mots'}</span></div>
+            {isRedemption && !showFeedback && <div className="ls-redemption-badge"><RotateCcw style={{ width: 12, height: 12, display: 'inline', marginRight: 4 }} />{isEnglish ? 'REDEMPTION' : 'RÉDEMPTION'}</div>}
+          </div>
+          <div className="ls-question-box">
+            <p className="ls-question-text">{isEnglish ? currentExercise.question : currentExercise.questionFr}</p>
+            {isRedemption && !showFeedback && <p className="ls-redemption-hint">{isEnglish ? '♥ Get half a heart back!' : '♥ Récupérez un demi-cœur !'}</p>}
+          </div>
+          <WordOrderExercise
+            exercise={currentExercise}
+            interfaceLanguage={interfaceLanguage}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+            onAnswer={handleWordOrderAnswer}
+          />
+          {showFeedback && (
+            <div className={`ls-feedback${isCorrect ? ' ls-feedback--correct' : ' ls-feedback--wrong'}`}>
+              <div className="ls-feedback-icon">{isCorrect ? <CheckCircle2 style={{ width: 22, height: 22, color: '#4ade80' }} /> : <XCircle style={{ width: 22, height: 22, color: '#fca5a5' }} />}</div>
+              <div className="ls-feedback-body">
+                <p className="ls-feedback-title">{isCorrect ? (isEnglish ? 'CORRECT!' : 'CORRECT !') : (isEnglish ? 'Correct order:' : 'Ordre correct :')}</p>
+                {!isCorrect && <p className="ls-feedback-answer">{getCorrectAnswer()}</p>}
+              </div>
+            </div>
+          )}
+        </div>
+        {showFeedback && (
+          <div className="ls-bottom"><div className="ls-bottom-inner">
+            <button onClick={handleNext} className="ls-btn-next">{exerciseQueue.length > 1 ? (isEnglish ? 'NEXT →' : 'SUIVANT →') : (isEnglish ? 'FINISH' : 'TERMINER')}</button>
+          </div></div>
+        )}
+      </div>
+    );
+  }
+
+  // ── Standard exercises (multiple-choice, type-answer, translate, fill-blank) ──
+
+  return (
+    <div className="ls-root">
+      {renderHeader()}
+
       <div className="ls-body">
-        {/* XP Boost indicator */}
         {xpBoostActive && (
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: '0.4rem', marginBottom: '0.75rem',
-            background: 'rgba(255,214,10,0.1)', border: '1px solid rgba(255,214,10,0.3)',
-            borderRadius: 8, padding: '6px 14px', fontSize: '0.8rem',
-            color: '#ffd60a', fontWeight: 'bold',
-          }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', marginBottom: '0.75rem', background: 'rgba(255,214,10,0.1)', border: '1px solid rgba(255,214,10,0.3)', borderRadius: 8, padding: '6px 14px', fontSize: '0.8rem', color: '#ffd60a', fontWeight: 'bold' }}>
             ⚡ {isEnglish ? '2× XP BOOST ACTIVE' : 'BOOST 2× XP ACTIF'}
           </div>
         )}
 
-        {/* Meta row */}
         <div className="ls-meta-row">
           <div className="ls-type-badge">
             <span>{getLessonIcon()}</span>
@@ -418,48 +705,50 @@ export function LessonScreen({
           )}
         </div>
 
-        {/* Question */}
         <div className="ls-question-box">
           <p className="ls-question-text">
             {isEnglish ? currentExercise.question : currentExercise.questionFr}
           </p>
           {isRedemption && !showFeedback && (
             <p className="ls-redemption-hint">
-              {isEnglish ? '♥ Get half a heart back!' : '♥ Récupérez un demi-cœur!'}
+              {isEnglish ? '♥ Get half a heart back!' : '♥ Récupérez un demi-cœur !'}
             </p>
           )}
         </div>
 
-        {/* Multiple Choice */}
+        {/* Multiple choice */}
         {currentExercise.type === 'multiple-choice' && currentExercise.options && (
           <div className="ls-options-grid">
-            {shuffledOptions.map((option, index) => {
-              const isSelected = userAnswer === option;
-              const isCorrectAnswer = option === getCorrectAnswer();
-              const showCorrect = showFeedback && isCorrectAnswer;
-              const showIncorrect = showFeedback && isSelected && !isCorrect;
+            {shuffledOptions.map((option, i) => {
+              const isSelected    = userAnswer === option;
+              const isCorrectOpt  = option === getCorrectAnswer();
+              const showCorr      = showFeedback && isCorrectOpt;
+              const showInco      = showFeedback && isSelected && !isCorrect;
               return (
                 <button
-                  key={index}
+                  key={i}
                   onClick={() => setUserAnswer(option)}
                   disabled={showFeedback}
-                  className={`ls-option-btn${showCorrect ? ' ls-option-btn--correct' : showIncorrect ? ' ls-option-btn--wrong' : isSelected ? ' ls-option-btn--selected' : ''}`}
+                  className={`ls-option-btn${showCorr ? ' ls-option-btn--correct' : showInco ? ' ls-option-btn--wrong' : isSelected ? ' ls-option-btn--selected' : ''}`}
                 >
                   <span>{option}</span>
-                  {showCorrect && <CheckCircle2 style={{ width: 18, height: 18, flexShrink: 0 }} />}
-                  {showIncorrect && <XCircle style={{ width: 18, height: 18, flexShrink: 0 }} />}
+                  {showCorr && <CheckCircle2 style={{ width: 18, height: 18, flexShrink: 0 }} />}
+                  {showInco && <XCircle      style={{ width: 18, height: 18, flexShrink: 0 }} />}
                 </button>
               );
             })}
           </div>
         )}
 
-        {/* Type Answer */}
-        {(currentExercise.type === 'type-answer' || currentExercise.type === 'translate' || currentExercise.type === 'fill-blank') && (
+        {/* Text input */}
+        {(currentExercise.type === 'type-answer' ||
+          currentExercise.type === 'translate' ||
+          currentExercise.type === 'fill-blank') && (
           <input
             type="text"
             value={userAnswer}
-            onChange={(e) => setUserAnswer(e.target.value)}
+            onChange={e => setUserAnswer(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' && userAnswer && !showFeedback) handleSubmit(); }}
             disabled={showFeedback}
             placeholder={isEnglish ? 'Type your answer…' : 'Tapez votre réponse…'}
             className={`ls-type-input${showFeedback ? (isCorrect ? ' ls-type-input--correct' : ' ls-type-input--wrong') : ''}`}
@@ -470,12 +759,8 @@ export function LessonScreen({
         {/* Hint */}
         {currentExercise.hint && !showFeedback && (
           <div className="ls-hint">
-            <div className="ls-hint-icon">
-              <Lightbulb style={{ width: 14, height: 14, color: '#e53935' }} />
-            </div>
-            <p className="ls-hint-text">
-              {isEnglish ? currentExercise.hint : currentExercise.hintFr}
-            </p>
+            <div className="ls-hint-icon"><Lightbulb style={{ width: 14, height: 14, color: '#e53935' }} /></div>
+            <p className="ls-hint-text">{isEnglish ? currentExercise.hint : currentExercise.hintFr}</p>
           </div>
         )}
 
@@ -485,22 +770,24 @@ export function LessonScreen({
             <div className="ls-feedback-icon">
               {isCorrect
                 ? <CheckCircle2 style={{ width: 22, height: 22, color: '#4ade80' }} />
-                : <XCircle style={{ width: 22, height: 22, color: '#fca5a5' }} />}
+                : <XCircle      style={{ width: 22, height: 22, color: '#fca5a5' }} />}
             </div>
             <div className="ls-feedback-body">
               <p className="ls-feedback-title">
                 {isCorrect
                   ? isRedemption
-                    ? (isEnglish ? 'REDEEMED! +0.5 ♥' : 'RÉDEMPTÉ! +0.5 ♥')
-                    : (isEnglish ? 'CORRECT!' : 'CORRECT!')
-                  : (isEnglish ? 'Correct answer:' : 'Bonne réponse:')}
+                    ? (isEnglish ? 'REDEEMED! +0.5 ♥' : 'RÉDEMPTÉ ! +0.5 ♥')
+                    : (isEnglish ? 'CORRECT!' : 'CORRECT !')
+                  : (isEnglish ? 'Correct answer:' : 'Bonne réponse :')}
               </p>
               {!isCorrect && (
                 <>
                   <p className="ls-feedback-answer">{getCorrectAnswer()}</p>
                   {!isRedemption && (
                     <p className="ls-feedback-note">
-                      {isEnglish ? "You'll get a chance to redeem yourself later." : 'Vous aurez une chance de vous racheter plus tard.'}
+                      {isEnglish
+                        ? "You'll get a chance to redeem yourself later."
+                        : 'Vous aurez une chance de vous racheter plus tard.'}
                     </p>
                   )}
                 </>
@@ -510,7 +797,7 @@ export function LessonScreen({
         )}
       </div>
 
-      {/* ── Bottom bar ── */}
+      {/* Bottom bar */}
       <div className="ls-bottom">
         <div className="ls-bottom-inner">
           {!showFeedback ? (
@@ -527,7 +814,7 @@ export function LessonScreen({
         </div>
       </div>
 
-      {/* Hearts Out Modal */}
+      {/* Modals */}
       <HeartsOutModal
         isOpen={showHeartsOutModal}
         onClose={() => setShowHeartsOutModal(false)}
@@ -536,24 +823,24 @@ export function LessonScreen({
           if (isGuest) onGoToSignUp?.();
           else onGoToSubscription?.();
         }}
-        heartsData={heartsData || { currentHearts: 0, lastResetTime: Date.now(), maxHearts: 5 }}
+        heartsData={heartsData ?? { currentHearts: 0, lastResetTime: Date.now(), maxHearts: 5 }}
         isGuest={isGuest}
         currentGems={currentGems}
-        onRefillWithGems={onRefillWithGems ? async () => {
-          const ok = await onRefillWithGems();
-          if (ok) setCurrentHearts(5);
-          return ok;
-        } : undefined}
+        onRefillWithGems={
+          onRefillWithGems
+            ? async () => {
+                const ok = await onRefillWithGems();
+                if (ok) setCurrentHearts(5);
+                return ok;
+              }
+            : undefined
+        }
       />
 
-      {/* Guest Limit Modal */}
       <GuestLimitModal
         isOpen={showGuestLimitModal}
         onClose={() => setShowGuestLimitModal(false)}
-        onSignUp={() => {
-          setShowGuestLimitModal(false);
-          onGoToSignUp?.();
-        }}
+        onSignUp={() => { setShowGuestLimitModal(false); onGoToSignUp?.(); }}
         lessonsCompleted={3}
       />
     </div>

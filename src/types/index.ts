@@ -1,6 +1,6 @@
 export type InterfaceLanguage = 'en' | 'fr';
 
-export type AfricanLanguage = 
+export type AfricanLanguage =
   | 'swahili'
   | 'hausa'
   | 'yoruba'
@@ -63,17 +63,74 @@ export interface Lesson {
   exercises: Exercise[];
 }
 
+// ── Supporting interfaces for enriched exercise types ────────────────────────
+
+export interface ConversationTurn {
+  speaker: 'guide' | 'user';
+  text: string;                  // native language phrase shown
+  textTranslation: string;       // English gloss shown below
+  textTranslationFr?: string;
+  options?: string[];            // choices for user turns
+  optionsFr?: string[];
+  correctIndex?: number;         // index into options[] that is correct
+}
+
+export interface StoryWord {
+  word: string;       // native-language word as it appears in the story text
+  meaning: string;    // English meaning shown on tap
+  meaningFr?: string;
+}
+
+export interface ToneEntry {
+  mark: string;          // diacritic symbol shown e.g. "á"
+  name: string;          // English label e.g. "High Tone"
+  nameFr: string;
+  example: string;       // native word using that tone
+  meaning: string;       // English meaning of the example word
+  meaningFr: string;
+  pitch: 'high' | 'low' | 'mid' | 'rising' | 'falling';
+}
+
+// ── Exercise ─────────────────────────────────────────────────────────────────
+
 export interface Exercise {
   id: string;
-  type: 'multiple-choice' | 'fill-blank' | 'match' | 'translate' | 'type-answer';
+  type:
+    | 'multiple-choice'
+    | 'fill-blank'
+    | 'match'
+    | 'translate'
+    | 'type-answer'
+    // ── Enriched types (injected at runtime, not in lesson data files) ──
+    | 'flashcard'       // flip card: native word → English meaning
+    | 'audio-match'     // TTS audio plays, user picks written option
+    | 'word-order'      // tap word tiles to assemble a sentence
+    | 'cultural-card'   // non-quiz cultural insight slide
+    | 'conversation'    // scripted dialogue with option choices
+    | 'story'           // story paragraph with tappable vocab
+    | 'tone-trainer';   // tone identification for tonal languages
   question: string;
   questionFr: string;
   correctAnswer: string;
-  correctAnswerFr?: string; // French version of correct answer
+  correctAnswerFr?: string;
   options?: string[];
-  optionsFr?: string[]; // French version of options
+  optionsFr?: string[];
   hint?: string;
   hintFr?: string;
+  // word-order
+  wordTiles?: string[];
+  // cultural-card
+  culturalText?: string;
+  culturalTextFr?: string;
+  culturalEmoji?: string;
+  // conversation
+  conversationScript?: ConversationTurn[];
+  // story
+  storyText?: string;
+  storyTextFr?: string;
+  storyWords?: StoryWord[];
+  // tone-trainer
+  toneData?: ToneEntry[];
 }
 
 export interface CulturalCapsule {

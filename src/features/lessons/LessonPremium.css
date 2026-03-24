@@ -316,3 +316,413 @@
   .ls-option-btn { padding: 20px 18px; min-height: 80px; font-size: 1rem; }
   .ls-btn-check, .ls-btn-next { font-size: 1rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   INTRO STEP LABEL
+   ═══════════════════════════════════════════════════════════════ */
+.ls-intro-step-label {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.22); margin-bottom: 18px; margin-top: -12px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TEACH MODE
+   ═══════════════════════════════════════════════════════════════ */
+.ls-teach-counter {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.25);
+  margin-bottom: 16px;
+}
+
+.ls-teach-card {
+  width: 100%;
+  background: #0d0d0d;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: 28px 22px;
+  margin-bottom: 22px;
+  text-align: center;
+  min-height: 160px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+  animation: lsTeachIn 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+@keyframes lsTeachIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+.ls-teach-question {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: clamp(0.95rem, 3vw, 1.2rem);
+  color: rgba(255,255,255,0.55); line-height: 1.5;
+}
+
+.ls-teach-reveal-btn {
+  background: rgba(176,0,32,0.1); border: 1px solid rgba(176,0,32,0.3);
+  border-radius: 10px; padding: 12px 24px;
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.84rem; font-weight: 700; color: #e53935;
+  cursor: pointer; transition: all 0.18s;
+}
+.ls-teach-reveal-btn:hover { background: rgba(176,0,32,0.2); border-color: #b00020; }
+
+.ls-teach-answer-reveal { animation: lsTeachIn 0.25s ease-out; text-align: center; }
+.ls-teach-answer-label {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(176,0,32,0.6); margin-bottom: 6px;
+}
+.ls-teach-answer {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: clamp(1.4rem, 5vw, 2rem); font-weight: 900; color: #fff; line-height: 1.2;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PREVIEW PHASE
+   ═══════════════════════════════════════════════════════════════ */
+.ls-preview-dots {
+  display: flex; gap: 8px; justify-content: center; margin-bottom: 24px;
+}
+.ls-preview-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,0.12); transition: all 0.3s;
+}
+.ls-preview-dot--active { background: #b00020; transform: scale(1.3); }
+.ls-preview-dot--done   { background: rgba(176,0,32,0.4); }
+
+.ls-preview-flash {
+  text-align: center; padding: 24px 0 28px;
+  animation: lsFlashIn 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+@keyframes lsFlashIn {
+  from { opacity: 0; transform: scale(0.88); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.ls-preview-native {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: clamp(1.8rem, 6vw, 2.8rem); font-weight: 900; color: #fff;
+  margin-bottom: 10px;
+}
+.ls-preview-english {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.88rem; color: rgba(255,255,255,0.4); line-height: 1.5;
+}
+
+.ls-preview-ready {
+  text-align: center; padding: 16px 0 20px;
+  animation: lsTeachIn 0.3s ease-out;
+}
+.ls-preview-ready-icon { font-size: 2.8rem; display: block; margin-bottom: 12px; }
+.ls-preview-ready-text {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 1.05rem; color: rgba(255,255,255,0.6); margin-bottom: 24px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FLASHCARD EXERCISE
+   ═══════════════════════════════════════════════════════════════ */
+.ls-flashcard-wrap {
+  width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px;
+}
+.ls-flashcard-instruction {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.82rem; color: rgba(255,255,255,0.35);
+  text-align: center; letter-spacing: 0.04em;
+}
+
+.ls-flashcard {
+  width: 100%; max-width: 440px; aspect-ratio: 4/3;
+  perspective: 1000px; cursor: pointer;
+}
+.ls-flashcard-front,
+.ls-flashcard-back {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  background: #111; border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 18px; padding: 28px;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.ls-flashcard { position: relative; transform-style: preserve-3d; }
+.ls-flashcard-back { transform: rotateY(180deg); border-color: rgba(176,0,32,0.3); background: #0d0d0d; }
+.ls-flashcard--flipped .ls-flashcard-front { transform: rotateY(-180deg); }
+.ls-flashcard--flipped .ls-flashcard-back  { transform: rotateY(0deg); }
+
+.ls-flashcard-face-label {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.18em;
+  text-transform: uppercase; color: rgba(176,0,32,0.55);
+}
+.ls-flashcard-word {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: clamp(1.6rem, 6vw, 2.6rem); font-weight: 900; color: #fff;
+  text-align: center; line-height: 1.2;
+}
+.ls-flashcard-meaning {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: clamp(0.9rem, 3vw, 1.2rem); color: rgba(255,255,255,0.7);
+  text-align: center; line-height: 1.5;
+}
+.ls-flashcard-tap-hint {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.62rem; color: rgba(255,255,255,0.16);
+  letter-spacing: 0.1em;
+}
+
+.ls-flashcard-rate { width: 100%; max-width: 440px; animation: lsTeachIn 0.25s ease-out; }
+.ls-flashcard-rate-label {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.78rem; color: rgba(255,255,255,0.35);
+  text-align: center; margin-bottom: 12px;
+}
+.ls-flashcard-rate-btns { display: flex; gap: 10px; }
+.ls-flashcard-btn-hard,
+.ls-flashcard-btn-easy {
+  flex: 1; padding: 14px; border-radius: 12px;
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em;
+  cursor: pointer; transition: all 0.18s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 50px;
+}
+.ls-flashcard-btn-hard {
+  background: rgba(127,29,29,0.3); border: 1px solid rgba(176,0,32,0.4); color: #fca5a5;
+}
+.ls-flashcard-btn-hard:hover { background: rgba(127,29,29,0.5); }
+.ls-flashcard-btn-easy {
+  background: rgba(5,46,22,0.4); border: 1px solid rgba(34,197,94,0.35); color: #4ade80;
+}
+.ls-flashcard-btn-easy:hover { background: rgba(5,46,22,0.6); }
+
+/* ═══════════════════════════════════════════════════════════════
+   AUDIO MATCH EXERCISE
+   ═══════════════════════════════════════════════════════════════ */
+.ls-audio-wrap { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+
+.ls-audio-play-btn {
+  width: 120px; height: 120px; border-radius: 50%;
+  background: rgba(176,0,32,0.12); border: 2px solid rgba(176,0,32,0.4);
+  color: #e53935; cursor: pointer; transition: all 0.22s;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  font-family: 'Times New Roman', Georgia, serif; font-size: 0.68rem;
+  font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  box-shadow: 0 0 0 0 rgba(176,0,32,0.4);
+  animation: lsPulse 2s ease-in-out infinite;
+}
+.ls-audio-play-btn--played { animation: none; border-color: rgba(176,0,32,0.2); color: rgba(255,255,255,0.4); }
+.ls-audio-play-btn:hover:not(.ls-audio-play-btn--played) { background: rgba(176,0,32,0.22); border-color: #b00020; transform: scale(1.05); }
+@keyframes lsPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(176,0,32,0.35); }
+  50%       { box-shadow: 0 0 0 14px rgba(176,0,32,0); }
+}
+
+.ls-audio-instruction {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.82rem; color: rgba(255,255,255,0.38);
+  text-align: center; max-width: 300px; line-height: 1.5;
+}
+.ls-audio-must-play {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.75rem; color: rgba(176,0,32,0.6); text-align: center;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   WORD ORDER EXERCISE
+   ═══════════════════════════════════════════════════════════════ */
+.ls-word-order-wrap { width: 100%; display: flex; flex-direction: column; gap: 14px; }
+
+.ls-word-order-assembled {
+  width: 100%; min-height: 64px; border-radius: 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1.5px dashed rgba(255,255,255,0.1);
+  padding: 12px 14px;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+.ls-word-order-assembled--correct { border-color: rgba(34,197,94,0.4); background: rgba(5,46,22,0.2); }
+.ls-word-order-assembled--wrong   { border-color: rgba(176,0,32,0.4); background: rgba(127,29,29,0.2); }
+.ls-word-order-placeholder {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.82rem; color: rgba(255,255,255,0.18); font-style: italic;
+}
+
+.ls-word-tile-bank {
+  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+  padding: 14px; background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
+}
+
+.ls-word-tile {
+  padding: 10px 16px; border-radius: 8px;
+  background: #161616; border: 1px solid rgba(255,255,255,0.1);
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.9rem; font-weight: 700; color: #fff;
+  cursor: pointer; transition: all 0.15s;
+  min-height: 44px;
+}
+.ls-word-tile:hover:not(:disabled) { border-color: rgba(176,0,32,0.4); background: rgba(176,0,32,0.08); }
+.ls-word-tile:disabled { opacity: 0.5; cursor: default; }
+.ls-word-tile--selected {
+  background: rgba(176,0,32,0.14); border-color: rgba(176,0,32,0.35);
+}
+.ls-word-tile--selected:hover { background: rgba(176,0,32,0.22); border-color: #b00020; }
+
+/* ═══════════════════════════════════════════════════════════════
+   CULTURAL CARD EXERCISE
+   ═══════════════════════════════════════════════════════════════ */
+.ls-cultural-card {
+  width: 100%; max-width: 560px; margin: 0 auto;
+  background: linear-gradient(135deg, rgba(176,0,32,0.06) 0%, rgba(0,0,0,0) 60%);
+  border: 1px solid rgba(176,0,32,0.2);
+  border-radius: 20px; padding: 32px 28px;
+  text-align: center;
+  animation: lsTeachIn 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.ls-cultural-card-emoji { font-size: 3rem; display: block; margin-bottom: 14px; }
+.ls-cultural-card-label {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.2em;
+  text-transform: uppercase; color: #b00020; margin-bottom: 16px;
+}
+.ls-cultural-card-text {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: clamp(0.88rem, 3vw, 1.05rem); line-height: 1.75;
+  color: rgba(255,255,255,0.65); margin-bottom: 26px; font-style: italic;
+}
+.ls-cultural-card-btn { margin-top: 0; }
+
+/* ═══════════════════════════════════════════════════════════════
+   TONE TRAINER EXERCISE
+   ═══════════════════════════════════════════════════════════════ */
+.ls-tone-wrap { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+
+.ls-tone-word-box {
+  text-align: center; padding: 22px 32px;
+  background: #0d0d0d; border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px; width: 100%;
+}
+.ls-tone-word {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: clamp(2rem, 7vw, 3.5rem); font-weight: 900; color: #fff;
+  letter-spacing: 0.05em;
+}
+.ls-tone-mark-hint {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.72rem; color: rgba(176,0,32,0.6); margin-top: 6px;
+  letter-spacing: 0.1em;
+}
+.ls-tone-instruction {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.82rem; color: rgba(255,255,255,0.35);
+}
+.ls-tone-option { flex-direction: column; align-items: flex-start !important; gap: 2px; }
+.ls-tone-option-name { font-weight: 700; font-size: 0.88rem; }
+.ls-tone-option-mark { font-size: 0.78rem; color: rgba(176,0,32,0.7); }
+
+.ls-tone-explanation {
+  width: 100%; background: rgba(176,0,32,0.05);
+  border: 1px solid rgba(176,0,32,0.18); border-radius: 12px;
+  padding: 16px 18px; animation: lsTeachIn 0.25s ease-out;
+}
+.ls-tone-exp-title {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.82rem; font-weight: 700; color: #b00020; margin-bottom: 6px;
+}
+.ls-tone-exp-body {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.8rem; color: rgba(255,255,255,0.5); line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CONVERSATION EXERCISE
+   ═══════════════════════════════════════════════════════════════ */
+.ls-convo-wrap { width: 100%; display: flex; flex-direction: column; gap: 14px; }
+.ls-convo-label {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(176,0,32,0.6);
+}
+
+.ls-convo-history { display: flex; flex-direction: column; gap: 10px; }
+
+.ls-convo-bubble {
+  display: flex; align-items: flex-start; gap: 10px;
+  animation: lsTeachIn 0.28s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.ls-convo-bubble--user { flex-direction: row-reverse; }
+
+.ls-convo-bubble-speaker { font-size: 1.3rem; flex-shrink: 0; padding-top: 4px; }
+
+.ls-convo-bubble-body {
+  max-width: 75%; padding: 12px 16px; border-radius: 14px;
+  background: #161616; border: 1px solid rgba(255,255,255,0.07);
+}
+.ls-convo-bubble--user .ls-convo-bubble-body {
+  background: rgba(176,0,32,0.1); border-color: rgba(176,0,32,0.25);
+}
+.ls-convo-bubble-text {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 3px;
+}
+.ls-convo-bubble-gloss {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.72rem; color: rgba(255,255,255,0.32); font-style: italic;
+}
+
+.ls-convo-options { display: flex; flex-direction: column; gap: 8px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   STORY EXERCISE
+   ═══════════════════════════════════════════════════════════════ */
+.ls-story-wrap { width: 100%; display: flex; flex-direction: column; gap: 18px; }
+
+.ls-story-card {
+  background: #0d0d0d; border: 1px solid rgba(255,255,255,0.06);
+  border-left: 3px solid #b00020; border-radius: 14px;
+  padding: 22px 20px;
+}
+.ls-story-label {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.18em;
+  text-transform: uppercase; color: #b00020; margin-bottom: 14px;
+}
+.ls-story-text {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: clamp(0.9rem, 3vw, 1.05rem); line-height: 1.8;
+  color: rgba(255,255,255,0.65);
+}
+.ls-story-word {
+  background: rgba(176,0,32,0.12); border: 1px solid rgba(176,0,32,0.25);
+  border-radius: 4px; padding: 1px 5px;
+  font-family: inherit; font-size: inherit; font-weight: 700;
+  color: #e53935; cursor: pointer; transition: all 0.15s;
+  display: inline; line-height: inherit;
+}
+.ls-story-word--active { background: rgba(176,0,32,0.28); border-color: #b00020; }
+.ls-story-word:hover   { background: rgba(176,0,32,0.2); }
+
+.ls-story-vocab-group { position: relative; display: inline; }
+.ls-story-tooltip {
+  position: absolute; bottom: calc(100% + 6px); left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a; border: 1px solid rgba(176,0,32,0.4);
+  border-radius: 8px; padding: 6px 12px;
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.75rem; color: #fff; white-space: nowrap;
+  z-index: 20; box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  animation: lsTeachIn 0.2s ease-out;
+  pointer-events: none;
+}
+.ls-story-tap-hint {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.7rem; color: rgba(255,255,255,0.2);
+  margin-top: 12px; font-style: italic;
+}
+.ls-story-q-label {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.28);
+}
