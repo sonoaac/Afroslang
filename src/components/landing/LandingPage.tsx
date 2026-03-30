@@ -135,16 +135,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
             <img src="/Afroslang.png" alt="Afroslang" className="lp-logo" />
             <span className="lp-brand">Afro<em>slang</em></span>
           </div>
-          <div className="lp-header-right">
-            {isLoggedIn ? (
-              <button className="lp-btn-signup" onClick={onContinue}>Continue →</button>
-            ) : (
-              <>
-                <button className="lp-btn-login"  onClick={() => setSheet('login')}>Log In</button>
-                <button className="lp-btn-signup" onClick={() => setSheet('signup')}>Sign Up</button>
-              </>
-            )}
-          </div>
         </header>
 
         {/* Top block: logo left + tagline right, then CTAs stacked below */}
@@ -163,10 +153,15 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
               </button>
             ) : (
               <>
-                <button className="lp-btn-hero-primary" onClick={() => setSheet('signup')}>
-                  Get Started
-                </button>
-                <button className="lp-btn-hero-ghost" onClick={() => setGuestMode(true)}>
+                <div className="lp-stack-ctas-row">
+                  <button className="lp-btn-hero-primary" onClick={() => setSheet('signup')}>
+                    Get Started
+                  </button>
+                  <button className="lp-btn-hero-ghost" onClick={() => setSheet('login')}>
+                    I have an account
+                  </button>
+                </div>
+                <button className="lp-btn-guest-text" onClick={() => setGuestMode(true)}>
                   Try as Guest
                 </button>
               </>
