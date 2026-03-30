@@ -301,8 +301,11 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
                 <li><button className="lp-footer-link">Terms of Service</button></li>
                 <li><button className="lp-footer-link">Privacy Policy</button></li>
                 <li><button className="lp-footer-link">Cookie Policy</button></li>
-                <li><button className="lp-footer-link">Ownership</button></li>
               </ul>
+              <div className="lp-footer-ownership">
+                <p className="lp-footer-ownership-name">Owned by Sonoaac</p>
+                <p className="lp-footer-ownership-bio">Sonoaac is an Africa First Focus Group. Its Founder originating from Imo Owerri, Nigeria — born 2004, Lagos.</p>
+              </div>
             </div>
 
             <div className="lp-footer-col">

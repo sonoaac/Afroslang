@@ -729,6 +729,27 @@
 }
 .lp-footer-link:hover { color: rgba(255, 255, 255, 0.78); }
 
+.lp-footer-ownership {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.lp-footer-ownership-name {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 6px;
+  letter-spacing: 0.04em;
+}
+.lp-footer-ownership-bio {
+  font-family: Georgia, serif;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.38);
+  line-height: 1.6;
+  margin: 0;
+}
+
 .lp-footer-fact {
   font-family: Georgia, serif;
   font-size: 0.76rem;
