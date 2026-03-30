@@ -1342,6 +1342,42 @@
 }
 .auth-sheet::-webkit-scrollbar { display: none; }
 
+.auth-sheet-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 4px;
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 0.72rem;
+}
+.auth-sheet-divider::before,
+.auth-sheet-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.auth-sheet-guest {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 12px;
+  font-family: 'Times New Roman', serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  letter-spacing: 0.03em;
+}
+.auth-sheet-guest:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
 
 /* ════════════════════════════════
    RESPONSIVE

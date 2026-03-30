@@ -3,7 +3,6 @@ import { InterfaceLanguage, AfricanLanguage, UserProgress, Lesson } from './type
 import { AfroslangIntro } from './components/intro/AfroslangIntro';
 import { LandingPage } from './components/landing/LandingPage';
 
-import { InterfaceLanguageSelector } from './features/language-select/InterfaceLanguageSelector';
 import { LearningPath } from './features/lessons/LearningPath';
 import { LessonScreen } from './features/lessons/LessonScreen';
 import { LessonComplete } from './features/lessons/LessonComplete';
@@ -44,6 +43,7 @@ function App() {
   // (returning user — they don't go through LandingPage so no splash)
   const wasAuthOnLoad = useRef<boolean | null>(null);
   const [authSheet, setAuthSheet] = useState<'login' | 'signup' | null>(null);
+  const [preSelectedLanguage, setPreSelectedLanguage] = useState<string | null>(null);
   const [interfaceLanguage, setInterfaceLanguage] = useState<InterfaceLanguage>('en');
   const [currentLanguage, setCurrentLanguage] = useState<AfricanLanguage | null>(null);
   const [userProgressMap, setUserProgressMap] = useState<Record<string, UserProgress>>({});
@@ -106,10 +106,6 @@ function App() {
     localStorage.setItem('afroslang_interface', interfaceLanguage);
   }, [interfaceLanguage]);
 
-  const handleInterfaceLanguageSelect = (lang: InterfaceLanguage) => {
-    setInterfaceLanguage(lang);
-    // Stay on interface-select — language grid is already on this page
-  };
 
   const handleGoToSignIn = async () => {
     if (user) await logout();
@@ -388,7 +384,8 @@ function App() {
   }, [loading, user, isGuest]);
 
   // Handle authentication state changes:
-  // — Just signed in / signed up / went guest this session → go to interface-select
+  // — Just signed in / signed up this session → go to path if a language was pre-selected,
+  //   otherwise stay on LandingPage (they can pick from the explorer)
   // — Returning authenticated user → stay on LandingPage (they click "Continue Learning")
   // — Stripe payment return → show SuccessPage
   useEffect(() => {
@@ -396,12 +393,16 @@ function App() {
       if (paymentSuccessReturn) {
         setCurrentScreen('payment-success');
       } else if (wasAuthOnLoad.current === false) {
-        // User just authenticated this session → go to interface-select
-        setCurrentScreen('interface-select');
+        // User just authenticated this session
+        if (preSelectedLanguage) {
+          handleLanguageToLearnSelect(preSelectedLanguage);
+          setPreSelectedLanguage(null);
+        }
+        // If no pre-selected language, stay on LandingPage (isLoggedIn=true, pick from explorer)
       }
       // wasAuthOnLoad.current === true means returning user → LandingPage stays shown
     }
-  }, [user, isGuest, loading, currentScreen, paymentSuccessReturn]);
+  }, [user, isGuest, loading, currentScreen, paymentSuccessReturn, preSelectedLanguage]);
 
   // 1. Logo intro (once per session)
   if (showIntro) {
@@ -420,31 +421,24 @@ function App() {
     );
   }
 
-  // LandingPage is always the first screen after the intro animation
-  if (currentScreen === 'auth') {
+  // LandingPage — also shown when 'interface-select' is requested (InterfaceLanguageSelector removed)
+  if (currentScreen === 'auth' || currentScreen === 'interface-select') {
     return (
       <LandingPage
         initialSheet={authSheet}
         isLoggedIn={!!user}
-        onContinue={() => setCurrentScreen('interface-select')}
+        onContinue={() => {
+          if (currentLanguage) handleLanguageToLearnSelect(currentLanguage);
+          // else stay on LandingPage — user can pick a language from the explorer
+        }}
         onSelectLanguage={handleLanguageToLearnSelect}
+        onPreSelectLanguage={setPreSelectedLanguage}
       />
     );
   }
 
   return (
     <>
-      {currentScreen === 'interface-select' && (
-        <InterfaceLanguageSelector
-          onSelect={handleInterfaceLanguageSelect}
-          onSelectLanguage={(languageId) => {
-            setInterfaceLanguage('en');
-            handleLanguageToLearnSelect(languageId);
-          }}
-          onSignIn={handleGoToSignIn}
-          onSignUp={handleGoToSignUp}
-        />
-      )}
 
       {currentScreen === 'path' && currentLanguage && (
         <LearningPath
@@ -452,7 +446,7 @@ function App() {
           stages={getStagesForLanguage(currentLanguage)}
           progress={getCurrentProgress()}
           onStartLesson={handleStartLesson}
-          onBackToLanguageSelect={() => setCurrentScreen('interface-select')}
+          onBackToLanguageSelect={() => setCurrentScreen('auth')}
           onNavigate={(screen) => {
             if (screen === 'leaderboard') {
               setCurrentScreen('leaderboard');
@@ -491,7 +485,7 @@ function App() {
             isGuest={isGuest}
             onComplete={handleLessonComplete}
             onExit={handleExitLesson}
-            onBackToLanguageSelect={() => setCurrentScreen('interface-select')}
+            onBackToLanguageSelect={() => setCurrentScreen('auth')}
             onGoToSignUp={handleGoToSignUp}
             onGoToSubscription={() => setCurrentScreen('subscription')}
           />
@@ -502,7 +496,7 @@ function App() {
           interfaceLanguage={interfaceLanguage}
           xpEarned={lastCompletedXP}
           onContinue={handleContinueAfterComplete}
-          onBackToLanguageSelect={() => setCurrentScreen('interface-select')}
+          onBackToLanguageSelect={() => setCurrentScreen('auth')}
         />
       )}
 

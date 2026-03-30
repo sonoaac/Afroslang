@@ -12,6 +12,7 @@ interface LandingPageProps {
   isLoggedIn?: boolean;
   onContinue?: () => void;
   onSelectLanguage?: (languageId: string) => void;
+  onPreSelectLanguage?: (languageId: string) => void;
 }
 
 // ── Language names ────────────────────────────────────────────────────────────
@@ -100,7 +101,7 @@ const EXPLORE_COUNTRIES: ExploreCountry[] = [
 
 const EXPLORE_FIRST_COUNT = 21;
 
-export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLanguage }: LandingPageProps) {
+export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLanguage, onPreSelectLanguage }: LandingPageProps) {
   const { setGuestMode } = useAuth();
 
   const [sheet, setSheet] = useState<SheetMode>(initialSheet ?? null);
@@ -110,6 +111,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
   const [exploreSearch, setExploreSearch]         = useState('');
   const [selectedCountry, setSelectedCountry]     = useState<ExploreCountry | null>(null);
   const [selectedLanguage, setSelectedLanguage]   = useState('');
+  const [pendingLanguage, setPendingLanguage]     = useState('');
   const [panelOpen, setPanelOpen]                 = useState(false);
   const [showAll, setShowAll]                     = useState(false);
   const [exploreVisible, setExploreVisible]       = useState(false);
@@ -147,6 +149,8 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     if (isLoggedIn && onSelectLanguage) {
       onSelectLanguage(selectedLanguage);
     } else {
+      setPendingLanguage(selectedLanguage);
+      onPreSelectLanguage?.(selectedLanguage);
       setSheet('signup');
       setPanelOpen(false);
     }
@@ -592,6 +596,18 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
                 <button type="button" className="auth-sheet-forgot" onClick={handleForgotPassword}>
                   Forgot password?
                 </button>
+                <div className="auth-sheet-divider"><span>or</span></div>
+                <button
+                  type="button"
+                  className="auth-sheet-guest"
+                  onClick={() => {
+                    setGuestMode(true);
+                    closeSheet();
+                    if (pendingLanguage && onSelectLanguage) onSelectLanguage(pendingLanguage);
+                  }}
+                >
+                  Continue as Guest
+                </button>
               </form>
             )}
 
@@ -603,6 +619,18 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
                 <input className="auth-sheet-input" type="password" placeholder="Password (min 6 chars)" value={signupPassword} onChange={e => setSignupPassword(e.target.value)} required autoComplete="new-password" minLength={6} />
                 <button className="auth-sheet-submit" type="submit" disabled={signupLoading}>
                   {signupLoading ? 'Creating account…' : 'Create Account'}
+                </button>
+                <div className="auth-sheet-divider"><span>or</span></div>
+                <button
+                  type="button"
+                  className="auth-sheet-guest"
+                  onClick={() => {
+                    setGuestMode(true);
+                    closeSheet();
+                    if (pendingLanguage && onSelectLanguage) onSelectLanguage(pendingLanguage);
+                  }}
+                >
+                  Continue as Guest
                 </button>
               </form>
             )}
