@@ -195,7 +195,6 @@ export function LandingPage({ initialSheet }: LandingPageProps) {
       <section className="lp-countries">
         <div className="lp-countries-header">
           <h2 className="lp-countries-title">The Continent We Celebrate</h2>
-          <p className="lp-countries-sub">Seven nations. Seven stories. One lineage.</p>
         </div>
         <div className="lp-countries-grid">
           {COUNTRY_FACTS.map(c => (
