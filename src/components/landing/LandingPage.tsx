@@ -281,7 +281,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
           ref={langsSectionRef}
           className={`lp-langs-section${langsVisible ? ' lp-langs-section--visible' : ''}`}
         >
-          <p className="lp-langs-eyebrow">15 African Languages · Explore the Continent</p>
+          <p className="lp-langs-eyebrow">Over 1500+ African Languages · Explore the Continent — Not even half way there</p>
           <div className="lp-langs-grid">
             {(langsExpanded ? LANDING_COUNTRIES : LANDING_COUNTRIES.slice(0, INITIAL_COUNT)).map((c, i) => (
               <div
