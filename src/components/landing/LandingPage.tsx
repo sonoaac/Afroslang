@@ -127,26 +127,25 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
   return (
     <div className="lp">
 
-      {/* ── Header ── */}
-      <header className="lp-header">
-        <div className="lp-header-left">
-          <img src="/Afroslang.png" alt="Afroslang" className="lp-logo" />
-          <span className="lp-brand">Afro<em>slang</em></span>
-        </div>
-        <div className="lp-header-right">
-          {isLoggedIn ? (
-            <button className="lp-btn-signup" onClick={onContinue}>Continue →</button>
-          ) : (
-            <>
-              <button className="lp-btn-login"  onClick={() => setSheet('login')}>Log In</button>
-              <button className="lp-btn-signup" onClick={() => setSheet('signup')}>Sign Up</button>
-            </>
-          )}
-        </div>
-      </header>
-
-      {/* ── Stacked Hero ── */}
+      {/* ── Stacked Hero (header lives inside so it shares the gradient bg) ── */}
       <section className="lp-stack">
+
+        <header className="lp-header">
+          <div className="lp-header-left">
+            <img src="/Afroslang.png" alt="Afroslang" className="lp-logo" />
+            <span className="lp-brand">Afro<em>slang</em></span>
+          </div>
+          <div className="lp-header-right">
+            {isLoggedIn ? (
+              <button className="lp-btn-signup" onClick={onContinue}>Continue →</button>
+            ) : (
+              <>
+                <button className="lp-btn-login"  onClick={() => setSheet('login')}>Log In</button>
+                <button className="lp-btn-signup" onClick={() => setSheet('signup')}>Sign Up</button>
+              </>
+            )}
+          </div>
+        </header>
 
         {/* Top block: logo left + tagline right, then CTAs stacked below */}
         <div className="lp-stack-top">
