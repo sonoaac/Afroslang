@@ -388,20 +388,18 @@ function App() {
   }, [loading, user, isGuest]);
 
   // Handle authentication state changes:
-  // — If they were ALREADY auth'd on load (returning user) → skip splash, go straight to interface-select
-  // — If they just chose sign up / log in / guest this session → show splash first
-  // — If returning from Stripe payment (?payment_success=1) → show SuccessPage
+  // — Just signed in / signed up / went guest this session → go to interface-select
+  // — Returning authenticated user → stay on LandingPage (they click "Continue Learning")
+  // — Stripe payment return → show SuccessPage
   useEffect(() => {
     if (!loading && (user || isGuest) && currentScreen === 'auth') {
       if (paymentSuccessReturn) {
         setCurrentScreen('payment-success');
       } else if (wasAuthOnLoad.current === false) {
-        // User just authenticated this session — go straight to interface-select
-        setCurrentScreen('interface-select');
-      } else {
-        // Returning user — already auth'd on load
+        // User just authenticated this session → go to interface-select
         setCurrentScreen('interface-select');
       }
+      // wasAuthOnLoad.current === true means returning user → LandingPage stays shown
     }
   }, [user, isGuest, loading, currentScreen, paymentSuccessReturn]);
 
@@ -422,9 +420,15 @@ function App() {
     );
   }
 
-  // Landing page replaces the old auth screen
-  if (!user && !isGuest && currentScreen === 'auth') {
-    return <LandingPage initialSheet={authSheet} />;
+  // LandingPage is always the first screen after the intro animation
+  if (currentScreen === 'auth') {
+    return (
+      <LandingPage
+        initialSheet={authSheet}
+        isLoggedIn={!!user}
+        onContinue={() => setCurrentScreen('interface-select')}
+      />
+    );
   }
 
   return (

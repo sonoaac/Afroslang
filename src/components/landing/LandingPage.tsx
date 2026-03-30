@@ -9,6 +9,8 @@ type SheetMode = 'login' | 'signup' | null;
 
 interface LandingPageProps {
   initialSheet?: SheetMode;
+  isLoggedIn?: boolean;
+  onContinue?: () => void;
 }
 
 const COUNTRY_FACTS = [
@@ -49,7 +51,7 @@ const COUNTRY_FACTS = [
   },
 ];
 
-export function LandingPage({ initialSheet }: LandingPageProps) {
+export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPageProps) {
   const { setGuestMode } = useAuth();
 
   const [sheet, setSheet] = useState<SheetMode>(initialSheet ?? null);
@@ -132,8 +134,14 @@ export function LandingPage({ initialSheet }: LandingPageProps) {
           <span className="lp-brand">Afro<em>slang</em></span>
         </div>
         <div className="lp-header-right">
-          <button className="lp-btn-login"  onClick={() => setSheet('login')}>Log In</button>
-          <button className="lp-btn-signup" onClick={() => setSheet('signup')}>Sign Up</button>
+          {isLoggedIn ? (
+            <button className="lp-btn-signup" onClick={onContinue}>Continue →</button>
+          ) : (
+            <>
+              <button className="lp-btn-login"  onClick={() => setSheet('login')}>Log In</button>
+              <button className="lp-btn-signup" onClick={() => setSheet('signup')}>Sign Up</button>
+            </>
+          )}
         </div>
       </header>
 
@@ -149,12 +157,20 @@ export function LandingPage({ initialSheet }: LandingPageProps) {
           <h1 className="lp-stack-title">Welcome to Afroslang</h1>
           <p className="lp-stack-tagline">Rekindle with your ancestral tongues</p>
           <div className="lp-stack-ctas">
-            <button className="lp-btn-hero-primary" onClick={() => setSheet('signup')}>
-              Get Started
-            </button>
-            <button className="lp-btn-hero-ghost" onClick={() => setGuestMode(true)}>
-              Try as Guest
-            </button>
+            {isLoggedIn ? (
+              <button className="lp-btn-hero-primary" onClick={onContinue}>
+                Continue Learning →
+              </button>
+            ) : (
+              <>
+                <button className="lp-btn-hero-primary" onClick={() => setSheet('signup')}>
+                  Get Started
+                </button>
+                <button className="lp-btn-hero-ghost" onClick={() => setGuestMode(true)}>
+                  Try as Guest
+                </button>
+              </>
+            )}
           </div>
         </div>
 
