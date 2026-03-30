@@ -102,7 +102,7 @@ const EXPLORE_COUNTRIES: ExploreCountry[] = [
 const EXPLORE_FIRST_COUNT = 21;
 
 export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLanguage, onPreSelectLanguage }: LandingPageProps) {
-  const { setGuestMode } = useAuth();
+  const { setGuestMode, isGuest } = useAuth();
 
   const [sheet, setSheet] = useState<SheetMode>(initialSheet ?? null);
   const [showOurStory, setShowOurStory] = useState(false);
@@ -116,6 +116,8 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
   const [showAll, setShowAll]                     = useState(false);
   const [exploreVisible, setExploreVisible]       = useState(false);
   const exploreSectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => { window.scrollTo(0, 0); }, []);
 
   useEffect(() => {
     const el = exploreSectionRef.current;
@@ -146,7 +148,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
   const handleStartLearning = () => {
     if (!selectedLanguage) return;
-    if (isLoggedIn && onSelectLanguage) {
+    if ((isLoggedIn || isGuest) && onSelectLanguage) {
       onSelectLanguage(selectedLanguage);
     } else {
       setPendingLanguage(selectedLanguage);
@@ -154,6 +156,10 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
       setSheet('signup');
       setPanelOpen(false);
     }
+  };
+
+  const scrollToExplorer = () => {
+    exploreSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   // ── Auth form state ────────────────────────────────────────────────────────
@@ -252,7 +258,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
           </div>
           <div className="lp-stack-ctas">
             {isLoggedIn ? (
-              <button className="lp-btn-hero-primary" onClick={onContinue}>
+              <button className="lp-btn-hero-primary" onClick={onContinue ?? scrollToExplorer}>
                 Continue Learning →
               </button>
             ) : (
@@ -262,11 +268,11 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
                     Get Started
                   </button>
                   <button className="lp-btn-hero-ghost" onClick={() => setSheet('login')}>
-                    I have an account
+                    Sign In
                   </button>
                 </div>
-                <button className="lp-btn-guest-text" onClick={() => setGuestMode(true)}>
-                  Try as Guest
+                <button className="lp-btn-guest-text" onClick={scrollToExplorer}>
+                  Try as Guest — pick a language below
                 </button>
               </>
             )}
@@ -603,7 +609,11 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
                   onClick={() => {
                     setGuestMode(true);
                     closeSheet();
-                    if (pendingLanguage && onSelectLanguage) onSelectLanguage(pendingLanguage);
+                    if (pendingLanguage && onSelectLanguage) {
+                      onSelectLanguage(pendingLanguage);
+                    } else {
+                      scrollToExplorer();
+                    }
                   }}
                 >
                   Continue as Guest
@@ -627,7 +637,11 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
                   onClick={() => {
                     setGuestMode(true);
                     closeSheet();
-                    if (pendingLanguage && onSelectLanguage) onSelectLanguage(pendingLanguage);
+                    if (pendingLanguage && onSelectLanguage) {
+                      onSelectLanguage(pendingLanguage);
+                    } else {
+                      scrollToExplorer();
+                    }
                   }}
                 >
                   Continue as Guest
