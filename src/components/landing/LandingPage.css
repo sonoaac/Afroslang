@@ -31,7 +31,7 @@
   justify-content: center;
   position: relative;
   padding: 22px 28px;
-  background: #000;
+  background: transparent;
 }
 
 .lp-header-left {
