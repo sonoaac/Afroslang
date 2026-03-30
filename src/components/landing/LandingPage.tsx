@@ -148,14 +148,15 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
       {/* ── Stacked Hero ── */}
       <section className="lp-stack">
 
-        {/* Top block: logo + title + tagline */}
+        {/* Top block: logo left + tagline right, then CTAs stacked below */}
         <div className="lp-stack-top">
-          <div className="lp-stack-logo-wrap">
-            <img src="/Afroslang.png" alt="Afroslang" className="lp-stack-logo" />
-            <div className="lp-stack-logo-glow" />
+          <div className="lp-stack-hero-row">
+            <div className="lp-stack-logo-wrap">
+              <img src="/Afroslang.png" alt="Afroslang" className="lp-stack-logo" />
+              <div className="lp-stack-logo-glow" />
+            </div>
+            <p className="lp-stack-tagline">Rekindle with your ancestral tongues</p>
           </div>
-          <h1 className="lp-stack-title">Welcome to Afroslang</h1>
-          <p className="lp-stack-tagline">Rekindle with your ancestral tongues</p>
           <div className="lp-stack-ctas">
             {isLoggedIn ? (
               <button className="lp-btn-hero-primary" onClick={onContinue}>
