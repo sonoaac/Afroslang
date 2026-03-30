@@ -17,36 +17,43 @@ const COUNTRY_FACTS = [
   {
     flag: '🇳🇬',
     name: 'Nigeria',
+    languages: ['Hausa', 'Yoruba', 'Igbo'],
     fact: 'Home to over 500 languages making it the most linguistically diverse country on the entire continent. More tongues live within its borders than in all of Western Europe combined.',
   },
   {
     flag: '🇪🇹',
     name: 'Ethiopia',
+    languages: ['Amharic', 'Somali'],
     fact: 'One of only two African nations never colonised by a European power. Its legacy of sovereignty lit a flame that inspired independence movements across the whole continent.',
   },
   {
     flag: '🇿🇦',
     name: 'South Africa',
+    languages: ['Zulu'],
     fact: 'Home to 11 official languages the most of any single nation on Earth. Every tongue reflects a culture that was here long before borders were ever drawn.',
   },
   {
     flag: '🇪🇬',
     name: 'Egypt',
+    languages: ['Arabic'],
     fact: 'Home to the worlds oldest writing system with hieroglyphics dating back over 5000 years. Civilisation did not begin in Europe. It began here.',
   },
   {
     flag: '🇰🇪',
     name: 'Kenya',
+    languages: ['Swahili'],
     fact: 'Nairobi is known as the Silicon Savannah hosting hundreds of startups and standing as the undisputed tech capital of Africa with a growing global reach.',
   },
   {
     flag: '🇬🇭',
     name: 'Ghana',
+    languages: ['Twi', 'Hausa'],
     fact: 'The first sub Saharan African country to gain independence in 1957. That single act of sovereignty gave the entire continent the courage to rise.',
   },
   {
     flag: '🇹🇿',
     name: 'Tanzania',
+    languages: ['Swahili'],
     fact: 'Birthplace of Swahili now spoken by over 200 million people across the continent making it the most widely spoken Bantu language in the world.',
   },
 ];
@@ -56,6 +63,17 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
 
   const [sheet, setSheet] = useState<SheetMode>(initialSheet ?? null);
   const [showOurStory, setShowOurStory] = useState(false);
+  const [countrySearch, setCountrySearch] = useState('');
+
+  const filteredCountries = COUNTRY_FACTS.flatMap(c => {
+    const q = countrySearch.trim().toLowerCase();
+    if (!q) return [{ ...c, displayName: c.name }];
+    const countryMatch = c.name.toLowerCase().includes(q);
+    const langMatches = c.languages.filter(l => l.toLowerCase().includes(q));
+    if (langMatches.length > 0) return langMatches.map(l => ({ ...c, displayName: l }));
+    if (countryMatch) return [{ ...c, displayName: c.name }];
+    return [];
+  });
 
   const [loginEmail, setLoginEmail]       = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -207,15 +225,29 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
       <section className="lp-countries">
         <div className="lp-countries-header">
           <h2 className="lp-countries-title">The Continent We Celebrate</h2>
+          <div className="lp-countries-search-wrap">
+            <input
+              className="lp-countries-search"
+              type="text"
+              placeholder="Search country or language…"
+              value={countrySearch}
+              onChange={e => setCountrySearch(e.target.value)}
+            />
+            {countrySearch && (
+              <button className="lp-countries-search-clear" onClick={() => setCountrySearch('')}>✕</button>
+            )}
+          </div>
         </div>
         <div className="lp-countries-grid">
-          {COUNTRY_FACTS.map(c => (
-            <div className="lp-country-card" key={c.name}>
+          {filteredCountries.length > 0 ? filteredCountries.map((c, i) => (
+            <div className="lp-country-card" key={`${c.name}-${c.displayName}-${i}`}>
               <span className="lp-country-flag">{c.flag}</span>
-              <h3 className="lp-country-name">{c.name}</h3>
+              <h3 className="lp-country-name">{c.displayName}</h3>
               <p className="lp-country-fact">{c.fact}</p>
             </div>
-          ))}
+          )) : (
+            <p className="lp-countries-empty">No results for "{countrySearch}"</p>
+          )}
         </div>
       </section>
 
