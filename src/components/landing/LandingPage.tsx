@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
@@ -58,12 +58,52 @@ const COUNTRY_FACTS = [
   },
 ];
 
+const LANDING_COUNTRIES = [
+  { code: 'NG', name: 'Nigeria'       },
+  { code: 'ET', name: 'Ethiopia'      },
+  { code: 'EG', name: 'Egypt'         },
+  { code: 'TZ', name: 'Tanzania'      },
+  { code: 'KE', name: 'Kenya'         },
+  { code: 'ZA', name: 'South Africa'  },
+  { code: 'GH', name: 'Ghana'         },
+  { code: 'MA', name: 'Morocco'       },
+  { code: 'DZ', name: 'Algeria'       },
+  { code: 'CD', name: 'DR Congo'      },
+  { code: 'SN', name: 'Senegal'       },
+  { code: 'BF', name: 'Burkina Faso'  },
+  { code: 'ZW', name: 'Zimbabwe'      },
+  { code: 'SO', name: 'Somalia'       },
+  { code: 'MW', name: 'Malawi'        },
+  { code: 'ZM', name: 'Zambia'        },
+  { code: 'MZ', name: 'Mozambique'    },
+  { code: 'CG', name: 'Rep. of Congo' },
+  { code: 'BJ', name: 'Benin'         },
+  { code: 'GM', name: 'Gambia'        },
+  { code: 'UG', name: 'Uganda'        },
+];
+
+const INITIAL_COUNT = 7;
+
 export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPageProps) {
   const { setGuestMode } = useAuth();
 
   const [sheet, setSheet] = useState<SheetMode>(initialSheet ?? null);
   const [showOurStory, setShowOurStory] = useState(false);
   const [countrySearch, setCountrySearch] = useState('');
+  const [langsExpanded, setLangsExpanded] = useState(false);
+  const [langsVisible, setLangsVisible] = useState(false);
+  const langsSectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = langsSectionRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setLangsVisible(true); },
+      { threshold: 0.12 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   const filteredCountries = COUNTRY_FACTS.flatMap(c => {
     const q = countrySearch.trim().toLowerCase();
@@ -200,6 +240,39 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
           <div className="lp-stack-row-img-wrap lp-stack-row-img-wrap--right">
             <img src="/Afroslanglpimg1.png" alt="Afroslang community" className="lp-stack-img" />
             <div className="lp-stack-img-border" />
+          </div>
+        </div>
+
+        {/* ── Language Countries Grid ── */}
+        <div
+          ref={langsSectionRef}
+          className={`lp-langs-section${langsVisible ? ' lp-langs-section--visible' : ''}`}
+        >
+          <p className="lp-langs-eyebrow">15 African Languages · Explore the Continent</p>
+          <div className="lp-langs-grid">
+            {(langsExpanded ? LANDING_COUNTRIES : LANDING_COUNTRIES.slice(0, INITIAL_COUNT)).map((c, i) => (
+              <div
+                key={c.code}
+                className="lp-langs-card"
+                style={{ transitionDelay: `${i * 45}ms` }}
+              >
+                <img
+                  className="lp-langs-flag"
+                  src={`https://flagcdn.com/w40/${c.code.toLowerCase()}.png`}
+                  alt={c.name}
+                  loading="lazy"
+                />
+                <span className="lp-langs-name">{c.name}</span>
+              </div>
+            ))}
+
+            <button
+              className="lp-langs-toggle"
+              onClick={() => setLangsExpanded(e => !e)}
+              aria-label={langsExpanded ? 'Show less' : 'Show more'}
+            >
+              <span className={`lp-langs-toggle-icon${langsExpanded ? ' lp-langs-toggle-icon--up' : ''}`}>›</span>
+            </button>
           </div>
         </div>
 

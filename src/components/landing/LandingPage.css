@@ -356,6 +356,115 @@
 .lp-btn-guest-text:hover { color: rgba(255, 255, 255, 0.65); }
 
 
+/* ── Language countries grid ── */
+.lp-langs-section {
+  position: relative;
+  z-index: 1;
+  padding: clamp(48px, 7vw, 80px) clamp(20px, 6vw, 80px);
+  background: linear-gradient(180deg, #0a0a0a 0%, #060608 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.lp-langs-eyebrow {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #b00020;
+  text-align: center;
+  margin: 0 0 32px;
+}
+
+.lp-langs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 12px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Individual card */
+.lp-langs-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  cursor: default;
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.45s ease, transform 0.45s ease, background 0.2s, border-color 0.2s;
+}
+.lp-langs-card:hover {
+  background: rgba(176, 0, 32, 0.08);
+  border-color: rgba(176, 0, 32, 0.25);
+}
+.lp-langs-section--visible .lp-langs-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.lp-langs-flag {
+  width: 40px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.lp-langs-name {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+/* Show more / less toggle button */
+.lp-langs-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  cursor: pointer;
+  padding: 14px 8px;
+  transition: background 0.2s, border-color 0.2s;
+}
+.lp-langs-toggle:hover {
+  background: rgba(176, 0, 32, 0.12);
+  border-color: rgba(176, 0, 32, 0.3);
+}
+
+.lp-langs-toggle-icon {
+  font-size: 1.6rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1;
+  display: inline-block;
+  transform: rotate(0deg);
+  transition: transform 0.3s ease, color 0.2s;
+}
+.lp-langs-toggle-icon--up {
+  transform: rotate(-90deg);
+  color: #b00020;
+}
+.lp-langs-toggle:hover .lp-langs-toggle-icon { color: #fff; }
+
+/* Mobile: tighter grid */
+@media (max-width: 480px) {
+  .lp-langs-grid {
+    grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+    gap: 10px;
+  }
+}
+
 /* ── Stack rows ── */
 .lp-stack-row {
   position: relative;
