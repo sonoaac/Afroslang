@@ -99,8 +99,6 @@ const EXPLORE_COUNTRIES: ExploreCountry[] = [
   { code:'SC', name:'Seychelles',         languages:[],                           fact:'Home to the Coco de Mer, the world\'s largest seed, up to 25 kg.' },
 ];
 
-const EXPLORE_FIRST_COUNT = 21;
-
 export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLanguage, onPreSelectLanguage }: LandingPageProps) {
   const { setGuestMode, isGuest } = useAuth();
 
@@ -116,6 +114,8 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
   const [showAll, setShowAll]                     = useState(false);
   const [exploreVisible, setExploreVisible]       = useState(false);
   const exploreSectionRef = useRef<HTMLDivElement>(null);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const initialCount = isMobile ? 7 : 21;
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -137,8 +137,8 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     return c.languages.some(l => (LANGUAGE_NAMES[l] ?? l).toLowerCase().includes(q));
   });
 
-  const firstHalf  = filteredCountries.slice(0, EXPLORE_FIRST_COUNT);
-  const secondHalf = filteredCountries.slice(EXPLORE_FIRST_COUNT);
+  const firstHalf  = filteredCountries.slice(0, initialCount);
+  const secondHalf = filteredCountries.slice(initialCount);
 
   const handleFlagClick = (country: ExploreCountry) => {
     setSelectedCountry(country);
@@ -271,9 +271,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
                     Sign In
                   </button>
                 </div>
-                <button className="lp-btn-guest-text" onClick={scrollToExplorer}>
-                  Try as Guest — pick a language below
-                </button>
               </>
             )}
           </div>
