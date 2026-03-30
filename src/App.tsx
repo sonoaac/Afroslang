@@ -427,6 +427,7 @@ function App() {
         initialSheet={authSheet}
         isLoggedIn={!!user}
         onContinue={() => setCurrentScreen('interface-select')}
+        onSelectLanguage={handleLanguageToLearnSelect}
       />
     );
   }

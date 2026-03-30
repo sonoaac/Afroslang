@@ -11,143 +11,148 @@ interface LandingPageProps {
   initialSheet?: SheetMode;
   isLoggedIn?: boolean;
   onContinue?: () => void;
+  onSelectLanguage?: (languageId: string) => void;
 }
 
-const COUNTRY_FACTS = [
-  {
-    flag: '🇳🇬',
-    name: 'Nigeria',
-    languages: ['Hausa', 'Yoruba', 'Igbo'],
-    fact: 'Home to over 500 languages making it the most linguistically diverse country on the entire continent. More tongues live within its borders than in all of Western Europe combined.',
-  },
-  {
-    flag: '🇪🇹',
-    name: 'Ethiopia',
-    languages: ['Amharic', 'Somali'],
-    fact: 'One of only two African nations never colonised by a European power. Its legacy of sovereignty lit a flame that inspired independence movements across the whole continent.',
-  },
-  {
-    flag: '🇿🇦',
-    name: 'South Africa',
-    languages: ['Zulu'],
-    fact: 'Home to 11 official languages the most of any single nation on Earth. Every tongue reflects a culture that was here long before borders were ever drawn.',
-  },
-  {
-    flag: '🇪🇬',
-    name: 'Egypt',
-    languages: ['Arabic'],
-    fact: 'Home to the worlds oldest writing system with hieroglyphics dating back over 5000 years. Civilisation did not begin in Europe. It began here.',
-  },
-  {
-    flag: '🇰🇪',
-    name: 'Kenya',
-    languages: ['Swahili'],
-    fact: 'Nairobi is known as the Silicon Savannah hosting hundreds of startups and standing as the undisputed tech capital of Africa with a growing global reach.',
-  },
-  {
-    flag: '🇬🇭',
-    name: 'Ghana',
-    languages: ['Twi', 'Hausa'],
-    fact: 'The first sub Saharan African country to gain independence in 1957. That single act of sovereignty gave the entire continent the courage to rise.',
-  },
-  {
-    flag: '🇹🇿',
-    name: 'Tanzania',
-    languages: ['Swahili'],
-    fact: 'Birthplace of Swahili now spoken by over 200 million people across the continent making it the most widely spoken Bantu language in the world.',
-  },
+// ── Language names ────────────────────────────────────────────────────────────
+const LANGUAGE_NAMES: Record<string, string> = {
+  hausa:    'Hausa',
+  yoruba:   'Yoruba',
+  igbo:     'Igbo',
+  amharic:  'Amharic',
+  somali:   'Somali',
+  arabic:   'Arabic',
+  swahili:  'Swahili',
+  zulu:     'Zulu',
+  twi:      'Twi (Akan)',
+  wolof:    'Wolof',
+  moore:    'Mòoré',
+  lingala:  'Lingala',
+  shona:    'Shona',
+  chichewa: 'Chichewa',
+  berber:   'Berber (Tamazight)',
+};
+
+interface ExploreCountry {
+  code: string;
+  name: string;
+  fact: string;
+  languages: string[];
+}
+
+// ── All 54 African countries with language links ──────────────────────────────
+const EXPLORE_COUNTRIES: ExploreCountry[] = [
+  { code:'NG', name:'Nigeria',            languages:['hausa','yoruba','igbo'],    fact:'Home to over 500 languages, more than any other country in Africa.' },
+  { code:'ET', name:'Ethiopia',           languages:['amharic','somali'],         fact:'One of Africa\'s oldest civilizations, with over 90 languages spoken.' },
+  { code:'EG', name:'Egypt',              languages:['arabic'],                   fact:'Home to the world\'s oldest writing system, hieroglyphics dating back 5,000 years.' },
+  { code:'TZ', name:'Tanzania',           languages:['swahili'],                  fact:'Birthplace of Swahili, now spoken by over 200 million people across Africa.' },
+  { code:'KE', name:'Kenya',              languages:['swahili','somali'],         fact:'Africa\'s tech capital — Nairobi is known as the "Silicon Savannah."' },
+  { code:'ZA', name:'South Africa',       languages:['zulu'],                     fact:'Has 11 official languages, the most of any single country in the world.' },
+  { code:'GH', name:'Ghana',              languages:['twi','hausa'],              fact:'First sub-Saharan African country to gain independence in 1957.' },
+  { code:'MA', name:'Morocco',            languages:['arabic','berber'],          fact:'Home to the world\'s oldest university, al-Qarawiyyin, founded in 859 AD.' },
+  { code:'DZ', name:'Algeria',            languages:['arabic','berber'],          fact:'The largest country in Africa, bigger than all of Western Europe combined.' },
+  { code:'CD', name:'DR Congo',           languages:['lingala','swahili'],        fact:'Home to the second-largest rainforest and the world\'s deepest river.' },
+  { code:'SN', name:'Senegal',            languages:['wolof'],                    fact:'Nearly all Senegalese speak Wolof as a shared language, regardless of ethnicity.' },
+  { code:'BF', name:'Burkina Faso',       languages:['moore'],                    fact:'"Land of Incorruptible Men" — Mòoré is spoken by nearly half the population.' },
+  { code:'ZW', name:'Zimbabwe',           languages:['shona'],                    fact:'Home to Victoria Falls, one of the Seven Natural Wonders of the World.' },
+  { code:'SO', name:'Somalia',            languages:['somali'],                   fact:'Somali is the most widely spoken Cushitic language in Africa.' },
+  { code:'MW', name:'Malawi',             languages:['chichewa'],                 fact:'Lake Malawi contains more fish species than any other lake on Earth.' },
+  { code:'ZM', name:'Zambia',             languages:['chichewa'],                 fact:'Home to 73 spoken languages and shares the spectacular Victoria Falls.' },
+  { code:'MZ', name:'Mozambique',         languages:['chichewa'],                 fact:'Has one of the longest coastlines in Africa, over 2,500 km.' },
+  { code:'CG', name:'Rep. of Congo',      languages:['lingala'],                  fact:'Part of the Congo Basin, the second-largest tropical forest in the world.' },
+  { code:'BJ', name:'Benin',              languages:['yoruba'],                   fact:'Birthplace of Vodun (Voodoo), a tradition that spread to the Americas.' },
+  { code:'GM', name:'Gambia',             languages:['wolof'],                    fact:'The smallest country in mainland Africa, almost surrounded by Senegal.' },
+  { code:'UG', name:'Uganda',             languages:['swahili'],                  fact:'Hosts over half of the world\'s remaining mountain gorillas.' },
+  { code:'SD', name:'Sudan',              languages:['arabic'],                   fact:'Sudan has more ancient pyramids than Egypt — over 200 Nubian pyramids.' },
+  { code:'TN', name:'Tunisia',            languages:['arabic'],                   fact:'The northernmost country in Africa and birthplace of the Arab Spring.' },
+  { code:'LY', name:'Libya',              languages:['arabic'],                   fact:'Libya holds the largest proven oil reserves in Africa.' },
+  { code:'MR', name:'Mauritania',         languages:['arabic'],                   fact:'Ancient cities of Chinguetti and Ouadane are UNESCO World Heritage Sites.' },
+  { code:'DJ', name:'Djibouti',           languages:['somali'],                   fact:'Home to Lake Assal, the lowest point in Africa.' },
+  { code:'NE', name:'Niger',              languages:['hausa'],                    fact:'The largest country in West Africa — 80% covered by the Sahara.' },
+  { code:'MG', name:'Madagascar',         languages:[],                           fact:'Over 90% of Madagascar\'s wildlife exists nowhere else on Earth.' },
+  { code:'CM', name:'Cameroon',           languages:[],                           fact:'"Africa in miniature" — rainforests, savannas, mountains, deserts, and beaches.' },
+  { code:'AO', name:'Angola',             languages:[],                           fact:'Angola has the most Portuguese speakers outside Brazil and Portugal.' },
+  { code:'ML', name:'Mali',               languages:[],                           fact:'Timbuktu was once the world\'s greatest center of Islamic scholarship.' },
+  { code:'TD', name:'Chad',               languages:[],                           fact:'Lake Chad has shrunk by 90% since the 1960s due to climate change.' },
+  { code:'CI', name:"Côte d'Ivoire",     languages:[],                           fact:'The world\'s largest producer of cocoa — 40% of the global supply.' },
+  { code:'GN', name:'Guinea',             languages:[],                           fact:'Guinea contains two-thirds of the world\'s bauxite reserves.' },
+  { code:'RW', name:'Rwanda',             languages:[],                           fact:'Rwanda has the highest percentage of female parliament members in the world.' },
+  { code:'BI', name:'Burundi',            languages:[],                           fact:'Despite its small size, Burundi has remarkable cultural diversity.' },
+  { code:'SS', name:'South Sudan',        languages:[],                           fact:'South Sudan is the world\'s newest country, gaining independence in 2011.' },
+  { code:'TG', name:'Togo',               languages:[],                           fact:'Togo\'s Vodoun Day draws thousands of visitors each January.' },
+  { code:'SL', name:'Sierra Leone',       languages:[],                           fact:'"Lion Mountains" in Portuguese — named by early explorers.' },
+  { code:'LR', name:'Liberia',            languages:[],                           fact:'Africa\'s oldest republic, founded in 1847 by freed American slaves.' },
+  { code:'CF', name:'Cent. African R.',   languages:[],                           fact:'Home to Dzanga-Sangha, one of the last refuges for forest elephants.' },
+  { code:'ER', name:'Eritrea',            languages:[],                           fact:'Eritrea gained independence after a 30-year liberation struggle.' },
+  { code:'NA', name:'Namibia',            languages:[],                           fact:'The Namib Desert is the world\'s oldest desert, at over 55 million years.' },
+  { code:'BW', name:'Botswana',           languages:[],                           fact:'Botswana transformed from one of Africa\'s poorest nations into one of its fastest-growing.' },
+  { code:'LS', name:'Lesotho',            languages:[],                           fact:'Lesotho is entirely surrounded by South Africa.' },
+  { code:'GW', name:'Guinea-Bissau',      languages:[],                           fact:'The Bijagós Archipelago is a UNESCO Biosphere Reserve with oceanic hippos.' },
+  { code:'GA', name:'Gabon',              languages:[],                           fact:'Gabon has 88% forest cover — one of the most forested countries on Earth.' },
+  { code:'GQ', name:'Equatorial Guinea',  languages:[],                           fact:'The only mainland African country where Spanish is an official language.' },
+  { code:'SZ', name:'Eswatini',           languages:[],                           fact:'One of Africa\'s last absolute monarchies.' },
+  { code:'CV', name:'Cape Verde',         languages:[],                           fact:'Cape Verde\'s Morna music is UNESCO Intangible Cultural Heritage.' },
+  { code:'ST', name:'São Tomé & Príncipe',languages:[],                           fact:'Sits almost exactly on the equator in the Atlantic Ocean.' },
+  { code:'KM', name:'Comoros',            languages:[],                           fact:'The world\'s largest producer of ylang-ylang, used in fine perfumes.' },
+  { code:'MU', name:'Mauritius',          languages:[],                           fact:'The extinct dodo bird was native to Mauritius.' },
+  { code:'SC', name:'Seychelles',         languages:[],                           fact:'Home to the Coco de Mer, the world\'s largest seed, up to 25 kg.' },
 ];
 
-const LANDING_COUNTRIES = [
-  { code: 'NG', name: 'Nigeria'            },
-  { code: 'ET', name: 'Ethiopia'           },
-  { code: 'EG', name: 'Egypt'              },
-  { code: 'TZ', name: 'Tanzania'           },
-  { code: 'KE', name: 'Kenya'              },
-  { code: 'ZA', name: 'South Africa'       },
-  { code: 'GH', name: 'Ghana'              },
-  { code: 'MA', name: 'Morocco'            },
-  { code: 'DZ', name: 'Algeria'            },
-  { code: 'CD', name: 'DR Congo'           },
-  { code: 'SN', name: 'Senegal'            },
-  { code: 'BF', name: 'Burkina Faso'       },
-  { code: 'ZW', name: 'Zimbabwe'           },
-  { code: 'SO', name: 'Somalia'            },
-  { code: 'MW', name: 'Malawi'             },
-  { code: 'ZM', name: 'Zambia'             },
-  { code: 'MZ', name: 'Mozambique'         },
-  { code: 'CG', name: 'Rep. of Congo'      },
-  { code: 'BJ', name: 'Benin'              },
-  { code: 'GM', name: 'Gambia'             },
-  { code: 'UG', name: 'Uganda'             },
-  { code: 'SD', name: 'Sudan'              },
-  { code: 'TN', name: 'Tunisia'            },
-  { code: 'LY', name: 'Libya'              },
-  { code: 'MR', name: 'Mauritania'         },
-  { code: 'DJ', name: 'Djibouti'           },
-  { code: 'NE', name: 'Niger'              },
-  { code: 'MG', name: 'Madagascar'         },
-  { code: 'CM', name: 'Cameroon'           },
-  { code: 'AO', name: 'Angola'             },
-  { code: 'ML', name: 'Mali'               },
-  { code: 'TD', name: 'Chad'               },
-  { code: 'CI', name: "Côte d'Ivoire"      },
-  { code: 'GN', name: 'Guinea'             },
-  { code: 'RW', name: 'Rwanda'             },
-  { code: 'BI', name: 'Burundi'            },
-  { code: 'SS', name: 'South Sudan'        },
-  { code: 'TG', name: 'Togo'               },
-  { code: 'SL', name: 'Sierra Leone'       },
-  { code: 'LR', name: 'Liberia'            },
-  { code: 'CF', name: 'Cent. African R.'   },
-  { code: 'ER', name: 'Eritrea'            },
-  { code: 'NA', name: 'Namibia'            },
-  { code: 'BW', name: 'Botswana'           },
-  { code: 'LS', name: 'Lesotho'            },
-  { code: 'GW', name: 'Guinea-Bissau'      },
-  { code: 'GA', name: 'Gabon'              },
-  { code: 'GQ', name: 'Equatorial Guinea'  },
-  { code: 'SZ', name: 'Eswatini'           },
-  { code: 'CV', name: 'Cape Verde'         },
-  { code: 'ST', name: 'São Tomé & Príncipe'},
-  { code: 'KM', name: 'Comoros'            },
-  { code: 'MU', name: 'Mauritius'          },
-  { code: 'SC', name: 'Seychelles'         },
-];
+const EXPLORE_FIRST_COUNT = 21;
 
-const INITIAL_COUNT = 7;
-
-export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPageProps) {
+export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLanguage }: LandingPageProps) {
   const { setGuestMode } = useAuth();
 
   const [sheet, setSheet] = useState<SheetMode>(initialSheet ?? null);
   const [showOurStory, setShowOurStory] = useState(false);
-  const [countrySearch, setCountrySearch] = useState('');
-  const [langsExpanded, setLangsExpanded] = useState(false);
-  const [langsVisible, setLangsVisible] = useState(false);
-  const langsSectionRef = useRef<HTMLDivElement>(null);
+
+  // Explorer section state
+  const [exploreSearch, setExploreSearch]         = useState('');
+  const [selectedCountry, setSelectedCountry]     = useState<ExploreCountry | null>(null);
+  const [selectedLanguage, setSelectedLanguage]   = useState('');
+  const [panelOpen, setPanelOpen]                 = useState(false);
+  const [showAll, setShowAll]                     = useState(false);
+  const [exploreVisible, setExploreVisible]       = useState(false);
+  const exploreSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const el = langsSectionRef.current;
+    const el = exploreSectionRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setLangsVisible(true); },
-      { threshold: 0.12 }
+      ([entry]) => { if (entry.isIntersecting) setExploreVisible(true); },
+      { threshold: 0.08 }
     );
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
 
-  const filteredCountries = COUNTRY_FACTS.flatMap(c => {
-    const q = countrySearch.trim().toLowerCase();
-    if (!q) return [{ ...c, displayName: c.name }];
-    const countryMatch = c.name.toLowerCase().includes(q);
-    const langMatches = c.languages.filter(l => l.toLowerCase().includes(q));
-    if (langMatches.length > 0) return langMatches.map(l => ({ ...c, displayName: l }));
-    if (countryMatch) return [{ ...c, displayName: c.name }];
-    return [];
+  const filteredCountries = EXPLORE_COUNTRIES.filter(c => {
+    const q = exploreSearch.trim().toLowerCase();
+    if (!q) return true;
+    if (c.name.toLowerCase().includes(q)) return true;
+    return c.languages.some(l => (LANGUAGE_NAMES[l] ?? l).toLowerCase().includes(q));
   });
 
+  const firstHalf  = filteredCountries.slice(0, EXPLORE_FIRST_COUNT);
+  const secondHalf = filteredCountries.slice(EXPLORE_FIRST_COUNT);
+
+  const handleFlagClick = (country: ExploreCountry) => {
+    setSelectedCountry(country);
+    setSelectedLanguage(country.languages[0] || '');
+    setPanelOpen(true);
+  };
+
+  const handleStartLearning = () => {
+    if (!selectedLanguage) return;
+    if (isLoggedIn && onSelectLanguage) {
+      onSelectLanguage(selectedLanguage);
+    } else {
+      setSheet('signup');
+      setPanelOpen(false);
+    }
+  };
+
+  // ── Auth form state ────────────────────────────────────────────────────────
   const [loginEmail, setLoginEmail]       = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginLoading, setLoginLoading]   = useState(false);
@@ -219,7 +224,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
   return (
     <div className="lp">
 
-      {/* ── Stacked Hero (header lives inside so it shares the gradient bg) ── */}
+      {/* ── Stacked Hero ── */}
       <section className="lp-stack">
 
         <header className="lp-header">
@@ -229,14 +234,17 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
           </div>
         </header>
 
-        {/* Top block: logo left + tagline right, then CTAs stacked below */}
+        {/* Top block: logo + tagline + CTAs */}
         <div className="lp-stack-top">
           <div className="lp-stack-hero-row">
             <div className="lp-stack-logo-wrap">
               <img src="/Afroslang.png" alt="Afroslang" className="lp-stack-logo" />
               <div className="lp-stack-logo-glow" />
             </div>
-            <p className="lp-stack-tagline">Rekindle with your ancestral tongues</p>
+            <p className="lp-stack-tagline">
+              <span style={{ color: '#ffffff' }}>Rekindle</span>{' '}
+              <span style={{ color: '#b00020' }}>with your ancestral tongues</span>
+            </p>
           </div>
           <div className="lp-stack-ctas">
             {isLoggedIn ? (
@@ -261,7 +269,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
           </div>
         </div>
 
-        {/* Row 1: mission text left + lpimg1 right */}
+        {/* Our Mission row */}
         <div className="lp-stack-row lp-stack-row--right">
           <div className="lp-stack-row-text">
             <span className="lp-stack-row-label">Our Mission</span>
@@ -276,40 +284,159 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
           </div>
         </div>
 
-        {/* ── Language Countries Grid ── */}
+        {/* ── Interactive Language Explorer ── */}
         <div
-          ref={langsSectionRef}
-          className={`lp-langs-section${langsVisible ? ' lp-langs-section--visible' : ''}`}
+          ref={exploreSectionRef}
+          className={`lp-explore-section${exploreVisible ? ' lp-explore-section--visible' : ''}`}
         >
-          <p className="lp-langs-eyebrow">Over 1500+ African Languages · Explore the Continent — Not even half way there</p>
-          <div className="lp-langs-grid">
-            {(langsExpanded ? LANDING_COUNTRIES : LANDING_COUNTRIES.slice(0, INITIAL_COUNT)).map((c, i) => (
-              <div
-                key={c.code}
-                className="lp-langs-card"
-                style={{ transitionDelay: `${i * 45}ms` }}
-              >
-                <img
-                  className="lp-langs-flag"
-                  src={`https://flagcdn.com/w40/${c.code.toLowerCase()}.png`}
-                  alt={c.name}
-                  loading="lazy"
-                />
-                <span className="lp-langs-name">{c.name}</span>
-              </div>
-            ))}
+          {/* Section header */}
+          <div className="lp-explore-header">
+            <p className="lp-langs-eyebrow">Over 1500+ African Languages · Explore the Continent — Not even half way there</p>
+            <div className="lp-explore-search-wrap">
+              <svg className="lp-explore-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="22" y2="22" />
+              </svg>
+              <input
+                className="lp-explore-search"
+                type="text"
+                placeholder="Search country or language…"
+                value={exploreSearch}
+                onChange={e => setExploreSearch(e.target.value)}
+              />
+              {exploreSearch && (
+                <button className="lp-explore-search-clear" onClick={() => setExploreSearch('')}>✕</button>
+              )}
+            </div>
+          </div>
 
-            <button
-              className="lp-langs-toggle"
-              onClick={() => setLangsExpanded(e => !e)}
-              aria-label={langsExpanded ? 'Show less' : 'Show more'}
-            >
-              <span className={`lp-langs-toggle-icon${langsExpanded ? ' lp-langs-toggle-icon--up' : ''}`}>›</span>
-            </button>
+          {/* Main: panel left + grid right */}
+          <div className="lp-explore-main">
+
+            {/* Left panel */}
+            <aside className={`lp-explore-panel${panelOpen ? ' lp-explore-panel--open' : ''}`}>
+              <div className="lp-explore-panel-handle" />
+              {selectedCountry ? (
+                <div className="lp-explore-panel-inner">
+                  <button className="lp-explore-panel-close" onClick={() => setPanelOpen(false)}>✕</button>
+                  <img
+                    className="lp-explore-panel-flag"
+                    src={`https://flagcdn.com/w80/${selectedCountry.code.toLowerCase()}.png`}
+                    alt={selectedCountry.name}
+                  />
+                  <h3 className="lp-explore-panel-name">{selectedCountry.name}</h3>
+                  <p className="lp-explore-panel-fact">{selectedCountry.fact}</p>
+
+                  {selectedCountry.languages.length > 0 ? (
+                    <div className="lp-explore-panel-langs">
+                      <label className="lp-explore-lang-label">Choose a language to learn</label>
+                      <div className="lp-explore-select-wrap">
+                        <select
+                          className="lp-explore-lang-select"
+                          value={selectedLanguage}
+                          onChange={e => setSelectedLanguage(e.target.value)}
+                        >
+                          {selectedCountry.languages.map(lid => (
+                            <option key={lid} value={lid}>{LANGUAGE_NAMES[lid] ?? lid}</option>
+                          ))}
+                        </select>
+                        <span className="lp-explore-select-arrow">▾</span>
+                      </div>
+                      <button className="lp-explore-btn-start" onClick={handleStartLearning}>
+                        Start Learning {LANGUAGE_NAMES[selectedLanguage] ?? selectedLanguage}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="lp-explore-coming-soon">
+                      <span>🌍</span>
+                      <p>Languages for {selectedCountry.name} are coming soon!</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="lp-explore-panel-empty">
+                  <img src="/Afroslang.png" alt="" className="lp-explore-panel-logo" />
+                  <p>Tap a flag to explore its languages</p>
+                </div>
+              )}
+            </aside>
+
+            {/* Flag grid */}
+            <div className="lp-explore-grid-wrap">
+              <div className="lp-explore-grid">
+                {firstHalf.map((country, idx) => (
+                  <button
+                    key={country.code}
+                    className={[
+                      'lp-explore-flag-btn',
+                      selectedCountry?.code === country.code ? 'lp-explore-flag-btn--active' : '',
+                      country.languages.length === 0 ? 'lp-explore-flag-btn--dim' : '',
+                    ].join(' ')}
+                    style={{ animationDelay: `${idx * 28}ms` }}
+                    onClick={() => handleFlagClick(country)}
+                    title={country.name}
+                  >
+                    <img
+                      className="lp-langs-flag"
+                      src={`https://flagcdn.com/w40/${country.code.toLowerCase()}.png`}
+                      alt={country.name}
+                      loading="lazy"
+                    />
+                    <span className="lp-langs-name">{country.name}</span>
+                  </button>
+                ))}
+
+                {!showAll && secondHalf.length > 0 && (
+                  <button
+                    className="lp-langs-toggle"
+                    onClick={() => setShowAll(true)}
+                    aria-label="Show more countries"
+                  >
+                    <span className="lp-langs-toggle-icon">›</span>
+                  </button>
+                )}
+
+                {showAll && secondHalf.map((country, idx) => (
+                  <button
+                    key={country.code}
+                    className={[
+                      'lp-explore-flag-btn',
+                      selectedCountry?.code === country.code ? 'lp-explore-flag-btn--active' : '',
+                      country.languages.length === 0 ? 'lp-explore-flag-btn--dim' : '',
+                    ].join(' ')}
+                    style={{ animationDelay: `${idx * 28}ms` }}
+                    onClick={() => handleFlagClick(country)}
+                    title={country.name}
+                  >
+                    <img
+                      className="lp-langs-flag"
+                      src={`https://flagcdn.com/w40/${country.code.toLowerCase()}.png`}
+                      alt={country.name}
+                      loading="lazy"
+                    />
+                    <span className="lp-langs-name">{country.name}</span>
+                  </button>
+                ))}
+
+                {showAll && (
+                  <button
+                    className="lp-langs-toggle"
+                    onClick={() => setShowAll(false)}
+                    aria-label="Show fewer countries"
+                  >
+                    <span className="lp-langs-toggle-icon lp-langs-toggle-icon--up">›</span>
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Row 2: lpimg2 left + charity text right */}
+        {/* Mobile backdrop for panel */}
+        {panelOpen && (
+          <div className="lp-explore-backdrop" onClick={() => setPanelOpen(false)} />
+        )}
+
+        {/* Giving Back row */}
         <div className="lp-stack-row lp-stack-row--left">
           <div className="lp-stack-row-img-wrap lp-stack-row-img-wrap--left">
             <img src="/Afroslanglpimg2.png" alt="Afroslang giving back" className="lp-stack-img" />
@@ -327,41 +454,10 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
 
       </section>
 
-      {/* ── 7 Countries ── */}
-      <section className="lp-countries">
-        <div className="lp-countries-header">
-          <h2 className="lp-countries-title">The Continent We Celebrate</h2>
-          <div className="lp-countries-search-wrap">
-            <input
-              className="lp-countries-search"
-              type="text"
-              placeholder="Search country or language…"
-              value={countrySearch}
-              onChange={e => setCountrySearch(e.target.value)}
-            />
-            {countrySearch && (
-              <button className="lp-countries-search-clear" onClick={() => setCountrySearch('')}>✕</button>
-            )}
-          </div>
-        </div>
-        <div className="lp-countries-grid">
-          {filteredCountries.length > 0 ? filteredCountries.map((c, i) => (
-            <div className="lp-country-card" key={`${c.name}-${c.displayName}-${i}`}>
-              <span className="lp-country-flag">{c.flag}</span>
-              <h3 className="lp-country-name">{c.displayName}</h3>
-              <p className="lp-country-fact">{c.fact}</p>
-            </div>
-          )) : (
-            <p className="lp-countries-empty">No results for "{countrySearch}"</p>
-          )}
-        </div>
-      </section>
-
       {/* ── Footer ── */}
       <footer className="lp-footer">
         <div className="lp-footer-inner">
 
-          {/* Brand column */}
           <div className="lp-footer-brand">
             <img src="/Afroslang.png" alt="Afroslang" className="lp-footer-logo" />
             <span className="lp-footer-brand-name">Afro<em>slang</em></span>
@@ -370,25 +466,13 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
               connect with the continent
             </p>
             <div className="lp-footer-socials">
-              <a
-                className="lp-social-link"
-                href="https://www.tiktok.com"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="TikTok"
-              >
+              <a className="lp-social-link" href="https://www.tiktok.com" target="_blank" rel="noreferrer" aria-label="TikTok">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/>
                 </svg>
                 TikTok
               </a>
-              <a
-                className="lp-social-link"
-                href="https://www.instagram.com"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Instagram"
-              >
+              <a className="lp-social-link" href="https://www.instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                   <circle cx="12" cy="12" r="4"/>
@@ -396,13 +480,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
                 </svg>
                 Instagram
               </a>
-              <a
-                className="lp-social-link"
-                href="https://www.twitter.com"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="X / Twitter"
-              >
+              <a className="lp-social-link" href="https://www.twitter.com" target="_blank" rel="noreferrer" aria-label="X / Twitter">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                 </svg>
@@ -411,7 +489,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
             </div>
           </div>
 
-          {/* Links columns */}
           <div className="lp-footer-links-grid">
 
             <div className="lp-footer-col">
@@ -521,8 +598,8 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
             {sheet === 'signup' && (
               <form onSubmit={handleSignup}>
                 {signupError && <div className="auth-sheet-error">{signupError}</div>}
-                <input className="auth-sheet-input" type="text"     placeholder="Full name"           value={signupName}     onChange={e => setSignupName(e.target.value)}     required autoComplete="name" />
-                <input className="auth-sheet-input" type="email"    placeholder="Email address"       value={signupEmail}    onChange={e => setSignupEmail(e.target.value)}    required autoComplete="email" />
+                <input className="auth-sheet-input" type="text"     placeholder="Full name"              value={signupName}     onChange={e => setSignupName(e.target.value)}     required autoComplete="name" />
+                <input className="auth-sheet-input" type="email"    placeholder="Email address"          value={signupEmail}    onChange={e => setSignupEmail(e.target.value)}    required autoComplete="email" />
                 <input className="auth-sheet-input" type="password" placeholder="Password (min 6 chars)" value={signupPassword} onChange={e => setSignupPassword(e.target.value)} required autoComplete="new-password" minLength={6} />
                 <button className="auth-sheet-submit" type="submit" disabled={signupLoading}>
                   {signupLoading ? 'Creating account…' : 'Create Account'}

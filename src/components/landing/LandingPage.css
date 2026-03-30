@@ -263,17 +263,10 @@
   font-size: clamp(1.15rem, 2.8vw, 1.75rem);
   font-weight: 900;
   font-style: italic;
-  color: #ffffff;
   margin: 0;
   letter-spacing: 0.03em;
   text-align: left;
-  text-shadow:
-    0 1px 0 rgba(255,255,255,0.9),
-    1px 2px 0 rgba(176, 0, 32, 0.6),
-    2px 4px 0 rgba(176, 0, 32, 0.4),
-    3px 6px 0 rgba(100, 0, 16, 0.25),
-    4px 8px 12px rgba(0, 0, 0, 0.8),
-    0 0 40px rgba(255, 100, 80, 0.25);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.7);
 }
 
 /* CTAs — stacked vertically */
@@ -596,48 +589,43 @@
 
 
 /* ════════════════════════════════
-   7 COUNTRIES SECTION
+   LANGUAGE EXPLORER SECTION
    ════════════════════════════════ */
-.lp-countries {
-  padding: clamp(56px, 8vw, 100px) clamp(20px, 5vw, 80px);
-  background: #000;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+.lp-explore-section {
   position: relative;
-  overflow: hidden;
+  z-index: 1;
+  padding: clamp(48px, 7vw, 80px) clamp(20px, 6vw, 72px);
+  background: linear-gradient(180deg, #0a0a0a 0%, #060608 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-/* Background accent */
-.lp-countries::before {
-  content: '';
+/* Section header + search */
+.lp-explore-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.lp-explore-search-wrap {
+  position: relative;
+  max-width: 480px;
+  margin: 18px auto 0;
+}
+
+.lp-explore-search-icon {
   position: absolute;
-  bottom: -20%;
-  right: -10%;
-  width: 50%;
-  height: 60%;
-  background: radial-gradient(ellipse at center, rgba(176, 0, 32, 0.08) 0%, transparent 65%);
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.3);
   pointer-events: none;
 }
 
-.lp-countries-header {
-  text-align: center;
-  margin-bottom: clamp(36px, 5vw, 60px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
-
-.lp-countries-search-wrap {
-  position: relative;
-  width: min(420px, 90vw);
-}
-
-.lp-countries-search {
+.lp-explore-search {
   width: 100%;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 50px;
-  padding: 11px 40px 11px 20px;
+  padding: 11px 40px 11px 40px;
   font-family: Georgia, serif;
   font-size: 0.9rem;
   color: #fff;
@@ -645,13 +633,13 @@
   transition: border-color 0.2s, background 0.2s;
   box-sizing: border-box;
 }
-.lp-countries-search::placeholder { color: rgba(255, 255, 255, 0.3); }
-.lp-countries-search:focus {
+.lp-explore-search::placeholder { color: rgba(255, 255, 255, 0.3); }
+.lp-explore-search:focus {
   border-color: rgba(176, 0, 32, 0.5);
   background: rgba(255, 255, 255, 0.07);
 }
 
-.lp-countries-search-clear {
+.lp-explore-search-clear {
   position: absolute;
   right: 14px;
   top: 50%;
@@ -664,96 +652,292 @@
   padding: 0;
   transition: color 0.2s;
 }
-.lp-countries-search-clear:hover { color: #fff; }
+.lp-explore-search-clear:hover { color: #fff; }
 
-.lp-countries-empty {
-  grid-column: 1 / -1;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.35);
-  font-family: Georgia, serif;
-  font-size: 0.95rem;
-  padding: 40px 0;
-}
-
-.lp-countries-title {
-  font-family: 'Times New Roman', Georgia, serif;
-  font-size: clamp(1.8rem, 4vw, 3rem);
-  font-weight: 900;
-  color: #fff;
-  margin: 0 0 12px;
-  letter-spacing: -0.01em;
-}
-
-.lp-countries-sub {
-  font-family: Georgia, serif;
-  font-size: clamp(0.88rem, 1.5vw, 1.05rem);
-  font-style: italic;
-  color: rgba(255, 255, 255, 0.38);
-  margin: 0;
-}
-
-.lp-countries-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
-  max-width: 1200px;
+/* Main layout: panel left + grid right */
+.lp-explore-main {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
-.lp-country-card {
-  background: rgba(255, 255, 255, 0.025);
+/* ── Left panel (desktop sidebar) ── */
+.lp-explore-panel {
+  flex: 0 0 260px;
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 14px;
-  padding: 24px 20px;
+  border-radius: 16px;
+  padding: 24px;
+  min-height: 280px;
+  position: sticky;
+  top: 24px;
+  transition: border-color 0.25s;
+}
+.lp-explore-panel--open {
+  border-color: rgba(176, 0, 32, 0.25);
+}
+
+.lp-explore-panel-handle {
+  display: none;
+}
+
+.lp-explore-panel-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+
+.lp-explore-panel-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  transition: color 0.2s;
+}
+.lp-explore-panel-close:hover { color: #fff; }
+
+.lp-explore-panel-flag {
+  width: 72px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.lp-explore-panel-name {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #fff;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+.lp-explore-panel-fact {
+  font-family: Georgia, serif;
+  font-size: 0.8rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.lp-explore-panel-langs {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  transition: transform 0.22s ease, border-color 0.22s, background 0.22s;
-  position: relative;
-  overflow: hidden;
+  margin-top: 4px;
 }
 
-.lp-country-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #b00020, transparent);
-  opacity: 0;
-  transition: opacity 0.22s;
-}
-
-.lp-country-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(176, 0, 32, 0.3);
-  background: rgba(176, 0, 32, 0.05);
-}
-.lp-country-card:hover::after {
-  opacity: 1;
-}
-
-.lp-country-flag {
-  font-size: 2.4rem;
-  line-height: 1;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
-}
-
-.lp-country-name {
+.lp-explore-lang-label {
   font-family: 'Times New Roman', serif;
-  font-size: 1.1rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  color: #fff;
-  margin: 0;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
 }
 
-.lp-country-fact {
+.lp-explore-select-wrap {
+  position: relative;
+}
+
+.lp-explore-lang-select {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 10px 32px 10px 14px;
   font-family: Georgia, serif;
+  font-size: 0.88rem;
+  color: #fff;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.lp-explore-lang-select:focus { border-color: rgba(176, 0, 32, 0.5); }
+.lp-explore-lang-select option { background: #111; color: #fff; }
+
+.lp-explore-select-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
   font-size: 0.8rem;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.5);
+}
+
+.lp-explore-btn-start {
+  width: 100%;
+  background: #b00020;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-family: 'Times New Roman', serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+  text-align: center;
+}
+.lp-explore-btn-start:hover {
+  background: #d4002a;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(176, 0, 32, 0.45);
+}
+
+.lp-explore-coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 0;
+  text-align: center;
+}
+.lp-explore-coming-soon span { font-size: 2rem; }
+.lp-explore-coming-soon p {
+  font-family: Georgia, serif;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.38);
   margin: 0;
+  line-height: 1.5;
+}
+
+.lp-explore-panel-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 40px 16px;
+  text-align: center;
+}
+.lp-explore-panel-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  opacity: 0.25;
+}
+.lp-explore-panel-empty p {
+  font-family: Georgia, serif;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.28);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Flag grid ── */
+.lp-explore-grid-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.lp-explore-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+}
+
+/* Flag button — reuses lp-langs-card visuals but is interactive */
+.lp-explore-flag-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.18s;
+  animation: flagCardIn 0.45s ease both;
+}
+@keyframes flagCardIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.lp-explore-flag-btn:hover {
+  background: rgba(176, 0, 32, 0.1);
+  border-color: rgba(176, 0, 32, 0.3);
+  transform: translateY(-2px);
+}
+.lp-explore-flag-btn--active {
+  background: rgba(176, 0, 32, 0.15) !important;
+  border-color: rgba(176, 0, 32, 0.55) !important;
+  box-shadow: 0 0 0 1px rgba(176, 0, 32, 0.3);
+}
+.lp-explore-flag-btn--dim {
+  opacity: 0.45;
+}
+
+/* Mobile backdrop for panel */
+.lp-explore-backdrop {
+  display: none;
+}
+
+/* ── Mobile: panel becomes a bottom sheet ── */
+@media (max-width: 768px) {
+  .lp-explore-main {
+    flex-direction: column;
+  }
+
+  .lp-explore-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 110;
+    border-radius: 20px 20px 0 0;
+    border-bottom: none;
+    min-height: unset;
+    max-height: 72vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    background: #0d0d0d;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+  .lp-explore-panel--open {
+    transform: translateY(0);
+  }
+
+  .lp-explore-panel-handle {
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+    margin: 12px auto 20px;
+  }
+
+  .lp-explore-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 109;
+    animation: lpFadeIn 0.22s ease;
+  }
+
+  .lp-explore-grid-wrap {
+    width: 100%;
+  }
+
+  .lp-explore-grid {
+    grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+    gap: 8px;
+  }
 }
 
 
