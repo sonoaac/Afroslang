@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
-import { UserData, loadUserData, createGuestUser, loadGuestProgress, saveGuestProgress } from '../utils/userData';
-import { getCurrentHeartsStatus, getGuestHeartsStatus } from '../utils/heartsTimer';
+import { UserData, loadUserData, createGuestUser, saveGuestProgress } from '../utils/userData';
+import { getCurrentHeartsStatus } from '../utils/heartsTimer';
 
 interface AuthContextType {
   user: User | null;
@@ -60,20 +60,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(null);
         setUserData(null);
         setIsGuest(false);
-        
-        // Check for guest progress
-        const guestProgress = loadGuestProgress();
-        if (guestProgress) {
-          // Update guest hearts based on timer
-          const heartsStatus = getGuestHeartsStatus();
-          const updatedGuestProgress = {
-            ...guestProgress,
-            hearts: heartsStatus.currentHearts,
-            heartsData: heartsStatus
-          };
-          setUserData(updatedGuestProgress);
-          setIsGuest(true);
-        }
+        // Guest mode is not auto-restored on load — users always start from LandingPage
+        // and must explicitly click "Try as Guest" each session.
       }
       setLoading(false);
     });
