@@ -925,12 +925,7 @@
   }
 
   .lp-explore-backdrop {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.65);
-    z-index: 109;
-    animation: lpFadeIn 0.22s ease;
+    display: none;
   }
 
   .lp-explore-grid-wrap {
