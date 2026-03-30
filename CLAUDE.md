@@ -71,16 +71,41 @@ On every auth state change, `AuthContext` calls `getCurrentHeartsStatus()` from 
 All languages share the same 7-stage structure via `createSevenStageCurriculum()`:
 1. Raw lesson arrays live in `src/data/lessons/<language>.ts` (exported as `<language>Lessons`)
 2. Swahili uses a structured format (`swahili-structured.ts`) with pre-defined stages
-3. The curriculum builder distributes raw lessons across 7 stages × 7 lessons, padding with review lessons when raw content is insufficient
+3. The curriculum builder distributes raw lessons across 7 stages × 7 lessons, padding with review lessons (`createReviewLesson()`) when raw content is insufficient
 4. Each lesson is normalized to exactly 20 exercises by `normalizeToTwenty()` (repeats with "(Review)" suffix if needed)
 5. `getStagesForLanguage(languageId)` is the main entry point
 
-Exercise types: `multiple-choice | fill-blank | match | translate | type-answer`
+**Base exercise types** (defined in lesson data files): `multiple-choice | fill-blank | match | translate | type-answer`
+
+**Enriched exercise types** (injected at runtime by `src/features/lessons/lessonUtils.ts`, never written into lesson data files):
+
+| Type | Description |
+|---|---|
+| `flashcard` | Flip card showing native word → English meaning |
+| `audio-match` | TTS audio plays; user picks the written match |
+| `word-order` | Tap word tiles to assemble a sentence |
+| `cultural-card` | Non-quiz cultural insight slide (no score impact) |
+| `conversation` | Scripted dialogue with option choices (uses `ConversationTurn[]`) |
+| `story` | Story paragraph with tappable vocabulary (uses `StoryWord[]`) |
+| `tone-trainer` | Tone identification for tonal languages (uses `ToneEntry[]`) |
+
+Enriched exercises carry `isEnriched: true` on the runtime `EnrichedExercise` type and **do not count toward quiz score or total**. They form the "teaching phase" of a lesson before quiz exercises begin.
+
+### Conversation Scripts (`src/features/lessons/conversationScripts.ts`)
+
+Topic-aware dialogue scripts exist for all 15 languages. `getConversationScript(languageId, topic)` returns a `ConversationTurn[]` array with native text, English gloss, French gloss, answer choices, and `wrongExplanation` fields. `detectTopic(lessonTitle)` infers topic from lesson title keywords (greetings, numbers, family, food, colors, etc.). All conversation turns include bilingual fields (`text`, `textTranslation`, `textTranslationFr`, `wrongExplanation`, `wrongExplanationFr`).
+
+### Tone Training (`src/features/lessons/lessonUtils.ts`)
+
+Tonal languages get `tone-trainer` exercises automatically. `TONAL_LANGUAGES` set: `igbo, yoruba, hausa, twi, ewe, moore, lingala`. The `TONE_DATA` object maps each language to an array of `ToneEntry` objects containing the diacritic mark, English/French name, a native example word, its meaning, and pitch direction (`high | low | mid | rising | falling`).
 
 ### Key Data Types (`src/types/index.ts`)
 
 - `UserProgress` — per-language client state (xp, level, hearts, streak, completedLessons[])
 - `Stage` → `Lesson` → `Exercise` — the content hierarchy
+- `ConversationTurn` — one turn in a scripted dialogue (speaker, native text, translation, options, wrongExplanation)
+- `StoryWord` — a tappable word in a story exercise (word, meaning, meaningFr)
+- `ToneEntry` — one tone in a tone-trainer slide (mark, name, example, pitch)
 - Hearts: max 5, regenerate at **1 heart per 5 hours** (incremental, not a bulk reset). Managed server-side via `src/utils/heartsTimer.ts` for authenticated users, via `localStorage` key `afroslang_guest_hearts` for guests. Subscribers get 999 (unlimited).
 - Guest lesson cap: 3 completions before `GuestLimitModal` prompts sign-up; XP/streaks do not persist for guests
 
@@ -89,7 +114,7 @@ Exercise types: `multiple-choice | fill-blank | match | translate | type-answer`
 Dark luxury theme defined in `src/styles/globals.css`:
 - **Brand colors:** `--brand-black: #000000`, `--brand-red: #b00020`, `--brand-green: #35b729`
 - **Background:** `--app-bg` is a radial gradient (dark black + subtle red glow)
-- **Font:** Roboto (loaded via Google Fonts)
+- **Fonts:** Roboto (primary UI font, loaded via Google Fonts) and Playfair Display (serif/editorial, imported but not yet applied to CSS rules)
 - **Component library:** shadcn/ui in `src/components/ui/` — **do not modify these files directly**
 
 ### Firebase / Backend (`src/firebase.ts`, `src/utils/`, `functions/`)
@@ -103,7 +128,7 @@ Dark luxury theme defined in `src/styles/globals.css`:
 
 ### Gems & Currency (`src/utils/currencyUtils.ts`)
 
-Two in-app currencies: **Gems** (earned by completing lessons) and **Sandbits** (unused currently). Shop actions: hearts refill (100 gems), XP boost (150 sandbits → 2× XP for 1 hour). XP boost expiry is stored on `userData.xpBoostExpiry` (timestamp). Plus subscribers bypass the hearts system entirely (hearts set to 999).
+Two in-app currencies: **Gems** (earned by completing lessons) and **Sandbits** (purchasable; used for XP boosts). Shop actions: hearts refill (100 gems), XP boost (150 sandbits → 2× XP for 1 hour), Sandbits pack purchase. XP boost expiry is stored on `userData.xpBoostExpiry` (timestamp). Plus subscribers bypass the hearts system entirely (hearts set to 999).
 
 ### Path Aliases
 
@@ -117,9 +142,10 @@ TypeScript path alias `@/*` maps to `./src/*` (configured in `tsconfig.json`). U
 
 - `src/components/ui/` — shadcn/ui component library (do not modify these files)
 - `src/features/` — feature-level screens: `language-select/`, `lessons/`, `store/` (`auth/` and `progress/` subdirs exist but are empty)
-- `src/hooks/` — directory exists but is empty; hook logic lives in components or `src/utils/`
+- `src/hooks/` — empty; hook logic lives in components or `src/utils/`
+- `src/api/` — `create-checkout-session.ts` and `stripe-webhook.ts` (reference-only; live webhook is in `functions/`)
 - `src/components/intro/` — `AfroslangIntro` (animated logo reveal, plays once per session)
-- `src/components/splash/` — `SplashScreen` (3D shattering text animation, plays once per session after auth)
+- `src/components/splash/` — `SplashScreen` (3D shattering text animation, unused in App.tsx)
 - `src/components/landing/` — `LandingPage` with login/signup bottom sheets and `RainCanvas` animated background
 - `src/components/rain/` — `RainCanvas` (animated rain background) and `MascotFactCard` (cultural facts carousel shown on `LearningPath` for languages in `RAIN_LANGUAGES`)
 - `src/components/` — shared components: auth, layout, leaderboard, subscription, streak, mascot, debug
@@ -134,12 +160,12 @@ When adding a new language, add cultural facts here and decide whether it belong
 
 ### Duplicate / Legacy Files
 
-- `src/data/` contains legacy copies of some lesson files (e.g. `src/data/swahili.ts`, `hausa.ts`, `yoruba.ts`, `zulu.ts`). The canonical source is `src/data/lessons/<language>.ts`. Do not add new content to the legacy files in `src/data/`.
+- `src/data/` root contains legacy copies of some lesson files (e.g. `src/data/swahili.ts`, `hausa.ts`, `yoruba.ts`, `zulu.ts`). The canonical source is `src/data/lessons/<language>.ts`. **Do not add new content to files in `src/data/` root.**
 - `src/data/all-languages.ts` and `src/data/lessons/all-languages.ts` are aggregate files — do not add new lessons here; add to individual language files instead.
 - `src/data/swahili-structured.ts` mirrors `src/data/lessons/swahili-structured.ts` — the `lessons/` version is canonical.
 - `src/firebase.js` and `src/firebase.ts` both exist — use only `src/firebase.ts`. The `.js` file is a legacy artifact.
-- `src/main.tsx.backup` is a backup file — ignore it.
-- `src/components/splash/SplashScreen.tsx` exists but is unused in App.tsx.
+- `src/main.tsx.backup` — ignore it.
+- `src/lib/` and `src/pages/` directories exist but are empty placeholders.
 
 ### Adding a New Language
 
@@ -147,7 +173,10 @@ When adding a new language, add cultural facts here and decide whether it belong
 2. Add the language ID to `AfricanLanguage` type in `src/types/index.ts`
 3. Add it to `rawLessonsForLanguage()` switch in `src/data/lessons/index.ts`
 4. Add metadata to `src/data/languages.ts`
-5. Run `npm run validate:lessons` to check data integrity
+5. Add cultural facts to `src/data/culturalFacts.ts`; decide whether it belongs in `RAIN_LANGUAGES`
+6. If tonal, add it to `TONAL_LANGUAGES` and provide `TONE_DATA` entries in `src/features/lessons/lessonUtils.ts`
+7. Add topic-aware conversation scripts to `src/features/lessons/conversationScripts.ts`
+8. Run `npm run validate:lessons` to check data integrity
 
 ### Lesson Data Validation
 
@@ -160,6 +189,7 @@ When adding a new language, add cultural facts here and decide whether it belong
 
 Every user-facing string in lesson/exercise data must have English + French variants:
 - `title` / `titleFr`, `question` / `questionFr`, `options` / `optionsFr`, `hint` / `hintFr`
+- `ConversationTurn` fields: `textTranslation` / `textTranslationFr`, `wrongExplanation` / `wrongExplanationFr`
 - Interface language (`'en'` | `'fr'`) is set at startup and persisted in `localStorage` as `afroslang_interface`
 
 ### Igbo Text Handling
