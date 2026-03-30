@@ -32,13 +32,13 @@
   position: relative;
   padding: 22px 28px;
   background: transparent;
+  justify-content: flex-start;
 }
 
 .lp-header-left {
   display: flex;
   align-items: center;
   gap: 12px;
-  transform: translateX(-6%);
 }
 
 .lp-logo {
