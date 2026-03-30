@@ -55,6 +55,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
   const { setGuestMode } = useAuth();
 
   const [sheet, setSheet] = useState<SheetMode>(initialSheet ?? null);
+  const [showOurStory, setShowOurStory] = useState(false);
 
   const [loginEmail, setLoginEmail]       = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -279,7 +280,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
               <h4 className="lp-footer-col-title">Get to Know</h4>
               <ul className="lp-footer-list">
                 <li><button className="lp-footer-link" onClick={() => setSheet('signup')}>About Afroslang</button></li>
-                <li><button className="lp-footer-link" onClick={() => setSheet('signup')}>Our Story</button></li>
+                <li><button className="lp-footer-link" onClick={() => setShowOurStory(true)}>Our Story</button></li>
                 <li><button className="lp-footer-link" onClick={() => setSheet('signup')}>The Team</button></li>
                 <li><button className="lp-footer-link" onClick={() => setSheet('signup')}>Roadmap</button></li>
               </ul>
@@ -302,10 +303,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
                 <li><button className="lp-footer-link">Privacy Policy</button></li>
                 <li><button className="lp-footer-link">Cookie Policy</button></li>
               </ul>
-              <div className="lp-footer-ownership">
-                <p className="lp-footer-ownership-name">Owned by Sonoaac</p>
-                <p className="lp-footer-ownership-bio">Sonoaac is an Africa First Focus Group. Its Founder originating from Imo Owerri, Nigeria — born 2004, Lagos.</p>
-              </div>
             </div>
 
             <div className="lp-footer-col">
@@ -326,6 +323,29 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue }: LandingPag
           <span className="lp-footer-bottom-right">50% of all payments go directly to African charities</span>
         </div>
       </footer>
+
+      {/* ── Our Story modal ── */}
+      {showOurStory && (
+        <>
+          <div className="our-story-backdrop" onClick={() => setShowOurStory(false)} />
+          <div className="our-story-modal">
+            <button className="our-story-close" onClick={() => setShowOurStory(false)} aria-label="Close">✕</button>
+            <h2 className="our-story-title">Our Story</h2>
+            <div className="our-story-body">
+              <p className="our-story-owner">Owned by <strong>Sonoaac</strong></p>
+              <p>
+                Sonoaac is an Africa First Focus Group dedicated to building products that celebrate,
+                preserve, and elevate African culture and identity across the globe.
+              </p>
+              <p>
+                Its Founder originates from <strong>Imo Owerri, Nigeria</strong> — born in <strong>2004</strong> in Lagos.
+                Afroslang was created from a personal mission: to ensure that descendants of the diaspora
+                never lose connection with their ancestral tongues.
+              </p>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* ── Auth bottom sheet ── */}
       {sheet && (
