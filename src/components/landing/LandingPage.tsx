@@ -169,26 +169,113 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
   const [loginError, setLoginError]       = useState('');
   const [loginSuccess, setLoginSuccess]   = useState('');
 
-  const [signupName, setSignupName]         = useState('');
+  const [signupUsername, setSignupUsername] = useState('');
   const [signupEmail, setSignupEmail]       = useState('');
+  const [signupPhone, setSignupPhone]       = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [signupLoading, setSignupLoading]   = useState(false);
   const [signupError, setSignupError]       = useState('');
+  const [pwdFocused, setPwdFocused]         = useState(false);
+
+  // ── Password rules ─────────────────────────────────────────────────────────
+  // Standard keyboard special chars only
+  const SPECIAL_RE = /[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/;
+
+  const pwdRules = [
+    { label: 'At least 7 characters',     ok: signupPassword.length >= 7 },
+    { label: '1 uppercase letter (A–Z)',   ok: /[A-Z]/.test(signupPassword) },
+    { label: '1 lowercase letter (a–z)',   ok: /[a-z]/.test(signupPassword) },
+    { label: '1 special character',        ok: SPECIAL_RE.test(signupPassword) },
+  ];
+  const pwdValid = pwdRules.every(r => r.ok);
+
+  const validateUsername = (v: string) => /^[a-zA-Z0-9_]{3,20}$/.test(v.trim());
+  const validateEmail    = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+  const validatePhone    = (v: string) => v === '' || /^\+?[0-9\s\-().]{7,20}$/.test(v.trim());
+
+  // ── Rate limiting ──────────────────────────────────────────────────────────
+  const RL_KEY = 'afro_login_rl';
+  const MAX_ATTEMPTS = 5;
+  const LOCKOUT_MS   = 15 * 60 * 1000; // 15 min
+
+  const getRl = (): { count: number; until: number } => {
+    try { return JSON.parse(localStorage.getItem(RL_KEY) || '{"count":0,"until":0}'); }
+    catch { return { count: 0, until: 0 }; }
+  };
+  const setRl = (d: { count: number; until: number }) =>
+    localStorage.setItem(RL_KEY, JSON.stringify(d));
+  const clearRl = () => localStorage.removeItem(RL_KEY);
+
+  const checkLocked = (): { locked: boolean; minutesLeft: number } => {
+    const rl = getRl();
+    if (rl.until > Date.now()) {
+      return { locked: true, minutesLeft: Math.ceil((rl.until - Date.now()) / 60000) };
+    }
+    if (rl.until && rl.until <= Date.now()) clearRl();
+    return { locked: false, minutesLeft: 0 };
+  };
+
+  const recordFailedLogin = (): number => {
+    const rl = getRl();
+    const count = rl.count + 1;
+    const until = count >= MAX_ATTEMPTS ? Date.now() + LOCKOUT_MS : rl.until;
+    setRl({ count, until });
+    return MAX_ATTEMPTS - count;
+  };
+
+  // ── Friendly Firebase error map ────────────────────────────────────────────
+  const friendlyAuthError = (code: string): string => {
+    const map: Record<string, string> = {
+      'auth/user-not-found':        'No account found with that email.',
+      'auth/wrong-password':        'Incorrect password. Please try again.',
+      'auth/invalid-email':         'Please enter a valid email address.',
+      'auth/email-already-in-use':  'An account with that email already exists. Try logging in.',
+      'auth/weak-password':         'Password does not meet the requirements.',
+      'auth/too-many-requests':     'Too many attempts. Please wait before trying again.',
+      'auth/network-request-failed':'Network error. Check your connection and try again.',
+      'auth/invalid-credential':    'Incorrect email or password.',
+      'auth/user-disabled':         'This account has been disabled. Contact support.',
+    };
+    return map[code] || 'Something went wrong. Please try again.';
+  };
 
   const closeSheet = () => {
     setSheet(null);
     setLoginError(''); setLoginSuccess('');
     setSignupError('');
+    setPwdFocused(false);
   };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoginLoading(true); setLoginError(''); setLoginSuccess('');
+    setLoginError(''); setLoginSuccess('');
+
+    // Rate limit check
+    const { locked, minutesLeft } = checkLocked();
+    if (locked) {
+      setLoginError(`Too many failed attempts. Try again in ${minutesLeft} minute${minutesLeft !== 1 ? 's' : ''}.`);
+      return;
+    }
+
+    const email = loginEmail.trim().toLowerCase();
+    if (!validateEmail(email)) { setLoginError('Please enter a valid email address.'); return; }
+    if (!loginPassword)        { setLoginError('Please enter your password.'); return; }
+
+    setLoginLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
+      await signInWithEmailAndPassword(auth, email, loginPassword);
+      clearRl();
       closeSheet();
     } catch (err: any) {
-      setLoginError(err?.message || 'Login failed.');
+      const remaining = recordFailedLogin();
+      const base = friendlyAuthError(err?.code ?? '');
+      if (remaining > 0 && remaining <= 3) {
+        setLoginError(`${base} (${remaining} attempt${remaining !== 1 ? 's' : ''} remaining before lockout)`);
+      } else if (remaining <= 0) {
+        setLoginError(`Account locked for 15 minutes due to too many failed attempts.`);
+      } else {
+        setLoginError(base);
+      }
     } finally {
       setLoginLoading(false);
     }
@@ -196,36 +283,62 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
   const handleForgotPassword = async () => {
     setLoginError(''); setLoginSuccess('');
-    if (!loginEmail) { setLoginError('Enter your email first.'); return; }
+    const email = loginEmail.trim().toLowerCase();
+    if (!email) { setLoginError('Enter your email address above first.'); return; }
+    if (!validateEmail(email)) { setLoginError('Please enter a valid email address.'); return; }
     try {
-      await sendPasswordResetEmail(auth, loginEmail);
-      setLoginSuccess('Reset email sent. Check your inbox.');
+      await sendPasswordResetEmail(auth, email);
+      setLoginSuccess('Password reset email sent. Check your inbox.');
     } catch (err: any) {
-      setLoginError(err?.message || 'Could not send reset email.');
+      setLoginError(friendlyAuthError(err?.code ?? ''));
     }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSignupLoading(true); setSignupError('');
+    setSignupError('');
+
+    const username = signupUsername.trim();
+    const email    = signupEmail.trim().toLowerCase();
+    const phone    = signupPhone.trim();
+    const password = signupPassword;
+
+    if (!validateUsername(username)) {
+      setSignupError('Username must be 3–20 characters: letters, numbers, and underscores only.');
+      return;
+    }
+    if (!validateEmail(email)) {
+      setSignupError('Please enter a valid email address.');
+      return;
+    }
+    if (phone && !validatePhone(phone)) {
+      setSignupError('Please enter a valid phone number or leave it blank.');
+      return;
+    }
+    if (!pwdValid) {
+      setSignupError('Password does not meet all requirements below.');
+      setPwdFocused(true);
+      return;
+    }
+
+    setSignupLoading(true);
     try {
-      const { user } = await createUserWithEmailAndPassword(auth, signupEmail, signupPassword);
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
       await setDoc(doc(db, 'users', user.uid), {
-        username: signupName,
-        email: signupEmail,
+        username,
+        email,
+        ...(phone ? { phone } : {}),
         hearts: 5,
         xp: 0,
+        gems: 0,
+        sandbits: 0,
         subscription: { active: false, plan: null },
         createdAt: new Date().toISOString(),
         languages: {},
       });
       closeSheet();
     } catch (err: any) {
-      const code = err?.code ?? '';
-      if (code === 'auth/email-already-in-use') setSignupError('Email already registered. Try logging in.');
-      else if (code === 'auth/weak-password')   setSignupError('Password must be at least 6 characters.');
-      else if (code === 'auth/invalid-email')   setSignupError('Please enter a valid email address.');
-      else setSignupError(err?.message || 'Signup failed. Try again.');
+      setSignupError(friendlyAuthError(err?.code ?? ''));
     } finally {
       setSignupLoading(false);
     }
@@ -590,8 +703,26 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               <form onSubmit={handleLogin}>
                 {loginError   && <div className="auth-sheet-error">{loginError}</div>}
                 {loginSuccess && <div className="auth-sheet-success">{loginSuccess}</div>}
-                <input className="auth-sheet-input" type="email"    placeholder="Email address"   value={loginEmail}    onChange={e => setLoginEmail(e.target.value)}    required autoComplete="email" />
-                <input className="auth-sheet-input" type="password" placeholder="Password"         value={loginPassword} onChange={e => setLoginPassword(e.target.value)} required autoComplete="current-password" />
+                <input
+                  className="auth-sheet-input"
+                  type="email"
+                  placeholder="Email address"
+                  value={loginEmail}
+                  onChange={e => setLoginEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  maxLength={254}
+                />
+                <input
+                  className="auth-sheet-input"
+                  type="password"
+                  placeholder="Password"
+                  value={loginPassword}
+                  onChange={e => setLoginPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  maxLength={128}
+                />
                 <button className="auth-sheet-submit" type="submit" disabled={loginLoading}>
                   {loginLoading ? 'Logging in…' : 'Log In'}
                 </button>
@@ -620,9 +751,57 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
             {sheet === 'signup' && (
               <form onSubmit={handleSignup}>
                 {signupError && <div className="auth-sheet-error">{signupError}</div>}
-                <input className="auth-sheet-input" type="text"     placeholder="Full name"              value={signupName}     onChange={e => setSignupName(e.target.value)}     required autoComplete="name" />
-                <input className="auth-sheet-input" type="email"    placeholder="Email address"          value={signupEmail}    onChange={e => setSignupEmail(e.target.value)}    required autoComplete="email" />
-                <input className="auth-sheet-input" type="password" placeholder="Password (min 6 chars)" value={signupPassword} onChange={e => setSignupPassword(e.target.value)} required autoComplete="new-password" minLength={6} />
+                <input
+                  className="auth-sheet-input"
+                  type="text"
+                  placeholder="Username (e.g. africanking_01)"
+                  value={signupUsername}
+                  onChange={e => setSignupUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g, ''))}
+                  required
+                  autoComplete="username"
+                  maxLength={20}
+                  minLength={3}
+                />
+                <input
+                  className="auth-sheet-input"
+                  type="email"
+                  placeholder="Email address"
+                  value={signupEmail}
+                  onChange={e => setSignupEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  maxLength={254}
+                />
+                <input
+                  className="auth-sheet-input"
+                  type="tel"
+                  placeholder="Phone number (optional)"
+                  value={signupPhone}
+                  onChange={e => setSignupPhone(e.target.value)}
+                  autoComplete="tel"
+                  maxLength={20}
+                />
+                <input
+                  className="auth-sheet-input"
+                  type="password"
+                  placeholder="Password"
+                  value={signupPassword}
+                  onChange={e => setSignupPassword(e.target.value)}
+                  onFocus={() => setPwdFocused(true)}
+                  required
+                  autoComplete="new-password"
+                  maxLength={128}
+                />
+                {(pwdFocused || signupPassword.length > 0) && (
+                  <div className="auth-pwd-rules">
+                    {pwdRules.map(r => (
+                      <div key={r.label} className={`auth-pwd-rule${r.ok ? ' auth-pwd-rule--ok' : ''}`}>
+                        <span className="auth-pwd-rule-icon">{r.ok ? '✓' : '·'}</span>
+                        {r.label}
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <button className="auth-sheet-submit" type="submit" disabled={signupLoading}>
                   {signupLoading ? 'Creating account…' : 'Create Account'}
                 </button>

@@ -1410,6 +1410,40 @@
   color: #fff;
 }
 
+/* ── Password strength rules ── */
+.auth-pwd-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: -6px;
+  margin-bottom: 10px;
+}
+
+.auth-pwd-rule {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.4);
+  transition: color 0.2s;
+}
+
+.auth-pwd-rule--ok {
+  color: #35b729;
+}
+
+.auth-pwd-rule-icon {
+  font-size: 0.82rem;
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+  font-weight: bold;
+}
+
 
 /* ════════════════════════════════
    RESPONSIVE
