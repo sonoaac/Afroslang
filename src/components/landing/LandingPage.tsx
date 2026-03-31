@@ -316,14 +316,17 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
             </div>
           </div>
 
-          {/* Main: panel left + grid right */}
-          <div className="lp-explore-main">
+          {/* Main: panel left + grid right (desktop); panel replaces grid (mobile) */}
+          <div className={`lp-explore-main${panelOpen ? ' lp-explore-main--panel-open' : ''}`}>
 
             {/* Left panel */}
             <aside className={`lp-explore-panel${panelOpen ? ' lp-explore-panel--open' : ''}`}>
               <div className="lp-explore-panel-handle" />
               {selectedCountry ? (
                 <div className="lp-explore-panel-inner">
+                  <button className="lp-explore-back-btn" onClick={() => setPanelOpen(false)}>
+                    ← All countries
+                  </button>
                   <button className="lp-explore-panel-close" onClick={() => setPanelOpen(false)}>✕</button>
                   <img
                     className="lp-explore-panel-flag"
@@ -438,10 +441,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
           </div>
         </div>
 
-        {/* Mobile backdrop for panel */}
-        {panelOpen && (
-          <div className="lp-explore-backdrop" onClick={() => setPanelOpen(false)} />
-        )}
 
         {/* Giving Back row */}
         <div className="lp-stack-row lp-stack-row--left">
