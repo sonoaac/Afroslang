@@ -123,6 +123,12 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
   const [showAll, setShowAll]                     = useState(false);
   const [exploreVisible, setExploreVisible]       = useState(false);
   const exploreSectionRef = useRef<HTMLDivElement>(null);
+  // Tracks last active tab so form content stays rendered during close animation
+  const lastSheetRef = useRef<'login' | 'signup'>('signup');
+  if (sheet) lastSheetRef.current = sheet;
+  const displaySheet = sheet ?? lastSheetRef.current;
+  const [authTitleKey, setAuthTitleKey] = useState(0);
+
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   const initialCount = isMobile ? 7 : 21;
 
@@ -157,6 +163,25 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     els.forEach(el => obs.observe(el));
     return () => obs.disconnect();
   }, []);
+
+  // ── Body scroll lock when overlay is open ─────────────────────────────────
+  useEffect(() => {
+    document.body.style.overflow = sheet ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [sheet]);
+
+  // ── ESC key closes overlay ─────────────────────────────────────────────────
+  useEffect(() => {
+    if (!sheet) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeSheet(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [sheet]);
+
+  // ── Re-trigger title drop-in on open + tab switch ─────────────────────────
+  useEffect(() => {
+    if (sheet) setAuthTitleKey(k => k + 1);
+  }, [sheet]);
 
   const filteredCountries = EXPLORE_COUNTRIES.filter(c => {
     const q = exploreSearch.trim().toLowerCase();
@@ -724,179 +749,236 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
         </>
       )}
 
-      {/* ── Auth bottom sheet ── */}
-      {sheet && (
-        <>
-          <div className="auth-sheet-backdrop" onClick={closeSheet} />
-          <div className="auth-sheet">
-            <div className="auth-sheet-handle" />
+      {/* ── Auth glassmorphic phase-in overlay ── */}
+      <div
+        className={`as-auth-overlay${sheet ? ' as-auth-overlay--active' : ''}`}
+        aria-modal="true"
+        role="dialog"
+        aria-label="Authentication"
+      >
+        {/* Backdrop — click to close */}
+        <div className="as-auth-backdrop" onClick={closeSheet} />
 
-            <div className="auth-sheet-tabs">
-              <button
-                className={`auth-sheet-tab${sheet === 'login' ? ' auth-sheet-tab--active' : ''}`}
-                onClick={() => { setSheet('login'); setSignupError(''); setLoginError(''); setLoginSuccess(''); }}
-              >Log In</button>
-              <button
-                className={`auth-sheet-tab${sheet === 'signup' ? ' auth-sheet-tab--active' : ''}`}
-                onClick={() => { setSheet('signup'); setLoginError(''); setLoginSuccess(''); setSignupError(''); }}
-              >Sign Up</button>
+        {/* Glass card */}
+        <div className="as-auth-card">
+
+          {/* Close */}
+          <button className="as-auth-close" onClick={closeSheet} aria-label="Close">✕</button>
+
+          {/* Drop-in title (DescrambleText, re-triggers on open + tab switch) */}
+          <div className="as-auth-title-wrap">
+            <DescrambleText
+              key={authTitleKey}
+              chars={(displaySheet === 'login' ? 'LOG IN' : 'SIGN UP').split('').map(ch => ({ from: ch, to: ch }))}
+              className="as-auth-title"
+              startDelay={90}
+              p1Duration={550}
+              p1Stagger={42}
+            />
+          </div>
+
+          {/* Language context badge — shows when triggered from country panel */}
+          {selectedCountry && selectedLanguage && (
+            <div className="as-auth-lang-badge">
+              <img
+                src={`https://flagcdn.com/w20/${selectedCountry.code.toLowerCase()}.png`}
+                alt={selectedCountry.name}
+                className="as-auth-lang-flag"
+              />
+              Starting <strong>{LANGUAGE_NAMES[selectedLanguage] ?? selectedLanguage}</strong>
+              <span className="as-auth-lang-country">· {selectedCountry.name}</span>
             </div>
+          )}
 
-            {sheet === 'login' && (
-              <form onSubmit={handleLogin}>
-                {loginError   && <div className="auth-sheet-error">{loginError}</div>}
-                {loginSuccess && <div className="auth-sheet-success">{loginSuccess}</div>}
+          {/* Tab switcher */}
+          <div className="as-auth-tabs">
+            <button
+              className={`as-tab-btn${displaySheet === 'login' ? ' as-tab-btn--active' : ''}`}
+              onClick={() => { setSheet('login'); setSignupError(''); setLoginError(''); setLoginSuccess(''); }}
+            >Log In</button>
+            <button
+              className={`as-tab-btn${displaySheet === 'signup' ? ' as-tab-btn--active' : ''}`}
+              onClick={() => { setSheet('signup'); setLoginError(''); setLoginSuccess(''); setSignupError(''); }}
+            >Sign Up</button>
+          </div>
+
+          {/* LOG IN form */}
+          {displaySheet === 'login' && (
+            <form className="as-auth-form" onSubmit={handleLogin} autoComplete="on">
+              {loginError   && <div className="as-auth-error">{loginError}</div>}
+              {loginSuccess && <div className="as-auth-success">{loginSuccess}</div>}
+
+              <div className="as-field-group">
                 <input
-                  className="auth-sheet-input"
                   type="email"
-                  placeholder="Email address"
+                  id="as-login-email"
+                  placeholder=" "
                   value={loginEmail}
                   onChange={e => setLoginEmail(e.target.value)}
-                  required
                   autoComplete="email"
+                  required
                   maxLength={254}
                 />
-                <div className="auth-pwd-wrap">
-                  <input
-                    className="auth-sheet-input"
-                    type={showLoginPwd ? 'text' : 'password'}
-                    placeholder="Password"
-                    value={loginPassword}
-                    onChange={e => setLoginPassword(e.target.value)}
-                    required
-                    autoComplete="current-password"
-                    maxLength={128}
-                  />
-                  <button
-                    type="button"
-                    className="auth-pwd-eye"
-                    onClick={() => setShowLoginPwd(v => !v)}
-                    aria-label={showLoginPwd ? 'Hide password' : 'Show password'}
-                  >
-                    {showLoginPwd ? (
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                    ) : (
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    )}
-                  </button>
-                </div>
-                <button className="auth-sheet-submit" type="submit" disabled={loginLoading}>
-                  {loginLoading ? 'Logging in…' : 'Log In'}
-                </button>
-                <button type="button" className="auth-sheet-forgot" onClick={handleForgotPassword}>
-                  Forgot password?
-                </button>
-                <div className="auth-sheet-divider"><span>or</span></div>
+                <label htmlFor="as-login-email">Email address</label>
+              </div>
+
+              <div className="as-field-group">
+                <input
+                  type={showLoginPwd ? 'text' : 'password'}
+                  id="as-login-pwd"
+                  placeholder=" "
+                  value={loginPassword}
+                  onChange={e => setLoginPassword(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                  maxLength={128}
+                />
+                <label htmlFor="as-login-pwd">Password</label>
                 <button
                   type="button"
-                  className="auth-sheet-guest"
-                  onClick={() => {
-                    setGuestMode(true);
-                    closeSheet();
-                    if (pendingLanguage && onSelectLanguage) {
-                      onSelectLanguage(pendingLanguage);
-                    } else {
-                      scrollToExplorer();
-                    }
-                  }}
+                  className="as-eye-btn"
+                  onClick={() => setShowLoginPwd(v => !v)}
+                  aria-label={showLoginPwd ? 'Hide password' : 'Show password'}
                 >
-                  Continue as Guest
+                  {showLoginPwd ? (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  )}
                 </button>
-              </form>
-            )}
+              </div>
 
-            {sheet === 'signup' && (
-              <form onSubmit={handleSignup}>
-                {signupError && <div className="auth-sheet-error">{signupError}</div>}
+              <button className="as-btn-primary" type="submit" disabled={loginLoading}>
+                {loginLoading ? 'Logging in…' : 'LOG IN'}
+              </button>
+              <button type="button" className="as-btn-forgot" onClick={handleForgotPassword}>
+                Forgot password?
+              </button>
+              <div className="as-auth-divider"><span>or</span></div>
+              <button
+                type="button"
+                className="as-btn-guest"
+                onClick={() => {
+                  setGuestMode(true);
+                  closeSheet();
+                  if (pendingLanguage && onSelectLanguage) {
+                    onSelectLanguage(pendingLanguage);
+                  } else {
+                    scrollToExplorer();
+                  }
+                }}
+              >
+                Continue as Guest
+              </button>
+            </form>
+          )}
+
+          {/* SIGN UP form */}
+          {displaySheet === 'signup' && (
+            <form className="as-auth-form" onSubmit={handleSignup} autoComplete="on">
+              {signupError && <div className="as-auth-error">{signupError}</div>}
+
+              <div className="as-field-group">
                 <input
-                  className="auth-sheet-input"
                   type="text"
-                  placeholder="Username (e.g. africanking_01)"
+                  id="as-signup-username"
+                  placeholder=" "
                   value={signupUsername}
                   onChange={e => setSignupUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g, ''))}
-                  required
                   autoComplete="username"
+                  required
                   maxLength={20}
                   minLength={3}
                 />
+                <label htmlFor="as-signup-username">Username (e.g. africanking_01)</label>
+              </div>
+              <div className="as-field-group">
                 <input
-                  className="auth-sheet-input"
                   type="email"
-                  placeholder="Email address"
+                  id="as-signup-email"
+                  placeholder=" "
                   value={signupEmail}
                   onChange={e => setSignupEmail(e.target.value)}
-                  required
                   autoComplete="email"
+                  required
                   maxLength={254}
                 />
+                <label htmlFor="as-signup-email">Email address</label>
+              </div>
+              <div className="as-field-group">
                 <input
-                  className="auth-sheet-input"
                   type="tel"
-                  placeholder="Phone number (optional)"
+                  id="as-signup-phone"
+                  placeholder=" "
                   value={signupPhone}
                   onChange={e => setSignupPhone(e.target.value)}
                   autoComplete="tel"
                   maxLength={20}
                 />
-                <div className="auth-pwd-wrap">
-                  <input
-                    className="auth-sheet-input"
-                    type={showSignupPwd ? 'text' : 'password'}
-                    placeholder="Password"
-                    value={signupPassword}
-                    onChange={e => setSignupPassword(e.target.value)}
-                    onFocus={() => setPwdFocused(true)}
-                    required
-                    autoComplete="new-password"
-                    maxLength={128}
-                  />
-                  <button
-                    type="button"
-                    className="auth-pwd-eye"
-                    onClick={() => setShowSignupPwd(v => !v)}
-                    aria-label={showSignupPwd ? 'Hide password' : 'Show password'}
-                  >
-                    {showSignupPwd ? (
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                    ) : (
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    )}
-                  </button>
-                </div>
-                {(pwdFocused || signupPassword.length > 0) && (
-                  <div className="auth-pwd-rules">
-                    {pwdRules.map(r => (
-                      <div key={r.label} className={`auth-pwd-rule${r.ok ? ' auth-pwd-rule--ok' : ''}`}>
-                        <span className="auth-pwd-rule-icon">{r.ok ? '✓' : '·'}</span>
-                        {r.label}
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <button className="auth-sheet-submit" type="submit" disabled={signupLoading}>
-                  {signupLoading ? 'Creating account…' : 'Create Account'}
-                </button>
-                <div className="auth-sheet-divider"><span>or</span></div>
+                <label htmlFor="as-signup-phone">Phone number (optional)</label>
+              </div>
+              <div className="as-field-group">
+                <input
+                  type={showSignupPwd ? 'text' : 'password'}
+                  id="as-signup-pwd"
+                  placeholder=" "
+                  value={signupPassword}
+                  onChange={e => setSignupPassword(e.target.value)}
+                  onFocus={() => setPwdFocused(true)}
+                  autoComplete="new-password"
+                  required
+                  maxLength={128}
+                />
+                <label htmlFor="as-signup-pwd">Password</label>
                 <button
                   type="button"
-                  className="auth-sheet-guest"
-                  onClick={() => {
-                    setGuestMode(true);
-                    closeSheet();
-                    if (pendingLanguage && onSelectLanguage) {
-                      onSelectLanguage(pendingLanguage);
-                    } else {
-                      scrollToExplorer();
-                    }
-                  }}
+                  className="as-eye-btn"
+                  onClick={() => setShowSignupPwd(v => !v)}
+                  aria-label={showSignupPwd ? 'Hide password' : 'Show password'}
                 >
-                  Continue as Guest
+                  {showSignupPwd ? (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  )}
                 </button>
-              </form>
-            )}
-          </div>
-        </>
-      )}
+              </div>
+
+              {(pwdFocused || signupPassword.length > 0) && (
+                <div className="as-pwd-rules">
+                  {pwdRules.map(r => (
+                    <div key={r.label} className={`as-pwd-rule${r.ok ? ' as-pwd-rule--ok' : ''}`}>
+                      <span className="as-pwd-rule-icon">{r.ok ? '✓' : '·'}</span>
+                      {r.label}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button className="as-btn-primary" type="submit" disabled={signupLoading}>
+                {signupLoading ? 'Creating account…' : 'CREATE ACCOUNT'}
+              </button>
+              <div className="as-auth-divider"><span>or</span></div>
+              <button
+                type="button"
+                className="as-btn-guest"
+                onClick={() => {
+                  setGuestMode(true);
+                  closeSheet();
+                  if (pendingLanguage && onSelectLanguage) {
+                    onSelectLanguage(pendingLanguage);
+                  } else {
+                    scrollToExplorer();
+                  }
+                }}
+              >
+                Continue as Guest
+              </button>
+            </form>
+          )}
+
+        </div>
+      </div>
     </div>
   );
 }
