@@ -252,8 +252,8 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               <div className="lp-stack-logo-glow" />
             </div>
             <p className="lp-stack-tagline">
-              <span style={{ color: '#ffffff' }}>Rekindle</span>{' '}
-              <span style={{ color: '#b00020' }}>with your ancestral tongues</span>
+              <span style={{ color: '#ffffff', display: 'block', fontWeight: 800, fontSize: '2em', lineHeight: 1.1 }}>Rekindle</span>
+              <span style={{ color: '#b00020', display: 'block' }}>with your ancestral tongues</span>
             </p>
           </div>
           <div className="lp-stack-ctas">

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { Gem, Heart, Zap } from 'lucide-react';
+import { Gem, Heart, Zap, ChevronLeft } from 'lucide-react';
 import { SandbitsIcon } from '../../components/ui/SandbitsIcon';
 import { InterfaceLanguage } from '../../types';
 import {
@@ -25,7 +25,6 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
   const [purchasing, setPurchasing] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
-  // Get currency values (with defaults)
   const gems     = userData?.gems     ?? 0;
   const sandbits = userData?.sandbits ?? 0;
 
@@ -83,8 +82,9 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
   const spSurface = '#111111';
   const spBorder = 'rgba(255,255,255,0.08)';
   const spRed = '#b00020';
+  const spRedBright = '#e53935';
   const spText = '#ffffff';
-  const spMuted = 'rgba(255,255,255,0.6)';
+  const spMuted = 'rgba(255,255,255,0.55)';
 
   const boostActive = isXpBoostActive(userData);
   const boostMs = xpBoostRemainingMs(userData);
@@ -92,157 +92,303 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
 
   const shopItems = [
     {
-      icon: <Heart style={{ width: 36, height: 36, color: spRed }} strokeWidth={1.5} />,
+      icon: <Heart style={{ width: 52, height: 52, color: spRedBright }} strokeWidth={1.5} />,
+      emoji: '❤️',
       title: isEnglish ? 'Refill Hearts' : 'Recharger les Cœurs',
-      desc: isEnglish ? 'Restore all 5 hearts instantly' : 'Restaurez les 5 cœurs instantanément',
+      desc: isEnglish
+        ? 'Lost all your hearts? Get back in the game immediately. Restore all 5 lives in one tap.'
+        : 'Plus de cœurs? Revenez immédiatement dans le jeu. Restaurez 5 vies en un seul tap.',
       price: COST_HEARTS_REFILL,
       currency: isEnglish ? 'Gems' : 'Gemmes',
-      CurrencyIcon: <Gem style={{ width: 16, height: 16, color: spRed }} strokeWidth={2} />,
+      CurrencyIcon: <Gem style={{ width: 18, height: 18, color: spRedBright }} strokeWidth={2} />,
       canAfford: gems >= COST_HEARTS_REFILL,
+      accentColor: '#e53935',
+      tag: null,
     },
     {
-      icon: <SandbitsIcon size={36} className="" />,
+      icon: <SandbitsIcon size={52} className="" />,
+      emoji: '✨',
       title: isEnglish ? 'Sandbits Pack' : 'Pack de Sablebits',
-      desc: isEnglish ? '+500 Sandbits (premium currency)' : '+500 Sablebits (devise premium)',
+      desc: isEnglish
+        ? 'Stock up on premium currency. Use Sandbits to unlock exclusive boosts and power-ups.'
+        : 'Faites le plein de devise premium. Utilisez des Sablebits pour débloquer des boosts exclusifs.',
       price: COST_SANDBITS_PACK,
       currency: isEnglish ? 'Gems' : 'Gemmes',
-      CurrencyIcon: <Gem style={{ width: 16, height: 16, color: spRed }} strokeWidth={2} />,
+      CurrencyIcon: <Gem style={{ width: 18, height: 18, color: spRedBright }} strokeWidth={2} />,
       canAfford: gems >= COST_SANDBITS_PACK,
+      accentColor: '#c0850a',
+      tag: '+500',
     },
     {
-      icon: <Zap style={{ width: 36, height: 36, color: boostActive ? '#ffd60a' : spRed }} strokeWidth={1.5} />,
+      icon: <Zap style={{ width: 52, height: 52, color: boostActive ? '#ffd60a' : spRedBright }} strokeWidth={1.5} />,
+      emoji: '⚡',
       title: isEnglish ? 'XP Boost 2×' : 'Boost XP 2×',
       desc: boostActive
-        ? (isEnglish ? `Active — ${boostMinutes}m remaining` : `Actif — ${boostMinutes}m restantes`)
-        : (isEnglish ? '2× XP earned for 1 hour' : '2× XP gagné pendant 1 heure'),
+        ? (isEnglish ? `Your boost is active — ${boostMinutes} minutes remaining. Keep learning!` : `Votre boost est actif — ${boostMinutes} minutes restantes. Continuez!`)
+        : (isEnglish ? 'Double your XP for an entire hour. Perfect for powering through lessons.' : 'Doublez vos XP pendant une heure. Idéal pour avancer rapidement dans les leçons.'),
       price: COST_XP_BOOST,
       currency: isEnglish ? 'Sandbits' : 'Sablebits',
-      CurrencyIcon: <SandbitsIcon size={16} />,
+      CurrencyIcon: <SandbitsIcon size={18} />,
       canAfford: sandbits >= COST_XP_BOOST,
+      accentColor: boostActive ? '#ffd60a' : spRedBright,
+      tag: boostActive ? (isEnglish ? 'ACTIVE' : 'ACTIF') : '1HR',
     },
   ];
 
   return (
     <div style={{ minHeight: '100vh', background: spBg, fontFamily: spFont }}>
-      {/* Toast notification */}
+
+      {/* Toast */}
       {toast && (
         <div style={{
           position: 'fixed', top: 24, left: '50%', transform: 'translateX(-50%)',
           background: '#111', border: '1px solid rgba(176,0,32,0.5)',
-          color: '#fff', padding: '12px 24px', borderRadius: 8,
-          fontSize: '0.9rem', fontWeight: 'bold', zIndex: 9999,
-          boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
+          color: '#fff', padding: '12px 28px', borderRadius: 8,
+          fontSize: '0.95rem', fontWeight: 'bold', zIndex: 9999,
+          boxShadow: '0 4px 32px rgba(0,0,0,0.6)', whiteSpace: 'nowrap',
         }}>
           {toast}
         </div>
       )}
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '1.5rem 1rem' }}>
 
-        {/* Header */}
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '1.5rem 1rem 4rem' }}>
+
+        {/* Back */}
+        <button
+          onClick={onBack}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '0.4rem',
+            background: 'transparent', border: 'none',
+            color: spMuted, cursor: 'pointer',
+            fontFamily: spFont, fontSize: '0.9rem',
+            marginBottom: '1.25rem', padding: 0, transition: 'color 0.2s',
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = spText; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = spMuted; }}
+        >
+          <ChevronLeft style={{ width: 18, height: 18 }} strokeWidth={2} />
+          {isEnglish ? 'Back' : 'Retour'}
+        </button>
+
+        {/* Title */}
         <div style={{ marginBottom: '2rem' }}>
-          <button
-            onClick={onBack}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'transparent', border: 'none', color: spMuted, cursor: 'pointer', fontFamily: spFont, fontSize: '0.9rem', marginBottom: '1.5rem', padding: 0, transition: 'color 0.2s' }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = spText; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = spMuted; }}
-          >
-            <svg style={{ width: 18, height: 18 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {isEnglish ? 'Back' : 'Retour'}
-          </button>
-          <div style={{ height: '2px', background: spRed, marginBottom: '1.5rem', opacity: 0.7 }} />
-          <h1 style={{ color: spText, fontFamily: spFont, fontSize: 'clamp(1.8rem, 5vw, 3rem)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>
+          <div style={{ height: '2px', background: spRed, opacity: 0.7, marginBottom: '1.25rem' }} />
+          <h1 style={{
+            color: spText, fontFamily: spFont,
+            fontSize: 'clamp(2rem, 6vw, 3.2rem)',
+            fontWeight: 'bold', textTransform: 'uppercase',
+            letterSpacing: '0.08em', margin: 0,
+          }}>
             {isEnglish ? 'Shop' : 'Boutique'}
           </h1>
+          <p style={{ color: spMuted, fontSize: '0.9rem', marginTop: '0.4rem' }}>
+            {isEnglish ? 'Spend your hard-earned currency on power-ups and bonuses.' : 'Dépensez vos devises gagnées pour des power-ups et bonus.'}
+          </p>
         </div>
 
-        {/* Currency Display */}
-        <div style={{ background: spSurface, border: `1px solid ${spBorder}`, padding: '1.25rem 1.5rem', marginBottom: '2rem', display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'center' }}>
+        {/* Currency Balance */}
+        <div style={{
+          background: spSurface, border: `1px solid ${spBorder}`,
+          padding: '1rem 1.5rem', marginBottom: '2.5rem',
+          display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'center',
+        }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ background: 'rgba(176,0,32,0.12)', border: `1px solid rgba(176,0,32,0.3)`, padding: '0.5rem', display: 'flex' }}>
-              <Gem style={{ width: 22, height: 22, color: spRed }} strokeWidth={1.5} />
+            <div style={{ background: 'rgba(176,0,32,0.15)', border: '1px solid rgba(176,0,32,0.3)', padding: '0.5rem', display: 'flex', borderRadius: 4 }}>
+              <Gem style={{ width: 22, height: 22, color: spRedBright }} strokeWidth={1.5} />
             </div>
             <div>
-              <p style={{ color: spMuted, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>{isEnglish ? 'Gems' : 'Gemmes'}</p>
-              <p style={{ color: spText, fontSize: '1.3rem', fontWeight: 'bold', fontFamily: spFont, margin: 0 }}>{gems}</p>
+              <p style={{ color: spMuted, fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>{isEnglish ? 'Gems' : 'Gemmes'}</p>
+              <p style={{ color: spText, fontSize: '1.4rem', fontWeight: 'bold', fontFamily: spFont, margin: 0 }}>{gems}</p>
             </div>
           </div>
 
-          <div style={{ width: '1px', height: '40px', background: spBorder }} />
+          <div style={{ width: 1, height: 44, background: spBorder }} />
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ background: 'rgba(176,0,32,0.12)', border: `1px solid rgba(176,0,32,0.3)`, padding: '0.5rem', display: 'flex' }}>
+            <div style={{ background: 'rgba(176,0,32,0.15)', border: '1px solid rgba(176,0,32,0.3)', padding: '0.5rem', display: 'flex', borderRadius: 4 }}>
               <SandbitsIcon size={22} />
             </div>
             <div>
-              <p style={{ color: spMuted, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>{isEnglish ? 'Sandbits' : 'Sablebits'}</p>
-              <p style={{ color: spText, fontSize: '1.3rem', fontWeight: 'bold', fontFamily: spFont, margin: 0 }}>{sandbits}</p>
+              <p style={{ color: spMuted, fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>{isEnglish ? 'Sandbits' : 'Sablebits'}</p>
+              <p style={{ color: spText, fontSize: '1.4rem', fontWeight: 'bold', fontFamily: spFont, margin: 0 }}>{sandbits}</p>
             </div>
           </div>
         </div>
 
-        {/* Shop Items Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem', marginBottom: '2.5rem' }}>
-          {shopItems.map((item, i) => (
-            <div
-              key={i}
-              style={{ background: spSurface, border: `1px solid ${spBorder}`, padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', transition: 'border-color 0.2s', position: 'relative', overflow: 'hidden' }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(176,0,32,0.5)'; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = spBorder; }}
-            >
-              <div style={{ marginBottom: '1rem', padding: '0.75rem', background: 'rgba(176,0,32,0.08)', border: `1px solid rgba(176,0,32,0.2)` }}>
-                {item.icon}
-              </div>
-              <h3 style={{ color: spText, fontFamily: spFont, fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.5rem', marginTop: 0 }}>{item.title}</h3>
-              <p style={{ color: spMuted, fontSize: '0.82rem', fontFamily: spFont, marginBottom: '1.25rem', lineHeight: 1.4, flex: 1 }}>{item.desc}</p>
-              <button
-                onClick={() => handlePurchase(i)}
-                disabled={purchasing === i || (i === 2 && boostActive)}
+        {/* Shop Items — vertical scroll cards */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginBottom: '3rem' }}>
+          {shopItems.map((item, i) => {
+            const isDisabled = purchasing === i || (i === 2 && boostActive);
+            return (
+              <div
+                key={i}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: '0.4rem',
-                  background: item.canAfford && !(i === 2 && boostActive)
-                    ? 'rgba(176,0,32,0.18)'
-                    : 'rgba(80,80,80,0.18)',
-                  border: `1px solid ${item.canAfford && !(i === 2 && boostActive) ? 'rgba(176,0,32,0.5)' : 'rgba(80,80,80,0.3)'}`,
-                  padding: '0.5rem 1rem', borderRadius: 6, cursor: purchasing === i || (i === 2 && boostActive) ? 'not-allowed' : 'pointer',
-                  fontFamily: spFont, color: spText, fontWeight: 'bold', fontSize: '1rem',
-                  opacity: purchasing === i ? 0.6 : 1, transition: 'all 0.15s',
+                  background: spSurface,
+                  border: `1px solid ${spBorder}`,
+                  borderTop: `3px solid ${item.accentColor}`,
+                  padding: 'clamp(1.25rem, 4vw, 2rem)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1.25rem',
+                  transition: 'border-color 0.2s, box-shadow 0.2s',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 0 1px ${item.accentColor}40, 0 8px 32px rgba(0,0,0,0.4)`;
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
                 }}
               >
-                {purchasing === i ? '…' : (
-                  <>
+                {/* Top row: icon + title area */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.25rem' }}>
+                  {/* Icon */}
+                  <div style={{
+                    background: `rgba(176,0,32,0.1)`,
+                    border: `1px solid rgba(176,0,32,0.25)`,
+                    padding: '0.9rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 8,
+                    flexShrink: 0,
+                  }}>
+                    {item.icon}
+                  </div>
+
+                  {/* Title + tag */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.3rem' }}>
+                      {/* 3D red bold title */}
+                      <h2 style={{
+                        margin: 0,
+                        fontFamily: spFont,
+                        fontWeight: 'bold',
+                        fontSize: 'clamp(1.4rem, 4vw, 2rem)',
+                        color: spRedBright,
+                        textShadow: `0 1px 0 #8b0000, 0 2px 0 #7a0000, 0 3px 0 #6a0000, 0 4px 8px rgba(0,0,0,0.55)`,
+                        letterSpacing: '0.01em',
+                        lineHeight: 1.1,
+                      }}>
+                        {item.title}
+                      </h2>
+                      {item.tag && (
+                        <span style={{
+                          background: `${item.accentColor}22`,
+                          border: `1px solid ${item.accentColor}55`,
+                          color: item.accentColor,
+                          fontSize: '0.7rem',
+                          fontWeight: 'bold',
+                          letterSpacing: '0.1em',
+                          padding: '2px 8px',
+                          borderRadius: 20,
+                          flexShrink: 0,
+                        }}>
+                          {item.tag}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Description */}
+                    <p style={{
+                      color: spText,
+                      fontSize: 'clamp(0.85rem, 2.5vw, 1rem)',
+                      fontFamily: spFont,
+                      margin: 0,
+                      lineHeight: 1.55,
+                      opacity: 0.9,
+                    }}>
+                      {item.desc}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div style={{ height: 1, background: spBorder }} />
+
+                {/* Bottom row: price + button */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     {item.CurrencyIcon}
-                    <span>{i === 2 && boostActive ? (isEnglish ? 'Active' : 'Actif') : item.price}</span>
-                  </>
-                )}
-              </button>
-            </div>
-          ))}
+                    <span style={{ color: spText, fontFamily: spFont, fontWeight: 'bold', fontSize: '1.1rem' }}>{item.price}</span>
+                    <span style={{ color: spMuted, fontSize: '0.82rem' }}>{item.currency}</span>
+                  </div>
+
+                  <button
+                    onClick={() => handlePurchase(i)}
+                    disabled={isDisabled}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '0.5rem',
+                      background: isDisabled
+                        ? 'rgba(60,60,60,0.4)'
+                        : item.canAfford
+                          ? `${item.accentColor}`
+                          : 'rgba(60,60,60,0.4)',
+                      border: 'none',
+                      color: isDisabled ? 'rgba(255,255,255,0.4)' : '#ffffff',
+                      padding: '0.65rem 1.6rem',
+                      borderRadius: 6,
+                      cursor: isDisabled ? 'not-allowed' : 'pointer',
+                      fontFamily: spFont,
+                      fontWeight: 'bold',
+                      fontSize: '1rem',
+                      letterSpacing: '0.04em',
+                      opacity: purchasing === i ? 0.6 : 1,
+                      transition: 'all 0.15s',
+                      minWidth: 110,
+                      justifyContent: 'center',
+                      boxShadow: (!isDisabled && item.canAfford) ? `0 4px 16px ${item.accentColor}44` : 'none',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isDisabled && item.canAfford) {
+                        (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.15)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.filter = 'none';
+                    }}
+                  >
+                    {purchasing === i ? '…' : (
+                      i === 2 && boostActive
+                        ? (isEnglish ? 'Active' : 'Actif')
+                        : !item.canAfford
+                          ? (isEnglish ? 'Not enough' : 'Insuffisant')
+                          : (isEnglish ? 'Purchase' : 'Acheter')
+                    )}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Info Section */}
-        <div style={{ background: spSurface, border: `1px solid ${spBorder}`, padding: '1.5rem' }}>
-          <h2 style={{ color: spText, fontFamily: spFont, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem', marginTop: 0 }}>
+        {/* About currencies */}
+        <div style={{ background: spSurface, border: `1px solid ${spBorder}`, padding: '1.5rem 1.75rem' }}>
+          <h3 style={{
+            color: spText, fontFamily: spFont,
+            fontSize: '0.85rem', textTransform: 'uppercase',
+            letterSpacing: '0.12em', marginBottom: '1.25rem', marginTop: 0,
+          }}>
             {isEnglish ? 'About Currencies' : 'À Propos des Devises'}
-          </h2>
+          </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', borderLeft: `2px solid rgba(176,0,32,0.4)`, paddingLeft: '0.75rem' }}>
-              <Gem style={{ width: 16, height: 16, color: spRed, flexShrink: 0, marginTop: 2 }} strokeWidth={1.5} />
-              <p style={{ color: spMuted, fontSize: '0.85rem', fontFamily: spFont, margin: 0, lineHeight: 1.5 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', borderLeft: `2px solid rgba(176,0,32,0.4)`, paddingLeft: '0.85rem' }}>
+              <Gem style={{ width: 16, height: 16, color: spRedBright, flexShrink: 0, marginTop: 3 }} strokeWidth={1.5} />
+              <p style={{ color: spMuted, fontSize: '0.85rem', fontFamily: spFont, margin: 0, lineHeight: 1.55 }}>
                 <strong style={{ color: spText }}>{isEnglish ? 'Gems' : 'Gemmes'}:</strong>{' '}
                 {isEnglish
-                  ? 'Earn gems by completing lessons and achieving daily goals. Use gems to purchase hearts and special items.'
-                  : 'Gagnez des gemmes en complétant des leçons et en atteignant des objectifs quotidiens. Utilisez des gemmes pour acheter des cœurs et des objets spéciaux.'}
+                  ? 'Earned by completing lessons and hitting daily goals. Spend on hearts and items.'
+                  : 'Gagnées en complétant des leçons et des objectifs quotidiens. Dépensez pour des cœurs et objets.'}
               </p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', borderLeft: `2px solid rgba(176,0,32,0.4)`, paddingLeft: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', borderLeft: `2px solid rgba(176,0,32,0.4)`, paddingLeft: '0.85rem' }}>
               <SandbitsIcon size={16} />
-              <p style={{ color: spMuted, fontSize: '0.85rem', fontFamily: spFont, margin: 0, lineHeight: 1.5 }}>
+              <p style={{ color: spMuted, fontSize: '0.85rem', fontFamily: spFont, margin: 0, lineHeight: 1.55 }}>
                 <strong style={{ color: spText }}>{isEnglish ? 'Sandbits' : 'Sablebits'}:</strong>{' '}
                 {isEnglish
-                  ? 'Premium currency earned through special quests and achievements. Use Sandbits for exclusive items and bonuses.'
-                  : 'Devise premium gagnée grâce à des quêtes spéciales et des réalisations. Utilisez les Sablebits pour des objets exclusifs et des bonus.'}
+                  ? 'Premium currency from special quests and achievements. Use for exclusive power-ups like XP Boost.'
+                  : 'Devise premium gagnée via des quêtes et réalisations. Utilisez pour des power-ups exclusifs.'}
               </p>
             </div>
           </div>
