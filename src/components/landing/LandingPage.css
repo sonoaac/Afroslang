@@ -194,6 +194,17 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 32px;
+  animation: lpHeroLogoIn 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes lpHeroLogoIn {
+  from { opacity: 0; transform: scale(0.65); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes lpHeroFadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .lp-stack-logo {
@@ -265,6 +276,7 @@
   margin: 0;
   letter-spacing: 0.03em;
   text-align: left;
+  animation: lpHeroFadeUp 0.7s ease-out 0.3s both;
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.7);
 }
 
@@ -273,6 +285,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: lpHeroFadeUp 0.7s ease-out 0.55s both;
   gap: 14px;
 }
 
@@ -366,7 +379,9 @@
   color: #b00020;
   text-align: center;
   margin: 0 0 32px;
+  transition: letter-spacing 0.4s ease;
 }
+.lp-langs-eyebrow:hover { letter-spacing: 0.22em; }
 
 .lp-langs-grid {
   display: grid;
