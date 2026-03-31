@@ -276,8 +276,13 @@
   margin: 0;
   letter-spacing: 0.03em;
   text-align: left;
-  animation: lpHeroFadeUp 0.7s ease-out 0.3s both;
+  /* No parent animation — DescrambleText handles "Rekindle" entrance */
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.7);
+}
+
+/* "with your ancestral tongues" fades up after Rekindle lands */
+.lp-tagline-sub {
+  animation: lpHeroFadeUp 0.7s ease-out 1.8s both;
 }
 
 /* CTAs — stacked vertically */

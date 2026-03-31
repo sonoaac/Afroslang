@@ -1,0 +1,62 @@
+/* ════════════════════════════════════════════════════
+   Drop-Down Descramble Animation
+   ════════════════════════════════════════════════════
+
+   Mechanic (mirrors the GSAP scramble technique):
+   ─────────────────────────────────────────────────
+   Each .dsc-char holds its "scramble" letter as text content.
+   Its ::before holds the "final" letter (via data-to attribute)
+   positioned at translateY(-103%) above it.
+
+   Phase 1 — all .dsc-char drop in from -103% → 0
+             (scrambled word appears)
+
+   Phase 2 — changing .dsc-char continue to 103% (out below)
+             As the parent moves +103%, its ::before (at -103%)
+             lands at exactly 0% — the final letter appears.
+
+   The .dsc-word container clips with overflow:hidden so nothing
+   outside the line box is visible.
+   ════════════════════════════════════════════════════ */
+
+.dsc-word {
+  display: inline-flex;
+  overflow: hidden;
+  vertical-align: bottom;
+  /* Slight padding so descenders aren't clipped */
+  padding-bottom: 0.06em;
+  line-height: inherit;
+}
+
+.dsc-char {
+  display: inline-block;
+  position: relative;
+  white-space: pre; /* preserve space characters */
+  /* Initial state: above the clip — animation-fill-mode:both handles this */
+}
+
+/* The final revealed character lives here.
+   Absolutely positioned so it matches the scramble char exactly.
+   translateY(-103%) means it's above the parent and moves WITH it. */
+.dsc-char::before {
+  content: attr(data-to);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transform: translateY(-103%);
+  /* Inherits font, color, weight from parent */
+}
+
+/* ── Keyframes ── */
+
+@keyframes dscIn {
+  from { transform: translateY(-103%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes dscOut {
+  from { transform: translateY(0); }
+  to   { transform: translateY(103%); }
+  /* When parent reaches 103%, ::before at -103% becomes visible at 0% */
+}

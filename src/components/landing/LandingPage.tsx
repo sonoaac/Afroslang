@@ -3,7 +3,11 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswor
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
+import { DescrambleText, scrambleWord } from '../ui/DescrambleText';
 import './LandingPage.css';
+
+// Pre-compute scramble chars once per module load (deterministic each session)
+const REKINDLE_CHARS = scrambleWord('Rekindle');
 
 type SheetMode = 'login' | 'signup' | null;
 
@@ -389,8 +393,10 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               <div className="lp-stack-logo-glow" />
             </div>
             <p className="lp-stack-tagline">
-              <span style={{ color: '#ffffff', display: 'block', fontWeight: 800, fontSize: '2em', lineHeight: 1.1 }}>Rekindle</span>
-              <span style={{ color: '#b00020', display: 'block' }}>with your ancestral tongues</span>
+              <span style={{ color: '#ffffff', display: 'block', fontWeight: 800, fontSize: '2em', lineHeight: 1.1 }}>
+                <DescrambleText chars={REKINDLE_CHARS} />
+              </span>
+              <span className="lp-tagline-sub" style={{ color: '#b00020', display: 'block' }}>with your ancestral tongues</span>
             </p>
           </div>
           <div className="lp-stack-ctas">
