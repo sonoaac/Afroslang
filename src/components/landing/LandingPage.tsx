@@ -3,16 +3,16 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswor
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
-import { DescrambleText, scrambleWord, getPhase2Start } from '../ui/DescrambleText';
+import { DescrambleText } from '../ui/DescrambleText';
 import './LandingPage.css';
 
-// Pre-compute scramble chars once per module load (deterministic each session)
-const AFROSLANG_CHARS  = scrambleWord('AFROSLANG');
-// REKINDLE starts when AFROSLANG enters phase 2 (same-time overlap like the original demo)
-const REKINDLE_START   = getPhase2Start(AFROSLANG_CHARS.length);  // ~1620ms
-const REKINDLE_CHARS   = scrambleWord('REKINDLE');
-// "with your ancestral tongues" appears after REKINDLE fully lands
-const SUB_DELAY        = getPhase2Start(REKINDLE_CHARS.length, REKINDLE_START) + REKINDLE_CHARS.length * 85 + 800;
+// Drop-in only — no scramble chars. from === to so only phase 1 (drop-in) runs.
+const AFROSLANG_CHARS = 'AFROSLANG'.split('').map(ch => ({ from: ch, to: ch }));
+// REKINDLE starts after AFROSLANG fully lands + a short beat
+const REKINDLE_START  = (AFROSLANG_CHARS.length - 1) * 55 + 900 + 180; // ~1500ms
+const REKINDLE_CHARS  = 'REKINDLE'.split('').map(ch => ({ from: ch, to: ch }));
+// Sub-line after REKINDLE fully lands
+const SUB_DELAY       = REKINDLE_START + (REKINDLE_CHARS.length - 1) * 55 + 900 + 200; // ~2985ms
 
 type SheetMode = 'login' | 'signup' | null;
 
