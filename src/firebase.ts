@@ -3,15 +3,15 @@ import { getAuth, connectAuthEmulator } from "firebase/auth";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
-// Firebase configuration
+// Firebase configuration — values come from .env locally and Vercel env vars in production
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyC9HA38JEoEVOWjGFqMgLmdcsChg7XzwaY",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "afroslang.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "afroslang",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "afroslang.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "425906765569",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:425906765569:web:a827daa1060570126d6500",
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-N63XE0SYQY"
+  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
