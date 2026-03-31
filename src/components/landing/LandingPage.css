@@ -1410,6 +1410,23 @@
   color: #fff;
 }
 
+/* ── Scroll reveal ── */
+.lp-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  will-change: opacity, transform;
+}
+.lp-reveal--from-left  { transform: translateX(-36px); }
+.lp-reveal--from-right { transform: translateX(36px); }
+.lp-reveal--delay-1    { transition-delay: 0.15s; }
+.lp-reveal--delay-2    { transition-delay: 0.3s; }
+
+.lp-reveal--visible {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
 /* ── Password eye toggle ── */
 .auth-pwd-wrap {
   position: relative;

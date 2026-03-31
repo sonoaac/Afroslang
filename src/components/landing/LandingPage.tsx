@@ -130,6 +130,25 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     return () => obs.disconnect();
   }, []);
 
+  // ── Scroll reveal observer ─────────────────────────────────────────────────
+  useEffect(() => {
+    const els = document.querySelectorAll<HTMLElement>('.lp-reveal');
+    if (!els.length) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('lp-reveal--visible');
+            obs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    els.forEach(el => obs.observe(el));
+    return () => obs.disconnect();
+  }, []);
+
   const filteredCountries = EXPLORE_COUNTRIES.filter(c => {
     const q = exploreSearch.trim().toLowerCase();
     if (!q) return true;
@@ -396,14 +415,14 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
         {/* Our Mission row */}
         <div className="lp-stack-row lp-stack-row--right">
-          <div className="lp-stack-row-text">
+          <div className="lp-stack-row-text lp-reveal lp-reveal--from-left">
             <span className="lp-stack-row-label">Our Mission</span>
             <p>
               Afroslang main goal is to help and assist descendants and children of the diaspora
               to maintain their language culture and ancestral sense of knowing
             </p>
           </div>
-          <div className="lp-stack-row-img-wrap lp-stack-row-img-wrap--right">
+          <div className="lp-stack-row-img-wrap lp-stack-row-img-wrap--right lp-reveal lp-reveal--from-right lp-reveal--delay-1">
             <img src="/Afroslanglpimg1.png" alt="Afroslang community" className="lp-stack-img" />
             <div className="lp-stack-img-border" />
           </div>
@@ -415,7 +434,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
           className={`lp-explore-section${exploreVisible ? ' lp-explore-section--visible' : ''}`}
         >
           {/* Section header */}
-          <div className="lp-explore-header">
+          <div className="lp-explore-header lp-reveal">
             <p className="lp-langs-eyebrow">Over 1500+ African Languages · Explore the Continent — Not even half way there</p>
             <div className="lp-explore-search-wrap">
               <svg className="lp-explore-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
@@ -562,11 +581,11 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
         {/* Giving Back row */}
         <div className="lp-stack-row lp-stack-row--left">
-          <div className="lp-stack-row-img-wrap lp-stack-row-img-wrap--left">
+          <div className="lp-stack-row-img-wrap lp-stack-row-img-wrap--left lp-reveal lp-reveal--from-left">
             <img src="/Afroslanglpimg2.png" alt="Afroslang giving back" className="lp-stack-img" />
             <div className="lp-stack-img-border" />
           </div>
-          <div className="lp-stack-row-text lp-stack-row-text--right">
+          <div className="lp-stack-row-text lp-stack-row-text--right lp-reveal lp-reveal--from-right lp-reveal--delay-1">
             <span className="lp-stack-row-label">Giving Back</span>
             <p>
               Afroslang will better charity cases in africa as a whole whilst being transparent
@@ -582,7 +601,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
       <footer className="lp-footer">
         <div className="lp-footer-inner">
 
-          <div className="lp-footer-brand">
+          <div className="lp-footer-brand lp-reveal">
             <img src="/Afroslang.png" alt="Afroslang" className="lp-footer-logo" />
             <span className="lp-footer-brand-name">Afro<em>slang</em></span>
             <p className="lp-footer-brand-desc">
@@ -613,7 +632,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
             </div>
           </div>
 
-          <div className="lp-footer-links-grid">
+          <div className="lp-footer-links-grid lp-reveal lp-reveal--delay-1">
 
             <div className="lp-footer-col">
               <h4 className="lp-footer-col-title">Get to Know</h4>
