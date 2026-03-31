@@ -176,6 +176,8 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
   const [signupLoading, setSignupLoading]   = useState(false);
   const [signupError, setSignupError]       = useState('');
   const [pwdFocused, setPwdFocused]         = useState(false);
+  const [showLoginPwd, setShowLoginPwd]     = useState(false);
+  const [showSignupPwd, setShowSignupPwd]   = useState(false);
 
   // ── Password rules ─────────────────────────────────────────────────────────
   // Standard keyboard special chars only
@@ -185,6 +187,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     { label: 'At least 7 characters',     ok: signupPassword.length >= 7 },
     { label: '1 uppercase letter (A–Z)',   ok: /[A-Z]/.test(signupPassword) },
     { label: '1 lowercase letter (a–z)',   ok: /[a-z]/.test(signupPassword) },
+    { label: '1 number (0–9)',             ok: /[0-9]/.test(signupPassword) },
     { label: '1 special character',        ok: SPECIAL_RE.test(signupPassword) },
   ];
   const pwdValid = pwdRules.every(r => r.ok);
@@ -244,6 +247,8 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     setLoginError(''); setLoginSuccess('');
     setSignupError('');
     setPwdFocused(false);
+    setShowLoginPwd(false);
+    setShowSignupPwd(false);
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -713,16 +718,30 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
                   autoComplete="email"
                   maxLength={254}
                 />
-                <input
-                  className="auth-sheet-input"
-                  type="password"
-                  placeholder="Password"
-                  value={loginPassword}
-                  onChange={e => setLoginPassword(e.target.value)}
-                  required
-                  autoComplete="current-password"
-                  maxLength={128}
-                />
+                <div className="auth-pwd-wrap">
+                  <input
+                    className="auth-sheet-input"
+                    type={showLoginPwd ? 'text' : 'password'}
+                    placeholder="Password"
+                    value={loginPassword}
+                    onChange={e => setLoginPassword(e.target.value)}
+                    required
+                    autoComplete="current-password"
+                    maxLength={128}
+                  />
+                  <button
+                    type="button"
+                    className="auth-pwd-eye"
+                    onClick={() => setShowLoginPwd(v => !v)}
+                    aria-label={showLoginPwd ? 'Hide password' : 'Show password'}
+                  >
+                    {showLoginPwd ? (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    )}
+                  </button>
+                </div>
                 <button className="auth-sheet-submit" type="submit" disabled={loginLoading}>
                   {loginLoading ? 'Logging in…' : 'Log In'}
                 </button>
@@ -781,17 +800,31 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
                   autoComplete="tel"
                   maxLength={20}
                 />
-                <input
-                  className="auth-sheet-input"
-                  type="password"
-                  placeholder="Password"
-                  value={signupPassword}
-                  onChange={e => setSignupPassword(e.target.value)}
-                  onFocus={() => setPwdFocused(true)}
-                  required
-                  autoComplete="new-password"
-                  maxLength={128}
-                />
+                <div className="auth-pwd-wrap">
+                  <input
+                    className="auth-sheet-input"
+                    type={showSignupPwd ? 'text' : 'password'}
+                    placeholder="Password"
+                    value={signupPassword}
+                    onChange={e => setSignupPassword(e.target.value)}
+                    onFocus={() => setPwdFocused(true)}
+                    required
+                    autoComplete="new-password"
+                    maxLength={128}
+                  />
+                  <button
+                    type="button"
+                    className="auth-pwd-eye"
+                    onClick={() => setShowSignupPwd(v => !v)}
+                    aria-label={showSignupPwd ? 'Hide password' : 'Show password'}
+                  >
+                    {showSignupPwd ? (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    )}
+                  </button>
+                </div>
                 {(pwdFocused || signupPassword.length > 0) && (
                   <div className="auth-pwd-rules">
                     {pwdRules.map(r => (

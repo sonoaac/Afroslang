@@ -1410,6 +1410,40 @@
   color: #fff;
 }
 
+/* ── Password eye toggle ── */
+.auth-pwd-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.auth-pwd-wrap .auth-sheet-input {
+  padding-right: 44px;
+}
+
+.auth-pwd-eye {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+  line-height: 0;
+}
+
+.auth-pwd-eye:hover { color: rgba(255, 255, 255, 0.75); }
+
+.auth-pwd-eye svg {
+  width: 18px;
+  height: 18px;
+}
+
 /* ── Password strength rules ── */
 .auth-pwd-rules {
   display: flex;
