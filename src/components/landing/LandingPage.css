@@ -280,9 +280,10 @@
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.7);
 }
 
-/* "with your ancestral tongues" fades up after Rekindle lands */
+/* "with your ancestral tongues" fades up after both words land.
+   Delay is set via inline style (animationDelay) to match computed sequence timing. */
 .lp-tagline-sub {
-  animation: lpHeroFadeUp 0.7s ease-out 1.8s both;
+  animation: lpHeroFadeUp 0.7s ease-out both;
 }
 
 /* CTAs — stacked vertically */

@@ -3,11 +3,16 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswor
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
-import { DescrambleText, scrambleWord } from '../ui/DescrambleText';
+import { DescrambleText, scrambleWord, getPhase2Start } from '../ui/DescrambleText';
 import './LandingPage.css';
 
 // Pre-compute scramble chars once per module load (deterministic each session)
-const REKINDLE_CHARS = scrambleWord('Rekindle');
+const AFROSLANG_CHARS  = scrambleWord('AFROSLANG');
+// REKINDLE starts when AFROSLANG enters phase 2 (same-time overlap like the original demo)
+const REKINDLE_START   = getPhase2Start(AFROSLANG_CHARS.length);  // ~1620ms
+const REKINDLE_CHARS   = scrambleWord('REKINDLE');
+// "with your ancestral tongues" appears after REKINDLE fully lands
+const SUB_DELAY        = getPhase2Start(REKINDLE_CHARS.length, REKINDLE_START) + REKINDLE_CHARS.length * 85 + 800;
 
 type SheetMode = 'login' | 'signup' | null;
 
@@ -393,10 +398,18 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               <div className="lp-stack-logo-glow" />
             </div>
             <p className="lp-stack-tagline">
-              <span style={{ color: '#ffffff', display: 'block', fontWeight: 800, fontSize: '2em', lineHeight: 1.1 }}>
-                <DescrambleText chars={REKINDLE_CHARS} />
+              <span style={{ color: '#b00020', display: 'block', fontWeight: 800, fontSize: '2em', lineHeight: 1.05, letterSpacing: '0.04em' }}>
+                <DescrambleText chars={AFROSLANG_CHARS} />
               </span>
-              <span className="lp-tagline-sub" style={{ color: '#b00020', display: 'block' }}>with your ancestral tongues</span>
+              <span style={{ color: '#ffffff', display: 'block', fontWeight: 800, fontSize: '2em', lineHeight: 1.05, letterSpacing: '0.04em' }}>
+                <DescrambleText chars={REKINDLE_CHARS} startDelay={REKINDLE_START} />
+              </span>
+              <span
+                className="lp-tagline-sub"
+                style={{ color: 'rgba(255,255,255,0.75)', display: 'block', animationDelay: `${SUB_DELAY}ms` }}
+              >
+                with your ancestral tongues
+              </span>
             </p>
           </div>
           <div className="lp-stack-ctas">
