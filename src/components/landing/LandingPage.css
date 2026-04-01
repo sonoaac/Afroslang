@@ -1772,3 +1772,44 @@
   }
   .lp-stack-top { padding: 48px 16px 40px; }
 }
+
+/* ── Firefly animation section ────────────────────────────────────────────── */
+.lp-firefly-section {
+  position: relative;
+  margin: 48px 0 0;
+  overflow: hidden;
+}
+
+.lp-firefly-label {
+  text-align: center;
+  font-family: 'Times New Roman', serif;
+  font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(176, 0, 32, 0.7);
+  margin-bottom: 16px;
+}
+
+.lp-firefly-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.lp-firefly-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.lp-firefly-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, #000 0%, transparent 12%, transparent 88%, #000 100%),
+    linear-gradient(to right,  #000 0%, transparent 8%,  transparent 92%, #000 100%);
+  pointer-events: none;
+}

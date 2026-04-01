@@ -123,6 +123,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
   const [showAll, setShowAll]                     = useState(false);
   const [exploreVisible, setExploreVisible]       = useState(false);
   const exploreSectionRef = useRef<HTMLDivElement>(null);
+  const fireflyVideoRef   = useRef<HTMLVideoElement>(null);
   // Tracks last active tab so form content stays rendered during close animation
   const lastSheetRef = useRef<'login' | 'signup'>('signup');
   if (sheet) lastSheetRef.current = sheet;
@@ -142,6 +143,24 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
       { threshold: 0.08 }
     );
     obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  // ── Firefly video: play on scroll into view, pause on scroll out ──────────
+  useEffect(() => {
+    const video = fireflyVideoRef.current;
+    if (!video) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.25 }
+    );
+    obs.observe(video);
     return () => obs.disconnect();
   }, []);
 
@@ -651,6 +670,22 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               of where your money is going. All payments 50% go to charity the other 50% to the
               continuous development of the site
             </p>
+          </div>
+        </div>
+
+        {/* ── Firefly animation section ── */}
+        <div className="lp-firefly-section lp-reveal">
+          <div className="lp-firefly-label">Our Heritage</div>
+          <div className="lp-firefly-wrap">
+            <video
+              ref={fireflyVideoRef}
+              className="lp-firefly-video"
+              src="/firefly-anim.mp4"
+              muted
+              loop
+              playsInline
+            />
+            <div className="lp-firefly-overlay" />
           </div>
         </div>
 
