@@ -305,7 +305,13 @@ export function AfroslangIntro({ onComplete }: AfroslangIntroProps) {
       <div className={`afro-africa-stage${africaVisible ? ' afro-africa-stage--visible' : ''}`}>
         <canvas ref={africaRef} className="afro-africa-canvas" />
         <div className={`afro-globe-title-block${titleVisible ? ' afro-globe-title-block--show' : ''}`}>
-          <img src="/Afroslang.png" alt="" className="afro-title-logo-bg" aria-hidden="true" />
+          <dotlottie-wc
+            src="https://lottie.host/75a566a2-61ec-4b60-9c5b-6ec41aff8523/1aJFp2Ot5H.lottie"
+            autoplay
+            loop
+            aria-hidden="true"
+            style={{ display: 'block', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'clamp(180px, 40vw, 340px)', height: 'clamp(180px, 40vw, 340px)', opacity: 0.32, pointerEvents: 'none' }}
+          />
           <h1 className="afro-globe-title">
             <span style={{ color: '#ffffff' }}>AFRO</span><span style={{ color: '#b00020' }}>SLANG</span>
           </h1>

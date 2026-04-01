@@ -410,7 +410,13 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
         <header className="lp-header">
           <div className="lp-header-left">
-            <img src="/Afroslang.png" alt="Afroslang" className="lp-logo" />
+            <dotlottie-wc
+              src="https://lottie.host/75a566a2-61ec-4b60-9c5b-6ec41aff8523/1aJFp2Ot5H.lottie"
+              autoplay
+              loop
+              className="lp-logo"
+              style={{ display: 'block', width: '52px', height: '52px' }}
+            />
             <span className="lp-brand">Afro<em>slang</em></span>
           </div>
         </header>
@@ -419,7 +425,13 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
         <div className="lp-stack-top">
           <div className="lp-stack-hero-row">
             <div className="lp-stack-logo-wrap">
-              <img src="/Afroslang.png" alt="Afroslang" className="lp-stack-logo" />
+              <dotlottie-wc
+                src="https://lottie.host/75a566a2-61ec-4b60-9c5b-6ec41aff8523/1aJFp2Ot5H.lottie"
+                autoplay
+                loop
+                className="lp-stack-logo"
+                style={{ display: 'block' }}
+              />
               <div className="lp-stack-logo-glow" />
             </div>
             <p className="lp-stack-tagline">

@@ -141,7 +141,9 @@ TypeScript path alias `@/*` maps to `./src/*` (configured in `tsconfig.json`). U
 ### UI Components & Screen Modules
 
 - `src/components/ui/` — shadcn/ui component library (do not modify these files)
-- `src/features/` — feature-level screens: `language-select/`, `lessons/`, `store/` (`auth/` and `progress/` subdirs exist but are empty)
+- `src/features/language-select/` — `LanguageSelectionScreen`, `InterfaceLanguageSelector`, `FlagIcon`, `SelectMotionOverlay` (visual overlay during language pick transition)
+- `src/features/lessons/` — `LearningPath` (stage/lesson map), `LessonScreen` (quiz runner), `LessonComplete`, `ExerciseTypes` (base exercise renderers), `AdvancedExercises` (type-answer, word-order variants), `EnrichedExercises` (flashcard, audio-match, cultural-card renderers), `IntroPhases` (teaches content before quiz phase begins)
+- `src/features/store/` — `ShopScreen` (gems/sandbits shop)
 - `src/hooks/` — empty; hook logic lives in components or `src/utils/`
 - `src/api/` — `create-checkout-session.ts` and `stripe-webhook.ts` (reference-only; live webhook is in `functions/`)
 - `src/components/intro/` — `AfroslangIntro` (animated logo reveal, plays once per session)
@@ -166,6 +168,7 @@ When adding a new language, add cultural facts here and decide whether it belong
 - `src/firebase.js` and `src/firebase.ts` both exist — use only `src/firebase.ts`. The `.js` file is a legacy artifact.
 - `src/main.tsx.backup` — ignore it.
 - `src/lib/` and `src/pages/` directories exist but are empty placeholders.
+- Root-level `components/` directory at the repo root (not `src/components/`) is a legacy artifact — do not add anything there.
 
 ### Adding a New Language
 
