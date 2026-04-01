@@ -5,7 +5,12 @@
 /* ── Page shell ── */
 .lp {
   min-height: 100dvh;
-  background: #000;
+  /* Single warm dark atmosphere for the whole page — no section will fight it */
+  background:
+    radial-gradient(ellipse 140% 55% at 50% 0%,   rgba(176,0,32,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 100% 40% at 20% 60%,  rgba(176,0,32,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 100% 40% at 80% 80%,  rgba(176,0,32,0.03) 0%, transparent 50%),
+    #000;
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -29,6 +34,22 @@
   align-items: center;
   padding: 22px 28px 22px clamp(28px, 6vw, 80px);
   background: transparent;
+}
+.lp-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: clamp(28px, 6vw, 80px);
+  right: 28px;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(176, 0, 32, 0.18) 30%,
+    rgba(176, 0, 32, 0.18) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
 }
 
 .lp-header-left {
@@ -357,8 +378,7 @@
   position: relative;
   z-index: 1;
   padding: clamp(48px, 7vw, 80px) clamp(20px, 6vw, 80px);
-  background: linear-gradient(180deg, #0a0a0a 0%, #060608 100%);
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  background: transparent;
 }
 
 .lp-langs-eyebrow {
@@ -476,14 +496,12 @@
 
 .lp-stack-row--right {
   flex-direction: row;
-  background: linear-gradient(135deg, #0a0a0a 0%, #0f0608 100%);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: transparent;
 }
 
 .lp-stack-row--left {
   flex-direction: row;
-  background: linear-gradient(225deg, #0a0a0a 0%, #060808 100%);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(176, 0, 32, 0.025);
 }
 
 /* Text block */
@@ -558,16 +576,16 @@
   z-index: 2;
 }
 
-/* Gradient overlay fading image into bg */
+/* Gradient overlay fading image into transparent bg */
 .lp-stack-row--right .lp-stack-row-img-wrap::before {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to right,
-    #0a0a0a 0%,
-    transparent 30%,
-    transparent 100%
+    rgba(0,0,0,0.92) 0%,
+    rgba(0,0,0,0.4) 25%,
+    transparent 55%
   );
   z-index: 1;
   pointer-events: none;
@@ -579,9 +597,9 @@
   inset: 0;
   background: linear-gradient(
     to left,
-    #060808 0%,
-    transparent 30%,
-    transparent 100%
+    rgba(0,0,0,0.92) 0%,
+    rgba(0,0,0,0.4) 25%,
+    transparent 55%
   );
   z-index: 1;
   pointer-events: none;
@@ -600,8 +618,7 @@
   position: relative;
   z-index: 1;
   padding: clamp(48px, 7vw, 80px) clamp(20px, 6vw, 72px);
-  background: linear-gradient(180deg, #0a0a0a 0%, #060608 100%);
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  background: transparent;
 }
 
 /* Section header + search */
@@ -983,8 +1000,18 @@
    FOOTER
    ════════════════════════════════ */
 .lp-footer {
-  background: #050505;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  position: relative;
+  background: rgba(0, 0, 0, 0.55);
+}
+.lp-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.45) 100%);
+  pointer-events: none;
 }
 
 .lp-footer-inner {
@@ -1730,10 +1757,10 @@
   }
   .lp-stack-img { object-position: center; }
   .lp-stack-row--right .lp-stack-row-img-wrap::before {
-    background: linear-gradient(to left, transparent 30%, #0a0a0a 100%);
+    background: linear-gradient(to left, transparent 30%, rgba(0,0,0,0.92) 100%);
   }
   .lp-stack-row--left .lp-stack-row-img-wrap::before {
-    background: linear-gradient(to right, transparent 30%, #0a0a0a 100%);
+    background: linear-gradient(to right, transparent 30%, rgba(0,0,0,0.92) 100%);
   }
   .lp-stack-row-text {
     flex: 1;
@@ -1800,16 +1827,16 @@
   position: absolute;
   inset: 0;
   background:
-    /* top: dissolves out of the Giving Back row (#060808) */
+    /* top + bottom: dissolves into page atmosphere */
     linear-gradient(to bottom,
-      #060808 0%,
-      rgba(6,8,8,0.85) 8%,
-      rgba(6,8,8,0.4)  18%,
-      transparent      35%,
-      transparent      65%,
-      rgba(5,5,5,0.5)  82%,
-      rgba(5,5,5,0.92) 92%,
-      #050505          100%
+      rgba(0,0,0,0.88) 0%,
+      rgba(0,0,0,0.55) 10%,
+      rgba(0,0,0,0.15) 28%,
+      transparent      42%,
+      transparent      58%,
+      rgba(0,0,0,0.15) 72%,
+      rgba(0,0,0,0.55) 90%,
+      rgba(0,0,0,0.88) 100%
     ),
     /* sides: gentle edge fade */
     linear-gradient(to right,
