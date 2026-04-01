@@ -4,6 +4,7 @@ import { X, Heart, CheckCircle2, XCircle, Lightbulb, RotateCcw, Home } from 'luc
 import { checkIgboAnswer } from '../../utils/igboTextUtils';
 import { HeartsTimer } from '../../components/ui/HeartsTimer';
 import { HeartsOutModal } from '../../components/ui/HeartsOutModal';
+import { TrialOfferModal } from '../../components/ui/TrialOfferModal';
 import { GuestLimitModal } from '../../components/ui/GuestLimitModal';
 import { HeartsData, updateHearts, updateGuestHearts } from '../../utils/heartsTimer';
 import { culturalFacts } from '../../data/culturalFacts';
@@ -117,6 +118,7 @@ export function LessonScreen({
   const [currentHearts,     setCurrentHearts]     = useState(hearts);
   const [showHeartsOutModal,  setShowHeartsOutModal]  = useState(false);
   const [showGuestLimitModal, setShowGuestLimitModal] = useState(false);
+  const [showTrialOffer,      setShowTrialOffer]      = useState(false);
 
   // Stage number for intro eyebrow
   const stageNumber = useMemo(() => {
@@ -175,7 +177,14 @@ export function LessonScreen({
   // ── Heart / scoring helpers ───────────────────────────────────────────────
 
   const loseHeart = () => {
-    setTotalHeartsLost(prev => prev + 1);
+    setTotalHeartsLost(prev => {
+      const newTotal = prev + 1;
+      // Show trial offer on the very first heart lost (not subscribed, not guest)
+      if (newTotal === 1 && !isSubscribed && !isGuest) {
+        setShowTrialOffer(true);
+      }
+      return newTotal;
+    });
     if (currentHearts > 0) {
       setCurrentHearts(prev => Math.max(0, prev - 1));
       if (userId && !isGuest) updateHearts(userId, 1);
@@ -844,6 +853,12 @@ export function LessonScreen({
         onClose={() => setShowGuestLimitModal(false)}
         onSignUp={() => { setShowGuestLimitModal(false); onGoToSignUp?.(); }}
         lessonsCompleted={3}
+      />
+
+      <TrialOfferModal
+        isOpen={showTrialOffer}
+        onClose={() => setShowTrialOffer(false)}
+        onStartTrial={() => { setShowTrialOffer(false); onGoToSubscription?.(); }}
       />
     </div>
   );

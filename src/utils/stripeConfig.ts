@@ -17,8 +17,8 @@ export const getStripe = () => {
 // Subscription plans with real Stripe payment links
 export const SUBSCRIPTION_PLANS = {
   monthly: {
-    priceId: 'price_monthly_5_99', // Replace with your actual Stripe price ID
-    amount: 599, // $5.99 in cents
+    priceId: 'price_monthly_4_99', // Replace with your actual Stripe price ID
+    amount: 499, // $4.99 in cents
     interval: 'month',
     name: 'Monthly Plus',
     description: 'Unlimited hearts, XP boost, feedback page, and more!',
