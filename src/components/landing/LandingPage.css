@@ -242,21 +242,6 @@
   100% { transform: scale(1.12); opacity: 1;   }
 }
 
-/* Spinning ring behind logo */
-.lp-stack-logo-wrap::after {
-  content: '';
-  position: absolute;
-  inset: -8%;
-  border-radius: 50%;
-  border: 1px solid rgba(176, 0, 32, 0.2);
-  border-top-color: rgba(255, 170, 0, 0.3);
-  animation: logoRingSpin 12s linear infinite;
-}
-@keyframes logoRingSpin {
-  0%   { transform: rotate(0deg);   }
-  100% { transform: rotate(360deg); }
-}
-
 .lp-stack-title {
   font-family: 'Times New Roman', Georgia, serif;
   font-size: clamp(2.2rem, 6vw, 5rem);
