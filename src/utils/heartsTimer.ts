@@ -1,4 +1,4 @@
-import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
 export interface HeartsData {
@@ -61,17 +61,18 @@ export const getCurrentHeartsStatus = async (userId: string): Promise<HeartsData
       }
     }
     
-    // Initialize hearts data for new users
+    // Initialize hearts data for new users (use setDoc merge so it works even
+    // if the user doc doesn't exist yet or was just created)
     const initialHeartsData: HeartsData = {
       currentHearts: MAX_HEARTS,
       lastResetTime: Date.now(),
       maxHearts: MAX_HEARTS
     };
-    
-    await updateDoc(userRef, {
+
+    await setDoc(userRef, {
       hearts: MAX_HEARTS,
       heartsData: initialHeartsData
-    });
+    }, { merge: true });
     
     return initialHeartsData;
   } catch (error) {

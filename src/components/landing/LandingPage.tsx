@@ -382,7 +382,10 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     setSignupLoading(true);
     try {
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
-      await setDoc(doc(db, 'users', user.uid), {
+      // Write Firestore profile in background — don't block on it.
+      // onAuthStateChanged fires immediately after Auth succeeds, and waiting
+      // on setDoc causes the spinner to hang if Firestore is slow.
+      setDoc(doc(db, 'users', user.uid), {
         username,
         email,
         ...(phone ? { phone } : {}),
@@ -393,7 +396,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
         subscription: { active: false, plan: null },
         createdAt: new Date().toISOString(),
         languages: {},
-      });
+      }).catch(() => {});
       closeSheet();
     } catch (err: any) {
       setSignupError(friendlyAuthError(err?.code ?? ''));
