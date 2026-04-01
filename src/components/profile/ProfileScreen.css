@@ -1,0 +1,389 @@
+/* ── Profile Screen ──────────────────────────────────────────────────────── */
+.ps-screen {
+  min-height: 100dvh;
+  background: var(--app-bg, #000);
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
+  overflow-y: auto;
+}
+
+/* Header */
+.ps-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(12px);
+}
+
+.ps-back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ps-back-btn:hover { background: rgba(255,255,255,0.1); }
+
+.ps-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.ps-header-spacer { width: 40px; }
+
+/* Body */
+.ps-body {
+  flex: 1;
+  padding: 28px 20px 48px;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Identity */
+.ps-identity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 4px;
+}
+
+.ps-avatar {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #b00020, #6b0010);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 3px rgba(176,0,32,0.3), 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.ps-avatar-initials {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+
+.ps-avatar-crown {
+  position: absolute;
+  top: -8px;
+  right: -4px;
+  font-size: 1.1rem;
+}
+
+.ps-username {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin: 4px 0 0;
+}
+
+.ps-email {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.5);
+  margin: 0;
+}
+
+.ps-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.ps-badge--premium {
+  background: linear-gradient(135deg, #f5c842, #e0a800);
+  color: #000;
+}
+.ps-badge--free {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+/* Stats */
+.ps-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: 20px 0;
+}
+
+.ps-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.ps-stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+.ps-stat-label {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ps-stat-divider {
+  width: 1px;
+  height: 36px;
+  background: rgba(255,255,255,0.08);
+}
+
+/* Sections */
+.ps-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ps-section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin: 0 0 2px 4px;
+}
+
+/* Continue Learning card */
+.ps-continue-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(176,0,32,0.18), rgba(176,0,32,0.08));
+  border: 1px solid rgba(176,0,32,0.35);
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s, border-color 0.2s, transform 0.1s;
+}
+.ps-continue-card:hover {
+  background: linear-gradient(135deg, rgba(176,0,32,0.28), rgba(176,0,32,0.14));
+  border-color: rgba(176,0,32,0.55);
+}
+.ps-continue-card:active { transform: scale(0.98); }
+
+.ps-continue-card-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ps-continue-flag { font-size: 1.8rem; line-height: 1; }
+
+.ps-continue-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ps-continue-lang {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.ps-continue-meta {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.55);
+}
+
+.ps-continue-arrow { color: rgba(176,0,32,0.8); flex-shrink: 0; }
+
+/* Language list */
+.ps-lang-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.07);
+}
+
+.ps-lang-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.03);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.ps-lang-row:last-child { border-bottom: none; }
+.ps-lang-row:hover { background: rgba(255,255,255,0.07); }
+
+.ps-lang-name { flex: 1; font-size: 0.9rem; font-weight: 500; }
+.ps-lang-xp { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-right: 8px; }
+
+/* Settings */
+.ps-settings-list {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.07);
+}
+
+.ps-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 16px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.85);
+}
+.ps-setting-row:last-child { border-bottom: none; }
+.ps-setting-row--link { cursor: pointer; transition: background 0.15s; }
+.ps-setting-row--link:hover { background: rgba(255,255,255,0.07); }
+
+.ps-setting-label { font-size: 0.9rem; }
+
+/* Interface language toggle */
+.ps-lang-toggle {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.ps-lang-toggle-btn {
+  padding: 5px 14px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  background: transparent;
+  color: rgba(255,255,255,0.45);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.ps-lang-toggle-btn--active {
+  background: #b00020;
+  color: #fff;
+}
+.ps-lang-toggle-btn:not(.ps-lang-toggle-btn--active):hover {
+  background: rgba(255,255,255,0.07);
+  color: #fff;
+}
+
+/* Danger / Sign out */
+.ps-section--danger { margin-top: 8px; }
+
+.ps-signout-btn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid rgba(176,0,32,0.4);
+  background: rgba(176,0,32,0.08);
+  color: #e03050;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  letter-spacing: 0.03em;
+}
+.ps-signout-btn:hover {
+  background: rgba(176,0,32,0.18);
+  border-color: rgba(176,0,32,0.7);
+}
+.ps-signout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.ps-confirm-logout {
+  background: rgba(176,0,32,0.1);
+  border: 1px solid rgba(176,0,32,0.3);
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ps-confirm-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.8);
+  text-align: center;
+}
+
+.ps-confirm-row {
+  display: flex;
+  gap: 10px;
+}
+
+.ps-confirm-cancel {
+  flex: 1;
+  padding: 11px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.75);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ps-confirm-cancel:hover { background: rgba(255,255,255,0.1); }
+
+.ps-confirm-yes {
+  flex: 1;
+  padding: 11px;
+  border-radius: 10px;
+  border: none;
+  background: #b00020;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ps-confirm-yes:hover { background: #cc0025; }
+.ps-confirm-yes:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Responsive: tablet+ */
+@media (min-width: 480px) {
+  .ps-body { padding: 36px 28px 60px; }
+  .ps-avatar { width: 96px; height: 96px; }
+  .ps-avatar-initials { font-size: 2.4rem; }
+  .ps-username { font-size: 1.5rem; }
+}

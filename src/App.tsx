@@ -12,6 +12,7 @@ import { SuccessPage } from './components/subscription/SuccessPage';
 import { FeedbackPage } from './components/feedback/FeedbackPage';
 import { LatestNews } from './components/layout/LatestNews';
 import { ShopScreen } from './features/store/ShopScreen';
+import { ProfileScreen } from './components/profile/ProfileScreen';
 
 import { useAuth } from './contexts/AuthContext';
 import { getLanguageById } from './data/languages';
@@ -20,7 +21,7 @@ import { saveUserProgress } from './utils/userData';
 import { addWeeklyXP, getCurrentWeekIdFromDB, getUserLeague } from './utils/leaderboardUtils';
 import { calcGemsEarned, awardGems, isXpBoostActive, purchaseHeartsRefill } from './utils/currencyUtils';
 
-type Screen = 'auth' | 'interface-select' | 'path' | 'lesson' | 'complete' | 'leaderboard' | 'subscription' | 'payment-success' | 'feedback' | 'shop' | 'latest-news';
+type Screen = 'auth' | 'interface-select' | 'path' | 'lesson' | 'complete' | 'leaderboard' | 'subscription' | 'payment-success' | 'feedback' | 'shop' | 'latest-news' | 'profile';
 
 function App() {
   const { user, userData, setUserData, isGuest, loading, logout, setGuestMode } = useAuth();
@@ -454,12 +455,10 @@ function App() {
               setCurrentScreen('shop');
             } else if (screen === 'latest-news') {
               setCurrentScreen('latest-news');
-            } else if (screen === 'profile') {
-              // Add profile screen if needed
-            } else if (screen === 'settings') {
-              // Add settings screen if needed
+            } else if (screen === 'profile' || screen === 'settings') {
+              setCurrentScreen('profile');
             } else if (screen === 'quests') {
-              // Add quests screen if needed
+              // reserved
             }
           }}
           onSignUp={handleGoToSignUp}
@@ -535,6 +534,17 @@ function App() {
         <LatestNews
           interfaceLanguage={interfaceLanguage}
           onBack={() => setCurrentScreen('path')}
+        />
+      )}
+
+      {currentScreen === 'profile' && (
+        <ProfileScreen
+          userProgressMap={userProgressMap}
+          currentLanguage={currentLanguage}
+          interfaceLanguage={interfaceLanguage}
+          onBack={() => setCurrentScreen(currentLanguage ? 'path' : 'auth')}
+          onContinueLearning={handleLanguageToLearnSelect}
+          onChangeInterfaceLanguage={setInterfaceLanguage}
         />
       )}
     </>

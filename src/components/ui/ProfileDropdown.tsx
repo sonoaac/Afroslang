@@ -16,11 +16,6 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Debug userData
-  console.log('ProfileDropdown - user:', user);
-  console.log('ProfileDropdown - userData:', userData);
-  console.log('ProfileDropdown - isGuest:', isGuest);
-
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
