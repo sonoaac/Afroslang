@@ -675,7 +675,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
         {/* ── Firefly animation section ── */}
         <div className="lp-firefly-section lp-reveal">
-          <div className="lp-firefly-label">Our Heritage</div>
           <div className="lp-firefly-wrap">
             <video
               ref={fireflyVideoRef}
@@ -686,6 +685,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               playsInline
             />
             <div className="lp-firefly-overlay" />
+            <span className="lp-firefly-label">Our Heritage</span>
           </div>
         </div>
 
