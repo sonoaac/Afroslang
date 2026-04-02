@@ -122,6 +122,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
   const [panelOpen, setPanelOpen]                 = useState(false);
   const [showAll, setShowAll]                     = useState(false);
   const [exploreVisible, setExploreVisible]       = useState(false);
+  const [headerScrolled, setHeaderScrolled]       = useState(false);
   const exploreSectionRef = useRef<HTMLDivElement>(null);
   const fireflyVideoRef   = useRef<HTMLVideoElement>(null);
   // Tracks last active tab so form content stays rendered during close animation
@@ -134,6 +135,12 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
   const initialCount = isMobile ? 7 : 21;
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
+
+  useEffect(() => {
+    const onScroll = () => setHeaderScrolled(window.scrollY > 60);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     const el = exploreSectionRef.current;
@@ -430,7 +437,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
       {/* ── Stacked Hero ── */}
       <section className="lp-stack">
 
-        <header className="lp-header">
+        <header className={`lp-header${headerScrolled ? ' lp-header--scrolled' : ''}`}>
           <div className="lp-header-left">
             <dotlottie-wc
               src="https://lottie.host/75a566a2-61ec-4b60-9c5b-6ec41aff8523/1aJFp2Ot5H.lottie"
@@ -439,7 +446,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               className="lp-logo"
               style={{ display: 'block', width: '52px', height: '52px' }}
             />
-            <span className="lp-brand">Afro<em>slang</em></span>
+            <span className="lp-brand">AFRO<em>SLANG</em></span>
           </div>
         </header>
 
@@ -454,7 +461,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
                 className="lp-stack-logo"
                 style={{ display: 'block' }}
               />
-              <div className="lp-stack-logo-glow" />
             </div>
             <p className="lp-stack-tagline">
               <span style={{ color: '#b00020', display: 'block', fontWeight: 800, fontSize: '2em', lineHeight: 1.05, letterSpacing: '0.04em' }}>
