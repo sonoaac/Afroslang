@@ -4,6 +4,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { DescrambleText } from '../ui/DescrambleText';
+import { StaticPage } from './StaticPage';
 import './LandingPage.css';
 
 // Drop-in only — no scramble chars. from === to so only phase 1 (drop-in) runs.
@@ -134,7 +135,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
   const { setGuestMode, isGuest } = useAuth();
 
   const [sheet, setSheet] = useState<SheetMode>(initialSheet ?? null);
-  const [showOurStory, setShowOurStory] = useState(false);
 
   // Explorer section state
   const [exploreSearch, setExploreSearch]         = useState('');
@@ -145,6 +145,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
   const [showAll, setShowAll]                     = useState(false);
   const [exploreVisible, setExploreVisible]       = useState(false);
   const [headerScrolled, setHeaderScrolled]       = useState(false);
+  const [activePage, setActivePage]               = useState<string | null>(null);
   const exploreSectionRef = useRef<HTMLDivElement>(null);
   const fireflyVideoRef   = useRef<HTMLVideoElement>(null);
   // Tracks last active tab so form content stays rendered during close animation
@@ -453,6 +454,239 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     }
   };
 
+  // ── Static page render ────────────────────────────────────────────────────
+  const PAGE_CONTENT: Record<string, { title: string; body: React.ReactNode }> = {
+    about: {
+      title: 'About Afroslang',
+      body: (<>
+        <span className="sp-label">Who We Are</span>
+        <p>Afroslang is a gamified African language learning platform built for the diaspora and for everyone who wants to connect with the African continent through its most living cultural threads — its languages.</p>
+        <div className="sp-divider" />
+        <h2>Our Purpose</h2>
+        <p>Africa holds over 2,000 languages. Many of them are at risk. Afroslang exists to make learning these languages feel joyful, addictive, and meaningful — not like homework.</p>
+        <p>We believe language is the bridge between identity and heritage. When you speak your ancestral tongue, you carry forward thousands of years of wisdom, story, and connection.</p>
+        <div className="sp-divider" />
+        <h2>What We Offer</h2>
+        <ul>
+          <li>15 African languages with full 7-stage curricula</li>
+          <li>Gamified lessons: XP, streaks, leaderboards, hearts</li>
+          <li>Cultural facts, tone training, and conversation scripts</li>
+          <li>Bilingual interface — English and French</li>
+          <li>Mobile-first — works on any device</li>
+        </ul>
+      </>),
+    },
+    'our-story': {
+      title: 'Our Story',
+      body: (<>
+        <span className="sp-label">Owned by Sonoaac</span>
+        <p>Sonoaac is an Africa First Focus Group dedicated to building products that celebrate, preserve, and elevate African culture and identity across the globe.</p>
+        <div className="sp-divider" />
+        <p>The Founder originates from <strong>Imo Owerri, Nigeria</strong> — born in <strong>2004</strong> in Lagos. Afroslang was created from a personal mission: to ensure that descendants of the diaspora never lose connection with their ancestral tongues.</p>
+        <p>What began as a personal frustration — the feeling of being disconnected from Igbo, from the rhythms of home — became a platform that now serves learners from over a dozen African language communities.</p>
+        <div className="sp-divider" />
+        <h2>Where We're Going</h2>
+        <p>Afroslang will expand to cover all major African languages, partner with African linguists and cultural institutions, and donate 50% of every subscription directly to African education charities.</p>
+      </>),
+    },
+    team: {
+      title: 'The Team',
+      body: (<>
+        <span className="sp-label">Sonoaac</span>
+        <p>Afroslang is built by a small, focused team under the Sonoaac umbrella — a group of African creators, engineers, and educators who believe technology should serve cultural preservation.</p>
+        <div className="sp-divider" />
+        <h2>Founder</h2>
+        <p><strong>Sonoaac Founder</strong> — Imo Owerri, Nigeria origin. Full-stack developer, language advocate, and diaspora voice. Built Afroslang from scratch at age 20.</p>
+        <div className="sp-divider" />
+        <h2>Join the Team</h2>
+        <p>We are always looking for African language speakers, linguists, educators, and developers who share our mission. Reach out through the Contact page.</p>
+      </>),
+    },
+    roadmap: {
+      title: 'Roadmap',
+      body: (<>
+        <span className="sp-label">What's Coming</span>
+        <p>Afroslang is actively growing. Here is a transparent view of what we are building next.</p>
+        <div className="sp-divider" />
+        <h2>In Progress</h2>
+        <ul>
+          <li>Expanding to 30+ African languages</li>
+          <li>Native speaker audio recordings for all exercises</li>
+          <li>Offline mode via Capacitor (iOS & Android apps)</li>
+          <li>Community leaderboard leagues with prizes</li>
+        </ul>
+        <div className="sp-divider" />
+        <h2>Planned</h2>
+        <ul>
+          <li>AI conversation partner trained on African languages</li>
+          <li>Diaspora community forums per language</li>
+          <li>Children's mode — ages 4–10</li>
+          <li>School partnership programme for African institutions</li>
+          <li>Physical merchandise — Afroslang cultural collections</li>
+        </ul>
+        <div className="sp-divider" />
+        <h2>Long-Term Vision</h2>
+        <p>A world where no African child of the diaspora grows up without access to their ancestral language — free, joyful, and always available in their pocket.</p>
+      </>),
+    },
+    terms: {
+      title: 'Terms of Service',
+      body: (<>
+        <span className="sp-label">Last updated: 2025</span>
+        <p>By accessing or using Afroslang, you agree to be bound by these Terms of Service. If you do not agree, please do not use the platform.</p>
+        <div className="sp-divider" />
+        <h2>Use of Service</h2>
+        <p>Afroslang grants you a personal, non-transferable licence to use the platform for personal, non-commercial language learning. You may not reproduce, distribute, or create derivative works from our content without written permission.</p>
+        <h2>Accounts</h2>
+        <p>You are responsible for maintaining the confidentiality of your account credentials. You must be at least 13 years old to create an account. We reserve the right to suspend accounts that violate these terms.</p>
+        <h2>Subscriptions & Payments</h2>
+        <p>Paid subscriptions are processed through Stripe. The 7-day free trial converts to a paid subscription unless cancelled before the trial ends. Cancellations take effect at the end of the current billing period.</p>
+        <h2>Charitable Contributions</h2>
+        <p>50% of all subscription revenue is donated to vetted African education charities. Afroslang publishes an annual transparency report detailing all charitable disbursements.</p>
+        <h2>Limitation of Liability</h2>
+        <p>Afroslang is provided "as is." We make no warranties regarding uptime, accuracy of language content, or fitness for any particular purpose. Our liability is limited to the amount you paid in the 12 months prior to any claim.</p>
+      </>),
+    },
+    privacy: {
+      title: 'Privacy Policy',
+      body: (<>
+        <span className="sp-label">Last updated: 2025</span>
+        <p>Afroslang is committed to protecting your privacy. This policy explains what data we collect, how we use it, and your rights.</p>
+        <div className="sp-divider" />
+        <h2>Data We Collect</h2>
+        <ul>
+          <li>Account information: email address, username</li>
+          <li>Learning progress: XP, completed lessons, streak data</li>
+          <li>Usage data: lessons started, time on platform</li>
+          <li>Payment data: processed by Stripe — we do not store card details</li>
+        </ul>
+        <div className="sp-divider" />
+        <h2>How We Use Your Data</h2>
+        <p>We use your data to operate the platform, personalise your learning experience, and send occasional product updates. We do not sell your data to third parties.</p>
+        <h2>Data Retention</h2>
+        <p>We retain your account data for as long as your account exists. You may request deletion at any time by contacting us.</p>
+        <h2>Your Rights</h2>
+        <p>You have the right to access, correct, or delete your personal data. Contact us at the address on the Contact page to exercise these rights.</p>
+      </>),
+    },
+    cookies: {
+      title: 'Cookie Policy',
+      body: (<>
+        <span className="sp-label">Last updated: 2025</span>
+        <p>Afroslang uses a minimal number of cookies and browser storage to operate the platform.</p>
+        <div className="sp-divider" />
+        <h2>What We Use</h2>
+        <ul>
+          <li><strong>localStorage</strong> — stores your learning progress, interface language preference, and guest session data locally on your device</li>
+          <li><strong>sessionStorage</strong> — tracks whether the intro animation has been shown this session</li>
+          <li><strong>Firebase Auth cookies</strong> — maintains your login session securely</li>
+        </ul>
+        <div className="sp-divider" />
+        <h2>Third-Party Cookies</h2>
+        <p>Stripe (payment processor) may set cookies during the checkout flow. These are governed by Stripe's own privacy policy.</p>
+        <h2>Managing Cookies</h2>
+        <p>You can clear localStorage and cookies through your browser settings at any time. Doing so will log you out and reset your locally-stored progress.</p>
+      </>),
+    },
+    partner: {
+      title: 'Partner with Us',
+      body: (<>
+        <span className="sp-label">Sponsorships & Partnerships</span>
+        <p>Afroslang is building the most prominent African language platform on the internet. We are open to partnerships that align with our mission of celebrating and preserving African culture.</p>
+        <div className="sp-divider" />
+        <h2>Who We Partner With</h2>
+        <ul>
+          <li>African cultural organisations and NGOs</li>
+          <li>Universities and language preservation institutes</li>
+          <li>African-owned businesses wanting to reach the diaspora</li>
+          <li>Media companies and content creators in the African space</li>
+          <li>Tech companies building African-focused products</li>
+        </ul>
+        <div className="sp-divider" />
+        <h2>What We Offer Partners</h2>
+        <p>In-app placements, co-branded learning content, newsletter features, and access to an engaged diaspora audience actively investing in their African identity.</p>
+        <p>Contact us at the Contact page to discuss a partnership.</p>
+      </>),
+    },
+    charity: {
+      title: 'Charity Partners',
+      body: (<>
+        <span className="sp-label">50% Goes Back</span>
+        <p>Afroslang was built on a simple promise: half of every payment goes directly to African education and cultural preservation charities. No exceptions.</p>
+        <div className="sp-divider" />
+        <h2>Our Commitment</h2>
+        <p>We publish an annual transparency report showing exactly how much was raised and where it went. Every subscriber can see the direct impact of their membership.</p>
+        <div className="sp-divider" />
+        <h2>Areas We Support</h2>
+        <ul>
+          <li>Children's literacy programmes in sub-Saharan Africa</li>
+          <li>Indigenous language documentation projects</li>
+          <li>Scholarships for African students studying linguistics</li>
+          <li>Community libraries and learning centres</li>
+        </ul>
+        <div className="sp-divider" />
+        <h2>Partner Charities</h2>
+        <p>We are currently onboarding our first cohort of charity partners. If you represent an African education or language charity, reach out through the Contact page.</p>
+      </>),
+    },
+    advertise: {
+      title: 'Advertise',
+      body: (<>
+        <span className="sp-label">Reach the Diaspora</span>
+        <p>Afroslang's audience is educated, culturally engaged, and actively investing in their African heritage. Our users span the UK, US, Canada, France, and across Africa itself.</p>
+        <div className="sp-divider" />
+        <h2>Ad Formats Available</h2>
+        <ul>
+          <li>Sponsored cultural fact cards between lessons</li>
+          <li>Newsletter placements (coming soon)</li>
+          <li>Co-branded language learning content</li>
+          <li>Community challenges and leaderboard sponsorships</li>
+        </ul>
+        <div className="sp-divider" />
+        <h2>Our Standards</h2>
+        <p>We only accept advertisers whose products and values align with our mission. No gambling, no fast fashion, no content that conflicts with African cultural dignity.</p>
+        <p>Interested? Contact us through the Contact page.</p>
+      </>),
+    },
+    contact: {
+      title: 'Contact Us',
+      body: (<>
+        <span className="sp-label">Get in Touch</span>
+        <p>We are a small team and we read every message. Whether you have a question, a partnership proposal, or just want to say hello — reach out.</p>
+        <div className="sp-divider" />
+        <div className="sp-contact-grid">
+          <div className="sp-contact-card">
+            <span className="sp-contact-card-label">General Enquiries</span>
+            <span className="sp-contact-card-value">hello@afroslang.com</span>
+          </div>
+          <div className="sp-contact-card">
+            <span className="sp-contact-card-label">Partnerships</span>
+            <span className="sp-contact-card-value">partners@afroslang.com</span>
+          </div>
+          <div className="sp-contact-card">
+            <span className="sp-contact-card-label">Press & Media</span>
+            <span className="sp-contact-card-value">press@afroslang.com</span>
+          </div>
+          <div className="sp-contact-card">
+            <span className="sp-contact-card-label">Charity Enquiries</span>
+            <span className="sp-contact-card-value">charity@afroslang.com</span>
+          </div>
+        </div>
+        <div className="sp-divider" />
+        <p>We typically respond within 2 business days. For technical support, include your account email in the message.</p>
+      </>),
+    },
+  };
+
+  if (activePage && PAGE_CONTENT[activePage]) {
+    const pg = PAGE_CONTENT[activePage];
+    return (
+      <StaticPage title={pg.title} onBack={() => setActivePage(null)}>
+        {pg.body}
+      </StaticPage>
+    );
+  }
+
   return (
     <div className="lp">
 
@@ -461,13 +695,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
         <header className={`lp-header${headerScrolled ? ' lp-header--scrolled' : ''}`}>
           <div className="lp-header-left">
-            <dotlottie-wc
-              src="https://lottie.host/75a566a2-61ec-4b60-9c5b-6ec41aff8523/1aJFp2Ot5H.lottie"
-              autoplay
-              loop
-              className="lp-logo"
-              style={{ display: 'block', width: '52px', height: '52px' }}
-            />
+            <img src="/Afroslang.png" className="lp-logo" alt="Afroslang" style={{ display: 'block', width: '52px', height: '52px' }} />
             <span className="lp-brand">AFRO<em>SLANG</em></span>
           </div>
         </header>
@@ -521,9 +749,9 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
         {/* Our Mission row */}
         <div className="lp-stack-row lp-stack-row--right">
-          <div className="lp-stack-row-text lp-reveal lp-reveal--from-left">
+          <div className="lp-stack-row-text lp-reveal lp-reveal--from-left" style={{ textAlign: 'center', alignItems: 'center' }}>
             <span className="lp-stack-row-label">Our Mission</span>
-            <p>
+            <p style={{ maxWidth: 480, textAlign: 'center' }}>
               Afroslang main goal is to help and assist descendants and children of the diaspora
               to maintain their language culture and ancestral sense of knowing
             </p>
@@ -727,11 +955,35 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
       {/* ── Footer ── */}
       <footer className="lp-footer">
+
+        {/* Did You Know facts strip */}
+        <div className="lp-footer-facts lp-reveal">
+          <p className="lp-footer-facts-eyebrow">Did You Know</p>
+          <div className="lp-footer-facts-grid">
+            <div className="lp-footer-fact-card">
+              <span className="lp-footer-fact-num">2,000+</span>
+              <span className="lp-footer-fact-label">Languages across Africa</span>
+            </div>
+            <div className="lp-footer-fact-card">
+              <span className="lp-footer-fact-num">200M</span>
+              <span className="lp-footer-fact-label">Swahili speakers worldwide</span>
+            </div>
+            <div className="lp-footer-fact-card">
+              <span className="lp-footer-fact-num">🇧🇷</span>
+              <span className="lp-footer-fact-label">Yoruba influenced languages in Brazil</span>
+            </div>
+            <div className="lp-footer-fact-card">
+              <span className="lp-footer-fact-num">Ge'ez</span>
+              <span className="lp-footer-fact-label">Amharic uses its own unique script</span>
+            </div>
+          </div>
+        </div>
+
         <div className="lp-footer-inner">
 
           <div className="lp-footer-brand lp-reveal">
             <img src="/Afroslang.png" alt="Afroslang" className="lp-footer-logo" />
-            <span className="lp-footer-brand-name">Afro<em>slang</em></span>
+            <span className="lp-footer-brand-name">AFRO<em>SLANG</em></span>
             <p className="lp-footer-brand-desc">
               Gamified African language learning for the diaspora and everyone who wants to
               connect with the continent
@@ -765,39 +1017,29 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
             <div className="lp-footer-col">
               <h4 className="lp-footer-col-title">Get to Know</h4>
               <ul className="lp-footer-list">
-                <li><button className="lp-footer-link" onClick={() => setSheet('signup')}>About Afroslang</button></li>
-                <li><button className="lp-footer-link" onClick={() => setShowOurStory(true)}>Our Story</button></li>
-                <li><button className="lp-footer-link" onClick={() => setSheet('signup')}>The Team</button></li>
-                <li><button className="lp-footer-link" onClick={() => setSheet('signup')}>Roadmap</button></li>
-              </ul>
-            </div>
-
-            <div className="lp-footer-col">
-              <h4 className="lp-footer-col-title">Did You Know</h4>
-              <ul className="lp-footer-list">
-                <li><span className="lp-footer-fact">Africa has over 2000 languages</span></li>
-                <li><span className="lp-footer-fact">Swahili is spoken by 200M people</span></li>
-                <li><span className="lp-footer-fact">Yoruba influenced languages in Brazil</span></li>
-                <li><span className="lp-footer-fact">Amharic uses its own unique script</span></li>
+                <li><button className="lp-footer-link" onClick={() => setActivePage('about')}>About Afroslang</button></li>
+                <li><button className="lp-footer-link" onClick={() => setActivePage('our-story')}>Our Story</button></li>
+                <li><button className="lp-footer-link" onClick={() => setActivePage('team')}>The Team</button></li>
+                <li><button className="lp-footer-link" onClick={() => setActivePage('roadmap')}>Roadmap</button></li>
               </ul>
             </div>
 
             <div className="lp-footer-col">
               <h4 className="lp-footer-col-title">Legalities</h4>
               <ul className="lp-footer-list">
-                <li><button className="lp-footer-link">Terms of Service</button></li>
-                <li><button className="lp-footer-link">Privacy Policy</button></li>
-                <li><button className="lp-footer-link">Cookie Policy</button></li>
+                <li><button className="lp-footer-link" onClick={() => setActivePage('terms')}>Terms of Service</button></li>
+                <li><button className="lp-footer-link" onClick={() => setActivePage('privacy')}>Privacy Policy</button></li>
+                <li><button className="lp-footer-link" onClick={() => setActivePage('cookies')}>Cookie Policy</button></li>
               </ul>
             </div>
 
             <div className="lp-footer-col">
               <h4 className="lp-footer-col-title">Sponsorships</h4>
               <ul className="lp-footer-list">
-                <li><button className="lp-footer-link">Partner with Us</button></li>
-                <li><button className="lp-footer-link">Charity Partners</button></li>
-                <li><button className="lp-footer-link">Advertise</button></li>
-                <li><button className="lp-footer-link">Contact Us</button></li>
+                <li><button className="lp-footer-link" onClick={() => setActivePage('partner')}>Partner with Us</button></li>
+                <li><button className="lp-footer-link" onClick={() => setActivePage('charity')}>Charity Partners</button></li>
+                <li><button className="lp-footer-link" onClick={() => setActivePage('advertise')}>Advertise</button></li>
+                <li><button className="lp-footer-link" onClick={() => setActivePage('contact')}>Contact Us</button></li>
               </ul>
             </div>
 
@@ -810,28 +1052,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
         </div>
       </footer>
 
-      {/* ── Our Story modal ── */}
-      {showOurStory && (
-        <>
-          <div className="our-story-backdrop" onClick={() => setShowOurStory(false)} />
-          <div className="our-story-modal">
-            <button className="our-story-close" onClick={() => setShowOurStory(false)} aria-label="Close">✕</button>
-            <h2 className="our-story-title">Our Story</h2>
-            <div className="our-story-body">
-              <p className="our-story-owner">Owned by <strong>Sonoaac</strong></p>
-              <p>
-                Sonoaac is an Africa First Focus Group dedicated to building products that celebrate,
-                preserve, and elevate African culture and identity across the globe.
-              </p>
-              <p>
-                Its Founder originates from <strong>Imo Owerri, Nigeria</strong> — born in <strong>2004</strong> in Lagos.
-                Afroslang was created from a personal mission: to ensure that descendants of the diaspora
-                never lose connection with their ancestral tongues.
-              </p>
-            </div>
-          </div>
-        </>
-      )}
 
       {/* ── Auth glassmorphic phase-in overlay ── */}
       <div

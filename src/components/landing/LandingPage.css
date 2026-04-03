@@ -223,8 +223,8 @@
 }
 
 .lp-stack-logo {
-  width: clamp(90px, 15vw, 150px);
-  height: clamp(90px, 15vw, 150px);
+  width: clamp(140px, 22vw, 220px);
+  height: clamp(140px, 22vw, 220px);
   object-fit: contain;
   position: relative;
   z-index: 1;
@@ -1006,6 +1006,71 @@
 
 
 /* ════════════════════════════════
+   FOOTER FACTS STRIP
+   ════════════════════════════════ */
+.lp-footer-facts {
+  padding: clamp(40px, 6vw, 64px) clamp(20px, 6vw, 80px);
+  text-align: center;
+  background: rgba(176,0,32,0.04);
+}
+
+.lp-footer-facts-eyebrow {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #b00020;
+  margin: 0 0 28px;
+}
+
+.lp-footer-facts-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.lp-footer-fact-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px 16px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(176,0,32,0.15);
+  border-radius: 16px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.lp-footer-fact-card:hover {
+  border-color: rgba(176,0,32,0.35);
+  background: rgba(176,0,32,0.06);
+}
+
+.lp-footer-fact-num {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.lp-footer-fact-label {
+  font-family: Georgia, serif;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .lp-footer-facts-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+/* ════════════════════════════════
    FOOTER
    ════════════════════════════════ */
 .lp-footer {
@@ -1729,7 +1794,7 @@
     margin-bottom: 28px;
   }
   .lp-stack-logo-wrap { margin-bottom: 0; }
-  .lp-stack-logo { width: 100px; height: 100px; }
+  .lp-stack-logo { width: 140px; height: 140px; }
   .lp-stack-tagline {
     font-size: clamp(1.3rem, 5vw, 1.6rem);
     text-align: center;
