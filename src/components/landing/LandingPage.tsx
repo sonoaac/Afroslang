@@ -108,6 +108,28 @@ const EXPLORE_COUNTRIES: ExploreCountry[] = [
   { code:'SC', name:'Seychelles',         languages:[],                           fact:'Home to the Coco de Mer, the world\'s largest seed, up to 25 kg.' },
 ];
 
+// Dominant flag color per country code (for hover glow)
+const FLAG_COLORS: Record<string, string> = {
+  NG:'#008751', ET:'#078930', EG:'#CE1126', TZ:'#1EB53A', KE:'#006600',
+  ZA:'#007A4D', GH:'#CD6C17', MA:'#C1272D', DZ:'#006233', CD:'#007FFF',
+  SN:'#00853F', BF:'#EF2B2D', ZW:'#006400', SO:'#4189DD', MW:'#B01C31',
+  ZM:'#198A00', MZ:'#009A44', CG:'#009A00', BJ:'#008751', GM:'#3A7728',
+  UG:'#000000', SD:'#D21034', TN:'#E70013', LY:'#000000', MR:'#006233',
+  DJ:'#6AB2E7', NE:'#E05206', MG:'#FC3D32', CM:'#007A5E', AO:'#CC0000',
+  ML:'#009A00', TD:'#002664', CI:'#F77F00', GN:'#CE1126', RW:'#FAD201',
+  BI:'#CE1126', SS:'#078930', TG:'#006A4E', SL:'#1EB53A', LR:'#BF0A30',
+  CF:'#003082', ER:'#4189DD', NA:'#003580', BW:'#75AADB', LS:'#009543',
+  GW:'#CE1126', GA:'#009E60', GQ:'#3E9A00', SZ:'#3E5EB9', CV:'#003893',
+  ST:'#12AD2B', KM:'#3A75C4', MU:'#EA2839', SC:'#003F87',
+};
+
+function hexToRgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLanguage, onPreSelectLanguage }: LandingPageProps) {
   const { setGuestMode, isGuest } = useAuth();
 
@@ -517,6 +539,17 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
           ref={exploreSectionRef}
           className={`lp-explore-section${exploreVisible ? ' lp-explore-section--visible' : ''}`}
         >
+          {/* Firefly video background */}
+          <video
+            ref={fireflyVideoRef}
+            className="lp-explore-video-bg"
+            src="/firefly-anim.mp4"
+            muted
+            loop
+            playsInline
+          />
+          <div className="lp-explore-video-overlay" />
+
           {/* Section header */}
           <div className="lp-explore-header lp-reveal">
             <p className="lp-langs-eyebrow">Over 1500+ African Languages · Explore the Continent — Not even half way there</p>
@@ -602,7 +635,12 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
                       selectedCountry?.code === country.code ? 'lp-explore-flag-btn--active' : '',
                       country.languages.length === 0 ? 'lp-explore-flag-btn--dim' : '',
                     ].join(' ')}
-                    style={{ animationDelay: `${idx * 28}ms` }}
+                    style={{
+                      animationDelay: `${idx * 28}ms`,
+                      '--flag-hover-bg': hexToRgba(FLAG_COLORS[country.code] ?? '#b00020', 0.18),
+                      '--flag-hover-border': hexToRgba(FLAG_COLORS[country.code] ?? '#b00020', 0.5),
+                      '--flag-hover-glow': hexToRgba(FLAG_COLORS[country.code] ?? '#b00020', 0.22),
+                    } as React.CSSProperties}
                     onClick={() => handleFlagClick(country)}
                     title={country.name}
                   >
@@ -634,7 +672,12 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
                       selectedCountry?.code === country.code ? 'lp-explore-flag-btn--active' : '',
                       country.languages.length === 0 ? 'lp-explore-flag-btn--dim' : '',
                     ].join(' ')}
-                    style={{ animationDelay: `${idx * 28}ms` }}
+                    style={{
+                      animationDelay: `${idx * 28}ms`,
+                      '--flag-hover-bg': hexToRgba(FLAG_COLORS[country.code] ?? '#b00020', 0.18),
+                      '--flag-hover-border': hexToRgba(FLAG_COLORS[country.code] ?? '#b00020', 0.5),
+                      '--flag-hover-glow': hexToRgba(FLAG_COLORS[country.code] ?? '#b00020', 0.22),
+                    } as React.CSSProperties}
                     onClick={() => handleFlagClick(country)}
                     title={country.name}
                   >
@@ -679,21 +722,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
           </div>
         </div>
 
-        {/* ── Firefly animation section ── */}
-        <div className="lp-firefly-section lp-reveal">
-          <div className="lp-firefly-wrap">
-            <video
-              ref={fireflyVideoRef}
-              className="lp-firefly-video"
-              src="/firefly-anim.mp4"
-              muted
-              loop
-              playsInline
-            />
-            <div className="lp-firefly-overlay" />
-            <span className="lp-firefly-label">Our Heritage</span>
-          </div>
-        </div>
 
       </section>
 

@@ -596,10 +596,35 @@
   z-index: 1;
   padding: clamp(48px, 7vw, 80px) clamp(20px, 6vw, 72px);
   background: transparent;
+  overflow: hidden;
+}
+
+/* ── Video background ── */
+.lp-explore-video-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* Dark overlay so text stays readable over video */
+.lp-explore-video-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 120% 80% at 50% 50%, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.88) 100%);
+  z-index: 1;
+  pointer-events: none;
 }
 
 /* Section header + search */
 .lp-explore-header {
+  position: relative;
+  z-index: 2;
   text-align: center;
   margin-bottom: 28px;
 }
@@ -655,6 +680,8 @@
 
 /* Main layout: panel left + grid right */
 .lp-explore-main {
+  position: relative;
+  z-index: 2;
   display: flex;
   gap: 24px;
   align-items: flex-start;
@@ -868,18 +895,18 @@
   gap: 10px;
 }
 
-/* Flag button — reuses lp-langs-card visuals but is interactive */
+/* Flag button — transparent, only flag + name visible */
 .lp-explore-flag-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   padding: 12px 8px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: 14px;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, transform 0.18s;
+  transition: background 0.22s, border-color 0.22s, transform 0.18s, box-shadow 0.22s, backdrop-filter 0.22s;
   animation: flagCardIn 0.45s ease both;
 }
 @keyframes flagCardIn {
@@ -887,17 +914,22 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 .lp-explore-flag-btn:hover {
-  background: rgba(176, 0, 32, 0.1);
-  border-color: rgba(176, 0, 32, 0.3);
+  background: var(--flag-hover-bg, rgba(176,0,32,0.15));
+  border-color: var(--flag-hover-border, rgba(176,0,32,0.35));
+  box-shadow: 0 4px 20px var(--flag-hover-glow, rgba(176,0,32,0.2));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   transform: translateY(-2px);
 }
 .lp-explore-flag-btn--active {
-  background: rgba(176, 0, 32, 0.15) !important;
-  border-color: rgba(176, 0, 32, 0.55) !important;
-  box-shadow: 0 0 0 1px rgba(176, 0, 32, 0.3);
+  background: var(--flag-hover-bg, rgba(176,0,32,0.18)) !important;
+  border-color: var(--flag-hover-border, rgba(176,0,32,0.55)) !important;
+  box-shadow: 0 4px 24px var(--flag-hover-glow, rgba(176,0,32,0.25)) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 .lp-explore-flag-btn--dim {
-  opacity: 0.45;
+  opacity: 0.4;
 }
 
 /* Mobile backdrop for panel */
@@ -1776,67 +1808,4 @@
   .lp-stack-top { padding: 48px 16px 40px; }
 }
 
-/* ── Firefly animation section ────────────────────────────────────────────── */
-.lp-firefly-section {
-  position: relative;
-  /* no margin/padding — bleeds edge-to-edge like the rows above/below */
-}
-
-.lp-firefly-wrap {
-  position: relative;
-  width: 100%;
-  /* shorter height so it reads as atmosphere, not a media block */
-  height: clamp(200px, 32vw, 380px);
-  overflow: hidden;
-  /* no border-radius, no box-shadow — seamless bleed */
-}
-
-.lp-firefly-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  opacity: 0.72;
-}
-
-.lp-firefly-overlay {
-  position: absolute;
-  inset: 0;
-  background:
-    /* top + bottom: dissolves into page atmosphere */
-    linear-gradient(to bottom,
-      rgba(0,0,0,0.88) 0%,
-      rgba(0,0,0,0.55) 10%,
-      rgba(0,0,0,0.15) 28%,
-      transparent      42%,
-      transparent      58%,
-      rgba(0,0,0,0.15) 72%,
-      rgba(0,0,0,0.55) 90%,
-      rgba(0,0,0,0.88) 100%
-    ),
-    /* sides: gentle edge fade */
-    linear-gradient(to right,
-      rgba(0,0,0,0.55) 0%,
-      transparent      12%,
-      transparent      88%,
-      rgba(0,0,0,0.55) 100%
-    );
-  pointer-events: none;
-}
-
-/* Label overlaid on the video, centered */
-.lp-firefly-label {
-  position: absolute;
-  bottom: 22%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: 'Times New Roman', serif;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.3);
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: 1;
-}
+/* (firefly section removed — video is now the explore section background) */
