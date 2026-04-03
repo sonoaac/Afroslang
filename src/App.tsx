@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { InterfaceLanguage, AfricanLanguage, UserProgress, Lesson } from './types';
-import { AfroslangIntro } from './components/intro/AfroslangIntro';
+// import { AfroslangIntro } from './components/intro/AfroslangIntro'; // disabled — high RAM cost
 import { LandingPage } from './components/landing/LandingPage';
 
 import { LearningPath } from './features/lessons/LearningPath';
@@ -26,14 +26,9 @@ type Screen = 'auth' | 'interface-select' | 'path' | 'lesson' | 'complete' | 'le
 function App() {
   const { user, userData, setUserData, isGuest, loading, logout, setGuestMode } = useAuth();
   const [currentScreen, setCurrentScreen] = useState<Screen>('auth');
-  // Show intro once per session; after it completes show splash
-  const [showIntro, setShowIntro] = useState<boolean>(
-    () => sessionStorage.getItem('afro_intro_seen') !== '1'
-  );
-  const handleIntroComplete = useCallback(() => {
-    sessionStorage.setItem('afro_intro_seen', '1');
-    setShowIntro(false);
-  }, []);
+  // Intro disabled — AfroslangIntro kept in src/components/intro/ but not rendered
+  const showIntro = false;
+  const handleIntroComplete = useCallback(() => {}, []);
 
   // Detect Stripe payment redirect: ?payment_success=1
   const [paymentSuccessReturn] = useState<boolean>(
@@ -405,10 +400,8 @@ function App() {
     }
   }, [user, isGuest, loading, currentScreen, paymentSuccessReturn, preSelectedLanguage]);
 
-  // 1. Logo intro (once per session)
-  if (showIntro) {
-    return <AfroslangIntro onComplete={handleIntroComplete} />;
-  }
+  // 1. Logo intro — disabled (showIntro is always false)
+  void showIntro; void handleIntroComplete;
 
   // Show loading screen while checking authentication
   if (loading) {
