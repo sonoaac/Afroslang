@@ -36,34 +36,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        setUser(user);
-        setIsGuest(false);
-        
-        // Load user data from Firestore
-        const data = await loadUserData(user.uid);
-        
-        // Update hearts based on timer
-        if (data && !data.subscription?.active) {
-          const heartsStatus = await getCurrentHeartsStatus(user.uid);
-          const updatedData = {
-            ...data,
-            hearts: heartsStatus.currentHearts,
-            heartsData: heartsStatus
-          };
-          setUserData(updatedData);
-        } else {
-          setUserData(data);
-        }
-      } else {
-        setUser(null);
-        setUserData(null);
-        setIsGuest(false);
-        // Guest mode is not auto-restored on load — users always start from LandingPage
-        // and must explicitly click "Try as Guest" each session.
-      }
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      // Unblock the UI immediately — Firebase Auth resolved (local, fast)
+      setUser(firebaseUser);
+      setIsGuest(false);
       setLoading(false);
+
+      if (firebaseUser) {
+        // Fetch Firestore data in the background — does NOT block loading screen
+        loadUserData(firebaseUser.uid).then(async (data) => {
+          if (data && !data.subscription?.active) {
+            const heartsStatus = await getCurrentHeartsStatus(firebaseUser.uid);
+            setUserData({ ...data, hearts: heartsStatus.currentHearts, heartsData: heartsStatus });
+          } else {
+            setUserData(data);
+          }
+        }).catch(() => {
+          // Firestore unavailable — app still works, userData stays null
+        });
+      } else {
+        setUserData(null);
+        // Guest mode is not auto-restored on load — users always start from LandingPage
+      }
     });
 
     return unsubscribe;
