@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { InterfaceLanguage, Lesson } from '../../types';
 import { X, Heart, CheckCircle2, XCircle, Lightbulb, RotateCcw, Home } from 'lucide-react';
 import { checkIgboAnswer } from '../../utils/igboTextUtils';
@@ -17,6 +18,7 @@ import { TeachMode, PreviewPhase } from './IntroPhases';
 import { FlashcardExercise, AudioMatchExercise, WordOrderExercise } from './ExerciseTypes';
 import { CulturalCardExercise, ToneTrainerExercise } from './EnrichedExercises';
 import { ConversationExercise, StoryExercise } from './AdvancedExercises';
+import { RainCanvas } from '../../components/rain/RainCanvas';
 import './LessonPremium.css';
 
 // ── Phase type ────────────────────────────────────────────────────────────────
@@ -411,6 +413,43 @@ export function LessonScreen({
   // QUIZ PHASE
   // ══════════════════════════════════════════════════════════════════════════
 
+  const progressRatio = progress / 100;
+  const dimAlpha = Math.max(0, 0.5 * (1 - progressRatio));
+  const rainOpacity = Math.max(0, 1 - progressRatio * 1.5);
+
+  const renderHeader = () => (
+    <>
+      {createPortal(
+        <>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none', background: `rgba(0,0,0,${dimAlpha})`, transition: 'background 0.8s ease' }} />
+          <div style={{ position: 'fixed', inset: 0, zIndex: 2, pointerEvents: 'none', opacity: rainOpacity, transition: 'opacity 1s ease' }}>
+            <RainCanvas intensity="heavy" />
+          </div>
+        </>,
+        document.body
+      )}
+      <div className="ls-header">
+        <div className="ls-header-inner">
+          <button onClick={onExit} className="ls-exit-btn" aria-label="Exit">
+            <X style={{ width: 18, height: 18 }} strokeWidth={2.5} />
+          </button>
+          <div className="ls-progress-track">
+            <div className="ls-progress-fill" style={{ width: `${progress}%` }} />
+          </div>
+          <div className="ls-counter">{correctAnswers}/{totalQuestions}</div>
+          <div style={{ display: 'flex', gap: 3 }}>
+            {heartsData
+              ? <HeartsTimer heartsData={heartsData} isSubscribed={isSubscribed} />
+              : renderHearts()}
+          </div>
+          <button onClick={onBackToLanguageSelect} className="ls-home-btn" aria-label="Home">
+            <Home style={{ width: 18, height: 18 }} strokeWidth={2} />
+          </button>
+        </div>
+      </div>
+    </>
+  );
+
   // ── Enriched non-quiz exercises bypass normal submit/next flow ─────────────
 
   // Cultural card — just show, then advance
@@ -441,15 +480,7 @@ export function LessonScreen({
   if (currentExercise.type === 'conversation') {
     return (
       <div className="ls-root">
-        <div className="ls-header">
-          <div className="ls-header-inner">
-            <button onClick={onExit} className="ls-exit-btn"><X style={{ width: 18, height: 18 }} strokeWidth={2.5} /></button>
-            <div className="ls-progress-track"><div className="ls-progress-fill" style={{ width: `${progress}%` }} /></div>
-            <div className="ls-counter">{correctAnswers}/{totalQuestions}</div>
-            <div style={{ display: 'flex', gap: 3 }}>{heartsData ? <HeartsTimer heartsData={heartsData} isSubscribed={isSubscribed} /> : renderHearts()}</div>
-            <button onClick={onBackToLanguageSelect} className="ls-home-btn"><Home style={{ width: 18, height: 18 }} /></button>
-          </div>
-        </div>
+        {renderHeader()}
         <div className="ls-body">
           <ConversationExercise
             exercise={currentExercise}
@@ -493,30 +524,6 @@ export function LessonScreen({
       </div>
     );
   }
-
-  // ── Shared header (all remaining quiz exercise types) ──────────────────────
-
-  const renderHeader = () => (
-    <div className="ls-header">
-      <div className="ls-header-inner">
-        <button onClick={onExit} className="ls-exit-btn" aria-label="Exit">
-          <X style={{ width: 18, height: 18 }} strokeWidth={2.5} />
-        </button>
-        <div className="ls-progress-track">
-          <div className="ls-progress-fill" style={{ width: `${progress}%` }} />
-        </div>
-        <div className="ls-counter">{correctAnswers}/{totalQuestions}</div>
-        <div style={{ display: 'flex', gap: 3 }}>
-          {heartsData
-            ? <HeartsTimer heartsData={heartsData} isSubscribed={isSubscribed} />
-            : renderHearts()}
-        </div>
-        <button onClick={onBackToLanguageSelect} className="ls-home-btn" aria-label="Home">
-          <Home style={{ width: 18, height: 18 }} strokeWidth={2} />
-        </button>
-      </div>
-    </div>
-  );
 
   // ── Story exercise ─────────────────────────────────────────────────────────
   if (currentExercise.type === 'story') {

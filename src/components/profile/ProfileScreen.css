@@ -1,12 +1,14 @@
 /* ── Profile Screen ──────────────────────────────────────────────────────── */
 .ps-screen {
   min-height: 100dvh;
-  background: var(--app-bg, #000);
+  background: rgba(6,3,1,0.82);
   display: flex;
   flex-direction: column;
   color: #fff;
   font-family: 'Roboto', sans-serif;
   overflow-y: auto;
+  position: relative;
+  z-index: 5;
 }
 
 /* Header */
@@ -19,8 +21,8 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  background: rgba(0,0,0,0.7);
-  backdrop-filter: blur(12px);
+  background: rgba(6,3,1,0.75);
+  backdrop-filter: none;
 }
 
 .ps-back-btn {
@@ -30,8 +32,8 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(6,3,1,0.82);
   color: #fff;
   cursor: pointer;
   transition: background 0.15s;

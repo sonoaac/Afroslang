@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Gem, Heart, Zap, ChevronLeft } from 'lucide-react';
 import { SandbitsIcon } from '../../components/ui/SandbitsIcon';
@@ -24,6 +24,8 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
   const isEnglish = interfaceLanguage === 'en';
   const [purchasing, setPurchasing] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [hoveredItem, setHoveredItem] = useState<number | null>(null);
+  const tooltipTimeouts = useRef<(ReturnType<typeof setTimeout> | null)[]>([null, null, null]);
 
   const gems     = userData?.gems     ?? 0;
   const sandbits = userData?.sandbits ?? 0;
@@ -78,10 +80,9 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
   };
 
   const spFont = "'Times New Roman', Georgia, serif";
-  const spBg = '#080808';
-  const spSurface = '#111111';
+  const spBg = 'transparent';
+  const spSurface = 'rgba(6,3,1,0.82)';
   const spBorder = 'rgba(255,255,255,0.08)';
-  const spRed = '#b00020';
   const spRedBright = '#e53935';
   const spText = '#ffffff';
   const spMuted = 'rgba(255,255,255,0.55)';
@@ -136,13 +137,43 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
   ];
 
   return (
-    <div style={{ minHeight: '100vh', background: spBg, fontFamily: spFont }}>
+    <div style={{ minHeight: '100vh', background: spBg, fontFamily: spFont, position: 'relative', zIndex: 5 }}>
+
+      {/* Lightning + glow keyframes */}
+      <style>{`
+        @keyframes sp-lightning-flicker {
+          0%   { box-shadow: 0 0 8px 2px #ffd60a44, 0 0 32px 8px #ffd60a22, inset 0 0 12px #ffd60a11; opacity: 1; }
+          8%   { box-shadow: 0 0 24px 6px #ffd60acc, 0 0 64px 20px #ffd60a66, inset 0 0 24px #ffd60a44; opacity: 0.85; }
+          10%  { box-shadow: 0 0 8px 2px #ffd60a44, 0 0 32px 8px #ffd60a22, inset 0 0 12px #ffd60a11; opacity: 1; }
+          42%  { box-shadow: 0 0 8px 2px #ffd60a44, 0 0 32px 8px #ffd60a22, inset 0 0 12px #ffd60a11; opacity: 1; }
+          44%  { box-shadow: 0 0 40px 12px #ffd60aaa, 0 0 80px 28px #ffd60a55, inset 0 0 32px #ffd60a55; opacity: 0.7; }
+          46%  { box-shadow: 0 0 8px 2px #ffd60a44, 0 0 32px 8px #ffd60a22, inset 0 0 12px #ffd60a11; opacity: 1; }
+          100% { box-shadow: 0 0 8px 2px #ffd60a44, 0 0 32px 8px #ffd60a22, inset 0 0 12px #ffd60a11; opacity: 1; }
+        }
+        @keyframes sp-zap-spin {
+          0%   { transform: scale(1) rotate(-8deg); filter: drop-shadow(0 0 6px #ffd60a); }
+          10%  { transform: scale(1.25) rotate(6deg); filter: drop-shadow(0 0 18px #ffd60a) drop-shadow(0 0 36px #ffb300); }
+          20%  { transform: scale(0.95) rotate(-4deg); filter: drop-shadow(0 0 4px #ffd60a); }
+          45%  { transform: scale(1.18) rotate(10deg); filter: drop-shadow(0 0 22px #ffd60a) drop-shadow(0 0 40px #ffb300); }
+          55%  { transform: scale(1) rotate(-2deg); filter: drop-shadow(0 0 6px #ffd60a); }
+          100% { transform: scale(1) rotate(-8deg); filter: drop-shadow(0 0 6px #ffd60a); }
+        }
+        @keyframes sp-bolt-drift {
+          0%   { opacity: 0.18; transform: translateY(0) scaleX(1); }
+          50%  { opacity: 0.08; transform: translateY(-6px) scaleX(0.85); }
+          100% { opacity: 0.18; transform: translateY(0) scaleX(1); }
+        }
+        @keyframes sp-hero-glow {
+          0%, 100% { opacity: 0.55; }
+          50%       { opacity: 0.85; }
+        }
+      `}</style>
 
       {/* Toast */}
       {toast && (
         <div style={{
           position: 'fixed', top: 24, left: '50%', transform: 'translateX(-50%)',
-          background: '#111', border: '1px solid rgba(176,0,32,0.5)',
+          background: 'rgba(6,3,1,0.92)', border: '1px solid rgba(176,0,32,0.5)',
           color: '#fff', padding: '12px 28px', borderRadius: 8,
           fontSize: '0.95rem', fontWeight: 'bold', zIndex: 9999,
           boxShadow: '0 4px 32px rgba(0,0,0,0.6)', whiteSpace: 'nowrap',
@@ -151,7 +182,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
         </div>
       )}
 
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '1.5rem 1rem 4rem' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '1.5rem 1rem 4rem', background: 'rgba(6,3,1,0.82)', borderRadius: 18 }}>
 
         {/* Back */}
         <button
@@ -161,7 +192,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
             background: 'transparent', border: 'none',
             color: spMuted, cursor: 'pointer',
             fontFamily: spFont, fontSize: '0.9rem',
-            marginBottom: '1.25rem', padding: 0, transition: 'color 0.2s',
+            marginBottom: '1.5rem', padding: 0, transition: 'color 0.2s',
           }}
           onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = spText; }}
           onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = spMuted; }}
@@ -170,25 +201,47 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
           {isEnglish ? 'Back' : 'Retour'}
         </button>
 
-        {/* Title */}
-        <div style={{ marginBottom: '2rem' }}>
-          <div style={{ height: '2px', background: spRed, opacity: 0.7, marginBottom: '1.25rem' }} />
+        {/* Hero welcome banner */}
+        <div style={{
+          background: 'rgba(6,3,1,0.78)',
+          border: '1px solid rgba(255,220,100,0.15)',
+          borderRadius: 20,
+          padding: 'clamp(1.5rem, 4vw, 2.5rem)',
+          marginBottom: '2rem',
+          position: 'relative',
+          overflow: 'hidden',
+          textAlign: 'center',
+        }}>
+          {/* subtle gold glow blob */}
+          <div style={{
+            position: 'absolute', top: '-40%', left: '50%',
+            transform: 'translateX(-50%)',
+            width: '80%', height: '180%',
+            background: 'radial-gradient(ellipse, rgba(255,214,10,0.09) 0%, transparent 65%)',
+            animation: 'sp-hero-glow 3s ease-in-out infinite',
+            pointerEvents: 'none',
+          }} />
+          <div style={{ fontSize: '2.8rem', marginBottom: '0.5rem', lineHeight: 1 }}>🛒</div>
           <h1 style={{
-            color: spText, fontFamily: spFont,
-            fontSize: 'clamp(2rem, 6vw, 3.2rem)',
+            color: '#f5ede0', fontFamily: spFont,
+            fontSize: 'clamp(1.8rem, 5vw, 2.8rem)',
             fontWeight: 'bold', textTransform: 'uppercase',
-            letterSpacing: '0.08em', margin: 0,
+            letterSpacing: '0.1em', margin: '0 0 0.4rem',
+            textShadow: '0 2px 0 rgba(0,0,0,0.6)',
           }}>
-            {isEnglish ? 'Shop' : 'Boutique'}
+            {isEnglish ? 'Power-Up Shop' : 'Boutique de Boosts'}
           </h1>
-          <p style={{ color: spMuted, fontSize: '0.9rem', marginTop: '0.4rem' }}>
-            {isEnglish ? 'Spend your hard-earned currency on power-ups and bonuses.' : 'Dépensez vos devises gagnées pour des power-ups et bonus.'}
+          <p style={{ color: 'rgba(245,237,224,0.6)', fontSize: '0.9rem', margin: 0, lineHeight: 1.5 }}>
+            {isEnglish
+              ? 'Fuel your learning with hearts, Sandbits, and XP multipliers.'
+              : 'Boostez votre apprentissage avec des cœurs, Sablebits et multiplicateurs XP.'}
           </p>
         </div>
 
         {/* Currency Balance */}
         <div style={{
           background: spSurface, border: `1px solid ${spBorder}`,
+          borderRadius: 14,
           padding: '1rem 1.5rem', marginBottom: '2.5rem',
           display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'center',
         }}>
@@ -215,183 +268,83 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
           </div>
         </div>
 
-        {/* Shop Items — vertical scroll cards */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginBottom: '3rem' }}>
+        {/* Icon-only shop items */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(2rem, 8vw, 5rem)', padding: '2rem 0 4rem' }}>
           {shopItems.map((item, i) => {
+            const isXpCard = i === 2;
+            const isHovered = hoveredItem === i;
             const isDisabled = purchasing === i || (i === 2 && boostActive);
             return (
               <div
                 key={i}
-                style={{
-                  background: spSurface,
-                  border: `1px solid ${spBorder}`,
-                  borderTop: `3px solid ${item.accentColor}`,
-                  padding: 'clamp(1.25rem, 4vw, 2rem)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '1.25rem',
-                  transition: 'border-color 0.2s, box-shadow 0.2s',
-                  position: 'relative',
-                  overflow: 'hidden',
+                style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                onMouseEnter={() => {
+                  if (tooltipTimeouts.current[i]) clearTimeout(tooltipTimeouts.current[i]!);
+                  setHoveredItem(i);
                 }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 0 1px ${item.accentColor}40, 0 8px 32px rgba(0,0,0,0.4)`;
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
+                onMouseLeave={() => {
+                  tooltipTimeouts.current[i] = setTimeout(() => setHoveredItem(null), 120);
                 }}
               >
-                {/* Top row: icon + title area */}
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.25rem' }}>
-                  {/* Icon */}
+                {/* Tooltip */}
+                {isHovered && (
                   <div style={{
-                    background: `rgba(176,0,32,0.1)`,
-                    border: `1px solid rgba(176,0,32,0.25)`,
-                    padding: '0.9rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 8,
-                    flexShrink: 0,
+                    position: 'absolute',
+                    bottom: 'calc(100% + 12px)',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    minWidth: 160,
+                    maxWidth: 220,
+                    zIndex: 50,
+                    pointerEvents: 'none',
+                    textAlign: 'center',
                   }}>
-                    {item.icon}
-                  </div>
-
-                  {/* Title + tag */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.3rem' }}>
-                      {/* 3D red bold title */}
-                      <h2 style={{
-                        margin: 0,
-                        fontFamily: spFont,
-                        fontWeight: 'bold',
-                        fontSize: 'clamp(1.4rem, 4vw, 2rem)',
-                        color: spRedBright,
-                        textShadow: `0 1px 0 #8b0000, 0 2px 0 #7a0000, 0 3px 0 #6a0000, 0 4px 8px rgba(0,0,0,0.55)`,
-                        letterSpacing: '0.01em',
-                        lineHeight: 1.1,
-                      }}>
-                        {item.title}
-                      </h2>
-                      {item.tag && (
-                        <span style={{
-                          background: `${item.accentColor}22`,
-                          border: `1px solid ${item.accentColor}55`,
-                          color: item.accentColor,
-                          fontSize: '0.7rem',
-                          fontWeight: 'bold',
-                          letterSpacing: '0.1em',
-                          padding: '2px 8px',
-                          borderRadius: 20,
-                          flexShrink: 0,
-                        }}>
-                          {item.tag}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Description */}
-                    <p style={{
-                      color: spText,
-                      fontSize: 'clamp(0.85rem, 2.5vw, 1rem)',
-                      fontFamily: spFont,
-                      margin: 0,
-                      lineHeight: 1.55,
-                      opacity: 0.9,
-                    }}>
-                      {item.desc}
+                    <p style={{ margin: '0 0 3px', fontFamily: spFont, fontWeight: 'bold', fontSize: '1rem', color: item.accentColor === '#c0850a' ? '#f5c542' : item.accentColor, textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
+                      {item.title}{item.tag && <span style={{ marginLeft: 5, fontSize: '0.7rem', opacity: 0.75 }}>{item.tag}</span>}
                     </p>
+                    <p style={{ margin: '0 0 6px', fontFamily: spFont, fontSize: '0.75rem', color: '#f5ede0', lineHeight: 1.4, textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
+                      {item.price} {item.currency}
+                    </p>
+                    <button
+                      onClick={() => handlePurchase(i)}
+                      disabled={isDisabled}
+                      style={{
+                        background: isDisabled ? 'rgba(60,60,60,0.6)' : item.canAfford ? item.accentColor : 'rgba(60,60,60,0.6)',
+                        border: 'none', borderRadius: 6,
+                        color: isDisabled ? 'rgba(255,255,255,0.35)' : '#fff',
+                        padding: '5px 14px', cursor: isDisabled ? 'not-allowed' : 'pointer',
+                        fontFamily: spFont, fontWeight: 'bold', fontSize: '0.78rem',
+                        letterSpacing: '0.05em', pointerEvents: 'auto',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.7)',
+                      }}
+                    >
+                      {purchasing === i ? '…' : i === 2 && boostActive ? (isEnglish ? 'Active' : 'Actif') : !item.canAfford ? (isEnglish ? 'Need more' : 'Insuffisant') : (isEnglish ? 'Buy' : 'Acheter')}
+                    </button>
                   </div>
-                </div>
+                )}
 
-                {/* Divider */}
-                <div style={{ height: 1, background: spBorder }} />
-
-                {/* Bottom row: price + button */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    {item.CurrencyIcon}
-                    <span style={{ color: spText, fontFamily: spFont, fontWeight: 'bold', fontSize: '1.1rem' }}>{item.price}</span>
-                    <span style={{ color: spMuted, fontSize: '0.82rem' }}>{item.currency}</span>
-                  </div>
-
-                  <button
-                    onClick={() => handlePurchase(i)}
-                    disabled={isDisabled}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: '0.5rem',
-                      background: isDisabled
-                        ? 'rgba(60,60,60,0.4)'
-                        : item.canAfford
-                          ? `${item.accentColor}`
-                          : 'rgba(60,60,60,0.4)',
-                      border: 'none',
-                      color: isDisabled ? 'rgba(255,255,255,0.4)' : '#ffffff',
-                      padding: '0.65rem 1.6rem',
-                      borderRadius: 6,
-                      cursor: isDisabled ? 'not-allowed' : 'pointer',
-                      fontFamily: spFont,
-                      fontWeight: 'bold',
-                      fontSize: '1rem',
-                      letterSpacing: '0.04em',
-                      opacity: purchasing === i ? 0.6 : 1,
-                      transition: 'all 0.15s',
-                      minWidth: 110,
-                      justifyContent: 'center',
-                      boxShadow: (!isDisabled && item.canAfford) ? `0 4px 16px ${item.accentColor}44` : 'none',
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isDisabled && item.canAfford) {
-                        (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.15)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLButtonElement).style.filter = 'none';
-                    }}
-                  >
-                    {purchasing === i ? '…' : (
-                      i === 2 && boostActive
-                        ? (isEnglish ? 'Active' : 'Actif')
-                        : !item.canAfford
-                          ? (isEnglish ? 'Not enough' : 'Insuffisant')
-                          : (isEnglish ? 'Purchase' : 'Acheter')
-                    )}
-                  </button>
-                </div>
+                {/* Icon button */}
+                <button
+                  onClick={() => handlePurchase(i)}
+                  disabled={isDisabled}
+                  style={{
+                    background: 'none', border: 'none', padding: 0,
+                    cursor: isDisabled ? 'not-allowed' : 'pointer',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                    transition: 'transform 0.2s',
+                    animation: isXpCard ? 'sp-zap-spin 3.2s ease-in-out infinite' : 'none',
+                    filter: isHovered
+                      ? `drop-shadow(0 0 12px ${item.accentColor}) drop-shadow(0 0 24px ${item.accentColor}88)`
+                      : `drop-shadow(0 2px 6px rgba(0,0,0,0.5))`,
+                    transform: isHovered ? 'scale(1.18) translateY(-4px)' : 'scale(1)',
+                    opacity: isDisabled && !isHovered ? 0.5 : 1,
+                  }}
+                >
+                  {item.icon}
+                </button>
               </div>
             );
           })}
-        </div>
-
-        {/* About currencies */}
-        <div style={{ background: spSurface, border: `1px solid ${spBorder}`, padding: '1.5rem 1.75rem' }}>
-          <h3 style={{
-            color: spText, fontFamily: spFont,
-            fontSize: '0.85rem', textTransform: 'uppercase',
-            letterSpacing: '0.12em', marginBottom: '1.25rem', marginTop: 0,
-          }}>
-            {isEnglish ? 'About Currencies' : 'À Propos des Devises'}
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', borderLeft: `2px solid rgba(176,0,32,0.4)`, paddingLeft: '0.85rem' }}>
-              <Gem style={{ width: 16, height: 16, color: spRedBright, flexShrink: 0, marginTop: 3 }} strokeWidth={1.5} />
-              <p style={{ color: spMuted, fontSize: '0.85rem', fontFamily: spFont, margin: 0, lineHeight: 1.55 }}>
-                <strong style={{ color: spText }}>{isEnglish ? 'Gems' : 'Gemmes'}:</strong>{' '}
-                {isEnglish
-                  ? 'Earned by completing lessons and hitting daily goals. Spend on hearts and items.'
-                  : 'Gagnées en complétant des leçons et des objectifs quotidiens. Dépensez pour des cœurs et objets.'}
-              </p>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', borderLeft: `2px solid rgba(176,0,32,0.4)`, paddingLeft: '0.85rem' }}>
-              <SandbitsIcon size={16} />
-              <p style={{ color: spMuted, fontSize: '0.85rem', fontFamily: spFont, margin: 0, lineHeight: 1.55 }}>
-                <strong style={{ color: spText }}>{isEnglish ? 'Sandbits' : 'Sablebits'}:</strong>{' '}
-                {isEnglish
-                  ? 'Premium currency from special quests and achievements. Use for exclusive power-ups like XP Boost.'
-                  : 'Devise premium gagnée via des quêtes et réalisations. Utilisez pour des power-ups exclusifs.'}
-              </p>
-            </div>
-          </div>
         </div>
 
       </div>

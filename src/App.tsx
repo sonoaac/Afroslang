@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { InterfaceLanguage, AfricanLanguage, UserProgress, Lesson } from './types';
-// import { AfroslangIntro } from './components/intro/AfroslangIntro'; // disabled — high RAM cost
 import { LandingPage } from './components/landing/LandingPage';
+import { GlCanvas } from './components/landing/GlCanvas';
 
 import { LearningPath } from './features/lessons/LearningPath';
 import { LessonScreen } from './features/lessons/LessonScreen';
@@ -26,7 +26,6 @@ type Screen = 'auth' | 'interface-select' | 'path' | 'lesson' | 'complete' | 'le
 function App() {
   const { user, userData, setUserData, isGuest, loading, logout, setGuestMode } = useAuth();
   const [currentScreen, setCurrentScreen] = useState<Screen>('auth');
-  // Intro disabled — AfroslangIntro kept in src/components/intro/ but not rendered
   const showIntro = false;
   const handleIntroComplete = useCallback(() => {}, []);
 
@@ -433,6 +432,7 @@ function App() {
 
   return (
     <>
+      <GlCanvas />
 
       {currentScreen === 'path' && currentLanguage && (
         <LearningPath
@@ -454,8 +454,6 @@ function App() {
               // reserved
             }
           }}
-          onSignUp={handleGoToSignUp}
-          onSignIn={handleGoToSignIn}
           currentLanguageId={currentLanguage}
         />
       )}
@@ -494,7 +492,7 @@ function App() {
 
       {currentScreen === 'leaderboard' && (
         <LeaderboardScreen
-          onBack={() => setCurrentScreen(currentLanguage ? 'path' : 'interface-select')}
+          onBack={() => setCurrentScreen('path')}
         />
       )}
 
@@ -535,7 +533,7 @@ function App() {
           userProgressMap={userProgressMap}
           currentLanguage={currentLanguage}
           interfaceLanguage={interfaceLanguage}
-          onBack={() => setCurrentScreen(currentLanguage ? 'path' : 'auth')}
+          onBack={() => setCurrentScreen('path')}
           onContinueLearning={handleLanguageToLearnSelect}
           onChangeInterfaceLanguage={setInterfaceLanguage}
         />

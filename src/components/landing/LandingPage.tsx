@@ -5,6 +5,8 @@ import { auth, db } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { DescrambleText } from '../ui/DescrambleText';
 import { StaticPage } from './StaticPage';
+import { AfricaMap } from './AfricaMap';
+import { GlCanvas } from './GlCanvas';
 import './LandingPage.css';
 
 // Drop-in only — no scramble chars. from === to so only phase 1 (drop-in) runs.
@@ -109,27 +111,6 @@ const EXPLORE_COUNTRIES: ExploreCountry[] = [
   { code:'SC', name:'Seychelles',         languages:[],                           fact:'Home to the Coco de Mer, the world\'s largest seed, up to 25 kg.' },
 ];
 
-// Dominant flag color per country code (for hover glow)
-const FLAG_COLORS: Record<string, string> = {
-  NG:'#008751', ET:'#078930', EG:'#CE1126', TZ:'#1EB53A', KE:'#006600',
-  ZA:'#007A4D', GH:'#CD6C17', MA:'#C1272D', DZ:'#006233', CD:'#007FFF',
-  SN:'#00853F', BF:'#EF2B2D', ZW:'#006400', SO:'#4189DD', MW:'#B01C31',
-  ZM:'#198A00', MZ:'#009A44', CG:'#009A00', BJ:'#008751', GM:'#3A7728',
-  UG:'#000000', SD:'#D21034', TN:'#E70013', LY:'#000000', MR:'#006233',
-  DJ:'#6AB2E7', NE:'#E05206', MG:'#FC3D32', CM:'#007A5E', AO:'#CC0000',
-  ML:'#009A00', TD:'#002664', CI:'#F77F00', GN:'#CE1126', RW:'#FAD201',
-  BI:'#CE1126', SS:'#078930', TG:'#006A4E', SL:'#1EB53A', LR:'#BF0A30',
-  CF:'#003082', ER:'#4189DD', NA:'#003580', BW:'#75AADB', LS:'#009543',
-  GW:'#CE1126', GA:'#009E60', GQ:'#3E9A00', SZ:'#3E5EB9', CV:'#003893',
-  ST:'#12AD2B', KM:'#3A75C4', MU:'#EA2839', SC:'#003F87',
-};
-
-function hexToRgba(hex: string, alpha: number): string {
-  const r = parseInt(hex.slice(1,3), 16);
-  const g = parseInt(hex.slice(3,5), 16);
-  const b = parseInt(hex.slice(5,7), 16);
-  return `rgba(${r},${g},${b},${alpha})`;
-}
 
 export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLanguage, onPreSelectLanguage }: LandingPageProps) {
   const { setGuestMode, isGuest } = useAuth();
@@ -142,20 +123,16 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
   const [selectedLanguage, setSelectedLanguage]   = useState('');
   const [pendingLanguage, setPendingLanguage]     = useState('');
   const [panelOpen, setPanelOpen]                 = useState(false);
-  const [showAll, setShowAll]                     = useState(false);
   const [exploreVisible, setExploreVisible]       = useState(false);
   const [headerScrolled, setHeaderScrolled]       = useState(false);
   const [activePage, setActivePage]               = useState<string | null>(null);
   const exploreSectionRef = useRef<HTMLDivElement>(null);
-  const fireflyVideoRef   = useRef<HTMLVideoElement>(null);
   // Tracks last active tab so form content stays rendered during close animation
   const lastSheetRef = useRef<'login' | 'signup'>('signup');
   if (sheet) lastSheetRef.current = sheet;
   const displaySheet = sheet ?? lastSheetRef.current;
   const [authTitleKey, setAuthTitleKey] = useState(0);
 
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const initialCount = isMobile ? 7 : 21;
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -176,21 +153,23 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     return () => obs.disconnect();
   }, []);
 
-  // ── Firefly video: play on scroll into view, pause on scroll out ──────────
+
+  // ── Typewriter reveal observer ────────────────────────────────────────────
   useEffect(() => {
-    const video = fireflyVideoRef.current;
-    if (!video) return;
+    const els = document.querySelectorAll<HTMLElement>('.lp-type-in');
+    if (!els.length) return;
     const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          video.play().catch(() => {});
-        } else {
-          video.pause();
-        }
+      (entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('lp-type-in--visible');
+            obs.unobserve(e.target);
+          }
+        });
       },
-      { threshold: 0.25 }
+      { threshold: 0.1 }
     );
-    obs.observe(video);
+    els.forEach(el => obs.observe(el));
     return () => obs.disconnect();
   }, []);
 
@@ -232,15 +211,30 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     if (sheet) setAuthTitleKey(k => k + 1);
   }, [sheet]);
 
-  const filteredCountries = EXPLORE_COUNTRIES.filter(c => {
-    const q = exploreSearch.trim().toLowerCase();
-    if (!q) return true;
-    if (c.name.toLowerCase().includes(q)) return true;
-    return c.languages.some(l => (LANGUAGE_NAMES[l] ?? l).toLowerCase().includes(q));
-  });
+  // ── Sand-rise scroll driver ────────────────────────────────────────────────
+  useEffect(() => {
+    const update = () => {
+      const els = document.querySelectorAll<HTMLElement>('.lp-sand-reveal');
+      const viewH = window.innerHeight;
+      els.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        const center = rect.top + rect.height / 2;
+        const norm = center / viewH; // 1=bottom 0=top
+        // Bell: 0 at edges, 1 when centered
+        let p = norm > 0.5
+          ? Math.max(0, Math.min(1, (1 - norm) * 2.4))
+          : Math.max(0, Math.min(1, norm * 2.4));
+        // Smoothstep
+        p = p * p * (3 - 2 * p);
+        el.style.setProperty('--sand-p', p.toFixed(3));
+      });
+    };
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    return () => window.removeEventListener('scroll', update);
+  }, []);
 
-  const firstHalf  = filteredCountries.slice(0, initialCount);
-  const secondHalf = filteredCountries.slice(initialCount);
+
 
   const handleFlagClick = (country: ExploreCountry) => {
     setSelectedCountry(country);
@@ -689,6 +683,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
   return (
     <div className="lp">
+      <GlCanvas />
 
       {/* ── Stacked Hero ── */}
       <section className="lp-stack">
@@ -696,7 +691,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
         <header className={`lp-header${headerScrolled ? ' lp-header--scrolled' : ''}`}>
           <div className="lp-header-left">
             <img src="/Afroslang.png" className="lp-logo" alt="Afroslang" style={{ display: 'block', width: '52px', height: '52px' }} />
-            <span className="lp-brand">AFRO<em>SLANG</em></span>
+            <span className="lp-brand lp-blood-text" style={{ animationDelay: '0.5s' }}>AFRO<em>SLANG</em></span>
           </div>
         </header>
 
@@ -704,30 +699,29 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
         <div className="lp-stack-top">
           <div className="lp-stack-hero-row">
             <div className="lp-stack-logo-wrap">
-              <dotlottie-wc
-                src="https://lottie.host/75a566a2-61ec-4b60-9c5b-6ec41aff8523/1aJFp2Ot5H.lottie"
-                autoplay
-                loop
+              <img
+                src="/Afroslang.png"
+                alt="Afroslang"
                 className="lp-stack-logo"
-                style={{ display: 'block' }}
+                style={{ opacity: 0.7 }}
               />
             </div>
             <p className="lp-stack-tagline">
-              <span style={{ color: '#b00020', display: 'block', fontWeight: 800, fontSize: '2em', lineHeight: 1.05, letterSpacing: '0.04em' }}>
+              <span className="lp-blood-text" style={{ color: '#b00020', display: 'block', fontWeight: 800, fontSize: '2em', lineHeight: 1.05, letterSpacing: '0.04em', animationDelay: '1.4s' }}>
                 <DescrambleText chars={AFROSLANG_CHARS} />
               </span>
-              <span style={{ color: '#ffffff', display: 'block', fontWeight: 800, fontSize: '2em', lineHeight: 1.05, letterSpacing: '0.04em' }}>
+              <span className="lp-blood-text" style={{ color: '#ffffff', display: 'block', fontWeight: 800, fontSize: '2em', lineHeight: 1.05, letterSpacing: '0.04em', animationDelay: '2.9s' }}>
                 <DescrambleText chars={REKINDLE_CHARS} startDelay={REKINDLE_START} />
               </span>
               <span
-                className="lp-tagline-sub"
-                style={{ color: 'rgba(255,255,255,0.75)', display: 'block', animationDelay: `${SUB_DELAY}ms` }}
+                className="lp-tagline-sub lp-blood-text"
+                style={{ color: 'rgba(255,255,255,0.75)', display: 'block', animationDelay: `${SUB_DELAY + 900}ms` }}
               >
                 with your ancestral tongues
               </span>
             </p>
           </div>
-          <div className="lp-stack-ctas">
+          <div className="lp-stack-ctas lp-type-in lp-type-in--delay-1">
             {isLoggedIn ? (
               <button className="lp-btn-hero-primary" onClick={onContinue ?? scrollToExplorer}>
                 Continue Learning →
@@ -749,16 +743,17 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
         {/* Our Mission row */}
         <div className="lp-stack-row lp-stack-row--right">
-          <div className="lp-stack-row-text lp-reveal lp-reveal--from-left" style={{ textAlign: 'center', alignItems: 'center' }}>
-            <span className="lp-stack-row-label">Our Mission</span>
-            <p style={{ maxWidth: 480, textAlign: 'center' }}>
-              Afroslang main goal is to help and assist descendants and children of the diaspora
-              to maintain their language culture and ancestral sense of knowing
+          <div className="lp-stack-row-text">
+            <span className="lp-sand-reveal" style={{ fontFamily: "'Times New Roman', serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em' }}>
+              <span style={{ color: '#b00020' }}>Our</span>{' '}
+              <span style={{ color: '#f5ede0' }}>Mission</span>
+            </span>
+            <p className="lp-sand-reveal">
+              Afroslang main goal is to help and assist descendants<br />
+              and children of the diaspora to maintain their<br />
+              language culture and ancestral sense<br />
+              of knowing
             </p>
-          </div>
-          <div className="lp-stack-row-img-wrap lp-stack-row-img-wrap--right lp-reveal lp-reveal--from-right lp-reveal--delay-1">
-            <img src="/Afroslanglpimg1.png" alt="Afroslang community" className="lp-stack-img" />
-            <div className="lp-stack-img-border" />
           </div>
         </div>
 
@@ -767,20 +762,9 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
           ref={exploreSectionRef}
           className={`lp-explore-section${exploreVisible ? ' lp-explore-section--visible' : ''}`}
         >
-          {/* Firefly video background */}
-          <video
-            ref={fireflyVideoRef}
-            className="lp-explore-video-bg"
-            src="/firefly-anim.mp4"
-            muted
-            loop
-            playsInline
-          />
-          <div className="lp-explore-video-overlay" />
-
           {/* Section header */}
           <div className="lp-explore-header lp-reveal">
-            <p className="lp-langs-eyebrow">Over 1500+ African Languages · Explore the Continent — Not even half way there</p>
+            <p className="lp-langs-eyebrow lp-type-in">Over 1500+ African Languages · Explore the Continent — Not even half way there</p>
             <div className="lp-explore-search-wrap">
               <svg className="lp-explore-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
                 <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="22" y2="22" />
@@ -809,7 +793,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
                   <button className="lp-explore-back-btn" onClick={() => setPanelOpen(false)}>
                     ← All countries
                   </button>
-                  <button className="lp-explore-panel-close" onClick={() => setPanelOpen(false)}>✕</button>
+                  <button className="lp-explore-panel-close" onClick={() => { setPanelOpen(false); setSelectedCountry(null); }}>✕</button>
                   <img
                     className="lp-explore-panel-flag"
                     src={`https://flagcdn.com/w80/${selectedCountry.code.toLowerCase()}.png`}
@@ -852,100 +836,38 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               )}
             </aside>
 
-            {/* Flag grid */}
-            <div className="lp-explore-grid-wrap">
-              <div className="lp-explore-grid">
-                {firstHalf.map((country, idx) => (
-                  <button
-                    key={country.code}
-                    className={[
-                      'lp-explore-flag-btn',
-                      selectedCountry?.code === country.code ? 'lp-explore-flag-btn--active' : '',
-                      country.languages.length === 0 ? 'lp-explore-flag-btn--dim' : '',
-                    ].join(' ')}
-                    style={{
-                      animationDelay: `${idx * 28}ms`,
-                      '--flag-hover-bg': hexToRgba(FLAG_COLORS[country.code] ?? '#b00020', 0.18),
-                      '--flag-hover-border': hexToRgba(FLAG_COLORS[country.code] ?? '#b00020', 0.5),
-                      '--flag-hover-glow': hexToRgba(FLAG_COLORS[country.code] ?? '#b00020', 0.22),
-                    } as React.CSSProperties}
-                    onClick={() => handleFlagClick(country)}
-                    title={country.name}
-                  >
-                    <img
-                      className="lp-langs-flag"
-                      src={`https://flagcdn.com/w40/${country.code.toLowerCase()}.png`}
-                      alt={country.name}
-                      loading="lazy"
-                    />
-                    <span className="lp-langs-name">{country.name}</span>
-                  </button>
-                ))}
-
-                {!showAll && secondHalf.length > 0 && (
-                  <button
-                    className="lp-langs-toggle"
-                    onClick={() => setShowAll(true)}
-                    aria-label="Show more countries"
-                  >
-                    <span className="lp-langs-toggle-icon">›</span>
-                  </button>
-                )}
-
-                {showAll && secondHalf.map((country, idx) => (
-                  <button
-                    key={country.code}
-                    className={[
-                      'lp-explore-flag-btn',
-                      selectedCountry?.code === country.code ? 'lp-explore-flag-btn--active' : '',
-                      country.languages.length === 0 ? 'lp-explore-flag-btn--dim' : '',
-                    ].join(' ')}
-                    style={{
-                      animationDelay: `${idx * 28}ms`,
-                      '--flag-hover-bg': hexToRgba(FLAG_COLORS[country.code] ?? '#b00020', 0.18),
-                      '--flag-hover-border': hexToRgba(FLAG_COLORS[country.code] ?? '#b00020', 0.5),
-                      '--flag-hover-glow': hexToRgba(FLAG_COLORS[country.code] ?? '#b00020', 0.22),
-                    } as React.CSSProperties}
-                    onClick={() => handleFlagClick(country)}
-                    title={country.name}
-                  >
-                    <img
-                      className="lp-langs-flag"
-                      src={`https://flagcdn.com/w40/${country.code.toLowerCase()}.png`}
-                      alt={country.name}
-                      loading="lazy"
-                    />
-                    <span className="lp-langs-name">{country.name}</span>
-                  </button>
-                ))}
-
-                {showAll && (
-                  <button
-                    className="lp-langs-toggle"
-                    onClick={() => setShowAll(false)}
-                    aria-label="Show fewer countries"
-                  >
-                    <span className="lp-langs-toggle-icon lp-langs-toggle-icon--up">›</span>
-                  </button>
-                )}
-              </div>
-            </div>
+            {/* Africa map */}
+            <AfricaMap
+              onCountrySelect={(iso2) => {
+                const country = EXPLORE_COUNTRIES.find(c => c.code === iso2);
+                if (country) handleFlagClick(country);
+              }}
+              highlightedCodes={(() => {
+                const q = exploreSearch.trim().toLowerCase();
+                if (!q) return undefined;
+                const matched = EXPLORE_COUNTRIES.filter(c =>
+                  c.name.toLowerCase().includes(q) ||
+                  c.languages.some(l => (LANGUAGE_NAMES[l] ?? l).toLowerCase().includes(q))
+                );
+                return matched.length ? new Set(matched.map(c => c.code)) : new Set<string>();
+              })()}
+            />
           </div>
         </div>
 
 
         {/* Giving Back row */}
         <div className="lp-stack-row lp-stack-row--left">
-          <div className="lp-stack-row-img-wrap lp-stack-row-img-wrap--left lp-reveal lp-reveal--from-left">
-            <img src="/Afroslanglpimg2.png" alt="Afroslang giving back" className="lp-stack-img" />
-            <div className="lp-stack-img-border" />
-          </div>
-          <div className="lp-stack-row-text lp-stack-row-text--right lp-reveal lp-reveal--from-right lp-reveal--delay-1">
-            <span className="lp-stack-row-label">Giving Back</span>
-            <p>
-              Afroslang will better charity cases in africa as a whole whilst being transparent
-              of where your money is going. All payments 50% go to charity the other 50% to the
-              continuous development of the site
+          <div className="lp-stack-row-text lp-stack-row-text--right">
+            <span className="lp-sand-reveal" style={{ fontFamily: "'Times New Roman', serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em' }}>
+              <span style={{ color: '#b00020' }}>Giving</span>{' '}
+              <span style={{ color: '#f5ede0' }}>Back</span>
+            </span>
+            <p className="lp-sand-reveal">
+              Afroslang will better charity cases in africa as a<br />
+              whole whilst being transparent of where your<br />
+              money is going. All payments 50% go to<br />
+              charity, the other 50% to the site
             </p>
           </div>
         </div>
@@ -956,28 +878,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
       {/* ── Footer ── */}
       <footer className="lp-footer">
 
-        {/* Did You Know facts strip */}
-        <div className="lp-footer-facts lp-reveal">
-          <p className="lp-footer-facts-eyebrow">Did You Know</p>
-          <div className="lp-footer-facts-grid">
-            <div className="lp-footer-fact-card">
-              <span className="lp-footer-fact-num">2,000+</span>
-              <span className="lp-footer-fact-label">Languages across Africa</span>
-            </div>
-            <div className="lp-footer-fact-card">
-              <span className="lp-footer-fact-num">200M</span>
-              <span className="lp-footer-fact-label">Swahili speakers worldwide</span>
-            </div>
-            <div className="lp-footer-fact-card">
-              <span className="lp-footer-fact-num">🇧🇷</span>
-              <span className="lp-footer-fact-label">Yoruba influenced languages in Brazil</span>
-            </div>
-            <div className="lp-footer-fact-card">
-              <span className="lp-footer-fact-num">Ge'ez</span>
-              <span className="lp-footer-fact-label">Amharic uses its own unique script</span>
-            </div>
-          </div>
-        </div>
 
         <div className="lp-footer-inner">
 

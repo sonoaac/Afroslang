@@ -1,14 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { InterfaceLanguage, Stage, Lesson, UserProgress } from '../../types';
-import { Home, Trophy as TrophyIcon, Store, User, Settings, Star, ChevronRight } from 'lucide-react';
+import { Home, Trophy as TrophyIcon, Store, User, Settings, Star } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getLanguageById } from '../../data/languages';
 import { FlagIcon } from '../language-select/FlagIcon';
 import { Exercise } from '../../types';
 import { MascotFactCard } from '../../components/rain/MascotFactCard';
-import { RAIN_LANGUAGES } from '../../data/culturalFacts';
 import { RainCanvas } from '../../components/rain/RainCanvas';
-
 import './HomeFeed.css';
 import '../../components/rain/MascotFactCard.css';
 
@@ -19,8 +17,6 @@ interface LearningPathProps {
   onStartLesson: (lesson: Lesson) => void;
   onBackToLanguageSelect: () => void;
   onNavigate?: (screen: 'leaderboard' | 'shop' | 'profile' | 'settings' | 'quests' | 'latest-news') => void;
-  onSignUp?: () => void;
-  onSignIn?: () => void;
   currentLanguageId?: string;
 }
 
@@ -38,8 +34,6 @@ export function LearningPath({
   onStartLesson,
   onBackToLanguageSelect,
   onNavigate,
-  onSignUp,
-  onSignIn,
   currentLanguageId
 }: LearningPathProps) {
   const isEnglish = interfaceLanguage === 'en';
@@ -49,7 +43,7 @@ export function LearningPath({
     'learn' | 'leaderboard' | 'quests' | 'shop' | 'profile' | 'settings' | 'latest-news'
   >('learn');
   const [guidebookStage, setGuidebookStage] = useState<number | null>(null);
-  const { user, userData, isGuest } = useAuth();
+  const { userData, isGuest } = useAuth();
   const mainRef = useRef<HTMLElement>(null);
 
   // Scroll to top on mount
@@ -147,12 +141,6 @@ export function LearningPath({
   };
   const firstActiveLessonId = getFirstActiveLessonId();
 
-  const xpPercent = Math.min(100, (progress.xp ?? 0) % 100);
-  const dailyXP = Math.min((progress.xp ?? 0) % 50, 50);
-  const dailyXPPercent = (dailyXP / 50) * 100;
-  const userName = (userData as any)?.username || (isGuest ? (isEnglish ? 'Guest' : 'Invité') : 'You');
-  const initials = userName.slice(0, 2).toUpperCase();
-  const showRain = currentLanguageId ? RAIN_LANGUAGES.has(currentLanguageId) : false;
 
   const getStageForIndex = (stageIndex: number): Stage => {
     const real = stages[stageIndex];
@@ -192,7 +180,7 @@ export function LearningPath({
 
   return (
     <div className="lp-shell">
-      {showRain && <RainCanvas intensity="heavy" />}
+      <RainCanvas intensity="heavy" />
 
       {/* ═══════════════════════════════════
           LEFT SIDEBAR
@@ -416,113 +404,6 @@ export function LearningPath({
         </main>
       </div>
 
-      {/* ═══════════════════════════════════
-          RIGHT SIDEBAR
-      ═══════════════════════════════════ */}
-      <aside className="lp-right">
-
-        {/* Daily XP widget */}
-        <div className="lp-widget">
-          <h3 className="lp-widget-title">⭐ {isEnglish ? 'Daily XP' : 'XP du jour'}</h3>
-          <div className="lp-xp-row">
-            <div className="lp-xp-bar">
-              <div className="lp-xp-fill" style={{ width: `${dailyXPPercent}%` }} />
-            </div>
-            <span className="lp-xp-label">{dailyXP} / 50</span>
-          </div>
-        </div>
-
-        {/* Profile strip */}
-        <div className="lp-widget lp-widget--profile">
-          <div className="lp-r-avatar">{initials}</div>
-          <div className="lp-r-info">
-            <div className="lp-r-name">{userName}</div>
-            <div className="lp-r-level">
-              {isEnglish ? `Level ${progress.level ?? 1}` : `Niveau ${progress.level ?? 1}`}
-            </div>
-            <div className="lp-r-xpbar">
-              <div className="lp-r-xpfill" style={{ width: `${xpPercent}%` }} />
-            </div>
-          </div>
-          <span className="lp-r-xp-badge">⚡ {progress.xp ?? 0}</span>
-        </div>
-
-        {/* Leaderboard unlock / mini leaderboard */}
-        {(progress.lessonsCompleted ?? 0) < 10 ? (
-          <div className="lp-widget">
-            <h3 className="lp-widget-title">🏆 {isEnglish ? 'Unlock Leaderboards!' : 'Débloquez les classements!'}</h3>
-            <p className="lp-widget-sub">
-              {isEnglish
-                ? `Complete ${10 - (progress.lessonsCompleted ?? 0)} more lessons to start competing`
-                : `Terminez ${10 - (progress.lessonsCompleted ?? 0)} leçons de plus`}
-            </p>
-          </div>
-        ) : (
-          <div className="lp-widget">
-            <h3 className="lp-widget-title">
-              🔥 {isEnglish ? 'Top Slangers' : 'Top Apprenants'}
-              <button className="lp-widget-action" onClick={() => handleSidebarClick('leaderboard')}>
-                {isEnglish ? 'VIEW ALL' : 'VOIR TOUT'} <ChevronRight className="w-3 h-3" style={{ display:'inline' }} />
-              </button>
-            </h3>
-            {[
-              { rank: 1, avatar: '🦅', name: 'Oga_Tunde',    xp: 340 },
-              { rank: 2, avatar: '🦁', name: 'Sisi_Lagos',   xp: 290 },
-              { rank: 3, avatar: '🐆', name: 'Nairobi_G',    xp: 210 },
-              { rank: 4, avatar: '🦊', name: 'Accra_Vibes',  xp: 180 },
-            ].map(row => (
-              <div key={row.rank} className="lp-lb-row">
-                <span className={`lp-lb-rank${row.rank === 1 ? ' lp-lb-rank--gold' : ''}`}>{row.rank}</span>
-                <span className="lp-lb-avatar">{row.avatar}</span>
-                <span className="lp-lb-name">{row.name}</span>
-                <span className="lp-lb-xp">{row.xp} XP</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Daily quests */}
-        <div className="lp-widget">
-          <h3 className="lp-widget-title">
-            🎯 {isEnglish ? 'Daily Quests' : 'Quêtes du jour'}
-            <button className="lp-widget-action" onClick={() => handleSidebarClick('quests')}>
-              {isEnglish ? 'VIEW ALL' : 'TOUT VOIR'}
-            </button>
-          </h3>
-          <div className="lp-quest-item">
-            <span className="lp-quest-icon">⚡</span>
-            <div className="lp-quest-body">
-              <strong>{isEnglish ? 'Earn 10 XP' : 'Gagner 10 XP'}</strong>
-              <div className="lp-quest-bar">
-                <div className="lp-quest-fill" style={{ width: `${Math.min(100, ((progress.xp ?? 0) % 10) * 10)}%` }} />
-              </div>
-              <span className="lp-quest-label">{Math.min((progress.xp ?? 0) % 10, 10)} / 10</span>
-            </div>
-            <span className="lp-quest-reward">🎖️</span>
-          </div>
-        </div>
-
-        {/* Sign up CTA for guests */}
-        {(isGuest || !user) && (
-          <div className="lp-widget">
-            <h3 className="lp-widget-title">🔐 {isEnglish ? 'Save Your Progress!' : 'Sauvegardez vos progrès!'}</h3>
-            <button className="lp-btn-primary" onClick={onSignUp ?? (() => handleSidebarClick('profile'))}>
-              {isEnglish ? 'CREATE PROFILE' : 'CRÉER UN PROFIL'}
-            </button>
-            <button className="lp-btn-secondary" onClick={onSignIn ?? (() => handleSidebarClick('profile'))}>
-              {isEnglish ? 'SIGN IN' : 'SE CONNECTER'}
-            </button>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="lp-footer-links">
-          <a href="#" onClick={e => e.preventDefault()}>About</a>
-          <a href="#" onClick={e => e.preventDefault()}>Blog</a>
-          <a href="#" onClick={e => e.preventDefault()}>Privacy</a>
-          <a href="#" onClick={e => e.preventDefault()}>Terms</a>
-        </div>
-      </aside>
 
       {/* ═══════════════════════════════════
           MOBILE BOTTOM NAV

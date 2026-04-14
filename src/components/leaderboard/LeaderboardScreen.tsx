@@ -10,22 +10,23 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ onBack }) 
   const { user } = useAuth();
 
   const lbFont = "'Times New Roman', Georgia, serif";
-  const lbBg = '#080808';
-  const lbSurface = '#111111';
+  const lbBg = 'transparent';
+  const lbSurface = 'rgba(6,3,1,0.82)';
   const lbBorder = 'rgba(255,255,255,0.08)';
   const lbRed = '#b00020';
-  const lbText = '#ffffff';
-  const lbMuted = 'rgba(255,255,255,0.6)';
+  const lbText = '#f5ede0';
+  const lbMuted = 'rgba(245,237,224,0.65)';
+  const lbShadow = '0 1px 6px rgba(0,0,0,0.9)';
 
   return (
-    <div style={{ minHeight: '100vh', background: lbBg, padding: '1.5rem', fontFamily: lbFont }}>
-      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+    <div style={{ minHeight: '100vh', background: lbBg, padding: '1.5rem', fontFamily: lbFont, position: 'relative', zIndex: 5 }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', background: 'rgba(6,3,1,0.82)', borderRadius: 18, padding: '1.5rem' }}>
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
           <button
             onClick={onBack}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: lbSurface, border: `1px solid ${lbBorder}`, color: lbText, padding: '0.6rem 1.2rem', cursor: 'pointer', fontFamily: lbFont, fontSize: '0.9rem', transition: 'border-color 0.2s' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#b00020', border: 'none', color: '#fff', padding: '0.6rem 1.2rem', borderRadius: 8, cursor: 'pointer', fontFamily: lbFont, fontSize: '0.9rem', fontWeight: 'bold', transition: 'background 0.2s' }}
             onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = lbRed; }}
             onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = lbBorder; }}
           >
@@ -36,7 +37,7 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ onBack }) 
           <div style={{ textAlign: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
               <Trophy style={{ width: 24, height: 24, color: lbRed }} strokeWidth={1.5} />
-              <h1 style={{ color: lbText, fontSize: 'clamp(1.4rem, 4vw, 2rem)', fontFamily: lbFont, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>
+              <h1 style={{ color: lbText, fontSize: 'clamp(1.4rem, 4vw, 2rem)', fontFamily: lbFont, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0, textShadow: lbShadow }}>
                 Leaderboard
               </h1>
             </div>
@@ -60,14 +61,14 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ onBack }) 
               fontFamily: lbFont, fontWeight: 'bold',
               fontSize: 'clamp(1.1rem, 4vw, 1.6rem)',
               lineHeight: 1.4, margin: 0,
-              maxWidth: 500,
+              maxWidth: 500, textShadow: lbShadow,
             }}>
               <span style={{ color: lbRed }}>Create an Account</span>
               <span style={{ color: lbText }}> or </span>
               <span style={{ color: lbRed }}>Sign in</span>
               <span style={{ color: lbText }}> to start tracking your progress vs Friends</span>
             </p>
-            <p style={{ color: lbMuted, fontSize: '0.9rem', marginTop: '1rem', fontFamily: lbFont }}>
+            <p style={{ color: lbMuted, fontSize: '0.9rem', marginTop: '1rem', fontFamily: lbFont, textShadow: lbShadow }}>
               Compete weekly. Climb the leagues. Rise to the top.
             </p>
           </div>
@@ -82,11 +83,11 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ onBack }) 
               fontFamily: lbFont, fontWeight: 'bold',
               fontSize: 'clamp(1.6rem, 5vw, 2.4rem)',
               color: lbText, margin: 0,
-              letterSpacing: '0.02em',
+              letterSpacing: '0.02em', textShadow: lbShadow,
             }}>
               Coming Soon
             </p>
-            <p style={{ color: lbMuted, fontSize: '0.9rem', marginTop: '1rem', fontFamily: lbFont, maxWidth: 400 }}>
+            <p style={{ color: lbMuted, fontSize: '0.9rem', marginTop: '1rem', fontFamily: lbFont, maxWidth: 400, textShadow: lbShadow }}>
               The leaderboard is being built. Your XP is already being tracked — be ready when it launches.
             </p>
           </div>

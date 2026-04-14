@@ -34,12 +34,13 @@
 /* ── Page shell ── */
 .lp-shell {
   min-height: 100svh;
-  background: var(--lp-black);
+  background: transparent;
   color: var(--lp-white);
   font-family: var(--lp-font);
   display: flex;
   position: relative;
   overflow-x: hidden;
+  z-index: 1;
 }
 
 /* ══════════════════════════════════════════════
@@ -48,8 +49,8 @@
 .lp-sidebar {
   width: var(--sidebar-w);
   min-height: 100svh;
-  background: var(--lp-dark);
-  border-right: 2px solid var(--lp-border);
+  background: rgba(10, 8, 5, 0.55);
+  border-right: 1px solid rgba(255,255,255,0.06);
   display: flex;
   flex-direction: column;
   padding: 20px 0;
@@ -182,9 +183,9 @@
 }
 
 .lp-nav-item--active {
-  background: linear-gradient(135deg, var(--lp-green) 0%, var(--lp-green2) 100%);
-  color: var(--lp-black) !important;
-  border: 2px solid var(--lp-yellow);
+  background: rgba(200, 169, 110, 0.18);
+  color: #f5ede0 !important;
+  border: 1px solid rgba(200, 169, 110, 0.45);
   font-weight: 900;
 }
 
@@ -228,10 +229,10 @@
   top: 0;
   z-index: 90;
   height: 56px;
-  background: rgba(26,26,26,0.95);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 2px solid var(--lp-border);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -344,15 +345,15 @@
 /* ── Section banner ── */
 .lp-section-banner {
   width: 100%;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent, #2dc653) 60%, #111) 0%, color-mix(in srgb, var(--accent, #2dc653) 30%, #111) 100%);
-  border: 2px solid var(--accent, #2dc653);
+  background: rgba(10, 8, 5, 0.45);
+  border: 1px solid rgba(200, 169, 110, 0.3);
   border-radius: 16px;
   padding: 18px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 28px;
-  box-shadow: 0 4px 24px color-mix(in srgb, var(--accent, #2dc653) 30%, transparent);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
 }
 
 .lp-banner-left small {

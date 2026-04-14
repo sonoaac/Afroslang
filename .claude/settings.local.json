@@ -32,7 +32,8 @@
       "Bash(find /c/Users/chuch/Downloads/Afroslang -maxdepth 3 -type d -not -path */node_modules/* -not -path */dist/* -not -path */.git/*)",
       "Bash(find /c/Users/chuch/Downloads/Afroslang -name vite.config.* -o -name vitest.config.* -o -name jest.config.* -o -name *.test.* -o -name *.spec.*)",
       "Bash(python3 fix_scripts.py)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(ls .env*)"
     ]
   }
 }
