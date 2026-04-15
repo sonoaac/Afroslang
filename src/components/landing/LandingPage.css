@@ -456,6 +456,13 @@
   margin-right: 6vw;
 }
 
+/* Strip the large padding/margin that lp-stack-row-text adds when used inside feature blocks */
+.lp-feature-block .lp-stack-row-text {
+  padding: 0;
+  margin: 0;
+  flex: unset;
+}
+
 .lp-feature-img-wrap {
   display: flex;
 }
@@ -1856,6 +1863,36 @@
   .lp-stack-row-label { font-size: 0.62rem; padding: 3px 8px; margin-bottom: 6px; }
   .lp-stack-row-text h2 { font-size: 1rem; margin-bottom: 8px; }
 
+  /* Feature blocks at tablet-mobile widths: stack image above text, centered */
+  .lp-feature-block {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 40px 24px;
+    margin-left: 0;
+    margin-right: 0;
+    gap: 24px;
+  }
+  .lp-feature-block--left,
+  .lp-feature-block--right {
+    align-items: center;
+    text-align: center;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .lp-feature-block .lp-stack-row-text,
+  .lp-feature-block .lp-stack-row-text--left,
+  .lp-feature-block .lp-stack-row-text--right {
+    align-items: center;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    flex: unset;
+  }
+  .lp-feature-block .lp-stack-row-text p { font-size: 1rem; max-width: 88vw; line-height: 1.55; }
+  .lp-feature-img-wrap { justify-content: center; width: 100%; }
+  .lp-afroplus-img { width: 130px; height: 130px; border-radius: 20px; }
+
   /* Explorer section */
   .lp-explore-section { padding: 40px 16px 32px; }
   .lp-explore-header  { margin-bottom: 20px; }
@@ -1887,4 +1924,43 @@
     gap: 8px;
   }
   .lp-stack-top { padding: 48px 16px 40px; }
+
+  /* Feature blocks: image above text, centered, full width */
+  .lp-feature-block {
+    align-items: center;
+    text-align: center;
+    padding: 32px 20px;
+    margin-left: 0;
+    margin-right: 0;
+    gap: 20px;
+  }
+  .lp-feature-block--left,
+  .lp-feature-block--right {
+    align-items: center;
+    text-align: center;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .lp-feature-block .lp-stack-row-text,
+  .lp-feature-block .lp-stack-row-text--left,
+  .lp-feature-block .lp-stack-row-text--right {
+    align-items: center;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+  }
+  .lp-feature-block .lp-stack-row-text p {
+    font-size: 1rem;
+    max-width: 88vw;
+    line-height: 1.55;
+  }
+  .lp-feature-img-wrap {
+    justify-content: center;
+    width: 100%;
+  }
+  .lp-afroplus-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 18px;
+  }
 }
