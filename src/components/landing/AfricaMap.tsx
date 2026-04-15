@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 
 const ISO3_TO_ISO2: Record<string, string> = {
   DZA:'DZ', AGO:'AO', BEN:'BJ', BWA:'BW', BFA:'BF', BDI:'BI', CPV:'CV',
@@ -78,17 +78,27 @@ function loadD3(): Promise<void> {
 
 interface AfricaMapProps {
   onCountrySelect: (iso2: string) => void;
-  highlightedCodes?: Set<string>; // ISO-2 codes to highlight; empty = show all equally
+  highlightedCodes?: Set<string>; // ISO-2 codes to highlight from search
   unlockedCodes?: Set<string>;    // ISO-2 codes that show flag colours; rest are greyscale
 }
 
 export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: AfricaMapProps) {
-  const containerRef  = useRef<HTMLDivElement>(null);
-  const tooltipRef    = useRef<HTMLDivElement>(null);
-  const onSelectRef   = useRef(onCountrySelect);
-  const pathMapRef    = useRef<Map<string, any>>(new Map()); // iso2 → d3 selection
-  onSelectRef.current = onCountrySelect;
+  const containerRef     = useRef<HTMLDivElement>(null);
+  const tooltipRef       = useRef<HTMLDivElement>(null);
+  const onSelectRef      = useRef(onCountrySelect);
+  const pathMapRef       = useRef<Map<string, any>>(new Map()); // iso2 → d3 path selection
+  const unlockedCodesRef = useRef<Set<string>>(new Set());
 
+  onSelectRef.current      = onCountrySelect;
+  unlockedCodesRef.current = unlockedCodes ?? new Set();
+
+  // Stable key so unlock effect only fires when the actual set of codes changes
+  const unlockedKey = useMemo(
+    () => [...(unlockedCodes ?? [])].sort().join(','),
+    [unlockedCodes]
+  );
+
+  // ── Draw map once ─────────────────────────────────────────────────────────
   useEffect(() => {
     const container = containerRef.current;
     const tooltip   = tooltipRef.current;
@@ -134,7 +144,7 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
       } catch { return; }
       if (cancelled) return;
 
-      const isoSet = new Set(Object.keys(COUNTRY_COLORS));
+      const isoSet   = new Set(Object.keys(COUNTRY_COLORS));
       const features = geoData.features.filter((f: any) =>
         isoSet.has(f.properties.iso_a3 || f.id)
       );
@@ -147,11 +157,8 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
       const pathGen = d3.geoPath().projection(proj);
       const g = svg.append('g');
 
-      let activeEl: any = null;
+      let activeEl: any    = null;
       let activeISO3: string | null = null;
-
-      // Determine whether to use colour or greyscale per country
-      const hasUnlocked = unlockedCodes && unlockedCodes.size > 0;
 
       features.forEach((feat: any) => {
         const iso3   = feat.properties.iso_a3 || feat.id;
@@ -159,13 +166,9 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
         if (!colors) return;
 
         const iso2 = ISO3_TO_ISO2[iso3];
-
-        // Unlocked = user has completed at least one lesson for a language from this country
-        const isUnlocked = hasUnlocked && iso2 ? unlockedCodes!.has(iso2) : false;
-
-        // Always use flag gradient as fill; locked countries are desaturated via filter
         const fill = mkGradient(`afg-${iso3}`, colors);
 
+        // All countries start greyscale; unlock effect will reveal colour later
         const p = g.append('path')
           .datum(feat)
           .attr('d', pathGen)
@@ -173,8 +176,8 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
           .attr('stroke', 'rgba(255,255,255,0.5)')
           .attr('stroke-width', 0.6)
           .style('cursor', iso2 ? 'pointer' : 'default')
-          .style('filter', isUnlocked ? 'none' : 'grayscale(1) brightness(0.75)')
-          .style('opacity', isUnlocked ? 1 : 0.7)
+          .style('filter', 'grayscale(1) brightness(0.75)')
+          .style('opacity', 0.7)
           .style('transition', 'filter 0.4s ease, opacity 0.4s ease, stroke-width 0.12s');
 
         if (!iso2) {
@@ -183,11 +186,6 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
         }
 
         pathMapRef.current.set(iso2, p);
-
-        // Filters to restore based on lock state
-        const lockedFilter   = 'grayscale(1) brightness(0.75)';
-        const unlockedFilter = 'none';
-        const baseFilter     = () => isUnlocked ? unlockedFilter : lockedFilter;
 
         p.on('mousemove', function(event: MouseEvent) {
             tooltip.style.opacity = '1';
@@ -198,33 +196,43 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
           .on('mouseleave', function() {
             tooltip.style.opacity = '0';
             if (activeISO3 !== iso3) {
+              const unlocked = unlockedCodesRef.current.has(iso2);
               d3.select(this)
                 .attr('stroke', 'rgba(255,255,255,0.5)')
                 .attr('stroke-width', 0.6)
-                .style('filter', baseFilter());
+                .style('filter', unlocked ? 'none' : 'grayscale(1) brightness(0.75)')
+                .style('opacity', unlocked ? 1 : 0.7);
             }
           })
           .on('mouseover', function() {
             if (activeISO3 === iso3) return;
+            const unlocked = unlockedCodesRef.current.has(iso2);
             d3.select(this)
               .attr('stroke', '#ffffff')
               .attr('stroke-width', 1.4)
-              // Locked: slight brightness lift only, no colour; Unlocked: full glow
-              .style('filter', isUnlocked
+              // Locked: subtle lift only, stays B&W. Unlocked: full colour glow.
+              .style('filter', unlocked
                 ? 'brightness(1.35) saturate(1.2)'
                 : 'grayscale(1) brightness(0.95)');
           })
           .on('click', function() {
             if (activeEl) {
+              const prevIso2 = activeEl.datum()
+                ? ISO3_TO_ISO2[activeEl.datum().properties?.iso_a3 || activeEl.datum().id] ?? ''
+                : '';
+              const prevUnlocked = unlockedCodesRef.current.has(prevIso2);
               activeEl
                 .attr('stroke', 'rgba(255,255,255,0.5)')
                 .attr('stroke-width', 0.6)
-                .style('filter', baseFilter());
+                .style('filter', prevUnlocked ? 'none' : 'grayscale(1) brightness(0.75)')
+                .style('opacity', prevUnlocked ? 1 : 0.7);
             }
+            const unlocked = unlockedCodesRef.current.has(iso2);
             d3.select(this)
-              .attr('stroke', isUnlocked ? '#000000' : 'rgba(255,255,255,0.9)')
+              .attr('stroke', unlocked ? '#000000' : 'rgba(255,255,255,0.9)')
               .attr('stroke-width', 1.8)
-              .style('filter', isUnlocked ? 'brightness(1.3)' : lockedFilter);
+              .style('filter', unlocked ? 'brightness(1.3)' : 'grayscale(1) brightness(0.95)')
+              .style('opacity', 1);
             activeEl   = d3.select(this);
             activeISO3 = iso3;
             tooltip.style.opacity = '0';
@@ -262,25 +270,45 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
       const s = container.querySelector('svg');
       if (s) s.remove();
     };
-  }, [unlockedCodes]);
+  }, []); // draw once only
 
-  // Highlight matching countries when search changes
+  // ── Apply unlock colours when unlockedCodes changes ───────────────────────
   useEffect(() => {
-    const pathMap = pathMapRef.current;
+    const pathMap  = pathMapRef.current;
     if (!pathMap.size) return;
-
-    const hasQuery = highlightedCodes && highlightedCodes.size > 0;
+    const unlocked = unlockedCodesRef.current;
 
     pathMap.forEach((p, iso2) => {
+      const isUnlocked = unlocked.has(iso2);
+      p.style('filter',  isUnlocked ? 'none' : 'grayscale(1) brightness(0.75)')
+       .style('opacity', isUnlocked ? 1 : 0.7);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unlockedKey]);
+
+  // ── Search highlight ──────────────────────────────────────────────────────
+  useEffect(() => {
+    const pathMap  = pathMapRef.current;
+    if (!pathMap.size) return;
+    const unlocked = unlockedCodesRef.current;
+    const hasQuery = highlightedCodes != null;
+
+    pathMap.forEach((p, iso2) => {
+      const isUnlocked  = unlocked.has(iso2);
+      const baseFilter  = isUnlocked ? 'none' : 'grayscale(1) brightness(0.75)';
+      const baseOpacity = isUnlocked ? 1 : 0.7;
+
       if (!hasQuery) {
-        // No search — reset all
-        p.style('opacity', null).style('filter', null);
+        // No search — restore lock-state
+        p.style('filter', baseFilter).style('opacity', baseOpacity);
       } else if (highlightedCodes!.has(iso2)) {
-        // Match — glow it
-        p.style('opacity', '1').style('filter', 'brightness(1.5) saturate(1.3)');
+        // Match — highlight
+        p.style('opacity', 1).style('filter', isUnlocked
+          ? 'brightness(1.4) saturate(1.2)'
+          : 'grayscale(1) brightness(1.05)');
       } else {
-        // No match — dim it
-        p.style('opacity', '0.22').style('filter', 'saturate(0.3)');
+        // No match — fade out
+        p.style('opacity', 0.08).style('filter', 'grayscale(1) brightness(0.5)');
       }
     });
   }, [highlightedCodes]);
