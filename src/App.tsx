@@ -401,6 +401,7 @@ function App() {
         }}
         onSelectLanguage={handleLanguageToLearnSelect}
         onPreSelectLanguage={setPreSelectedLanguage}
+        userProgressMap={userProgressMap}
       />
     );
   }

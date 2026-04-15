@@ -20,12 +20,32 @@ const SUB_DELAY       = REKINDLE_START + (REKINDLE_CHARS.length - 1) * 55 + 900 
 
 type SheetMode = 'login' | 'signup' | null;
 
+// Language → ISO-2 country codes (a language can span multiple countries)
+const LANGUAGE_COUNTRIES: Record<string, string[]> = {
+  swahili:  ['KE', 'TZ', 'UG', 'RW', 'BI', 'CD'],
+  hausa:    ['NG', 'NE', 'GH'],
+  yoruba:   ['NG', 'BJ', 'TG'],
+  igbo:     ['NG'],
+  zulu:     ['ZA'],
+  amharic:  ['ET'],
+  arabic:   ['EG', 'DZ', 'MA', 'TN', 'LY', 'SD', 'MR', 'SS'],
+  shona:    ['ZW'],
+  somali:   ['SO', 'DJ', 'ET'],
+  berber:   ['MA', 'DZ'],
+  moore:    ['BF'],
+  lingala:  ['CD', 'CG'],
+  twi:      ['GH'],
+  chichewa: ['MW', 'ZM'],
+  wolof:    ['SN', 'GM'],
+};
+
 interface LandingPageProps {
   initialSheet?: SheetMode;
   isLoggedIn?: boolean;
   onContinue?: () => void;
   onSelectLanguage?: (languageId: string) => void;
   onPreSelectLanguage?: (languageId: string) => void;
+  userProgressMap?: Record<string, { completedLessons: string[] }>;
 }
 
 // ── Language names ────────────────────────────────────────────────────────────
@@ -113,8 +133,15 @@ const EXPLORE_COUNTRIES: ExploreCountry[] = [
 ];
 
 
-export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLanguage, onPreSelectLanguage }: LandingPageProps) {
+export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLanguage, onPreSelectLanguage, userProgressMap = {} }: LandingPageProps) {
   const { setGuestMode, isGuest } = useAuth();
+
+  // Countries unlocked by completing at least 1 lesson in any of their languages
+  const unlockedCodes = new Set<string>(
+    Object.entries(userProgressMap)
+      .filter(([, progress]) => progress.completedLessons.length > 0)
+      .flatMap(([langId]) => LANGUAGE_COUNTRIES[langId] ?? [])
+  );
 
   const [sheet, setSheet] = useState<SheetMode>(initialSheet ?? null);
 
@@ -750,6 +777,11 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
           {/* Section header */}
           <div className="lp-explore-header lp-reveal">
             <p className="lp-langs-eyebrow lp-type-in">Over 1500+ African Languages · Explore the Continent — Not even half way there</p>
+            <p className="lp-map-cta-hint">
+              <span style={{ color: '#2ecc71' }}>C</span><span style={{ color: '#ffffff' }}>o</span><span style={{ color: '#1a1a1a', WebkitTextStroke: '0.5px rgba(255,255,255,0.4)' }}>l</span><span style={{ color: '#3498db' }}>o</span><span style={{ color: '#f5c842' }}>r</span>{' '}
+              <span style={{ color: '#ffffff' }}>t</span><span style={{ color: '#2ecc71' }}>h</span><span style={{ color: '#f5c842' }}>e</span>{' '}
+              <span style={{ color: '#3498db' }}>M</span><span style={{ color: '#ffffff' }}>a</span><span style={{ color: '#2ecc71' }}>p</span>
+            </p>
             <div className="lp-explore-search-wrap">
               <svg className="lp-explore-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
                 <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="22" y2="22" />
@@ -836,6 +868,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
                 );
                 return matched.length ? new Set(matched.map(c => c.code)) : new Set<string>();
               })()}
+              unlockedCodes={unlockedCodes}
             />
           </div>
         </div>
@@ -845,14 +878,12 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
           <div className="lp-feature-img-wrap">
             <SandbitsIcon size={140} />
           </div>
-          <div className="lp-stack-row-text lp-stack-row-text--left">
-            <span className="lp-sand-reveal" style={{ fontFamily: "'Times New Roman', serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em' }}>
-              <span style={{ color: '#f5c842' }}>Sandbits</span>
-            </span>
-            <p className="lp-sand-reveal">
-              Sandbits are Afroslang's in-game currency used to unlock avatars,<br />
-              backgrounds and cosmetics in the Shop. Earn them by finishing<br />
-              in the top 3 on the weekly leaderboard or converting Diamonds.
+          <div className="lp-feature-text-block">
+            <h3 className="lp-feature-heading lp-feature-heading--sandbits lp-sand-reveal">
+              Sandbits
+            </h3>
+            <p className="lp-feature-body lp-sand-reveal">
+              Sandbits are Afroslang's in-game currency used to unlock avatars, backgrounds and cosmetics in the Shop. Earn them by finishing in the top 3 on the weekly leaderboard or converting Diamonds.
             </p>
           </div>
         </div>
@@ -862,14 +893,12 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
           <div className="lp-feature-img-wrap">
             <img src="/Afroplus.png" alt="AfroPlus" className="lp-afroplus-img" />
           </div>
-          <div className="lp-stack-row-text lp-stack-row-text--right">
-            <span className="lp-sand-reveal" style={{ fontFamily: "'Times New Roman', serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em' }}>
+          <div className="lp-feature-text-block lp-feature-text-block--right">
+            <h3 className="lp-feature-heading lp-feature-heading--afroplus lp-sand-reveal">
               <span style={{ color: '#b00020' }}>Afro</span><span style={{ color: '#f5ede0' }}>Plus</span>
-            </span>
-            <p className="lp-sand-reveal">
-              AfroPlus unlocks unlimited hearts, 2× XP on every lesson,<br />
-              the full Reviews page and a completely ad free experience.<br />
-              Start with a 7 day free trial and cancel anytime.
+            </h3>
+            <p className="lp-feature-body lp-sand-reveal">
+              AfroPlus unlocks unlimited hearts, 2× XP on every lesson, the full Reviews page and a completely ad free experience. Start with a 7 day free trial and cancel anytime.
             </p>
           </div>
         </div>

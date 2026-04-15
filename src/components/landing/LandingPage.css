@@ -348,6 +348,16 @@
 }
 .lp-langs-eyebrow:hover { letter-spacing: 0.22em; }
 
+.lp-map-cta-hint {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 900;
+  text-align: center;
+  margin: 0 0 20px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 .lp-langs-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
@@ -488,6 +498,40 @@
   margin: 0;
   max-width: 600px;
   color: rgba(255, 255, 255, 0.82);
+}
+
+/* ── Feature text blocks (Sandbits / AfroPlus) ── */
+.lp-feature-text-block {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.lp-feature-text-block--right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.lp-feature-heading {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-weight: 900;
+  font-size: clamp(1.4rem, 2.8vw, 2rem);
+  letter-spacing: 0.04em;
+  margin: 0;
+  line-height: 1.1;
+}
+.lp-feature-heading--sandbits {
+  color: #c9960a;
+}
+
+.lp-feature-body {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: clamp(1rem, 1.8vw, 1.3rem);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.82);
+  margin: 0;
+  max-width: 520px;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* ── Stack rows ── */
@@ -1888,18 +1932,34 @@
     margin-right: 0;
   }
 
-  /* Feature blocks — full width, no side margins */
-  .lp-feature-block { padding: 28px 20px; gap: 14px; }
-  .lp-feature-block--left  { margin-left: 0; }
-  .lp-feature-block--right { margin-right: 0; }
-  .lp-feature-block .lp-sand-reveal[style] { font-size: 1.15rem !important; }
-  .lp-feature-block .lp-stack-row-text p {
-    font-size: 0.9rem;
-    max-width: 100%;
-    line-height: 1.55;
-    overflow-wrap: break-word;
+  /* Feature blocks — full width, centered on mobile */
+  .lp-feature-block {
+    padding: 32px 20px;
+    gap: 16px;
+    align-items: center;
+    text-align: center;
   }
-  /* Hide <br> inside feature blocks so text reflows naturally */
+  .lp-feature-block--left  { margin-left: 0; align-items: center; }
+  .lp-feature-block--right { margin-right: 0; align-items: center; }
+  .lp-feature-img-wrap { justify-content: center; }
+  .lp-feature-text-block,
+  .lp-feature-text-block--right {
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    max-width: 100%;
+  }
+  .lp-feature-heading {
+    font-size: clamp(1.3rem, 6vw, 1.6rem);
+    text-align: center;
+  }
+  .lp-feature-body {
+    font-size: 0.78rem;
+    max-width: 100%;
+    text-align: center;
+    line-height: 1.6;
+  }
+  /* Hide legacy <br> tags inside feature blocks */
   .lp-feature-block br { display: none; }
   .lp-afroplus-img { width: 110px; height: 110px; border-radius: 18px; }
   .lp-feature-img-wrap svg { width: 110px !important; height: 110px !important; }
@@ -1934,9 +1994,9 @@
   }
 
   /* Even tighter feature blocks */
-  .lp-feature-block { padding: 22px 16px; gap: 12px; }
-  .lp-feature-block .lp-sand-reveal[style] { font-size: 1.05rem !important; }
-  .lp-feature-block .lp-stack-row-text p { font-size: 0.85rem; }
+  .lp-feature-block { padding: 24px 16px; gap: 12px; }
+  .lp-feature-heading { font-size: clamp(1.2rem, 7vw, 1.4rem); }
+  .lp-feature-body { font-size: 0.72rem; }
   .lp-afroplus-img { width: 88px; height: 88px; border-radius: 14px; }
   .lp-feature-img-wrap svg { width: 88px !important; height: 88px !important; }
 }

@@ -79,9 +79,10 @@ function loadD3(): Promise<void> {
 interface AfricaMapProps {
   onCountrySelect: (iso2: string) => void;
   highlightedCodes?: Set<string>; // ISO-2 codes to highlight; empty = show all equally
+  unlockedCodes?: Set<string>;    // ISO-2 codes that show flag colours; rest are greyscale
 }
 
-export function AfricaMap({ onCountrySelect, highlightedCodes }: AfricaMapProps) {
+export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: AfricaMapProps) {
   const containerRef  = useRef<HTMLDivElement>(null);
   const tooltipRef    = useRef<HTMLDivElement>(null);
   const onSelectRef   = useRef(onCountrySelect);
@@ -106,9 +107,7 @@ export function AfricaMap({ onCountrySelect, highlightedCodes }: AfricaMapProps)
         .attr('viewBox', `0 0 ${W} ${H}`)
         .style('width', '100%')
         .style('height', '100%')
-        .style('display', 'block')
-        // overall brightness reduction
-        .style('filter', 'brightness(0.72) saturate(0.85)');
+        .style('display', 'block');
 
       const defs = svg.append('defs');
       const filt = defs.append('filter').attr('id', 'afmap-shadow')
@@ -151,22 +150,32 @@ export function AfricaMap({ onCountrySelect, highlightedCodes }: AfricaMapProps)
       let activeEl: any = null;
       let activeISO3: string | null = null;
 
+      // Determine whether to use colour or greyscale per country
+      const hasUnlocked = unlockedCodes && unlockedCodes.size > 0;
+
       features.forEach((feat: any) => {
         const iso3   = feat.properties.iso_a3 || feat.id;
         const colors = COUNTRY_COLORS[iso3];
         if (!colors) return;
 
         const iso2 = ISO3_TO_ISO2[iso3];
+
+        // Unlocked = user has completed at least one lesson for a language from this country
+        const isUnlocked = hasUnlocked && iso2 ? unlockedCodes!.has(iso2) : false;
+
+        // Always use flag gradient as fill; locked countries are desaturated via filter
         const fill = mkGradient(`afg-${iso3}`, colors);
 
         const p = g.append('path')
           .datum(feat)
           .attr('d', pathGen)
           .attr('fill', fill)
-          .attr('stroke', 'rgba(255,255,255,0.8)')
+          .attr('stroke', 'rgba(255,255,255,0.5)')
           .attr('stroke-width', 0.6)
           .style('cursor', iso2 ? 'pointer' : 'default')
-          .style('transition', 'filter 0.2s, opacity 0.2s, stroke-width 0.12s');
+          .style('filter', isUnlocked ? 'none' : 'grayscale(1) brightness(0.75)')
+          .style('opacity', isUnlocked ? 1 : 0.7)
+          .style('transition', 'filter 0.4s ease, opacity 0.4s ease, stroke-width 0.12s');
 
         if (!iso2) {
           p.style('opacity', 0.35);
@@ -174,6 +183,11 @@ export function AfricaMap({ onCountrySelect, highlightedCodes }: AfricaMapProps)
         }
 
         pathMapRef.current.set(iso2, p);
+
+        // Filters to restore based on lock state
+        const lockedFilter   = 'grayscale(1) brightness(0.75)';
+        const unlockedFilter = 'none';
+        const baseFilter     = () => isUnlocked ? unlockedFilter : lockedFilter;
 
         p.on('mousemove', function(event: MouseEvent) {
             tooltip.style.opacity = '1';
@@ -185,9 +199,9 @@ export function AfricaMap({ onCountrySelect, highlightedCodes }: AfricaMapProps)
             tooltip.style.opacity = '0';
             if (activeISO3 !== iso3) {
               d3.select(this)
-                .attr('stroke', 'rgba(255,255,255,0.8)')
+                .attr('stroke', 'rgba(255,255,255,0.5)')
                 .attr('stroke-width', 0.6)
-                .style('filter', null);
+                .style('filter', baseFilter());
             }
           })
           .on('mouseover', function() {
@@ -195,19 +209,22 @@ export function AfricaMap({ onCountrySelect, highlightedCodes }: AfricaMapProps)
             d3.select(this)
               .attr('stroke', '#ffffff')
               .attr('stroke-width', 1.4)
-              .style('filter', 'brightness(1.35) saturate(1.2)');
+              // Locked: slight brightness lift only, no colour; Unlocked: full glow
+              .style('filter', isUnlocked
+                ? 'brightness(1.35) saturate(1.2)'
+                : 'grayscale(1) brightness(0.95)');
           })
           .on('click', function() {
             if (activeEl) {
               activeEl
-                .attr('stroke', 'rgba(255,255,255,0.8)')
+                .attr('stroke', 'rgba(255,255,255,0.5)')
                 .attr('stroke-width', 0.6)
-                .style('filter', null);
+                .style('filter', baseFilter());
             }
             d3.select(this)
-              .attr('stroke', '#000000')
+              .attr('stroke', isUnlocked ? '#000000' : 'rgba(255,255,255,0.9)')
               .attr('stroke-width', 1.8)
-              .style('filter', 'brightness(1.3)');
+              .style('filter', isUnlocked ? 'brightness(1.3)' : lockedFilter);
             activeEl   = d3.select(this);
             activeISO3 = iso3;
             tooltip.style.opacity = '0';
@@ -245,7 +262,7 @@ export function AfricaMap({ onCountrySelect, highlightedCodes }: AfricaMapProps)
       const s = container.querySelector('svg');
       if (s) s.remove();
     };
-  }, []);
+  }, [unlockedCodes]);
 
   // Highlight matching countries when search changes
   useEffect(() => {
