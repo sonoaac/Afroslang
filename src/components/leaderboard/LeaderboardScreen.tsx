@@ -10,84 +10,141 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ onBack }) 
   const { user } = useAuth();
 
   const lbFont = "'Times New Roman', Georgia, serif";
-  const lbBg = 'transparent';
-  const lbSurface = 'rgba(6,3,1,0.82)';
-  const lbBorder = 'rgba(255,255,255,0.08)';
   const lbRed = '#b00020';
   const lbText = '#f5ede0';
   const lbMuted = 'rgba(245,237,224,0.65)';
   const lbShadow = '0 1px 6px rgba(0,0,0,0.9)';
 
   return (
-    <div style={{ minHeight: '100vh', background: lbBg, padding: '1.5rem', fontFamily: lbFont, position: 'relative', zIndex: 5 }}>
-      <div style={{ maxWidth: 900, margin: '0 auto', background: 'rgba(6,3,1,0.82)', borderRadius: 18, padding: '1.5rem' }}>
+    <div style={{
+      minHeight: '100dvh',
+      background: 'transparent',
+      padding: 'clamp(0.75rem, 3vw, 1.5rem)',
+      fontFamily: lbFont,
+      position: 'relative',
+      zIndex: 5,
+      boxSizing: 'border-box',
+    }}>
+      <div style={{
+        maxWidth: 900,
+        margin: '0 auto',
+        background: 'rgba(6,3,1,0.82)',
+        borderRadius: 18,
+        padding: 'clamp(1rem, 4vw, 1.5rem)',
+        overflow: 'hidden',
+      }}>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '1.5rem',
+          gap: '0.5rem',
+          minWidth: 0,
+        }}>
           <button
             onClick={onBack}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#b00020', border: 'none', color: '#fff', padding: '0.6rem 1.2rem', borderRadius: 8, cursor: 'pointer', fontFamily: lbFont, fontSize: '0.9rem', fontWeight: 'bold', transition: 'background 0.2s' }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = lbRed; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = lbBorder; }}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '0.3rem',
+              background: lbRed, border: 'none', color: '#fff',
+              padding: '0.5rem 0.85rem', borderRadius: 8,
+              cursor: 'pointer', fontFamily: lbFont,
+              fontSize: 'clamp(0.78rem, 2.5vw, 0.9rem)',
+              fontWeight: 'bold', flexShrink: 0,
+            }}
           >
-            <ChevronLeft style={{ width: 18, height: 18 }} strokeWidth={2} />
+            <ChevronLeft style={{ width: 16, height: 16 }} strokeWidth={2} />
             Back
           </button>
 
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
-              <Trophy style={{ width: 24, height: 24, color: lbRed }} strokeWidth={1.5} />
-              <h1 style={{ color: lbText, fontSize: 'clamp(1.4rem, 4vw, 2rem)', fontFamily: lbFont, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0, textShadow: lbShadow }}>
+          <div style={{ textAlign: 'center', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+              <Trophy style={{ width: 20, height: 20, color: lbRed, flexShrink: 0 }} strokeWidth={1.5} />
+              <h1 style={{
+                color: lbText,
+                fontSize: 'clamp(1.1rem, 4vw, 2rem)',
+                fontFamily: lbFont,
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                margin: 0,
+                textShadow: lbShadow,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}>
                 Leaderboard
               </h1>
             </div>
           </div>
 
-          <div style={{ width: 80 }} />
+          {/* Balancing spacer — shrinks on mobile */}
+          <div style={{ width: 'clamp(0px, 10vw, 72px)', flexShrink: 0 }} />
         </div>
 
         {/* Top bar accent */}
-        <div style={{ height: '2px', background: lbRed, marginBottom: '2rem', opacity: 0.7 }} />
+        <div style={{ height: '2px', background: lbRed, marginBottom: '1.5rem', opacity: 0.7 }} />
 
         {/* Main content — auth-gated */}
         {!user ? (
-          /* Not signed in */
           <div style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            minHeight: '50vh', textAlign: 'center', padding: '2rem 1rem',
+            minHeight: '45vh', textAlign: 'center', padding: '1.5rem 0.5rem',
           }}>
-            <Trophy style={{ width: 64, height: 64, color: lbRed, marginBottom: '1.5rem', opacity: 0.7 }} strokeWidth={1.5} />
+            <Trophy style={{ width: 52, height: 52, color: lbRed, marginBottom: '1.25rem', opacity: 0.7 }} strokeWidth={1.5} />
             <p style={{
-              fontFamily: lbFont, fontWeight: 'bold',
-              fontSize: 'clamp(1.1rem, 4vw, 1.6rem)',
-              lineHeight: 1.4, margin: 0,
-              maxWidth: 500, textShadow: lbShadow,
+              fontFamily: lbFont,
+              fontWeight: 'bold',
+              fontSize: 'clamp(0.95rem, 3.5vw, 1.5rem)',
+              lineHeight: 1.5,
+              margin: '0 0 0.75rem',
+              maxWidth: 480,
+              textShadow: lbShadow,
+              wordBreak: 'break-word',
             }}>
               <span style={{ color: lbRed }}>Create an Account</span>
               <span style={{ color: lbText }}> or </span>
               <span style={{ color: lbRed }}>Sign in</span>
               <span style={{ color: lbText }}> to start tracking your progress vs Friends</span>
             </p>
-            <p style={{ color: lbMuted, fontSize: '0.9rem', marginTop: '1rem', fontFamily: lbFont, textShadow: lbShadow }}>
+            <p style={{
+              color: lbMuted,
+              fontSize: 'clamp(0.78rem, 2.5vw, 0.9rem)',
+              margin: 0,
+              fontFamily: lbFont,
+              textShadow: lbShadow,
+              maxWidth: 360,
+            }}>
               Compete weekly. Climb the leagues. Rise to the top.
             </p>
           </div>
         ) : (
-          /* Signed in */
           <div style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            minHeight: '50vh', textAlign: 'center', padding: '2rem 1rem',
+            minHeight: '45vh', textAlign: 'center', padding: '1.5rem 0.5rem',
           }}>
-            <Trophy style={{ width: 64, height: 64, color: lbRed, marginBottom: '1.5rem', opacity: 0.6 }} strokeWidth={1.5} />
+            <Trophy style={{ width: 52, height: 52, color: lbRed, marginBottom: '1.25rem', opacity: 0.6 }} strokeWidth={1.5} />
             <p style={{
-              fontFamily: lbFont, fontWeight: 'bold',
-              fontSize: 'clamp(1.6rem, 5vw, 2.4rem)',
-              color: lbText, margin: 0,
-              letterSpacing: '0.02em', textShadow: lbShadow,
+              fontFamily: lbFont,
+              fontWeight: 'bold',
+              fontSize: 'clamp(1.3rem, 5vw, 2.2rem)',
+              color: lbText,
+              margin: '0 0 0.75rem',
+              letterSpacing: '0.02em',
+              textShadow: lbShadow,
             }}>
               Coming Soon
             </p>
-            <p style={{ color: lbMuted, fontSize: '0.9rem', marginTop: '1rem', fontFamily: lbFont, maxWidth: 400, textShadow: lbShadow }}>
+            <p style={{
+              color: lbMuted,
+              fontSize: 'clamp(0.78rem, 2.5vw, 0.9rem)',
+              margin: 0,
+              fontFamily: lbFont,
+              maxWidth: 360,
+              textShadow: lbShadow,
+              lineHeight: 1.6,
+            }}>
               The leaderboard is being built. Your XP is already being tracked — be ready when it launches.
             </p>
           </div>

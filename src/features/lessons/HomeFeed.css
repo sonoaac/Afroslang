@@ -359,8 +359,101 @@
 .lp-guidebook-panel {
   width: 100%;
   margin-bottom: 16px;
+}
+
+/* ── Guidebook insight card ── */
+.gb-panel {
+  position: relative;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
   border-radius: 14px;
+  padding: 18px 16px 16px;
   overflow: hidden;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* Decorative side lines */
+.gb-line {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+}
+.gb-line--yellow {
+  background: #ffd60a;
+  opacity: 0.85;
+}
+.gb-line--green {
+  left: 6px;
+  background: #2dc653;
+  opacity: 0.6;
+}
+
+.gb-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-left: 6px;
+}
+.gb-icon { font-size: 1.3rem; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+.gb-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #ffd60a;
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+.gb-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.92);
+  margin: 0;
+}
+
+.gb-section { margin-bottom: 14px; padding-left: 6px; }
+.gb-section-head {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.gb-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.gb-list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.78);
+}
+.gb-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.gb-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(255,214,10,0.06);
+  border: 1px solid rgba(255,214,10,0.2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-left: 6px;
+}
+.gb-tip-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.gb-tip-text {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.65);
+  margin: 0;
+  line-height: 1.55;
+  font-style: italic;
 }
 
 /* ══════════════════════════════════════════════

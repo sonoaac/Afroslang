@@ -5,10 +5,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import { getLanguageById } from '../../data/languages';
 import { FlagIcon } from '../language-select/FlagIcon';
 import { Exercise } from '../../types';
-import { MascotFactCard } from '../../components/rain/MascotFactCard';
+import { SandbitsIcon } from '../../components/ui/SandbitsIcon';
 import { RainCanvas } from '../../components/rain/RainCanvas';
 import './HomeFeed.css';
-import '../../components/rain/MascotFactCard.css';
 
 interface LearningPathProps {
   interfaceLanguage: InterfaceLanguage;
@@ -38,7 +37,6 @@ export function LearningPath({
 }: LearningPathProps) {
   const isEnglish = interfaceLanguage === 'en';
   const [logoError, setLogoError] = useState(false);
-  const [currencyError, setCurrencyError] = useState(false);
   const [activeSidebarItem, setActiveSidebarItem] = useState<
     'learn' | 'leaderboard' | 'quests' | 'shop' | 'profile' | 'settings' | 'latest-news'
   >('learn');
@@ -256,19 +254,9 @@ export function LearningPath({
               <span>⭐</span>
               <span>{progress.xp ?? 0}</span>
             </div>
-            {/* Currency icon uses afroslang-logo.png */}
             <div className="lp-stat lp-stat--gem">
-              {currencyError ? (
-                <span>💎</span>
-              ) : (
-                <img
-                  className="lp-currency-icon"
-                  src="/afroslang-logo.png"
-                  alt="coins"
-                  onError={() => setCurrencyError(true)}
-                />
-              )}
-              <span>{userData?.subscription?.active ? '∞' : progress.lessonsCompleted ?? 0}</span>
+              <SandbitsIcon size={18} />
+              <span>{userData?.sandbits ?? 0}</span>
             </div>
             <div className="lp-stat lp-stat--heart">
               <span>❤️</span>
@@ -310,10 +298,16 @@ export function LearningPath({
                     </button>
                   </div>
 
-                  {/* Guidebook (cultural fact card) */}
-                  {guidebookStage === stageIndex && currentLanguageId && (
+                  {/* Guidebook — lesson insights */}
+                  {guidebookStage === stageIndex && (
                     <div className="lp-guidebook-panel">
-                      <MascotFactCard languageId={currentLanguageId} isEnglish={isEnglish} />
+                      <GuidebookInsight
+                        stage={stage}
+                        stageIndex={stageIndex}
+                        lessons={lessons}
+                        isEnglish={isEnglish}
+                        accent={accent}
+                      />
                     </div>
                   )}
 
@@ -409,6 +403,81 @@ export function LearningPath({
           </button>
         ))}
       </nav>
+    </div>
+  );
+}
+
+// ── Guidebook insight panel ───────────────────────────────────────────────────
+interface GuidebookInsightProps {
+  stage: Stage;
+  stageIndex: number;
+  lessons: Lesson[];
+  isEnglish: boolean;
+  accent: string;
+}
+
+const STUDY_TIPS_EN = [
+  'Repeat each phrase out loud — speaking is the fastest path to fluency.',
+  'Try to use new words in a sentence of your own before moving on.',
+  'Review yesterday\'s lessons before starting today\'s to reinforce memory.',
+  'Focus on rhythm and tone — African languages are music to the ear.',
+  'Don\'t fear mistakes — every error is a step closer to mastery.',
+  'Pair new vocabulary with a vivid image or memory to make it stick.',
+  'Short daily sessions beat long infrequent ones every time.',
+];
+
+const STUDY_TIPS_FR = [
+  'Répétez chaque phrase à voix haute — parler est le chemin le plus rapide vers la fluidité.',
+  'Essayez d\'utiliser les nouveaux mots dans une phrase avant de continuer.',
+  'Révisez les leçons d\'hier avant de commencer celles d\'aujourd\'hui.',
+  'Concentrez-vous sur le rythme et le ton — les langues africaines sont musicales.',
+  'N\'ayez pas peur des erreurs — chaque erreur vous rapproche de la maîtrise.',
+  'Associez le vocabulaire à une image vivante pour mieux le retenir.',
+  'Des sessions courtes quotidiennes valent mieux que de longues sessions espacées.',
+];
+
+function GuidebookInsight({ stage, stageIndex, lessons, isEnglish, accent }: GuidebookInsightProps) {
+  const lessonTitles = lessons.slice(0, 5).map(l => isEnglish ? l.title : (l.titleFr || l.title));
+  const tip = isEnglish ? STUDY_TIPS_EN[stageIndex % STUDY_TIPS_EN.length] : STUDY_TIPS_FR[stageIndex % STUDY_TIPS_FR.length];
+  const stageTitle = isEnglish ? stage.title : (stage.titleFr || stage.title);
+
+  return (
+    <div className="gb-panel">
+      {/* Decorative lines */}
+      <div className="gb-line gb-line--yellow" />
+      <div className="gb-line gb-line--green" />
+
+      {/* Title */}
+      <div className="gb-header">
+        <span className="gb-icon">📖</span>
+        <div>
+          <p className="gb-label">{isEnglish ? 'Unit Guide' : 'Guide de l\'unité'}</p>
+          <p className="gb-title">{stageTitle}</p>
+        </div>
+      </div>
+
+      {/* What you'll learn */}
+      {lessonTitles.length > 0 && (
+        <div className="gb-section">
+          <p className="gb-section-head" style={{ color: accent }}>
+            {isEnglish ? 'What you\'ll learn' : 'Ce que vous apprendrez'}
+          </p>
+          <ul className="gb-list">
+            {lessonTitles.map((t, i) => (
+              <li key={i} className="gb-list-item">
+                <span className="gb-dot" style={{ background: accent }} />
+                {t}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Study tip */}
+      <div className="gb-tip">
+        <span className="gb-tip-icon">💡</span>
+        <p className="gb-tip-text">{tip}</p>
+      </div>
     </div>
   );
 }
