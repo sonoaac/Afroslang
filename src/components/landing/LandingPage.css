@@ -9,10 +9,16 @@
   color: #111;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  /* overflow-x must NOT be set here — it breaks position:sticky on children */
   animation: lpFadeIn 0.55s ease-out;
   position: relative;
   z-index: 1;
+}
+
+/* Clip horizontal overflow on the scrollable body content, not the root */
+.lp-stack,
+.lp-footer {
+  overflow-x: clip;
 }
 
 @keyframes lpFadeIn {
@@ -125,7 +131,7 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: hidden;
+  overflow-x: clip;
 }
 
 
@@ -1737,9 +1743,6 @@
 
   /* Hide mascot bird on mobile */
   .lp-stack-logo-wrap { display: none; }
-
-  /* Allow sticky to work inside lp-stack on mobile */
-  .lp-stack { overflow: visible; }
 
   /* Sticky hero row — stays pinned below the header as body scrolls */
   .lp-stack-hero-row {
