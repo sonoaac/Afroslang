@@ -46,27 +46,17 @@ export const PREMIUM_FEATURES = [
   },
   {
     icon: '⚡',
-    title: '1.42x XP Boost',
-    description: 'Earn 42% more XP and climb the leaderboard faster'
+    title: '2× XP Boost',
+    description: 'Earn double XP on every lesson and climb the leaderboard faster'
   },
   {
-    icon: '📊',
-    title: 'Personal Feedback Page',
-    description: 'Get detailed insights on your weak areas and improvement tips'
+    icon: '📖',
+    title: 'Reviews Page',
+    description: 'Access the full Reviews page to revisit and reinforce every lesson'
   },
   {
-    icon: '👑',
-    title: 'Crown Badge',
-    description: 'Show your premium status with a crown next to your name'
-  },
-  {
-    icon: '🏆',
-    title: 'Premium Leaderboard',
-    description: 'Compete with other premium users for exclusive rewards'
-  },
-  {
-    icon: '🎯',
-    title: 'Advanced Analytics',
-    description: 'Track your learning progress with detailed statistics'
+    icon: '🚫',
+    title: 'No Ads',
+    description: 'Enjoy a completely ad free learning experience'
   }
 ];

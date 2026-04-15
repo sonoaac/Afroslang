@@ -185,7 +185,7 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({ onBack }) =>
               style={{ background: selectedPlan === 'monthly' ? 'rgba(176,0,32,0.12)' : 'rgba(255,255,255,0.02)', border: selectedPlan === 'monthly' ? `1px solid ${subRed}` : `1px solid ${subBorder}`, padding: '1.5rem', textAlign: 'center', cursor: 'pointer', transition: 'border-color 0.2s, background 0.2s' }}
             >
               <h3 style={{ color: subText, fontFamily: subFont, fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem', marginTop: 0 }}>Monthly</h3>
-              <div style={{ color: subText, fontFamily: subFont, fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>$5.99</div>
+              <div style={{ color: subText, fontFamily: subFont, fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>${(SUBSCRIPTION_PLANS.monthly.amount / 100).toFixed(2)}</div>
               <div style={{ color: subMuted, fontSize: '0.82rem', fontFamily: subFont, marginBottom: '0.75rem' }}>per month</div>
               <div style={{ background: 'rgba(176,0,32,0.2)', border: `1px solid rgba(176,0,32,0.4)`, color: '#fca5a5', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0.3rem 0.75rem', display: 'inline-block', marginBottom: '1rem', fontFamily: subFont }}>
                 7 Day FREE trial
@@ -204,12 +204,12 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({ onBack }) =>
                 Best Value
               </div>
               <h3 style={{ color: subText, fontFamily: subFont, fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem', marginTop: '0.75rem' }}>Yearly</h3>
-              <div style={{ color: subText, fontFamily: subFont, fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>$39.99</div>
+              <div style={{ color: subText, fontFamily: subFont, fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>${(SUBSCRIPTION_PLANS.yearly.amount / 100).toFixed(2)}</div>
               <div style={{ color: subMuted, fontSize: '0.82rem', fontFamily: subFont, marginBottom: '0.5rem' }}>per year</div>
               <div style={{ background: 'rgba(176,0,32,0.2)', border: `1px solid rgba(176,0,32,0.4)`, color: '#fca5a5', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0.3rem 0.75rem', display: 'inline-block', marginBottom: '0.5rem', fontFamily: subFont }}>
                 7 Day FREE trial
               </div>
-              <div style={{ color: '#86efac', fontSize: '0.82rem', fontFamily: subFont, marginBottom: '1rem' }}>Save $32.89/year</div>
+              <div style={{ color: '#86efac', fontSize: '0.82rem', fontFamily: subFont, marginBottom: '1rem' }}>{SUBSCRIPTION_PLANS.yearly.savings}</div>
               <div style={{ background: selectedPlan === 'yearly' ? subRed : 'transparent', border: `1px solid ${selectedPlan === 'yearly' ? subRed : subBorder}`, color: subText, fontFamily: subFont, fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0.5rem 1rem', cursor: 'pointer', transition: 'all 0.2s' }}>
                 {selectedPlan === 'yearly' ? 'Selected' : 'Select Yearly'}
               </div>

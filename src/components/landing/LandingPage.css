@@ -436,6 +436,52 @@
   }
 }
 
+/* ── Feature blocks (Sandbits / AfroPlus) ── */
+.lp-feature-block {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 2.5vw, 32px);
+  padding: clamp(36px, 5vw, 72px) clamp(28px, 5vw, 64px);
+}
+
+.lp-feature-block--left {
+  align-items: flex-start;
+  text-align: left;
+  margin-left: 6vw;
+}
+
+.lp-feature-block--right {
+  align-items: flex-end;
+  text-align: right;
+  margin-right: 6vw;
+}
+
+.lp-feature-img-wrap {
+  display: flex;
+}
+
+.lp-afroplus-img {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  border-radius: 24px;
+}
+
+.lp-feature-text {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.lp-feature-p {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+  line-height: 1.65;
+  margin: 0;
+  max-width: 600px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
 /* ── Stack rows ── */
 .lp-stack-row {
   position: relative;
@@ -472,6 +518,13 @@
   padding-right: clamp(28px, 5vw, 72px);
   align-items: flex-end;
   text-align: right;
+}
+
+.lp-stack-row-text--left {
+  align-items: flex-start;
+  text-align: left;
+  margin-right: 0;
+  margin-left: 6vw;
 }
 
 .lp-stack-row-label {

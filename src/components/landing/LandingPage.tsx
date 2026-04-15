@@ -7,6 +7,7 @@ import { DescrambleText } from '../ui/DescrambleText';
 import { StaticPage } from './StaticPage';
 import { AfricaMap } from './AfricaMap';
 import { GlCanvas } from './GlCanvas';
+import { SandbitsIcon } from '../ui/SandbitsIcon';
 import './LandingPage.css';
 
 // Drop-in only — no scramble chars. from === to so only phase 1 (drop-in) runs.
@@ -839,9 +840,43 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
           </div>
         </div>
 
+        {/* Sandbits */}
+        <div className="lp-feature-block lp-feature-block--left">
+          <div className="lp-feature-img-wrap">
+            <SandbitsIcon size={140} />
+          </div>
+          <div className="lp-stack-row-text lp-stack-row-text--left">
+            <span className="lp-sand-reveal" style={{ fontFamily: "'Times New Roman', serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em' }}>
+              <span style={{ color: '#f5c842' }}>Sandbits</span>
+            </span>
+            <p className="lp-sand-reveal">
+              Sandbits are Afroslang's in-game currency used to unlock avatars,<br />
+              backgrounds and cosmetics in the Shop. Earn them by finishing<br />
+              in the top 3 on the weekly leaderboard or converting Diamonds.
+            </p>
+          </div>
+        </div>
+
+        {/* AfroPlus */}
+        <div className="lp-feature-block lp-feature-block--right">
+          <div className="lp-feature-img-wrap">
+            <img src="/Afroplus.png" alt="AfroPlus" className="lp-afroplus-img" />
+          </div>
+          <div className="lp-stack-row-text lp-stack-row-text--right">
+            <span className="lp-sand-reveal" style={{ fontFamily: "'Times New Roman', serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em' }}>
+              <span style={{ color: '#b00020' }}>Afro</span><span style={{ color: '#f5ede0' }}>Plus</span>
+            </span>
+            <p className="lp-sand-reveal">
+              AfroPlus unlocks unlimited hearts, 2× XP on every lesson,<br />
+              the full Reviews page and a completely ad free experience.<br />
+              Start with a 7 day free trial and cancel anytime.
+            </p>
+          </div>
+        </div>
+
         {/* Our Mission row */}
-        <div className="lp-stack-row lp-stack-row--right">
-          <div className="lp-stack-row-text">
+        <div className="lp-stack-row lp-stack-row--left">
+          <div className="lp-stack-row-text lp-stack-row-text--left">
             <span className="lp-sand-reveal" style={{ fontFamily: "'Times New Roman', serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em' }}>
               <span style={{ color: '#b00020' }}>Our</span>{' '}
               <span style={{ color: '#f5ede0' }}>Mission</span>
