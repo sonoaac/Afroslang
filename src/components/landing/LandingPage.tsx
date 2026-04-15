@@ -685,15 +685,15 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     <div className="lp">
       <GlCanvas />
 
+      <header className={`lp-header${headerScrolled ? ' lp-header--scrolled' : ''}`}>
+        <div className="lp-header-left">
+          <img src="/Afroslang.png" className="lp-logo" alt="Afroslang" style={{ display: 'block', width: '52px', height: '52px' }} />
+          <span className="lp-brand lp-blood-text" style={{ animationDelay: '0.5s' }}>AFRO<em>SLANG</em></span>
+        </div>
+      </header>
+
       {/* ── Stacked Hero ── */}
       <section className="lp-stack">
-
-        <header className={`lp-header${headerScrolled ? ' lp-header--scrolled' : ''}`}>
-          <div className="lp-header-left">
-            <img src="/Afroslang.png" className="lp-logo" alt="Afroslang" style={{ display: 'block', width: '52px', height: '52px' }} />
-            <span className="lp-brand lp-blood-text" style={{ animationDelay: '0.5s' }}>AFRO<em>SLANG</em></span>
-          </div>
-        </header>
 
         {/* Top block: logo + tagline + CTAs */}
         <div className="lp-stack-top">

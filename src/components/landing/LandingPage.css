@@ -1735,6 +1735,9 @@
     min-height: auto;
   }
 
+  /* Hide mascot bird on mobile */
+  .lp-stack-logo-wrap { display: none; }
+
   /* Stack logo above tagline on mobile */
   .lp-stack-hero-row {
     flex-direction: column;
