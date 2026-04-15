@@ -8,14 +8,20 @@ export interface UserData {
   hearts: number;
   heartsData?: HeartsData;
   xp: number;
-  gems?: number;
-  sandbits?: number;
-  xpBoostExpiry?: number; // ms timestamp — 2× XP boost active until this time
+  // ── Currencies ──────────────────────────────────────────────────────────
+  sandbits?: number;    // in-game currency — earned via leaderboard or converted from diamonds
+  diamonds?: number;    // premium currency — purchased with real money
+  // ── Cosmetics ───────────────────────────────────────────────────────────
+  ownedAvatars?: string[];      // list of owned avatar IDs
+  ownedBackgrounds?: string[];  // list of owned background IDs
+  equippedAvatar?: string;      // currently equipped avatar ID
+  equippedBackground?: string;  // currently equipped background ID
+  // ── Subscription ────────────────────────────────────────────────────────
   subscription: {
     active: boolean;
     plan: string | null;
     stripeSubId?: string | null;
-    renewsAt?: number | null;       // ms timestamp
+    renewsAt?: number | null;
     stripeCustomerId?: string | null;
     pastDue?: boolean;
   };
@@ -51,36 +57,31 @@ export const updateUserData = async (uid: string, data: Partial<UserData>): Prom
 };
 
 export const saveUserProgress = async (
-  uid: string, 
-  languageId: string, 
-  lessonId: string, 
-  xpGained: number, 
-  heartsLost: number
+  uid: string,
+  languageId: string,
+  lessonId: string,
+  xpGained: number,
+  heartsLost: number,
 ): Promise<void> => {
   try {
     const ref = doc(db, "users", uid);
     const snapshot = await getDoc(ref);
-    
     if (snapshot.exists()) {
       const userData = snapshot.data() as UserData;
       const languageProgress = userData.languages[languageId] || {
         completedLessons: [],
         xp: 0,
-        hearts: 5
+        hearts: 5,
       };
-
-      // Update language progress
       if (!languageProgress.completedLessons.includes(lessonId)) {
         languageProgress.completedLessons.push(lessonId);
       }
       languageProgress.xp += xpGained;
       languageProgress.hearts = Math.max(0, languageProgress.hearts - heartsLost);
-
-      // Update user data
       await updateDoc(ref, {
         xp: userData.xp + xpGained,
         hearts: Math.max(0, userData.hearts - heartsLost),
-        [`languages.${languageId}`]: languageProgress
+        [`languages.${languageId}`]: languageProgress,
       });
     }
   } catch (error) {
@@ -88,15 +89,20 @@ export const saveUserProgress = async (
   }
 };
 
-// Guest mode functions
 export const createGuestUser = (): UserData => ({
   username: "Guest",
   email: "",
   hearts: 5,
   xp: 0,
+  sandbits: 0,
+  diamonds: 0,
+  ownedAvatars: ['avatar_default'],
+  ownedBackgrounds: ['bg_default'],
+  equippedAvatar: 'avatar_default',
+  equippedBackground: 'bg_default',
   subscription: { active: false, plan: null },
   createdAt: new Date().toISOString(),
-  languages: {}
+  languages: {},
 });
 
 export const saveGuestProgress = (progress: UserData): void => {
@@ -107,8 +113,7 @@ export const loadGuestProgress = (): UserData | null => {
   try {
     const saved = localStorage.getItem('afroslang_guest_progress');
     return saved ? JSON.parse(saved) : null;
-  } catch (error) {
-    console.error("Error loading guest progress:", error);
+  } catch {
     return null;
   }
 };

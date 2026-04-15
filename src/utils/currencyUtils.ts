@@ -2,103 +2,148 @@ import { doc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../firebase';
 import { UserData } from './userData';
 
-// ── Gem earning constants ──────────────────────────────────────────────
-export const GEMS_PER_LESSON       = 5;   // base reward per completed lesson
-export const GEMS_PERFECT_BONUS    = 10;  // no hearts lost during lesson
-export const GEMS_FIRST_TIME_BONUS = 5;   // first time completing this lesson
+// ── Leaderboard weekly Sandbit rewards ────────────────────────────────────
+export const LEADERBOARD_REWARDS: Record<1 | 2 | 3, number> = {
+  1: 100,
+  2: 50,
+  3: 25,
+};
 
-// ── Shop costs ─────────────────────────────────────────────────────────
-export const COST_HEARTS_REFILL  = 100;  // gems  → refill all 5 hearts
-export const COST_SANDBITS_PACK  = 250;  // gems  → +500 sandbits
-export const COST_XP_BOOST       = 150;  // sandbits → 2× XP for 1 hour
+// ── Diamond conversion ─────────────────────────────────────────────────────
+export const SANDBITS_PER_DIAMOND = 50; // 1 diamond → 50 SB
 
-export const XP_BOOST_DURATION_MS = 60 * 60 * 1000; // 1 hour in ms
+// ── Diamond packs (real money via Stripe) ─────────────────────────────────
+// Set paymentLink to your Stripe Payment Link URLs.
+// Each link must be set up as a one-time payment product in Stripe Dashboard.
+// Pass ?client_reference_id=UID when redirecting so the webhook knows the user.
+export const DIAMOND_PACKS = [
+  {
+    id: 'diamonds_1',
+    diamonds: 1,
+    price: 1.99,
+    label: '1 Diamond',
+    paymentLink: '', // TODO: add Stripe Payment Link URL
+  },
+  {
+    id: 'diamonds_5',
+    diamonds: 5,
+    price: 4.99,
+    label: '5 Diamonds',
+    highlight: true,
+    paymentLink: '', // TODO: add Stripe Payment Link URL
+  },
+  {
+    id: 'diamonds_10',
+    diamonds: 10,
+    price: 9.99,
+    label: '10 Diamonds',
+    paymentLink: '', // TODO: add Stripe Payment Link URL
+  },
+] as const;
 
-/** How many gems are earned for completing a lesson. */
-export function calcGemsEarned(heartsLost: number, isFirstTime: boolean): number {
-  let gems = GEMS_PER_LESSON;
-  if (heartsLost === 0)  gems += GEMS_PERFECT_BONUS;
-  if (isFirstTime)       gems += GEMS_FIRST_TIME_BONUS;
-  return gems;
+// ── Cosmetic catalogue ─────────────────────────────────────────────────────
+// Add actual image files to /public/avatars/ and /public/backgrounds/.
+// id 'avatar_default' and 'bg_default' are always free and pre-owned.
+export interface CosmeticItem {
+  id: string;
+  name: string;
+  emoji: string;
+  price: number; // SB cost (0 = free)
+  image?: string; // path under /public (optional, falls back to emoji)
 }
 
-/** Whether the XP boost is currently active. */
+export const AVATARS: CosmeticItem[] = [
+  { id: 'avatar_default',   name: 'Default',    emoji: '🐦',  price: 0 },
+  { id: 'avatar_warrior',   name: 'Warrior',    emoji: '🗡️',  price: 200 },
+  { id: 'avatar_scholar',   name: 'Scholar',    emoji: '📚',  price: 150 },
+  { id: 'avatar_chief',     name: 'Chief',      emoji: '👑',  price: 350 },
+  { id: 'avatar_griot',     name: 'Griot',      emoji: '🎵',  price: 250 },
+  { id: 'avatar_hunter',    name: 'Hunter',     emoji: '🏹',  price: 300 },
+];
+
+export const BACKGROUNDS: CosmeticItem[] = [
+  { id: 'bg_default',   name: 'Default',    emoji: '🌌',  price: 0 },
+  { id: 'bg_savanna',   name: 'Savanna',    emoji: '🌅',  price: 300 },
+  { id: 'bg_market',    name: 'Market',     emoji: '🏪',  price: 250 },
+  { id: 'bg_night',     name: 'Night Sky',  emoji: '🌃',  price: 400 },
+  { id: 'bg_forest',    name: 'Forest',     emoji: '🌿',  price: 200 },
+  { id: 'bg_ocean',     name: 'Ocean',      emoji: '🌊',  price: 350 },
+];
+
+// ── 2× XP — Plus perk only (not a purchasable item) ───────────────────────
+/** Returns true if the user has an active AfroPlus subscription. */
 export function isXpBoostActive(userData: UserData | null): boolean {
-  if (!userData?.xpBoostExpiry) return false;
-  return Date.now() < userData.xpBoostExpiry;
+  return userData?.subscription?.active === true;
 }
 
-/** Remaining XP boost time in ms (0 if inactive). */
-export function xpBoostRemainingMs(userData: UserData | null): number {
-  if (!userData?.xpBoostExpiry) return 0;
-  return Math.max(0, userData.xpBoostExpiry - Date.now());
+// ── Firestore mutations ────────────────────────────────────────────────────
+
+/** Award Sandbit leaderboard reward to a user. */
+export async function awardLeaderboardSandbits(userId: string, rank: 1 | 2 | 3): Promise<void> {
+  const amount = LEADERBOARD_REWARDS[rank];
+  await updateDoc(doc(db, 'users', userId), { sandbits: increment(amount) });
 }
 
-/**
- * Award gems to a user after lesson completion.
- * Firestore increment — local state is handled by the caller.
- */
-export async function awardGems(userId: string, gems: number): Promise<void> {
-  const ref = doc(db, 'users', userId);
-  await updateDoc(ref, { gems: increment(gems) });
-}
-
-/**
- * Purchase: refill all 5 hearts using gems.
- * Returns the updated fields on success, null if insufficient gems.
- */
-export async function purchaseHeartsRefill(
+/** Convert diamonds → sandbits (1 diamond = 50 SB). */
+export async function convertDiamondsToSandbits(
   userId: string,
   userData: UserData,
+  diamondsToSpend: number,
 ): Promise<Partial<UserData> | null> {
-  const currentGems = userData.gems ?? 0;
-  if (currentGems < COST_HEARTS_REFILL) return null;
+  const currentDiamonds = userData.diamonds ?? 0;
+  if (currentDiamonds < diamondsToSpend || diamondsToSpend < 1) return null;
 
-  const newGems = currentGems - COST_HEARTS_REFILL;
-  const ref = doc(db, 'users', userId);
-  await updateDoc(ref, {
-    gems: newGems,
-    hearts: 5,
-    'heartsData.currentHearts': 5,
+  const sandbitsGained = diamondsToSpend * SANDBITS_PER_DIAMOND;
+  const newDiamonds = currentDiamonds - diamondsToSpend;
+  const newSandbits = (userData.sandbits ?? 0) + sandbitsGained;
+
+  await updateDoc(doc(db, 'users', userId), {
+    diamonds: newDiamonds,
+    sandbits: newSandbits,
   });
 
-  return { gems: newGems, hearts: 5 };
+  return { diamonds: newDiamonds, sandbits: newSandbits };
 }
 
-/**
- * Purchase: +500 sandbits pack using gems.
- * Returns the updated fields on success, null if insufficient gems.
- */
-export async function purchaseSandbitsPack(
+/** Purchase a cosmetic (avatar or background) with sandbits. */
+export async function purchaseCosmetic(
   userId: string,
   userData: UserData,
-): Promise<Partial<UserData> | null> {
-  const currentGems = userData.gems ?? 0;
-  if (currentGems < COST_SANDBITS_PACK) return null;
-
-  const newGems     = currentGems - COST_SANDBITS_PACK;
-  const newSandbits = (userData.sandbits ?? 0) + 500;
-  const ref = doc(db, 'users', userId);
-  await updateDoc(ref, { gems: newGems, sandbits: newSandbits });
-
-  return { gems: newGems, sandbits: newSandbits };
-}
-
-/**
- * Purchase: 2× XP Boost for 1 hour using sandbits.
- * Returns the updated fields on success, null if insufficient sandbits.
- */
-export async function purchaseXpBoost(
-  userId: string,
-  userData: UserData,
+  item: CosmeticItem,
+  type: 'avatar' | 'background',
 ): Promise<Partial<UserData> | null> {
   const currentSandbits = userData.sandbits ?? 0;
-  if (currentSandbits < COST_XP_BOOST) return null;
+  if (currentSandbits < item.price) return null;
 
-  const newSandbits  = currentSandbits - COST_XP_BOOST;
-  const xpBoostExpiry = Date.now() + XP_BOOST_DURATION_MS;
-  const ref = doc(db, 'users', userId);
-  await updateDoc(ref, { sandbits: newSandbits, xpBoostExpiry });
+  const ownedKey = type === 'avatar' ? 'ownedAvatars' : 'ownedBackgrounds';
+  const equippedKey = type === 'avatar' ? 'equippedAvatar' : 'equippedBackground';
+  const currentOwned: string[] = (userData as any)[ownedKey] ?? [];
 
-  return { sandbits: newSandbits, xpBoostExpiry };
+  if (currentOwned.includes(item.id)) {
+    // Already owned — just equip it (free)
+    await updateDoc(doc(db, 'users', userId), { [equippedKey]: item.id });
+    return { [equippedKey]: item.id };
+  }
+
+  const newSandbits = currentSandbits - item.price;
+  const newOwned = [...currentOwned, item.id];
+  await updateDoc(doc(db, 'users', userId), {
+    sandbits: newSandbits,
+    [ownedKey]: newOwned,
+    [equippedKey]: item.id,
+  });
+
+  return { sandbits: newSandbits, [ownedKey]: newOwned, [equippedKey]: item.id };
+}
+
+/** Redirect user to buy a diamond pack via Stripe. */
+export function buyDiamondPack(pack: typeof DIAMOND_PACKS[number], userId: string, userEmail: string): void {
+  if (!pack.paymentLink) {
+    // eslint-disable-next-line no-console
+    console.warn('Diamond payment link not configured for pack:', pack.id);
+    return;
+  }
+  const returnUrl = `${window.location.origin}?diamonds_success=1&pack=${pack.diamonds}`;
+  const url = `${pack.paymentLink}?client_reference_id=${encodeURIComponent(userId)}&prefilled_email=${encodeURIComponent(userEmail)}&redirect_url=${encodeURIComponent(returnUrl)}`;
+  window.location.href = url;
 }

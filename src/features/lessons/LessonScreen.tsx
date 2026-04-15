@@ -36,8 +36,6 @@ interface LessonScreenProps {
   heartsData?: HeartsData;
   isSubscribed?: boolean;
   xpBoostActive?: boolean;
-  currentGems?: number;
-  onRefillWithGems?: () => Promise<boolean>;
   userId?: string;
   userName?: string;
   isGuest?: boolean;
@@ -59,8 +57,6 @@ export function LessonScreen({
   heartsData,
   isSubscribed = false,
   xpBoostActive = false,
-  currentGems = 0,
-  onRefillWithGems,
   userId,
   userName = 'Friend',
   isGuest = false,
@@ -843,16 +839,6 @@ export function LessonScreen({
         }}
         heartsData={heartsData ?? { currentHearts: 0, lastResetTime: Date.now(), maxHearts: 5 }}
         isGuest={isGuest}
-        currentGems={currentGems}
-        onRefillWithGems={
-          onRefillWithGems
-            ? async () => {
-                const ok = await onRefillWithGems();
-                if (ok) setCurrentHearts(5);
-                return ok;
-              }
-            : undefined
-        }
       />
 
       <GuestLimitModal

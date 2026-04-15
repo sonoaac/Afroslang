@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, Clock, Gem, X } from 'lucide-react';
+import { Heart, Clock, X } from 'lucide-react';
 import { getTimeUntilNextReset, formatTimeRemaining } from '../../utils/heartsTimer';
-import { COST_HEARTS_REFILL } from '../../utils/currencyUtils';
 
 interface HeartsOutModalProps {
   isOpen: boolean;
@@ -13,8 +12,6 @@ interface HeartsOutModalProps {
     maxHearts: number;
   };
   isGuest?: boolean;
-  currentGems?: number;
-  onRefillWithGems?: () => Promise<boolean>;
 }
 
 export const HeartsOutModal: React.FC<HeartsOutModalProps> = ({
@@ -23,19 +20,8 @@ export const HeartsOutModal: React.FC<HeartsOutModalProps> = ({
   onSubscribe,
   heartsData,
   isGuest = false,
-  currentGems = 0,
-  onRefillWithGems,
 }) => {
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
-  const [refilling, setRefilling] = useState(false);
-
-  const handleGemRefill = async () => {
-    if (!onRefillWithGems) return;
-    setRefilling(true);
-    const success = await onRefillWithGems();
-    setRefilling(false);
-    if (success) onClose();
-  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -140,7 +126,7 @@ export const HeartsOutModal: React.FC<HeartsOutModalProps> = ({
             }}>
               {isGuest
                 ? "You've used all your free hearts. Create a profile to get more hearts and continue learning!"
-                : "You've used all your hearts. Refill with gems, wait for the reset, or go unlimited."}
+                : "You've used all your hearts. Wait for the reset or go unlimited with AfroPlus."}
             </p>
 
             {/* Timer (authenticated only) */}
@@ -227,45 +213,23 @@ export const HeartsOutModal: React.FC<HeartsOutModalProps> = ({
               {/* Authenticated */}
               {!isGuest && (
                 <>
-                  {/* Gem refill — when user has enough gems */}
-                  {onRefillWithGems && currentGems >= COST_HEARTS_REFILL && (
-                    <button
-                      onClick={handleGemRefill}
-                      disabled={refilling}
-                      style={{
-                        width: '100%', padding: '0.9rem',
-                        background: '#b00020', border: 'none', borderRadius: 12,
-                        color: '#fff', fontFamily: "'Times New Roman', Georgia, serif",
-                        fontSize: '0.9rem', fontWeight: 'bold',
-                        letterSpacing: '0.08em', textTransform: 'uppercase',
-                        cursor: refilling ? 'not-allowed' : 'pointer',
-                        boxShadow: '0 4px 0 #6e0012',
-                        opacity: refilling ? 0.6 : 1, transition: 'all 0.15s',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                      }}
-                    >
-                      <Gem style={{ width: 16, height: 16 }} />
-                      {refilling ? 'Refilling…' : `Use ${COST_HEARTS_REFILL} Gems — Refill ❤️`}
-                    </button>
-                  )}
-
                   {/* Subscribe */}
                   <button
                     onClick={onSubscribe}
                     style={{
                       width: '100%', padding: '0.9rem',
-                      background: 'rgba(176,0,32,0.12)',
-                      border: '1px solid rgba(176,0,32,0.4)',
-                      borderRadius: 12, color: '#f5f5f5',
-                      fontFamily: "'Times New Roman', Georgia, serif",
+                      background: '#b00020', border: 'none', borderRadius: 12,
+                      color: '#fff', fontFamily: "'Times New Roman', Georgia, serif",
                       fontSize: '0.9rem', fontWeight: 'bold',
                       letterSpacing: '0.08em', textTransform: 'uppercase',
-                      cursor: 'pointer', transition: 'all 0.15s',
+                      cursor: 'pointer', boxShadow: '0 4px 0 #6e0012',
+                      transition: 'all 0.15s',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
                     }}
-                    onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(176,0,32,0.8)')}
-                    onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(176,0,32,0.4)')}
+                    onMouseEnter={e => (e.currentTarget.style.background = '#d00025')}
+                    onMouseLeave={e => (e.currentTarget.style.background = '#b00020')}
                   >
-                    👑 Go Unlimited — Subscribe
+                    👑 Go Unlimited — AfroPlus
                   </button>
 
                   {/* Wait */}

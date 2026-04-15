@@ -296,8 +296,8 @@ export function LearningPath({
                     <div className="lp-banner-left">
                       <small>
                         {isEnglish
-                          ? `← SECTION 1, UNIT ${stageIndex + 1}`
-                          : `← SECTION 1, UNITÉ ${stageIndex + 1}`}
+                          ? `SECTION 1, UNIT ${stageIndex + 1}`
+                          : `SECTION 1, UNITÉ ${stageIndex + 1}`}
                       </small>
                       <h2>{stageTitle}</h2>
                     </div>
@@ -360,17 +360,6 @@ export function LearningPath({
                             {isFirstActive && (
                               <div className="lp-start-badge">
                                 {isEnglish ? 'START' : 'DÉBUT'}
-                              </div>
-                            )}
-
-                            {/* Floating mascot next to first active node */}
-                            {isFirstActive && (
-                              <div className="lp-path-mascot">
-                                {logoError ? (
-                                  <span style={{ fontSize: 36 }}>🐦</span>
-                                ) : (
-                                  <img src="/Afroslang.png" alt="" onError={() => setLogoError(true)} />
-                                )}
                               </div>
                             )}
 

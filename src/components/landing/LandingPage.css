@@ -1744,15 +1744,8 @@
   /* Hide mascot bird on mobile */
   .lp-stack-logo-wrap { display: none; }
 
-  /* Sticky hero row — stays pinned below the header as body scrolls */
+  /* Hero row — normal scroll, not sticky */
   .lp-stack-hero-row {
-    position: sticky;
-    top: 68px;
-    z-index: 90;
-    background: transparent;
-    backdrop-filter: none;
-    margin-bottom: 0;
-    padding: 10px 20px;
     flex-direction: column;
     align-items: center;
     text-align: center;

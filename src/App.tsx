@@ -19,7 +19,7 @@ import { getLanguageById } from './data/languages';
 import { getStagesForLanguage } from './data/lessons';
 import { saveUserProgress } from './utils/userData';
 import { addWeeklyXP, getCurrentWeekIdFromDB, getUserLeague } from './utils/leaderboardUtils';
-import { calcGemsEarned, awardGems, isXpBoostActive, purchaseHeartsRefill } from './utils/currencyUtils';
+import { isXpBoostActive } from './utils/currencyUtils';
 
 type Screen = 'auth' | 'interface-select' | 'path' | 'lesson' | 'complete' | 'leaderboard' | 'subscription' | 'payment-success' | 'feedback' | 'shop' | 'latest-news' | 'profile';
 
@@ -180,18 +180,6 @@ function App() {
         console.error('Error adding XP to leaderboard:', error);
       }
 
-      // Award gems for completing the lesson
-      try {
-        const currentProgress = userProgressMap[currentLanguage];
-        const isFirstTime = !currentProgress?.completedLessons?.includes(activeLesson.id);
-        const gemsEarned = calcGemsEarned(heartsLost, isFirstTime);
-        await awardGems(user.uid, gemsEarned);
-        if (userData) {
-          setUserData({ ...userData, gems: (userData.gems ?? 0) + gemsEarned });
-        }
-      } catch (error) {
-        console.error('Error awarding gems:', error);
-      }
     }
 
     setUserProgressMap(prev => {
@@ -309,19 +297,6 @@ function App() {
     setCurrentScreen('path');
   };
 
-  const handleRefillHeartsWithGems = async (): Promise<boolean> => {
-    if (!user || !userData) return false;
-    try {
-      const result = await purchaseHeartsRefill(user.uid, userData);
-      if (result) {
-        setUserData({ ...userData, ...result });
-        return true;
-      }
-    } catch (error) {
-      console.error('Error refilling hearts with gems:', error);
-    }
-    return false;
-  };
 
   const getCurrentProgress = (): UserProgress => {
     const unlimitedHearts = userData?.subscription?.active ? 999 : 5;
@@ -468,8 +443,6 @@ function App() {
             heartsData={userData?.heartsData}
             isSubscribed={userData?.subscription?.active || false}
             xpBoostActive={isXpBoostActive(userData)}
-            currentGems={userData?.gems ?? 0}
-            onRefillWithGems={handleRefillHeartsWithGems}
             userId={user?.uid}
             userName={userData?.name || user?.displayName || undefined}
             isGuest={isGuest}

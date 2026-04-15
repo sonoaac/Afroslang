@@ -188,165 +188,146 @@ export const igboLessons: Lesson[] = [
     exercises: [
       {
         id: 'ig-l2-q1',
-        type: 'multiple-choice',
-        question: 'How many letters are in the Igbo alphabet?',
-        questionFr: 'Combien de lettres y a-t-il dans l\'alphabet Igbo?',
-        correctAnswer: '36',
-        options: ['26', '30', '36', '40']
+        type: 'type-answer',
+        question: 'Type "I speak Igbo" in Igbo',
+        questionFr: 'Tapez "Je parle Igbo" en Igbo',
+        correctAnswer: 'Ana m asụ Igbo'
       },
       {
         id: 'ig-l2-q2',
-        type: 'multiple-choice',
-        question: 'What are the special Igbo letters called?',
-        questionFr: 'Comment s\'appellent les lettres spéciales Igbo?',
-        correctAnswer: 'Mkpụrụedemede',
-        options: ['Mkpụrụedemede', 'Mkpụrụ', 'Edemede', 'Okwu']
+        type: 'type-answer',
+        question: 'Type "Hello" in Igbo',
+        questionFr: 'Tapez "Bonjour" en Igbo',
+        correctAnswer: 'Ndewo'
       },
       {
         id: 'ig-l2-q3',
         type: 'type-answer',
-        question: 'Type "alphabet" in Igbo',
-        questionFr: 'Tapez "alphabet" en Igbo',
-        correctAnswer: 'Mkpụrụedemede'
+        question: 'Type "How are you?" in Igbo',
+        questionFr: 'Tapez "Comment vas-tu?" en Igbo',
+        correctAnswer: 'Kedu ka ị mere'
       },
       {
         id: 'ig-l2-q4',
-        type: 'multiple-choice',
-        question: 'Which letter makes the "gh" sound?',
-        questionFr: 'Quelle lettre fait le son "gh"?',
-        correctAnswer: 'gh',
-        options: ['gh', 'ch', 'sh', 'th']
+        type: 'type-answer',
+        question: 'Type "I am fine" in Igbo',
+        questionFr: 'Tapez "Je vais bien" en Igbo',
+        correctAnswer: 'Adị m mma'
       },
       {
         id: 'ig-l2-q5',
-        type: 'multiple-choice',
-        question: 'What does "ọ" represent in pronunciation?',
-        questionFr: 'Que représente "ọ" dans la prononciation?',
-        correctAnswer: 'Open o sound',
-        options: ['Open o sound', 'Closed o sound', 'Long o', 'Short o']
+        type: 'type-answer',
+        question: 'Type "Thank you" in Igbo',
+        questionFr: 'Tapez "Merci" en Igbo',
+        correctAnswer: 'Daalụ'
       },
       {
         id: 'ig-l2-q6',
         type: 'type-answer',
-        question: 'Type "letter" in Igbo',
-        questionFr: 'Tapez "lettre" en Igbo',
-        correctAnswer: 'Mkpụrụedemede'
+        question: 'Type "Yes" in Igbo',
+        questionFr: 'Tapez "Oui" en Igbo',
+        correctAnswer: 'Ee'
       },
       {
         id: 'ig-l2-q7',
-        type: 'multiple-choice',
-        question: 'How many vowel sounds does Igbo have?',
-        questionFr: 'Combien de sons de voyelles l\'Igbo a-t-il?',
-        correctAnswer: '8',
-        options: ['5', '6', '8', '10']
+        type: 'type-answer',
+        question: 'Type "No" in Igbo',
+        questionFr: 'Tapez "Non" en Igbo',
+        correctAnswer: 'Mba'
       },
       {
         id: 'ig-l2-q8',
-        type: 'multiple-choice',
-        question: 'Which letter is pronounced with a dot under it?',
-        questionFr: 'Quelle lettre est prononcée avec un point en dessous?',
-        correctAnswer: 'ị',
-        options: ['a', 'e', 'ị', 'o']
+        type: 'type-answer',
+        question: 'Type "Please" in Igbo',
+        questionFr: 'Tapez "S\'il vous plaît" en Igbo',
+        correctAnswer: 'Biko'
       },
       {
         id: 'ig-l2-q9',
         type: 'type-answer',
-        question: 'Type "sound" in Igbo',
-        questionFr: 'Tapez "son" en Igbo',
-        correctAnswer: 'Ụda'
+        question: 'Type "Good morning" in Igbo',
+        questionFr: 'Tapez "Bonjour (matin)" en Igbo',
+        correctAnswer: 'Ụtụtụ ọma'
       },
       {
         id: 'ig-l2-q10',
-        type: 'multiple-choice',
-        question: 'What does "kp" represent?',
-        questionFr: 'Que représente "kp"?',
-        correctAnswer: 'A combined consonant sound',
-        options: ['A combined consonant sound', 'A vowel', 'A tone', 'A syllable']
+        type: 'type-answer',
+        question: 'Type "Good night" in Igbo',
+        questionFr: 'Tapez "Bonne nuit" en Igbo',
+        correctAnswer: 'Ka chi fo'
       },
       {
         id: 'ig-l2-q11',
-        type: 'multiple-choice',
-        question: 'Which vowel has a nasalized version?',
-        questionFr: 'Quelle voyelle a une version nasalisée?',
-        correctAnswer: 'All vowels',
-        options: ['a only', 'e only', 'i only', 'All vowels']
+        type: 'type-answer',
+        question: 'Type "My name is" in Igbo',
+        questionFr: 'Tapez "Je m\'appelle" en Igbo',
+        correctAnswer: 'Aha m bụ'
       },
       {
         id: 'ig-l2-q12',
         type: 'type-answer',
-        question: 'Type "pronunciation" in Igbo',
-        questionFr: 'Tapez "prononciation" en Igbo',
-        correctAnswer: 'Mkpọpụta'
+        question: 'Type "What is your name?" in Igbo',
+        questionFr: 'Tapez "Comment tu t\'appelles?" en Igbo',
+        correctAnswer: 'Kedu aha gị'
       },
       {
         id: 'ig-l2-q13',
-        type: 'multiple-choice',
-        question: 'How many tones does Igbo have?',
-        questionFr: 'Combien de tons l\'Igbo a-t-il?',
-        correctAnswer: 'Three',
-        options: ['Two', 'Three', 'Four', 'Five']
+        type: 'type-answer',
+        question: 'Type "I love you" in Igbo',
+        questionFr: 'Tapez "Je t\'aime" en Igbo',
+        correctAnswer: 'A hụrụ m gị n\'anya'
       },
       {
         id: 'ig-l2-q14',
-        type: 'multiple-choice',
-        question: 'What does "gb" sound represent?',
-        questionFr: 'Que représente le son "gb"?',
-        correctAnswer: 'Voiced labial-velar',
-        options: ['Voiced labial-velar', 'Voiceless stop', 'Nasal sound', 'Fricative']
+        type: 'type-answer',
+        question: 'Type "Water" in Igbo',
+        questionFr: 'Tapez "Eau" en Igbo',
+        correctAnswer: 'Mmiri'
       },
       {
         id: 'ig-l2-q15',
         type: 'type-answer',
-        question: 'Type "word" in Igbo',
-        questionFr: 'Tapez "mot" en Igbo',
-        correctAnswer: 'Okwu'
+        question: 'Type "Food" in Igbo',
+        questionFr: 'Tapez "Nourriture" en Igbo',
+        correctAnswer: 'Nri'
       },
       {
         id: 'ig-l2-q16',
-        type: 'multiple-choice',
-        question: 'Which letter represents the "ny" sound?',
-        questionFr: 'Quelle lettre représente le son "ny"?',
-        correctAnswer: 'ny',
-        options: ['ny', 'ng', 'nw', 'nh']
+        type: 'type-answer',
+        question: 'Type "House" in Igbo',
+        questionFr: 'Tapez "Maison" en Igbo',
+        correctAnswer: 'Ụlọ'
       },
       {
         id: 'ig-l2-q17',
-        type: 'multiple-choice',
-        question: 'What is the correct way to write "mm" in Igbo?',
-        questionFr: 'Quelle est la bonne façon d\'écrire "mm" en Igbo?',
-        correctAnswer: 'mm',
-        options: ['mm', 'm', 'mmi', 'mmị']
+        type: 'type-answer',
+        question: 'Type "Mother" in Igbo',
+        questionFr: 'Tapez "Mère" en Igbo',
+        correctAnswer: 'Nne'
       },
       {
         id: 'ig-l2-q18',
         type: 'type-answer',
-        question: 'Type "syllable" in Igbo',
-        questionFr: 'Tapez "syllabe" en Igbo',
-        correctAnswer: 'Mkpụrụokwu'
+        question: 'Type "Father" in Igbo',
+        questionFr: 'Tapez "Père" en Igbo',
+        correctAnswer: 'Nna'
       },
       {
         id: 'ig-l2-q19',
-        type: 'multiple-choice',
-        question: 'Which combination represents the "kw" sound?',
-        questionFr: 'Quelle combinaison représente le son "kw"?',
-        correctAnswer: 'kw',
-        options: ['kw', 'qw', 'cw', 'hw']
+        type: 'type-answer',
+        question: 'Type "Friend" in Igbo',
+        questionFr: 'Tapez "Ami" en Igbo',
+        correctAnswer: 'Enyi'
       },
       {
         id: 'ig-l2-q20',
-        type: 'multiple-choice',
-        question: 'What does "ụ" represent?',
-        questionFr: 'Que représente "ụ"?',
-        correctAnswer: 'Open u sound',
-        options: ['Open u sound', 'Closed u sound', 'Long u', 'Short u']
+        type: 'type-answer',
+        question: 'Type "Goodbye" in Igbo',
+        questionFr: 'Tapez "Au revoir" en Igbo',
+        correctAnswer: 'Ka ọ dị'
       }
     ]
   },
-
-  // Note: Due to the massive size (100 lessons × 20 questions = 2000 questions),
-  // I'll create a pattern-based structure. Let me continue with key lessons and create
-  // a template that can be expanded. For now, I'll create Lessons 3-20 in a condensed
-  // but complete format, then provide the framework for lessons 21-100.
 
   // Lesson 3: Igbo Vowels and Consonant Sounds
   {
@@ -360,157 +341,143 @@ export const igboLessons: Lesson[] = [
     exercises: [
       {
         id: 'ig-l3-q1',
-        type: 'multiple-choice',
-        question: 'How many basic vowels does Igbo have?',
-        questionFr: 'Combien de voyelles de base l\'Igbo a-t-il?',
-        correctAnswer: '8',
-        options: ['5', '6', '8', '10']
+        type: 'type-answer',
+        question: 'Type "I speak Igbo" in Igbo',
+        questionFr: 'Tapez "Je parle Igbo" en Igbo',
+        correctAnswer: 'Ana m asụ Igbo'
       },
       {
         id: 'ig-l3-q2',
-        type: 'multiple-choice',
-        question: 'What are the Igbo vowels?',
-        questionFr: 'Quelles sont les voyelles Igbo?',
-        correctAnswer: 'a, e, i, ị, o, ọ, u, ụ',
-        options: ['a, e, i, o, u', 'a, e, i, ị, o, ọ, u, ụ', 'a, e, i, o, ọ, u', 'a, ị, ọ, ụ']
+        type: 'type-answer',
+        question: 'Type "Hello" in Igbo',
+        questionFr: 'Tapez "Bonjour" en Igbo',
+        correctAnswer: 'Ndewo'
       },
       {
         id: 'ig-l3-q3',
         type: 'type-answer',
-        question: 'Type "vowel" in Igbo',
-        questionFr: 'Tapez "voyelle" en Igbo',
-        correctAnswer: 'Mkpụrụụdaume'
+        question: 'Type "How are you?" in Igbo',
+        questionFr: 'Tapez "Comment vas-tu?" en Igbo',
+        correctAnswer: 'Kedu ka ị mere'
       },
       {
         id: 'ig-l3-q4',
-        type: 'multiple-choice',
-        question: 'What is the difference between "i" and "ị"?',
-        questionFr: 'Quelle est la différence entre "i" et "ị"?',
-        correctAnswer: 'i is closed, ị is open',
-        options: ['i is closed, ị is open', 'i is long, ị is short', 'i is high tone, ị is low', 'No difference']
+        type: 'type-answer',
+        question: 'Type "I am fine" in Igbo',
+        questionFr: 'Tapez "Je vais bien" en Igbo',
+        correctAnswer: 'Adị m mma'
       },
       {
         id: 'ig-l3-q5',
-        type: 'multiple-choice',
-        question: 'Which consonant combination makes a unique Igbo sound?',
-        questionFr: 'Quelle combinaison de consonnes fait un son Igbo unique?',
-        correctAnswer: 'kp',
-        options: ['kp', 'pt', 'kt', 'td']
+        type: 'type-answer',
+        question: 'Type "Thank you" in Igbo',
+        questionFr: 'Tapez "Merci" en Igbo',
+        correctAnswer: 'Daalụ'
       },
       {
         id: 'ig-l3-q6',
         type: 'type-answer',
-        question: 'Type "consonant" in Igbo',
-        questionFr: 'Tapez "consonne" en Igbo',
-        correctAnswer: 'Mkpụrụụda'
+        question: 'Type "Yes" in Igbo',
+        questionFr: 'Tapez "Oui" en Igbo',
+        correctAnswer: 'Ee'
       },
       {
         id: 'ig-l3-q7',
-        type: 'multiple-choice',
-        question: 'What sound does "gb" make?',
-        questionFr: 'Quel son fait "gb"?',
-        correctAnswer: 'Labial-velar plosive',
-        options: ['Labial-velar plosive', 'Dental fricative', 'Palatal nasal', 'Alveolar stop']
+        type: 'type-answer',
+        question: 'Type "No" in Igbo',
+        questionFr: 'Tapez "Non" en Igbo',
+        correctAnswer: 'Mba'
       },
       {
         id: 'ig-l3-q8',
-        type: 'multiple-choice',
-        question: 'How is "ọ" pronounced?',
-        questionFr: 'Comment "ọ" est-il prononcé?',
-        correctAnswer: 'Open mid-back vowel',
-        options: ['Open mid-back vowel', 'Closed mid-back vowel', 'High front vowel', 'Low central vowel']
+        type: 'type-answer',
+        question: 'Type "Please" in Igbo',
+        questionFr: 'Tapez "S\'il vous plaît" en Igbo',
+        correctAnswer: 'Biko'
       },
       {
         id: 'ig-l3-q9',
         type: 'type-answer',
-        question: 'Type "sound" in Igbo',
-        questionFr: 'Tapez "son" en Igbo',
-        correctAnswer: 'Ụda'
+        question: 'Type "Good morning" in Igbo',
+        questionFr: 'Tapez "Bonjour (matin)" en Igbo',
+        correctAnswer: 'Ụtụtụ ọma'
       },
       {
         id: 'ig-l3-q10',
-        type: 'multiple-choice',
-        question: 'What does "ch" represent in Igbo?',
-        questionFr: 'Que représente "ch" en Igbo?',
-        correctAnswer: 'Palato-alveolar affricate',
-        options: ['Palato-alveolar affricate', 'Dental fricative', 'Velar stop', 'Bilabial nasal']
+        type: 'type-answer',
+        question: 'Type "Good night" in Igbo',
+        questionFr: 'Tapez "Bonne nuit" en Igbo',
+        correctAnswer: 'Ka chi fo'
       },
       {
         id: 'ig-l3-q11',
-        type: 'multiple-choice',
-        question: 'Which is an example of a consonant cluster?',
-        questionFr: 'Quel est un exemple de groupe de consonnes?',
-        correctAnswer: 'kp',
-        options: ['kp', 'ab', 'ei', 'ou']
+        type: 'type-answer',
+        question: 'Type "My name is" in Igbo',
+        questionFr: 'Tapez "Je m\'appelle" en Igbo',
+        correctAnswer: 'Aha m bụ'
       },
       {
         id: 'ig-l3-q12',
         type: 'type-answer',
-        question: 'Type "letter" in Igbo',
-        questionFr: 'Tapez "lettre" en Igbo',
-        correctAnswer: 'Mkpụrụedemede'
+        question: 'Type "What is your name?" in Igbo',
+        questionFr: 'Tapez "Comment tu t\'appelles?" en Igbo',
+        correctAnswer: 'Kedu aha gị'
       },
       {
         id: 'ig-l3-q13',
-        type: 'multiple-choice',
-        question: 'What sound does "ny" make?',
-        questionFr: 'Quel son fait "ny"?',
-        correctAnswer: 'Palatal nasal',
-        options: ['Palatal nasal', 'Velar nasal', 'Alveolar nasal', 'Bilabial nasal']
+        type: 'type-answer',
+        question: 'Type "I love you" in Igbo',
+        questionFr: 'Tapez "Je t\'aime" en Igbo',
+        correctAnswer: 'A hụrụ m gị n\'anya'
       },
       {
         id: 'ig-l3-q14',
-        type: 'multiple-choice',
-        question: 'How is "ụ" different from "u"?',
-        questionFr: 'Comment "ụ" diffère-t-il de "u"?',
-        correctAnswer: 'ụ is open, u is closed',
-        options: ['ụ is open, u is closed', 'ụ is long, u is short', 'ụ is high tone, u is low', 'No difference']
+        type: 'type-answer',
+        question: 'Type "Water" in Igbo',
+        questionFr: 'Tapez "Eau" en Igbo',
+        correctAnswer: 'Mmiri'
       },
       {
         id: 'ig-l3-q15',
         type: 'type-answer',
-        question: 'Type "pronunciation" in Igbo',
-        questionFr: 'Tapez "prononciation" en Igbo',
-        correctAnswer: 'Mkpọpụta'
+        question: 'Type "Food" in Igbo',
+        questionFr: 'Tapez "Nourriture" en Igbo',
+        correctAnswer: 'Nri'
       },
       {
         id: 'ig-l3-q16',
-        type: 'multiple-choice',
-        question: 'What does "sh" represent?',
-        questionFr: 'Que représente "sh"?',
-        correctAnswer: 'Palato-alveolar fricative',
-        options: ['Palato-alveolar fricative', 'Dental fricative', 'Velar stop', 'Bilabial nasal']
+        type: 'type-answer',
+        question: 'Type "House" in Igbo',
+        questionFr: 'Tapez "Maison" en Igbo',
+        correctAnswer: 'Ụlọ'
       },
       {
         id: 'ig-l3-q17',
-        type: 'multiple-choice',
-        question: 'Which combination makes the "ng" sound?',
-        questionFr: 'Quelle combinaison fait le son "ng"?',
-        correctAnswer: 'ng',
-        options: ['ng', 'nk', 'nc', 'nt']
+        type: 'type-answer',
+        question: 'Type "Mother" in Igbo',
+        questionFr: 'Tapez "Mère" en Igbo',
+        correctAnswer: 'Nne'
       },
       {
         id: 'ig-l3-q18',
         type: 'type-answer',
-        question: 'Type "speech" in Igbo',
-        questionFr: 'Tapez "parole" en Igbo',
-        correctAnswer: 'Okwu'
+        question: 'Type "Father" in Igbo',
+        questionFr: 'Tapez "Père" en Igbo',
+        correctAnswer: 'Nna'
       },
       {
         id: 'ig-l3-q19',
-        type: 'multiple-choice',
-        question: 'What is the correct pronunciation of "mm"?',
-        questionFr: 'Quelle est la prononciation correcte de "mm"?',
-        correctAnswer: 'Long nasal m',
-        options: ['Long nasal m', 'Short m', 'Double m', 'Silent m']
+        type: 'type-answer',
+        question: 'Type "Friend" in Igbo',
+        questionFr: 'Tapez "Ami" en Igbo',
+        correctAnswer: 'Enyi'
       },
       {
         id: 'ig-l3-q20',
-        type: 'multiple-choice',
-        question: 'How many consonant sounds does Igbo have?',
-        questionFr: 'Combien de sons consonantiques l\'Igbo a-t-il?',
-        correctAnswer: 'Over 30',
-        options: ['20', '25', 'Over 30', '35']
+        type: 'type-answer',
+        question: 'Type "Goodbye" in Igbo',
+        questionFr: 'Tapez "Au revoir" en Igbo',
+        correctAnswer: 'Ka ọ dị'
       }
     ]
   },
