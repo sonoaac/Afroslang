@@ -965,6 +965,54 @@
   aspect-ratio: 7 / 11;
   max-height: 740px;
 }
+
+/* ── Map country state classes ── */
+/* Default: all countries greyscale until unlocked */
+.lp-africa-map .af-country {
+  transition: filter 0.4s ease, opacity 0.4s ease, stroke-width 0.12s;
+}
+.lp-africa-map .af-locked {
+  filter: grayscale(1) brightness(0.75) !important;
+  opacity: 0.7 !important;
+}
+.lp-africa-map .af-unlocked {
+  filter: none !important;
+  opacity: 1 !important;
+}
+.lp-africa-map .af-no-interact {
+  filter: grayscale(1) brightness(0.5) !important;
+  opacity: 0.35 !important;
+  pointer-events: none;
+}
+/* Hover — locked stays B&W, unlocked glows */
+.lp-africa-map .af-locked.af-hover {
+  filter: grayscale(1) brightness(0.95) !important;
+  opacity: 0.9 !important;
+}
+.lp-africa-map .af-unlocked.af-hover {
+  filter: brightness(1.35) saturate(1.2) !important;
+}
+/* Active (clicked) */
+.lp-africa-map .af-locked.af-active {
+  filter: grayscale(1) brightness(0.95) !important;
+  opacity: 1 !important;
+}
+.lp-africa-map .af-unlocked.af-active {
+  filter: brightness(1.3) !important;
+}
+/* Search states */
+.lp-africa-map .af-search-match.af-locked {
+  filter: grayscale(1) brightness(1.1) !important;
+  opacity: 1 !important;
+}
+.lp-africa-map .af-search-match.af-unlocked {
+  filter: brightness(1.4) saturate(1.2) !important;
+  opacity: 1 !important;
+}
+.lp-africa-map .af-search-dim {
+  opacity: 0.08 !important;
+  filter: grayscale(1) brightness(0.4) !important;
+}
 .lp-africa-map-tooltip {
   position: fixed;
   background: #1a1d23;
