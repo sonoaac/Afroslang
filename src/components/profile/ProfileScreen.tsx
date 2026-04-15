@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { AfricanLanguage, InterfaceLanguage, UserProgress } from '../../types';
 import { getLanguageById } from '../../data/languages';
+import { AVATARS, BACKGROUNDS } from '../../utils/currencyUtils';
 import './ProfileScreen.css';
 
 interface ProfileScreenProps {
@@ -11,6 +12,7 @@ interface ProfileScreenProps {
   onBack: () => void;
   onContinueLearning: (languageId: string) => void;
   onChangeInterfaceLanguage: (lang: InterfaceLanguage) => void;
+  onGoToShop?: () => void;
 }
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({
@@ -20,21 +22,29 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   onBack,
   onContinueLearning,
   onChangeInterfaceLanguage,
+  onGoToShop,
 }) => {
-  const { user, userData, isGuest, logout } = useAuth();
+  const { user, userData, isGuest, logout, equipItem } = useAuth();
   const [signingOut, setSigningOut] = useState(false);
   const [showConfirmLogout, setShowConfirmLogout] = useState(false);
+  const [equipping, setEquipping] = useState<string | null>(null);
 
-  const username = userData?.username || user?.displayName || (isGuest ? 'Guest' : 'User');
-  const email    = userData?.email    || user?.email    || '';
-  const initials = username.slice(0, 2).toUpperCase();
+  const username   = userData?.username || user?.displayName || (isGuest ? 'Guest' : 'User');
+  const email      = userData?.email    || user?.email    || '';
+  const initials   = username.slice(0, 2).toUpperCase();
+  const isPremium  = userData?.subscription?.active ?? false;
+
+  const equippedAvatarId = userData?.equippedAvatar ?? 'avatar_default';
+  const equippedBgId     = userData?.equippedBackground ?? 'bg_default';
+  const ownedAvatars     = userData?.ownedAvatars     ?? ['avatar_default'];
+  const ownedBackgrounds = userData?.ownedBackgrounds ?? ['bg_default'];
+
+  const equippedAvatarItem = AVATARS.find(a => a.id === equippedAvatarId) ?? AVATARS[0];
 
   const totalXP       = userData?.xp ?? 0;
   const totalLessons  = Object.values(userProgressMap).reduce((sum, p) => sum + (p.lessonsCompleted ?? 0), 0);
   const highestStreak = Object.values(userProgressMap).reduce((max, p) => Math.max(max, p.streak ?? 0), 0);
-  const isPremium     = userData?.subscription?.active ?? false;
 
-  // Languages with progress, most-recently-active first (most XP first as proxy)
   const activeLanguages = Object.entries(userProgressMap)
     .filter(([, p]) => (p.completedLessons?.length ?? 0) > 0)
     .sort(([, a], [, b]) => (b.xp ?? 0) - (a.xp ?? 0));
@@ -42,6 +52,15 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const resumeLanguage = currentLanguage ?? (activeLanguages[0]?.[0] as AfricanLanguage | undefined) ?? null;
   const resumeProgress = resumeLanguage ? userProgressMap[resumeLanguage] : null;
   const resumeLangMeta = resumeLanguage ? getLanguageById(resumeLanguage) : null;
+
+  const handleEquip = async (itemId: string, type: 'avatar' | 'background') => {
+    if (isGuest || !user) return;
+    const ownedList = type === 'avatar' ? ownedAvatars : ownedBackgrounds;
+    if (!ownedList.includes(itemId)) { onGoToShop?.(); return; }
+    setEquipping(itemId);
+    await equipItem(itemId, type);
+    setEquipping(null);
+  };
 
   const handleLogout = async () => {
     setSigningOut(true);
@@ -67,7 +86,10 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         {/* Avatar + identity */}
         <div className="ps-identity">
           <div className="ps-avatar">
-            <span className="ps-avatar-initials">{initials}</span>
+            {equippedAvatarItem.id === 'avatar_default'
+              ? <span className="ps-avatar-initials">{initials}</span>
+              : <span className="ps-avatar-emoji">{equippedAvatarItem.emoji}</span>
+            }
             {isPremium && <span className="ps-avatar-crown" aria-label="Premium">👑</span>}
           </div>
           <h2 className="ps-username">{username}</h2>
@@ -94,6 +116,68 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             <span className="ps-stat-label">Lessons</span>
           </div>
         </div>
+
+        {/* Avatar customisation */}
+        {!isGuest && (
+          <div className="ps-section">
+            <h3 className="ps-section-title">Avatar</h3>
+            <div className="ps-cosmetic-grid">
+              {AVATARS.map(avatar => {
+                const owned    = ownedAvatars.includes(avatar.id);
+                const equipped = equippedAvatarId === avatar.id;
+                const busy     = equipping === avatar.id;
+                return (
+                  <button
+                    key={avatar.id}
+                    className={`ps-cosmetic-item${equipped ? ' ps-cosmetic-item--equipped' : ''}${!owned ? ' ps-cosmetic-item--locked' : ''}`}
+                    onClick={() => handleEquip(avatar.id, 'avatar')}
+                    disabled={busy}
+                    title={owned ? avatar.name : `${avatar.name} — ${avatar.price} SB`}
+                  >
+                    <span className="ps-cosmetic-emoji">{avatar.emoji}</span>
+                    <span className="ps-cosmetic-name">{avatar.name}</span>
+                    {equipped && <span className="ps-cosmetic-check">✓</span>}
+                    {!owned && <span className="ps-cosmetic-lock">🔒</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Background customisation */}
+        {!isGuest && (
+          <div className="ps-section">
+            <h3 className="ps-section-title">Background</h3>
+            <div className="ps-cosmetic-grid">
+              {BACKGROUNDS.map(bg => {
+                const owned    = ownedBackgrounds.includes(bg.id);
+                const equipped = equippedBgId === bg.id;
+                const busy     = equipping === bg.id;
+                return (
+                  <button
+                    key={bg.id}
+                    className={`ps-cosmetic-item${equipped ? ' ps-cosmetic-item--equipped' : ''}${!owned ? ' ps-cosmetic-item--locked' : ''}`}
+                    onClick={() => handleEquip(bg.id, 'background')}
+                    disabled={busy}
+                    title={owned ? bg.name : `${bg.name} — ${bg.price} SB`}
+                  >
+                    <span className="ps-cosmetic-emoji">{bg.emoji}</span>
+                    <span className="ps-cosmetic-name">{bg.name}</span>
+                    {equipped && <span className="ps-cosmetic-check">✓</span>}
+                    {!owned && <span className="ps-cosmetic-lock">🔒</span>}
+                  </button>
+                );
+              })}
+            </div>
+            {!isGuest && (
+              <p className="ps-cosmetic-hint">
+                Locked items can be purchased in the{' '}
+                <button className="ps-cosmetic-shop-link" onClick={onGoToShop}>Shop</button>
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Continue Learning */}
         {resumeLanguage && resumeProgress && (
@@ -148,8 +232,6 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         <div className="ps-section">
           <h3 className="ps-section-title">Settings</h3>
           <div className="ps-settings-list">
-
-            {/* Interface language toggle */}
             <div className="ps-setting-row">
               <span className="ps-setting-label">Interface Language</span>
               <div className="ps-lang-toggle">
@@ -163,41 +245,32 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 >FR</button>
               </div>
             </div>
-
             <div className="ps-setting-row ps-setting-row--link">
               <span className="ps-setting-label">Privacy Policy</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <path d="M9 18l6-6-6-6" />
               </svg>
             </div>
-
             <div className="ps-setting-row ps-setting-row--link">
               <span className="ps-setting-label">Terms of Service</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <path d="M9 18l6-6-6-6" />
               </svg>
             </div>
-
           </div>
         </div>
 
         {/* Sign out */}
         <div className="ps-section ps-section--danger">
           {!showConfirmLogout ? (
-            <button
-              className="ps-signout-btn"
-              onClick={() => setShowConfirmLogout(true)}
-              disabled={signingOut}
-            >
+            <button className="ps-signout-btn" onClick={() => setShowConfirmLogout(true)} disabled={signingOut}>
               Sign Out
             </button>
           ) : (
             <div className="ps-confirm-logout">
               <p className="ps-confirm-text">Are you sure you want to sign out?</p>
               <div className="ps-confirm-row">
-                <button className="ps-confirm-cancel" onClick={() => setShowConfirmLogout(false)}>
-                  Cancel
-                </button>
+                <button className="ps-confirm-cancel" onClick={() => setShowConfirmLogout(false)}>Cancel</button>
                 <button className="ps-confirm-yes" onClick={handleLogout} disabled={signingOut}>
                   {signingOut ? 'Signing out…' : 'Yes, Sign Out'}
                 </button>

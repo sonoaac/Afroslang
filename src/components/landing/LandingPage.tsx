@@ -534,7 +534,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
         <h2>Accounts</h2>
         <p>You are responsible for maintaining the confidentiality of your account credentials. You must be at least 13 years old to create an account. We reserve the right to suspend accounts that violate these terms.</p>
         <h2>Subscriptions & Payments</h2>
-        <p>Paid subscriptions are processed through Stripe. The 7-day free trial converts to a paid subscription unless cancelled before the trial ends. Cancellations take effect at the end of the current billing period.</p>
+        <p>Paid subscriptions are processed through Stripe. The 7 day free trial converts to a paid subscription unless cancelled before the trial ends. Cancellations take effect at the end of the current billing period.</p>
         <h2>Charitable Contributions</h2>
         <p>50% of all subscription revenue is donated to vetted African education charities. Afroslang publishes an annual transparency report detailing all charitable disbursements.</p>
         <h2>Limitation of Liability</h2>
@@ -741,22 +741,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
           </div>
         </div>
 
-        {/* Our Mission row */}
-        <div className="lp-stack-row lp-stack-row--right">
-          <div className="lp-stack-row-text">
-            <span className="lp-sand-reveal" style={{ fontFamily: "'Times New Roman', serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em' }}>
-              <span style={{ color: '#b00020' }}>Our</span>{' '}
-              <span style={{ color: '#f5ede0' }}>Mission</span>
-            </span>
-            <p className="lp-sand-reveal">
-              Afroslang main goal is to help and assist descendants<br />
-              and children of the diaspora to maintain their<br />
-              language culture and ancestral sense<br />
-              of knowing
-            </p>
-          </div>
-        </div>
-
         {/* ── Interactive Language Explorer ── */}
         <div
           ref={exploreSectionRef}
@@ -855,6 +839,21 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
           </div>
         </div>
 
+        {/* Our Mission row */}
+        <div className="lp-stack-row lp-stack-row--right">
+          <div className="lp-stack-row-text">
+            <span className="lp-sand-reveal" style={{ fontFamily: "'Times New Roman', serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em' }}>
+              <span style={{ color: '#b00020' }}>Our</span>{' '}
+              <span style={{ color: '#f5ede0' }}>Mission</span>
+            </span>
+            <p className="lp-sand-reveal">
+              Afroslang main goal is to help and assist descendants<br />
+              and children of the diaspora to maintain their<br />
+              language culture and ancestral sense<br />
+              of knowing
+            </p>
+          </div>
+        </div>
 
         {/* Giving Back row */}
         <div className="lp-stack-row lp-stack-row--left">

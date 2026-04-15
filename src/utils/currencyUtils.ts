@@ -62,13 +62,42 @@ export const AVATARS: CosmeticItem[] = [
 ];
 
 export const BACKGROUNDS: CosmeticItem[] = [
-  { id: 'bg_default',   name: 'Default',    emoji: '🌌',  price: 0 },
-  { id: 'bg_savanna',   name: 'Savanna',    emoji: '🌅',  price: 300 },
-  { id: 'bg_market',    name: 'Market',     emoji: '🏪',  price: 250 },
-  { id: 'bg_night',     name: 'Night Sky',  emoji: '🌃',  price: 400 },
-  { id: 'bg_forest',    name: 'Forest',     emoji: '🌿',  price: 200 },
-  { id: 'bg_ocean',     name: 'Ocean',      emoji: '🌊',  price: 350 },
+  { id: 'bg_default',   name: 'Sandy Desert',  emoji: '🏜️',  price: 0 },
+  { id: 'bg_savanna',   name: 'Savanna',        emoji: '🌅',  price: 300 },
+  { id: 'bg_market',    name: 'Night Market',   emoji: '🏮',  price: 250 },
+  { id: 'bg_night',     name: 'Night Sky',      emoji: '🌃',  price: 400 },
+  { id: 'bg_forest',    name: 'Deep Forest',    emoji: '🌿',  price: 200 },
+  { id: 'bg_ocean',     name: 'Ocean Blue',     emoji: '🌊',  price: 350 },
 ];
+
+/** CSS gradient for each background ID, applied to the app root. */
+export function getBackgroundStyle(bgId: string | undefined): string {
+  switch (bgId) {
+    case 'bg_savanna':
+      return 'radial-gradient(1200px 700px at 50% 80%, rgba(244,163,0,0.28) 0%, rgba(0,0,0,0) 65%), linear-gradient(160deg, #0d0400 0%, #1a0800 45%, #0a0300 100%)';
+    case 'bg_market':
+      return 'radial-gradient(900px 500px at 30% 40%, rgba(220,60,0,0.22) 0%, rgba(0,0,0,0) 60%), linear-gradient(135deg, #0a0000 0%, #1a0505 50%, #050000 100%)';
+    case 'bg_night':
+      return 'radial-gradient(1000px 600px at 70% 10%, rgba(50,80,200,0.18) 0%, rgba(0,0,0,0) 65%), linear-gradient(160deg, #000008 0%, #00000f 55%, #000003 100%)';
+    case 'bg_forest':
+      return 'radial-gradient(900px 600px at 20% 60%, rgba(0,130,50,0.18) 0%, rgba(0,0,0,0) 65%), linear-gradient(150deg, #000500 0%, #001000 50%, #000300 100%)';
+    case 'bg_ocean':
+      return 'radial-gradient(1000px 600px at 60% 20%, rgba(0,100,200,0.18) 0%, rgba(0,0,0,0) 65%), linear-gradient(145deg, #000508 0%, #000f18 50%, #000305 100%)';
+    default: // bg_default — Sandy Desert (current default dark warm)
+      return 'radial-gradient(1200px 600px at 25% 20%, rgba(176, 0, 32, 0.35) 0%, rgba(0,0,0,0) 60%), linear-gradient(135deg, #000000 0%, #120007 55%, #000000 100%)';
+  }
+}
+
+/** Equip an already-owned cosmetic item without spending currency. */
+export async function equipCosmetic(
+  userId: string,
+  itemId: string,
+  type: 'avatar' | 'background',
+): Promise<Partial<UserData>> {
+  const equippedKey = type === 'avatar' ? 'equippedAvatar' : 'equippedBackground';
+  await updateDoc(doc(db, 'users', userId), { [equippedKey]: itemId });
+  return { [equippedKey]: itemId };
+}
 
 // ── 2× XP — Plus perk only (not a purchasable item) ───────────────────────
 /** Returns true if the user has an active AfroPlus subscription. */

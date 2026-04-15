@@ -42,7 +42,7 @@ export const PREMIUM_FEATURES = [
   {
     icon: '❤️',
     title: 'Unlimited Hearts',
-    description: 'Never run out of hearts - learn without limits!'
+    description: 'Never run out of hearts. Learn without limits!'
   },
   {
     icon: '⚡',

@@ -382,10 +382,108 @@
 .ps-confirm-yes:hover { background: #cc0025; }
 .ps-confirm-yes:disabled { opacity: 0.6; cursor: not-allowed; }
 
+/* Avatar emoji (equipped non-default avatar) */
+.ps-avatar-emoji {
+  font-size: 2.6rem;
+  line-height: 1;
+}
+
+/* Cosmetic grid */
+.ps-cosmetic-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.ps-cosmetic-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 14px 8px 10px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(255,255,255,0.08);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  min-height: 80px;
+}
+.ps-cosmetic-item:hover:not(:disabled) {
+  background: rgba(255,255,255,0.09);
+  border-color: rgba(255,255,255,0.18);
+}
+.ps-cosmetic-item:active:not(:disabled) { transform: scale(0.96); }
+.ps-cosmetic-item:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.ps-cosmetic-item--equipped {
+  background: rgba(176,0,32,0.18);
+  border-color: rgba(176,0,32,0.7);
+}
+
+.ps-cosmetic-item--locked {
+  opacity: 0.55;
+}
+.ps-cosmetic-item--locked:hover:not(:disabled) {
+  opacity: 0.75;
+  border-color: rgba(255,255,255,0.2);
+}
+
+.ps-cosmetic-emoji {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.ps-cosmetic-name {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.ps-cosmetic-check {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 0.65rem;
+  color: #b00020;
+  font-weight: 900;
+}
+
+.ps-cosmetic-lock {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  font-size: 0.65rem;
+}
+
+.ps-cosmetic-hint {
+  margin: 6px 0 0;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.35);
+  text-align: center;
+}
+
+.ps-cosmetic-shop-link {
+  background: none;
+  border: none;
+  color: rgba(176,0,32,0.85);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
 /* Responsive: tablet+ */
 @media (min-width: 480px) {
   .ps-body { padding: 36px 28px 60px; }
   .ps-avatar { width: 96px; height: 96px; }
   .ps-avatar-initials { font-size: 2.4rem; }
+  .ps-avatar-emoji { font-size: 3rem; }
   .ps-username { font-size: 1.5rem; }
+  .ps-cosmetic-grid { grid-template-columns: repeat(4, 1fr); }
 }

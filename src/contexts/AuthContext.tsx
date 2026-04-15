@@ -3,6 +3,7 @@ import { User, onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import { UserData, loadUserData, createGuestUser, saveGuestProgress } from '../utils/userData';
 import { getCurrentHeartsStatus } from '../utils/heartsTimer';
+import { equipCosmetic } from '../utils/currencyUtils';
 
 interface AuthContextType {
   user: User | null;
@@ -13,6 +14,7 @@ interface AuthContextType {
   setUserData: (data: UserData) => void;
   setGuestMode: (isGuest: boolean) => void;
   refreshUserData: () => Promise<void>;
+  equipItem: (itemId: string, type: 'avatar' | 'background') => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -104,6 +106,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const equipItem = async (itemId: string, type: 'avatar' | 'background') => {
+    if (!user || !userData) return;
+    const update = await equipCosmetic(user.uid, itemId, type);
+    handleSetUserData({ ...userData, ...update } as UserData);
+  };
+
   const value: AuthContextType = {
     user,
     userData,
@@ -113,6 +121,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUserData: handleSetUserData,
     setGuestMode: handleSetGuestMode,
     refreshUserData,
+    equipItem,
   };
 
   return (

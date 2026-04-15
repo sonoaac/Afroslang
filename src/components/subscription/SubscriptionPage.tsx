@@ -188,7 +188,7 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({ onBack }) =>
               <div style={{ color: subText, fontFamily: subFont, fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>$5.99</div>
               <div style={{ color: subMuted, fontSize: '0.82rem', fontFamily: subFont, marginBottom: '0.75rem' }}>per month</div>
               <div style={{ background: 'rgba(176,0,32,0.2)', border: `1px solid rgba(176,0,32,0.4)`, color: '#fca5a5', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0.3rem 0.75rem', display: 'inline-block', marginBottom: '1rem', fontFamily: subFont }}>
-                7-day FREE trial
+                7 Day FREE trial
               </div>
               <div style={{ background: selectedPlan === 'monthly' ? subRed : 'transparent', border: `1px solid ${selectedPlan === 'monthly' ? subRed : subBorder}`, color: subText, fontFamily: subFont, fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0.5rem 1rem', cursor: 'pointer', transition: 'all 0.2s' }}>
                 {selectedPlan === 'monthly' ? 'Selected' : 'Select Monthly'}
@@ -207,7 +207,7 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({ onBack }) =>
               <div style={{ color: subText, fontFamily: subFont, fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>$39.99</div>
               <div style={{ color: subMuted, fontSize: '0.82rem', fontFamily: subFont, marginBottom: '0.5rem' }}>per year</div>
               <div style={{ background: 'rgba(176,0,32,0.2)', border: `1px solid rgba(176,0,32,0.4)`, color: '#fca5a5', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0.3rem 0.75rem', display: 'inline-block', marginBottom: '0.5rem', fontFamily: subFont }}>
-                7-day FREE trial
+                7 Day FREE trial
               </div>
               <div style={{ color: '#86efac', fontSize: '0.82rem', fontFamily: subFont, marginBottom: '1rem' }}>Save $32.89/year</div>
               <div style={{ background: selectedPlan === 'yearly' ? subRed : 'transparent', border: `1px solid ${selectedPlan === 'yearly' ? subRed : subBorder}`, color: subText, fontFamily: subFont, fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0.5rem 1rem', cursor: 'pointer', transition: 'all 0.2s' }}>

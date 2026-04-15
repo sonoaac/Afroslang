@@ -19,7 +19,7 @@ import { getLanguageById } from './data/languages';
 import { getStagesForLanguage } from './data/lessons';
 import { saveUserProgress } from './utils/userData';
 import { addWeeklyXP, getCurrentWeekIdFromDB, getUserLeague } from './utils/leaderboardUtils';
-import { isXpBoostActive } from './utils/currencyUtils';
+import { isXpBoostActive, getBackgroundStyle } from './utils/currencyUtils';
 
 type Screen = 'auth' | 'interface-select' | 'path' | 'lesson' | 'complete' | 'leaderboard' | 'subscription' | 'payment-success' | 'feedback' | 'shop' | 'latest-news' | 'profile';
 
@@ -405,8 +405,10 @@ function App() {
     );
   }
 
+  const appBg = getBackgroundStyle(userData?.equippedBackground);
+
   return (
-    <>
+    <div style={{ minHeight: '100dvh', background: appBg }}>
       <GlCanvas />
 
       {currentScreen === 'path' && currentLanguage && (
@@ -509,9 +511,10 @@ function App() {
           onBack={() => setCurrentScreen('path')}
           onContinueLearning={handleLanguageToLearnSelect}
           onChangeInterfaceLanguage={setInterfaceLanguage}
+          onGoToShop={() => setCurrentScreen('shop')}
         />
       )}
-    </>
+    </div>
   );
 }
 

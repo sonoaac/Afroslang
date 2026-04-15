@@ -54,8 +54,9 @@ export const HeartsOutModal: React.FC<HeartsOutModalProps> = ({
       <div
         style={{
           position: 'fixed', inset: 0, zIndex: 9999,
-          background: 'rgba(0,0,0,0.45)',
-          backdropFilter: 'none',
+          background: 'rgba(0,0,0,0.3)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: '1rem',
         }}
@@ -81,7 +82,7 @@ export const HeartsOutModal: React.FC<HeartsOutModalProps> = ({
           {/* Inner card */}
           <div
             style={{
-              background: 'transparent',
+              background: 'rgba(8, 0, 3, 0.72)',
               borderRadius: 30,
               padding: '2rem 1.75rem',
               position: 'relative',

@@ -40,7 +40,9 @@ export const TrialOfferModal: React.FC<TrialOfferModalProps> = ({
           maxWidth: 420,
           margin: '0 16px',
           borderRadius: 20,
-          background: 'linear-gradient(135deg, #1a0008 0%, #0d0d0d 100%)',
+          background: 'rgba(8, 0, 3, 0.72)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
           border: '1px solid rgba(176,0,32,0.45)',
           boxShadow: '0 -4px 40px rgba(176,0,32,0.25), 0 8px 32px rgba(0,0,0,0.7)',
           padding: '20px 20px 18px',
@@ -108,7 +110,7 @@ export const TrialOfferModal: React.FC<TrialOfferModalProps> = ({
           onMouseEnter={e => (e.currentTarget.style.opacity = '0.9')}
           onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
         >
-          👑 Start 7-Day Free Trial
+          👑 Start 7 Day Free Trial
         </button>
 
         <p style={{
