@@ -1738,8 +1738,18 @@
   /* Hide mascot bird on mobile */
   .lp-stack-logo-wrap { display: none; }
 
-  /* Stack logo above tagline on mobile */
+  /* Allow sticky to work inside lp-stack on mobile */
+  .lp-stack { overflow: visible; }
+
+  /* Sticky hero row — stays pinned below the header as body scrolls */
   .lp-stack-hero-row {
+    position: sticky;
+    top: 68px;
+    z-index: 90;
+    background: transparent;
+    backdrop-filter: none;
+    margin-bottom: 0;
+    padding: 10px 20px;
     flex-direction: column;
     align-items: center;
     text-align: center;
@@ -1749,7 +1759,7 @@
   .lp-stack-logo-wrap { margin-bottom: 0; }
   .lp-stack-logo { width: 140px; height: 140px; }
   .lp-stack-tagline {
-    font-size: clamp(1.3rem, 5vw, 1.6rem);
+    font-size: clamp(1.1rem, 4.5vw, 1.4rem);
     text-align: center;
   }
 
