@@ -163,6 +163,7 @@
 
 /* Logo wrap */
 .lp-stack-logo-wrap {
+  display: none;
   position: relative;
   z-index: 10;
   display: inline-flex;
@@ -288,6 +289,13 @@
   flex-wrap: wrap;
   justify-content: center;
 }
+
+/* ── Hero word colour splits ── */
+/* AFROSLANG: chars 1–4 = AFRO (white, inherited), chars 5–9 = SLANG (red) */
+.dsc-afroslang .dsc-char:nth-child(n+5) { color: #b00020; }
+
+/* REKINDLE: chars 1–2 = RE (red), chars 3–8 = KINDLE (white, inherited) */
+.dsc-rekindle .dsc-char:nth-child(-n+2) { color: #b00020; }
 
 /* "I have an account" — outlined ghost button */
 .lp-btn-hero-ghost {
@@ -1833,6 +1841,16 @@
     padding: 16px 20px;
     font-size: 0.95rem;
   }
+  .lp-btn-hero-ghost {
+    border: 2px solid #000;
+    color: #000;
+    background: rgba(255, 255, 255, 0.88);
+  }
+  .lp-btn-hero-ghost:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: #000;
+    color: #000;
+  }
   .lp-btn-guest-text { font-size: 0.8rem; }
 
   /* Mission/Giving Back rows — keep side-by-side on mobile, just scaled down */
@@ -1863,35 +1881,17 @@
   .lp-stack-row-label { font-size: 0.62rem; padding: 3px 8px; margin-bottom: 6px; }
   .lp-stack-row-text h2 { font-size: 1rem; margin-bottom: 8px; }
 
-  /* Feature blocks at tablet-mobile widths: stack image above text, centered */
+  /* Feature blocks — preserve desktop alignment, just scale down */
   .lp-feature-block {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 40px 24px;
-    margin-left: 0;
-    margin-right: 0;
-    gap: 24px;
+    padding: 28px 20px;
+    gap: 16px;
   }
-  .lp-feature-block--left,
-  .lp-feature-block--right {
-    align-items: center;
-    text-align: center;
-    margin-left: 0;
-    margin-right: 0;
-  }
-  .lp-feature-block .lp-stack-row-text,
-  .lp-feature-block .lp-stack-row-text--left,
-  .lp-feature-block .lp-stack-row-text--right {
-    align-items: center;
-    text-align: center;
-    padding: 0;
-    margin: 0;
-    flex: unset;
-  }
-  .lp-feature-block .lp-stack-row-text p { font-size: 1rem; max-width: 88vw; line-height: 1.55; }
-  .lp-feature-img-wrap { justify-content: center; width: 100%; }
-  .lp-afroplus-img { width: 130px; height: 130px; border-radius: 20px; }
+  .lp-feature-block--left { margin-left: 4vw; }
+  .lp-feature-block--right { margin-right: 4vw; }
+  .lp-feature-block .lp-sand-reveal[style] { font-size: 1.15rem !important; }
+  .lp-feature-block .lp-stack-row-text p { font-size: 0.92rem; max-width: 92vw; line-height: 1.5; }
+  .lp-afroplus-img { width: 110px; height: 110px; border-radius: 18px; }
+  .lp-feature-img-wrap svg { width: 110px !important; height: 110px !important; }
 
   /* Explorer section */
   .lp-explore-section { padding: 40px 16px 32px; }
@@ -1925,42 +1925,15 @@
   }
   .lp-stack-top { padding: 48px 16px 40px; }
 
-  /* Feature blocks: image above text, centered, full width */
+  /* Feature blocks — preserve desktop alignment, scale down for small mobile */
   .lp-feature-block {
-    align-items: center;
-    text-align: center;
-    padding: 32px 20px;
-    margin-left: 0;
-    margin-right: 0;
-    gap: 20px;
+    padding: 24px 16px;
+    gap: 14px;
   }
-  .lp-feature-block--left,
-  .lp-feature-block--right {
-    align-items: center;
-    text-align: center;
-    margin-left: 0;
-    margin-right: 0;
-  }
-  .lp-feature-block .lp-stack-row-text,
-  .lp-feature-block .lp-stack-row-text--left,
-  .lp-feature-block .lp-stack-row-text--right {
-    align-items: center;
-    text-align: center;
-    padding: 0;
-    margin: 0;
-  }
-  .lp-feature-block .lp-stack-row-text p {
-    font-size: 1rem;
-    max-width: 88vw;
-    line-height: 1.55;
-  }
-  .lp-feature-img-wrap {
-    justify-content: center;
-    width: 100%;
-  }
-  .lp-afroplus-img {
-    width: 120px;
-    height: 120px;
-    border-radius: 18px;
-  }
+  .lp-feature-block--left { margin-left: 3vw; }
+  .lp-feature-block--right { margin-right: 3vw; }
+  .lp-feature-block .lp-sand-reveal[style] { font-size: 1.1rem !important; }
+  .lp-feature-block .lp-stack-row-text p { font-size: 0.88rem; max-width: 92vw; line-height: 1.5; }
+  .lp-afroplus-img { width: 90px; height: 90px; border-radius: 16px; }
+  .lp-feature-img-wrap svg { width: 90px !important; height: 90px !important; }
 }

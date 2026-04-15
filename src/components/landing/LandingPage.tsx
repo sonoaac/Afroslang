@@ -708,11 +708,11 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               />
             </div>
             <p className="lp-stack-tagline">
-              <span className="lp-blood-text" style={{ color: '#b00020', display: 'block', fontWeight: 800, fontSize: '2em', lineHeight: 1.05, letterSpacing: '0.04em', animationDelay: '1.4s' }}>
-                <DescrambleText chars={AFROSLANG_CHARS} />
+              <span className="lp-blood-text" style={{ color: '#ffffff', display: 'block', fontWeight: 800, fontSize: '2em', lineHeight: 1.05, letterSpacing: '0.04em', animationDelay: '1.4s' }}>
+                <DescrambleText chars={AFROSLANG_CHARS} className="dsc-afroslang" />
               </span>
               <span className="lp-blood-text" style={{ color: '#ffffff', display: 'block', fontWeight: 800, fontSize: '2em', lineHeight: 1.05, letterSpacing: '0.04em', animationDelay: '2.9s' }}>
-                <DescrambleText chars={REKINDLE_CHARS} startDelay={REKINDLE_START} />
+                <DescrambleText chars={REKINDLE_CHARS} startDelay={REKINDLE_START} className="dsc-rekindle" />
               </span>
               <span
                 className="lp-tagline-sub lp-blood-text"
