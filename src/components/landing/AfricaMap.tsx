@@ -120,9 +120,26 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
         .style('display', 'block');
 
       const defs = svg.append('defs');
-      const filt = defs.append('filter').attr('id', 'afmap-shadow')
+
+      // SVG grayscale filter — works on all mobile browsers (more reliable than CSS filter)
+      const grayFilt = defs.append('filter').attr('id', 'afmap-gray');
+      grayFilt.append('feColorMatrix')
+        .attr('type', 'saturate')
+        .attr('values', '0');
+      grayFilt.append('feComponentTransfer').append('feFuncR')
+        .attr('type', 'linear').attr('slope', '0.75');
+
+      // Hover brightness filter for locked countries
+      const hoverFilt = defs.append('filter').attr('id', 'afmap-gray-hover');
+      hoverFilt.append('feColorMatrix')
+        .attr('type', 'saturate')
+        .attr('values', '0');
+      hoverFilt.append('feComponentTransfer').append('feFuncA')
+        .attr('type', 'linear').attr('slope', '1');
+
+      const shadowFilt = defs.append('filter').attr('id', 'afmap-shadow')
         .attr('x','-4%').attr('y','-4%').attr('width','108%').attr('height','108%');
-      filt.append('feDropShadow').attr('dx', 0).attr('dy', 2)
+      shadowFilt.append('feDropShadow').attr('dx', 0).attr('dy', 2)
         .attr('stdDeviation', 3).attr('flood-color', 'rgba(0,0,0,0.12)');
 
       function mkGradient(id: string, colors: string[]): string {
@@ -168,22 +185,25 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
         const iso2 = ISO3_TO_ISO2[iso3];
         const fill = mkGradient(`afg-${iso3}`, colors);
 
-        // All countries start locked (greyscale via CSS class)
+        // All countries start locked — SVG filter attribute (works on all mobile browsers)
         const p = g.append('path')
           .datum(feat)
           .attr('d', pathGen)
           .attr('fill', fill)
-          .attr('class', 'af-country af-locked')
+          .attr('filter', 'url(#afmap-gray)')   // SVG attribute, not CSS
           .attr('stroke', 'rgba(255,255,255,0.5)')
           .attr('stroke-width', 0.6)
+          .attr('opacity', 0.7)
           .style('cursor', iso2 ? 'pointer' : 'default');
 
         if (!iso2) {
-          p.classed('af-no-interact', true);
+          p.attr('opacity', 0.35).style('pointer-events', 'none');
           return;
         }
 
         pathMapRef.current.set(iso2, p);
+
+        const getIsUnlocked = () => unlockedCodesRef.current.has(iso2);
 
         p.on('mousemove', function(event: MouseEvent) {
             tooltip.style.opacity = '1';
@@ -194,31 +214,43 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
           .on('mouseleave', function() {
             tooltip.style.opacity = '0';
             if (activeISO3 !== iso3) {
+              const unlocked = getIsUnlocked();
               d3.select(this)
                 .attr('stroke', 'rgba(255,255,255,0.5)')
                 .attr('stroke-width', 0.6)
-                .classed('af-hover', false);
+                .attr('filter', unlocked ? null : 'url(#afmap-gray)')
+                .attr('opacity', unlocked ? 1 : 0.7);
             }
           })
           .on('mouseover', function() {
             if (activeISO3 === iso3) return;
+            const unlocked = getIsUnlocked();
             d3.select(this)
               .attr('stroke', '#ffffff')
               .attr('stroke-width', 1.4)
-              .classed('af-hover', true);
+              // Locked: keep grayscale, slight brighten via opacity. Unlocked: no filter = full colour
+              .attr('filter', unlocked ? null : 'url(#afmap-gray)')
+              .attr('opacity', unlocked ? 1 : 0.9);
           })
           .on('click', function() {
             if (activeEl) {
+              const prevIso2 = (activeEl as any)._iso2;
+              const prevUnlocked = prevIso2 ? unlockedCodesRef.current.has(prevIso2) : false;
               activeEl
                 .attr('stroke', 'rgba(255,255,255,0.5)')
                 .attr('stroke-width', 0.6)
-                .classed('af-active af-hover', false);
+                .attr('filter', prevUnlocked ? null : 'url(#afmap-gray)')
+                .attr('opacity', prevUnlocked ? 1 : 0.7);
             }
-            d3.select(this)
+            const unlocked = getIsUnlocked();
+            const sel = d3.select(this);
+            (sel as any)._iso2 = iso2;
+            sel
+              .attr('stroke', unlocked ? '#000' : 'rgba(255,255,255,0.9)')
               .attr('stroke-width', 1.8)
-              .classed('af-active', true)
-              .classed('af-hover', false);
-            activeEl   = d3.select(this);
+              .attr('filter', unlocked ? null : 'url(#afmap-gray)')
+              .attr('opacity', 1);
+            activeEl   = sel;
             activeISO3 = iso3;
             tooltip.style.opacity = '0';
             onSelectRef.current(iso2);
@@ -257,7 +289,7 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
     };
   }, []); // draw once only
 
-  // ── Apply unlock classes when unlockedCodes changes ──────────────────────
+  // ── Apply unlock filter when unlockedCodes changes ───────────────────────
   useEffect(() => {
     const pathMap  = pathMapRef.current;
     if (!pathMap.size) return;
@@ -265,8 +297,8 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
 
     pathMap.forEach((p, iso2) => {
       const isUnlocked = unlocked.has(iso2);
-      p.classed('af-locked',   !isUnlocked)
-       .classed('af-unlocked',  isUnlocked);
+      p.attr('filter',  isUnlocked ? null : 'url(#afmap-gray)')
+       .attr('opacity', isUnlocked ? 1 : 0.7);
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unlockedKey]);
@@ -280,20 +312,20 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
 
     pathMap.forEach((p, iso2) => {
       const isUnlocked = unlocked.has(iso2);
-      // Remove search state classes first
-      p.classed('af-search-match af-search-dim', false);
 
       if (!hasQuery) {
-        // No search — restore base state (handled by af-locked / af-unlocked CSS)
+        // No search — restore lock state
+        p.attr('filter',  isUnlocked ? null : 'url(#afmap-gray)')
+         .attr('opacity', isUnlocked ? 1 : 0.7);
       } else if (highlightedCodes!.has(iso2)) {
-        p.classed('af-search-match', true);
+        // Match — show at full brightness (keep grayscale if locked)
+        p.attr('filter',  isUnlocked ? null : 'url(#afmap-gray)')
+         .attr('opacity', 1);
       } else {
-        p.classed('af-search-dim', true);
+        // No match — nearly invisible
+        p.attr('filter', 'url(#afmap-gray)')
+         .attr('opacity', 0.08);
       }
-
-      // Keep locked/unlocked class accurate during search
-      p.classed('af-locked',  !isUnlocked)
-       .classed('af-unlocked', isUnlocked);
     });
   }, [highlightedCodes]);
 
