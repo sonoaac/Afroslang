@@ -82,7 +82,9 @@ export const HeartsOutModal: React.FC<HeartsOutModalProps> = ({
           {/* Inner card */}
           <div
             style={{
-              background: 'rgba(8, 0, 3, 0.72)',
+              background: 'rgba(0, 0, 0, 0.18)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
               borderRadius: 30,
               padding: '2rem 1.75rem',
               position: 'relative',
@@ -105,9 +107,13 @@ export const HeartsOutModal: React.FC<HeartsOutModalProps> = ({
               <X style={{ width: 15, height: 15 }} />
             </button>
 
-            {/* Broken heart icon */}
-            <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
-              <div style={{ fontSize: 60, lineHeight: 1 }}>💔</div>
+            {/* AfroPlus image */}
+            <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+              <img
+                src="/Afroplus.png"
+                alt="AfroPlus"
+                style={{ width: 90, height: 90, objectFit: 'contain', borderRadius: 18 }}
+              />
             </div>
 
             {/* Title */}
@@ -230,7 +236,7 @@ export const HeartsOutModal: React.FC<HeartsOutModalProps> = ({
                     onMouseEnter={e => (e.currentTarget.style.background = '#d00025')}
                     onMouseLeave={e => (e.currentTarget.style.background = '#b00020')}
                   >
-                    👑 Go Unlimited — AfroPlus
+                    Go Unlimited — AfroPlus
                   </button>
 
                   {/* Wait */}

@@ -348,6 +348,31 @@
 }
 .lp-langs-eyebrow:hover { letter-spacing: 0.22em; }
 
+.lp-map-ctas {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px 48px;
+}
+.lp-map-ctas .lp-stack-ctas-row {
+  gap: 16px;
+}
+.lp-map-ctas .lp-btn-hero-primary,
+.lp-map-ctas .lp-btn-hero-ghost {
+  min-width: 160px;
+}
+
+@media (max-width: 767px) {
+  .lp-map-ctas { padding: 24px 20px 36px; }
+  .lp-map-ctas .lp-stack-ctas-row { flex-direction: column; width: 100%; gap: 10px; }
+  .lp-map-ctas .lp-btn-hero-primary,
+  .lp-map-ctas .lp-btn-hero-ghost { width: 100%; text-align: center; }
+  .lp-map-ctas .lp-btn-hero-ghost {
+    border: 2px solid #000;
+    color: #000;
+    background: rgba(255,255,255,0.88);
+  }
+}
+
 .lp-map-cta-hint {
   font-family: 'Times New Roman', Georgia, serif;
   font-size: clamp(1.4rem, 3vw, 2rem);

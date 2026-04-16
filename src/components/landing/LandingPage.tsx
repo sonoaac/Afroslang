@@ -749,24 +749,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               </span>
             </p>
           </div>
-          <div className="lp-stack-ctas lp-type-in lp-type-in--delay-1">
-            {isLoggedIn ? (
-              <button className="lp-btn-hero-primary" onClick={onContinue ?? scrollToExplorer}>
-                Continue Learning →
-              </button>
-            ) : (
-              <>
-                <div className="lp-stack-ctas-row">
-                  <button className="lp-btn-hero-primary" onClick={() => setSheet('signup')}>
-                    Get Started
-                  </button>
-                  <button className="lp-btn-hero-ghost" onClick={() => setSheet('login')}>
-                    Sign In
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
         </div>
 
         {/* ── Interactive Language Explorer ── */}
@@ -871,6 +853,24 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               unlockedCodes={unlockedCodes}
             />
           </div>
+        </div>
+
+        {/* CTAs below map */}
+        <div className="lp-map-ctas">
+          {isLoggedIn ? (
+            <button className="lp-btn-hero-primary" onClick={onContinue ?? scrollToExplorer}>
+              Continue Learning →
+            </button>
+          ) : (
+            <div className="lp-stack-ctas-row">
+              <button className="lp-btn-hero-primary" onClick={() => setSheet('signup')}>
+                Get Started
+              </button>
+              <button className="lp-btn-hero-ghost" onClick={() => setSheet('login')}>
+                Sign In
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Sandbits */}
