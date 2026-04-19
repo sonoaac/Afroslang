@@ -26,36 +26,19 @@ const COUNTRY_NAMES: Record<string, string> = {
   ZMB:'Zambia', ZWE:'Zimbabwe',
 };
 
+// All countries that exist on the map (still needed for membership check)
 const COUNTRY_COLORS: Record<string, string[]> = {
-  DZA:['#006233','#FFFFFF'], AGO:['#CC0000','#000000'],
-  BEN:['#008751','#FCD116','#E8112D'], BWA:['#75AADB','#FFFFFF','#000000'],
-  BFA:['#EF2B2D','#009A00','#FCD116'], BDI:['#CE1126','#FFFFFF','#1EB53A'],
-  CPV:['#003893','#CF2027','#FFFFFF'], CMR:['#007A5E','#CE1126','#FCD116'],
-  CAF:['#003082','#FFFFFF','#289728','#FECB00','#CE1126'],
-  TCD:['#002664','#FECB00','#C60C30'], COM:['#3A75C4','#009A44','#FFFFFF'],
-  COD:['#007FFF','#F7D618','#CE1021'], COG:['#009A44','#FBDE4A','#DC241F'],
-  DJI:['#6AB2E7','#12AD2B','#FFFFFF'], EGY:['#CE1126','#FFFFFF','#000000'],
-  GNQ:['#3E9A00','#FFFFFF','#E32118'], ERI:['#4189DD','#4DAA4B','#D02B27'],
-  SWZ:['#3E5EB9','#FFD900','#B10C0C'], ETH:['#078930','#FCDD09','#DA121A'],
-  GAB:['#009E60','#FCD116','#003189'], GMB:['#CE1126','#3A7728','#0C0CE8'],
-  GHA:['#006B3F','#FCD116','#CE1126'], GIN:['#CE1126','#FCD116','#009460'],
-  GNB:['#CE1126','#009E49','#000000'], CIV:['#F77F00','#FFFFFF','#009A44'],
-  KEN:['#006600','#CC0000','#000000','#FFFFFF'],
-  LSO:['#009543','#FFFFFF','#00209F'], LBR:['#BF0A30','#FFFFFF','#003087'],
-  LBY:['#000000','#239E46','#E70013'], MDG:['#FFFFFF','#FC3D32','#007E3A'],
-  MWI:['#000000','#CE1126','#339E35'], MLI:['#14B53A','#FCD116','#CE1126'],
-  MRT:['#006233','#FFD700'], MUS:['#EA2839','#1A206D','#FFD500'],
-  MAR:['#C1272D','#006233'], MOZ:['#009A44','#FFFFFF','#000000'],
-  NAM:['#003580','#CF0028','#009543'], NER:['#E05206','#FFFFFF','#0DB02B'],
-  NGA:['#008751','#FFFFFF','#008751'], RWA:['#20603D','#FAD201','#1F86CC'],
-  STP:['#12AD2B','#FFCD00','#D21034'], SEN:['#00853F','#FDEF42','#E31B23'],
-  SYC:['#003F87','#FCD856','#D62828'], SLE:['#1EB53A','#FFFFFF','#0072C6'],
-  SOM:['#4189DD','#FFFFFF'], ZAF:['#007A4D','#000000','#FFB612','#FFFFFF','#DE3831'],
-  SSD:['#078930','#FCDD09','#DA121A'], SDN:['#D21034','#FFFFFF','#000000'],
-  TZA:['#1EB53A','#FCD116','#000000'], TGO:['#006A4E','#FFCE00','#D21034'],
-  TUN:['#E70013','#FFFFFF'], UGA:['#000000','#FCDC04','#9E3039'],
-  ESH:['#007A3D','#FFFFFF','#000000'], ZMB:['#198A00','#EF7D00','#DE2010'],
-  ZWE:['#006400','#FFD200','#D40000'],
+  DZA:['#000'], AGO:['#000'], BEN:['#000'], BWA:['#000'], BFA:['#000'],
+  BDI:['#000'], CPV:['#000'], CMR:['#000'], CAF:['#000'], TCD:['#000'],
+  COM:['#000'], COD:['#000'], COG:['#000'], DJI:['#000'], EGY:['#000'],
+  GNQ:['#000'], ERI:['#000'], SWZ:['#000'], ETH:['#000'], GAB:['#000'],
+  GMB:['#000'], GHA:['#000'], GIN:['#000'], GNB:['#000'], CIV:['#000'],
+  KEN:['#000'], LSO:['#000'], LBR:['#000'], LBY:['#000'], MDG:['#000'],
+  MWI:['#000'], MLI:['#000'], MRT:['#000'], MUS:['#000'], MAR:['#000'],
+  MOZ:['#000'], NAM:['#000'], NER:['#000'], NGA:['#000'], RWA:['#000'],
+  STP:['#000'], SEN:['#000'], SYC:['#000'], SLE:['#000'], SOM:['#000'],
+  ZAF:['#000'], SSD:['#000'], SDN:['#000'], TZA:['#000'], TGO:['#000'],
+  TUN:['#000'], UGA:['#000'], ESH:['#000'], ZMB:['#000'], ZWE:['#000'],
 };
 
 function loadD3(): Promise<void> {
@@ -119,40 +102,7 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
         .style('height', '100%')
         .style('display', 'block');
 
-      const defs = svg.append('defs');
-
-      // SVG grayscale filter — works on all mobile browsers (more reliable than CSS filter)
-      const grayFilt = defs.append('filter').attr('id', 'afmap-gray');
-      grayFilt.append('feColorMatrix')
-        .attr('type', 'saturate')
-        .attr('values', '0');
-      grayFilt.append('feComponentTransfer').append('feFuncR')
-        .attr('type', 'linear').attr('slope', '0.75');
-
-      // Hover brightness filter for locked countries
-      const hoverFilt = defs.append('filter').attr('id', 'afmap-gray-hover');
-      hoverFilt.append('feColorMatrix')
-        .attr('type', 'saturate')
-        .attr('values', '0');
-      hoverFilt.append('feComponentTransfer').append('feFuncA')
-        .attr('type', 'linear').attr('slope', '1');
-
-      const shadowFilt = defs.append('filter').attr('id', 'afmap-shadow')
-        .attr('x','-4%').attr('y','-4%').attr('width','108%').attr('height','108%');
-      shadowFilt.append('feDropShadow').attr('dx', 0).attr('dy', 2)
-        .attr('stdDeviation', 3).attr('flood-color', 'rgba(0,0,0,0.12)');
-
-      function mkGradient(id: string, colors: string[]): string {
-        if (colors.length === 1) return colors[0];
-        const g = defs.append('linearGradient')
-          .attr('id', id).attr('x1','0%').attr('y1','0%').attr('x2','100%').attr('y2','0%');
-        colors.forEach((c, i) => {
-          g.append('stop')
-           .attr('offset', `${i / (colors.length - 1) * 100}%`)
-           .attr('stop-color', c);
-        });
-        return `url(#${id})`;
-      }
+      // No filters — clean black map with no blur
 
       let geoData: any;
       try {
@@ -183,17 +133,15 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
         if (!colors) return;
 
         const iso2 = ISO3_TO_ISO2[iso3];
-        const fill = mkGradient(`afg-${iso3}`, colors);
 
-        // All countries start locked — SVG filter attribute (works on all mobile browsers)
+        // All countries: solid black fill, thin white border line, no blur
         const p = g.append('path')
           .datum(feat)
           .attr('d', pathGen)
-          .attr('fill', fill)
-          .attr('filter', 'url(#afmap-gray)')   // SVG attribute, not CSS
-          .attr('stroke', 'rgba(255,255,255,0.5)')
-          .attr('stroke-width', 0.6)
-          .attr('opacity', 0.7)
+          .attr('fill', '#000000')
+          .attr('stroke', 'rgba(255,255,255,0.22)')
+          .attr('stroke-width', 0.5)
+          .attr('opacity', 1)
           .style('cursor', iso2 ? 'pointer' : 'default');
 
         if (!iso2) {
@@ -203,53 +151,41 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
 
         pathMapRef.current.set(iso2, p);
 
-        const getIsUnlocked = () => unlockedCodesRef.current.has(iso2);
-
         p.on('mousemove', function(event: MouseEvent) {
             tooltip.style.opacity = '1';
             tooltip.style.left    = `${event.clientX + 14}px`;
             tooltip.style.top     = `${event.clientY - 44}px`;
             tooltip.innerHTML     = `<strong>${COUNTRY_NAMES[iso3] ?? iso3}</strong>`;
           })
-          .on('mouseleave', function() {
+          .on('mouseleave', function(this: SVGPathElement) {
             tooltip.style.opacity = '0';
             if (activeISO3 !== iso3) {
-              const unlocked = getIsUnlocked();
               d3.select(this)
-                .attr('stroke', 'rgba(255,255,255,0.5)')
-                .attr('stroke-width', 0.6)
-                .attr('filter', unlocked ? null : 'url(#afmap-gray)')
-                .attr('opacity', unlocked ? 1 : 0.7);
+                .attr('fill', '#000000')
+                .attr('stroke', 'rgba(255,255,255,0.22)')
+                .attr('stroke-width', 0.5);
             }
           })
-          .on('mouseover', function() {
+          .on('mouseover', function(this: SVGPathElement) {
             if (activeISO3 === iso3) return;
-            const unlocked = getIsUnlocked();
             d3.select(this)
-              .attr('stroke', '#ffffff')
-              .attr('stroke-width', 1.4)
-              // Locked: keep grayscale, slight brighten via opacity. Unlocked: no filter = full colour
-              .attr('filter', unlocked ? null : 'url(#afmap-gray)')
-              .attr('opacity', unlocked ? 1 : 0.9);
+              .attr('fill', '#1a1a1a')
+              .attr('stroke', 'rgba(255,255,255,0.6)')
+              .attr('stroke-width', 1.2);
           })
-          .on('click', function() {
+          .on('click', function(this: SVGPathElement) {
             if (activeEl) {
-              const prevIso2 = (activeEl as any)._iso2;
-              const prevUnlocked = prevIso2 ? unlockedCodesRef.current.has(prevIso2) : false;
               activeEl
-                .attr('stroke', 'rgba(255,255,255,0.5)')
-                .attr('stroke-width', 0.6)
-                .attr('filter', prevUnlocked ? null : 'url(#afmap-gray)')
-                .attr('opacity', prevUnlocked ? 1 : 0.7);
+                .attr('fill', '#000000')
+                .attr('stroke', 'rgba(255,255,255,0.22)')
+                .attr('stroke-width', 0.5);
             }
-            const unlocked = getIsUnlocked();
             const sel = d3.select(this);
             (sel as any)._iso2 = iso2;
             sel
-              .attr('stroke', unlocked ? '#000' : 'rgba(255,255,255,0.9)')
-              .attr('stroke-width', 1.8)
-              .attr('filter', unlocked ? null : 'url(#afmap-gray)')
-              .attr('opacity', 1);
+              .attr('fill', '#111111')
+              .attr('stroke', 'rgba(255,255,255,0.9)')
+              .attr('stroke-width', 1.6);
             activeEl   = sel;
             activeISO3 = iso3;
             tooltip.style.opacity = '0';
@@ -269,12 +205,9 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
             .attr('dominant-baseline', 'middle')
             .attr('pointer-events', 'none')
             .style('font-family', '-apple-system, Segoe UI, sans-serif')
-            .style('font-weight', '600')
+            .style('font-weight', '500')
             .style('font-size', `${fs}px`)
-            .style('fill', 'rgba(255,255,255,0.95)')
-            .style('paint-order', 'stroke')
-            .style('stroke', 'rgba(0,0,0,0.45)')
-            .style('stroke-width', '2px')
+            .style('fill', 'rgba(255,255,255,0.7)')
             .style('letter-spacing', '0.05px')
             .text(COUNTRY_NAMES[iso3] ?? '');
         }
@@ -289,7 +222,7 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
     };
   }, []); // draw once only
 
-  // ── Apply unlock filter when unlockedCodes changes ───────────────────────
+  // ── Unlock effect: highlight unlocked countries with a subtle tint ───────
   useEffect(() => {
     const pathMap  = pathMapRef.current;
     if (!pathMap.size) return;
@@ -297,8 +230,8 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
 
     pathMap.forEach((p, iso2) => {
       const isUnlocked = unlocked.has(iso2);
-      p.attr('filter',  isUnlocked ? null : 'url(#afmap-gray)')
-       .attr('opacity', isUnlocked ? 1 : 0.7);
+      p.attr('fill', isUnlocked ? '#1a1a1a' : '#000000')
+       .attr('stroke', isUnlocked ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.22)');
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unlockedKey]);
@@ -314,17 +247,20 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
       const isUnlocked = unlocked.has(iso2);
 
       if (!hasQuery) {
-        // No search — restore lock state
-        p.attr('filter',  isUnlocked ? null : 'url(#afmap-gray)')
-         .attr('opacity', isUnlocked ? 1 : 0.7);
+        // No search — restore normal state
+        p.attr('fill', isUnlocked ? '#1a1a1a' : '#000000')
+         .attr('opacity', 1)
+         .attr('stroke', isUnlocked ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.22)');
       } else if (highlightedCodes!.has(iso2)) {
-        // Match — show at full brightness (keep grayscale if locked)
-        p.attr('filter',  isUnlocked ? null : 'url(#afmap-gray)')
-         .attr('opacity', 1);
+        // Match — highlight slightly
+        p.attr('fill', '#222222')
+         .attr('opacity', 1)
+         .attr('stroke', 'rgba(255,255,255,0.7)');
       } else {
-        // No match — nearly invisible
-        p.attr('filter', 'url(#afmap-gray)')
-         .attr('opacity', 0.08);
+        // No match — dim
+        p.attr('fill', '#000000')
+         .attr('opacity', 0.2)
+         .attr('stroke', 'rgba(255,255,255,0.08)');
       }
     });
   }, [highlightedCodes]);

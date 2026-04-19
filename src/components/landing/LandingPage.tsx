@@ -713,10 +713,13 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     <div className="lp">
       <GlCanvas />
 
-      <header className={`lp-header${headerScrolled ? ' lp-header--scrolled' : ''}`}>
-        <div className="lp-header-left">
+      <header className={`lp-header${headerScrolled ? ' lp-header--scrolled' : ''}`} style={{ justifyContent: 'flex-start', paddingLeft: 270 }}>
+        <div className="lp-header-left" style={{ gap: 6 }}>
           <img src="/Afroslang.png" className="lp-logo" alt="Afroslang" style={{ display: 'block', width: '52px', height: '52px' }} />
-          <span className="lp-brand lp-blood-text" style={{ animationDelay: '0.5s' }}>AFRO<em>SLANG</em></span>
+          <span className="lp-brand">
+            AFRO
+            <em style={{ color: '#b00020', WebkitTextStroke: '2.5px #000', marginLeft: 2 }}>SLANG</em>
+          </span>
         </div>
       </header>
 
@@ -735,9 +738,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               />
             </div>
             <p className="lp-stack-tagline">
-              <span className="lp-blood-text" style={{ color: '#ffffff', display: 'block', fontWeight: 800, fontSize: '2em', lineHeight: 1.05, letterSpacing: '0.04em', animationDelay: '1.4s' }}>
-                <DescrambleText chars={AFROSLANG_CHARS} className="dsc-afroslang" />
-              </span>
               <span className="lp-blood-text" style={{ color: '#ffffff', display: 'block', fontWeight: 800, fontSize: '2em', lineHeight: 1.05, letterSpacing: '0.04em', animationDelay: '2.9s' }}>
                 <DescrambleText chars={REKINDLE_CHARS} startDelay={REKINDLE_START} className="dsc-rekindle" />
               </span>
@@ -756,15 +756,12 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
           ref={exploreSectionRef}
           className={`lp-explore-section${exploreVisible ? ' lp-explore-section--visible' : ''}`}
         >
-          {/* Section header */}
+          {/* Section header — title + eyebrow only (search moved into left col on desktop) */}
           <div className="lp-explore-header lp-reveal">
             <p className="lp-langs-eyebrow lp-type-in">Over 1500+ African Languages · Explore the Continent — Not even half way there</p>
-            <p className="lp-map-cta-hint">
-              <span style={{ color: '#2ecc71' }}>C</span><span style={{ color: '#ffffff' }}>o</span><span style={{ color: '#1a1a1a', WebkitTextStroke: '0.5px rgba(255,255,255,0.4)' }}>l</span><span style={{ color: '#3498db' }}>o</span><span style={{ color: '#f5c842' }}>r</span>{' '}
-              <span style={{ color: '#ffffff' }}>t</span><span style={{ color: '#2ecc71' }}>h</span><span style={{ color: '#f5c842' }}>e</span>{' '}
-              <span style={{ color: '#3498db' }}>M</span><span style={{ color: '#ffffff' }}>a</span><span style={{ color: '#2ecc71' }}>p</span>
-            </p>
-            <div className="lp-explore-search-wrap">
+            <p className="lp-map-cta-hint">Color the Map</p>
+            {/* Search shown in header on mobile only */}
+            <div className="lp-explore-search-wrap lp-search-mobile-only">
               <svg className="lp-explore-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
                 <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="22" y2="22" />
               </svg>
@@ -781,8 +778,27 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
             </div>
           </div>
 
-          {/* Main: panel left + grid right (desktop); panel replaces grid (mobile) */}
+          {/* Main: left-col (search + panel) + map (desktop); stacked (mobile) */}
           <div className={`lp-explore-main${panelOpen ? ' lp-explore-main--panel-open' : ''}`}>
+
+            {/* Left column: search bar (desktop) + panel */}
+            <div className="lp-explore-left-col">
+              {/* Search shown in left col on desktop only */}
+              <div className="lp-explore-search-wrap lp-search-desktop-only">
+                <svg className="lp-explore-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                  <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="22" y2="22" />
+                </svg>
+                <input
+                  className="lp-explore-search"
+                  type="text"
+                  placeholder="Search country or language…"
+                  value={exploreSearch}
+                  onChange={e => setExploreSearch(e.target.value)}
+                />
+                {exploreSearch && (
+                  <button className="lp-explore-search-clear" onClick={() => setExploreSearch('')}>✕</button>
+                )}
+              </div>
 
             {/* Left panel */}
             <aside className={`lp-explore-panel${panelOpen ? ' lp-explore-panel--open' : ''}`}>
@@ -834,6 +850,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
                 </div>
               )}
             </aside>
+            </div>{/* end lp-explore-left-col */}
 
             {/* Africa map */}
             <AfricaMap

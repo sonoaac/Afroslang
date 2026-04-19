@@ -114,7 +114,7 @@ Tonal languages get `tone-trainer` exercises automatically. `TONAL_LANGUAGES` se
 Dark luxury theme defined in `src/styles/globals.css`:
 - **Brand colors:** `--brand-black: #000000`, `--brand-red: #b00020`, `--brand-green: #35b729`
 - **Background:** `--app-bg` is a radial gradient (dark black + subtle red glow)
-- **Fonts:** Roboto (primary UI font, loaded via Google Fonts) and Playfair Display (serif/editorial, imported but not yet applied to CSS rules)
+- **Fonts:** Kavoon (primary UI font), Roboto (fallback), and Playfair Display (serif/editorial) — all loaded via Google Fonts in `globals.css`
 - **Component library:** shadcn/ui in `src/components/ui/` — **do not modify these files directly**
 
 ### Firebase / Backend (`src/firebase.ts`, `src/utils/`, `functions/`)
@@ -148,7 +148,13 @@ TypeScript path alias `@/*` maps to `./src/*` (configured in `tsconfig.json`). U
 - `src/api/` — `create-checkout-session.ts` and `stripe-webhook.ts` (reference-only; live webhook is in `functions/`)
 - `src/components/intro/` — `AfroslangIntro` (animated logo reveal, plays once per session)
 - `src/components/splash/` — `SplashScreen` (3D shattering text animation, unused in App.tsx)
-- `src/components/landing/` — `LandingPage` with login/signup bottom sheets and `RainCanvas` animated background
+- `src/components/landing/` — Full landing page suite:
+  - `LandingPage` — scrolling marketing page with hero, interactive Africa map explorer, feature blocks, footer, and glassmorphic auth overlay (login/signup). Manages a `pendingLanguage` flow: when an unauthenticated user picks a language from the map and hits "Start Learning", the language is stored in `pendingLanguage` and applied after signup/login completes.
+  - `AfricaMap` — D3 v7 choropleth of Africa (loaded dynamically from CDN at `https://d3js.org/d3.v7.min.js`). Accepts `onCountrySelect(iso2)`, `highlightedCodes` (search results), and `unlockedCodes` (countries lit up when the user has completed ≥1 lesson in any of that country's languages). Country–language mapping lives in `LANGUAGE_COUNTRIES` in `LandingPage.tsx`.
+  - `GlCanvas` — WebGL animated canvas used as the hero background (also imported in `App.tsx`).
+  - `StaticPage` — wrapper that renders in-app static content (About, Our Story, Terms, Privacy, etc.) — navigated to by setting `activePage` state in `LandingPage`.
+  - `DescrambleText` — letter-by-letter drop-in/scramble animation used for the hero heading and auth modal titles.
+  - Auth overlay: glassmorphic card with Login / Sign Up tabs. Client-side rate limiting stored in `localStorage` key `afro_login_rl` (5 attempts → 15-minute lockout). Password validation enforces 7 chars + uppercase + lowercase + digit + special character before submission.
 - `src/components/rain/` — `RainCanvas` (animated rain background) and `MascotFactCard` (cultural facts carousel shown on `LearningPath` for languages in `RAIN_LANGUAGES`)
 - `src/components/` — shared components: auth, layout, leaderboard, subscription, streak, mascot, debug
 
@@ -179,7 +185,9 @@ When adding a new language, add cultural facts here and decide whether it belong
 5. Add cultural facts to `src/data/culturalFacts.ts`; decide whether it belongs in `RAIN_LANGUAGES`
 6. If tonal, add it to `TONAL_LANGUAGES` and provide `TONE_DATA` entries in `src/features/lessons/lessonUtils.ts`
 7. Add topic-aware conversation scripts to `src/features/lessons/conversationScripts.ts`
-8. Run `npm run validate:lessons` to check data integrity
+8. Add to `LANGUAGE_COUNTRIES` in `LandingPage.tsx` (maps language ID → ISO-2 country codes) so the Africa map lights up correctly
+9. Add the relevant countries to `EXPLORE_COUNTRIES` in `LandingPage.tsx` if not already present (each entry has `code`, `name`, `fact`, `languages[]`)
+10. Run `npm run validate:lessons` to check data integrity
 
 ### Lesson Data Validation
 

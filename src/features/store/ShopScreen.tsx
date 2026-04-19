@@ -274,9 +274,12 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
 
             {/* AfroPlus upsell */}
             <div style={{ background: 'transparent', border: `1px solid rgba(176,0,32,0.25)`, borderRadius: 14, padding: '1.1rem 1.2rem' }}>
-              <p style={{ color: text, fontFamily: font, fontWeight: 'bold', fontSize: '1rem', margin: '0 0 0.75rem' }}>
-                AfroPlus
-              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <img src="/Afroplus.png" alt="AfroPlus" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+                <p style={{ color: text, fontFamily: font, fontWeight: 'bold', fontSize: '1rem', margin: 0 }}>
+                  AfroPlus
+                </p>
+              </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {[
                   isEn ? '❤️ Unlimited hearts' : '❤️ Cœurs illimités',

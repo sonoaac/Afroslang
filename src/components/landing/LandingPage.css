@@ -65,14 +65,22 @@
   font-family: 'Times New Roman', Georgia, serif;
   font-weight: 900;
   font-size: 2.25rem;
-  color: #fff;
   letter-spacing: 0.06em;
   cursor: default;
   text-transform: uppercase;
+  /* AFRO: heavy black stroke outline around letters */
+  color: #ffffff;
+  -webkit-text-stroke: 2.5px #000000;
+  paint-order: stroke fill;
+  text-shadow: none;
+  animation: none; /* no blur animation on the header brand */
 }
 .lp-brand em {
-  color: #b00020;
   font-style: normal;
+  /* SLANG: heavy white stroke outline around letters */
+  color: #000000;
+  -webkit-text-stroke: 2.5px #ffffff;
+  paint-order: stroke fill;
 }
 
 .lp-header-right {
@@ -135,6 +143,34 @@
 }
 
 
+
+/* ── Decorative blob orbs in the hero ── */
+.lp-stack-top::before,
+.lp-stack-top::after {
+  content: '';
+  position: absolute;
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  animation: blob-morph 10s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+.lp-stack-top::before {
+  width: clamp(180px, 28vw, 340px);
+  height: clamp(180px, 28vw, 340px);
+  top: 10%;
+  left: -8%;
+  background: radial-gradient(ellipse, rgba(176,0,32,0.13) 0%, transparent 70%);
+  animation-duration: 12s;
+}
+.lp-stack-top::after {
+  width: clamp(140px, 22vw, 260px);
+  height: clamp(140px, 22vw, 260px);
+  bottom: 12%;
+  right: -6%;
+  background: radial-gradient(ellipse, rgba(53,183,41,0.08) 0%, transparent 70%);
+  animation-duration: 9s;
+  animation-direction: reverse;
+}
 
 /* ── Top block: logo + headings + CTAs ── */
 .lp-stack-top {
@@ -252,7 +288,7 @@
   padding: 15px 36px;
   background: #b00020;
   border: none;
-  border-radius: 14px;
+  border-radius: 30px 12px 28px 14px / 14px 28px 12px 30px;
   font-family: 'Times New Roman', serif;
   font-size: 1rem;
   font-weight: 700;
@@ -294,7 +330,7 @@
 .lp-btn-hero-ghost {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 14px;
+  border-radius: 14px 30px 14px 30px / 30px 14px 30px 14px;
   font-family: 'Times New Roman', serif;
   font-size: 0.92rem;
   font-weight: 600;
@@ -381,6 +417,9 @@
   margin: 0 0 20px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  color: #ffffff;
+  -webkit-text-stroke: 2px #000000;
+  paint-order: stroke fill;
 }
 
 .lp-langs-grid {
@@ -766,7 +805,7 @@
 }
 .lp-explore-search-clear:hover { color: #fff; }
 
-/* Main layout: panel left + grid right */
+/* Main layout: left-col + map */
 .lp-explore-main {
   position: relative;
   z-index: 2;
@@ -777,12 +816,29 @@
   margin: 0 auto;
 }
 
+/* Left column: wraps search (desktop) + panel */
+.lp-explore-left-col {
+  flex: 0 0 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Search visibility by breakpoint */
+.lp-search-mobile-only { display: none; }
+.lp-search-desktop-only { display: block; }
+
+@media (max-width: 767px) {
+  .lp-search-mobile-only  { display: block; }
+  .lp-search-desktop-only { display: none; }
+}
+
 /* ── Left panel (desktop sidebar) ── */
 .lp-explore-panel {
-  flex: 0 0 260px;
+  flex: 1;
   background: rgba(0, 0, 0, 0.03);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 16px;
+  border-radius: 28px 12px 28px 12px / 12px 28px 12px 28px;
   padding: 24px;
   min-height: 280px;
   position: sticky;
@@ -895,7 +951,7 @@
   width: 100%;
   background: rgba(245, 237, 224, 0.08);
   border: 1px solid rgba(245, 237, 224, 0.3);
-  border-radius: 10px;
+  border-radius: 18px 8px 18px 8px / 8px 18px 8px 18px;
   padding: 10px 32px 10px 14px;
   font-family: Georgia, serif;
   font-size: 0.88rem;
@@ -922,7 +978,7 @@
   width: 100%;
   background: #b00020;
   border: none;
-  border-radius: 12px;
+  border-radius: 24px 10px 24px 10px / 10px 24px 10px 24px;
   padding: 12px 16px;
   font-family: 'Times New Roman', serif;
   font-size: 0.9rem;
@@ -1000,7 +1056,7 @@
   background: #1a1d23;
   color: #fff;
   padding: 6px 11px;
-  border-radius: 8px;
+  border-radius: 16px 6px 16px 6px / 6px 16px 6px 16px;
   font-family: -apple-system, 'Segoe UI', sans-serif;
   font-size: 12px;
   font-weight: 600;
@@ -1072,6 +1128,12 @@
   .lp-explore-main {
     flex-direction: column;
     position: relative;
+  }
+
+  /* Left col goes full width on mobile */
+  .lp-explore-left-col {
+    width: 100%;
+    flex: none;
   }
 
   /* Grid hidden when panel is open */
@@ -1452,7 +1514,7 @@
   backdrop-filter: blur(28px) saturate(1.6);
   -webkit-backdrop-filter: blur(28px) saturate(1.6);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 22px;
+  border-radius: 32px 16px 32px 16px / 16px 32px 16px 32px;
   box-shadow:
     0 8px 40px rgba(0, 0, 0, 0.6),
     0 0 0 1px rgba(255, 255, 255, 0.04) inset,
@@ -1610,7 +1672,7 @@
   width: 100%;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 11px;
+  border-radius: 18px 8px 18px 8px / 8px 18px 8px 18px;
   padding: 1.1rem 1rem 0.45rem;
   font-family: Georgia, serif;
   font-size: 0.9rem;
@@ -1675,7 +1737,7 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   border: none;
-  border-radius: 11px;
+  border-radius: 22px 8px 22px 8px / 8px 22px 8px 22px;
   padding: 0.95rem;
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.2s;
@@ -1729,7 +1791,7 @@
   width: 100%;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 11px;
+  border-radius: 8px 22px 8px 22px / 22px 8px 22px 8px;
   padding: 0.82rem;
   font-family: 'Times New Roman', serif;
   font-size: 0.86rem;

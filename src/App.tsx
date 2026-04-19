@@ -42,6 +42,12 @@ function App() {
   const [interfaceLanguage, setInterfaceLanguage] = useState<InterfaceLanguage>('en');
   const [currentLanguage, setCurrentLanguage] = useState<AfricanLanguage | null>(null);
   const [userProgressMap, setUserProgressMap] = useState<Record<string, UserProgress>>({});
+
+  // Valid language slugs — used to parse URL on load / back navigation
+  const VALID_LANGS: AfricanLanguage[] = [
+    'swahili','hausa','yoruba','igbo','zulu','amharic','arabic','shona',
+    'somali','berber','moore','lingala','twi','chichewa','wolof'
+  ];
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [lastCompletedXP, setLastCompletedXP] = useState(0);
 
@@ -77,11 +83,39 @@ function App() {
     // Always start from interface selection for a fresh experience
     // Users can manually navigate to their previous language if needed
     // Don't auto-load saved language - let users choose fresh each time
-    
+
     // Clear any saved current language to ensure fresh start
     if (savedCurrentLang) {
       localStorage.removeItem('afroslang_current_language');
     }
+
+    // Parse URL on initial load — e.g. afroslang.com/igbo → go to Igbo path
+    const urlLang = window.location.pathname.slice(1).toLowerCase() as AfricanLanguage;
+    if (VALID_LANGS.includes(urlLang)) {
+      // Replace the current history entry so state is attached
+      window.history.replaceState({ screen: 'path', lang: urlLang }, '', `/${urlLang}`);
+      // Language will be set once auth resolves (handled in auth effect below)
+      setPreSelectedLanguage(urlLang);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Browser back/forward button support
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      const state = e.state as { screen?: string; lang?: string } | null;
+      if (state?.screen === 'path' && state?.lang) {
+        const lang = state.lang as AfricanLanguage;
+        setCurrentLanguage(lang);
+        setCurrentScreen('path');
+      } else {
+        // Back to landing
+        setCurrentScreen('auth');
+        setCurrentLanguage(null);
+        window.history.replaceState(null, '', '/');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   // Save progress to localStorage whenever it changes
@@ -102,18 +136,24 @@ function App() {
   }, [interfaceLanguage]);
 
 
+  const goToLanding = () => {
+    window.history.pushState(null, '', '/');
+    setCurrentScreen('auth');
+    setCurrentLanguage(null);
+  };
+
   const handleGoToSignIn = async () => {
     if (user) await logout();
     else setGuestMode(false);
     setAuthSheet('login');
-    setCurrentScreen('auth');
+    goToLanding();
   };
 
   const handleGoToSignUp = async () => {
     if (user) await logout();
     else setGuestMode(false);
     setAuthSheet('signup');
-    setCurrentScreen('auth');
+    goToLanding();
   };
 
   const handleLanguageToLearnSelect = (languageId: string) => {
@@ -140,6 +180,8 @@ function App() {
       setUserProgressMap(prev => ({ ...prev, [lang]: newProgress }));
     }
 
+    // Update browser URL so back button and refresh work
+    window.history.pushState({ screen: 'path', lang }, '', `/${lang}`);
     setCurrentScreen('path');
   };
 
@@ -418,7 +460,7 @@ function App() {
           stages={getStagesForLanguage(currentLanguage)}
           progress={getCurrentProgress()}
           onStartLesson={handleStartLesson}
-          onBackToLanguageSelect={() => setCurrentScreen('auth')}
+          onBackToLanguageSelect={goToLanding}
           onNavigate={(screen) => {
             if (screen === 'leaderboard') {
               setCurrentScreen('leaderboard');
@@ -451,7 +493,7 @@ function App() {
             isGuest={isGuest}
             onComplete={handleLessonComplete}
             onExit={handleExitLesson}
-            onBackToLanguageSelect={() => setCurrentScreen('auth')}
+            onBackToLanguageSelect={goToLanding}
             onGoToSignUp={handleGoToSignUp}
             onGoToSubscription={() => setCurrentScreen('subscription')}
           />
@@ -462,7 +504,7 @@ function App() {
           interfaceLanguage={interfaceLanguage}
           xpEarned={lastCompletedXP}
           onContinue={handleContinueAfterComplete}
-          onBackToLanguageSelect={() => setCurrentScreen('auth')}
+          onBackToLanguageSelect={goToLanding}
         />
       )}
 
