@@ -770,7 +770,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
         >
           {/* Section header — title + eyebrow only (search moved into left col on desktop) */}
           <div className="lp-explore-header lp-reveal">
-            <p className="lp-langs-eyebrow lp-type-in">Over 1500+ African Languages · Explore the Continent — Not even half way there</p>
+            <p className="lp-langs-eyebrow lp-type-in" style={{ color: '#ffffff' }}>Explore the continent one language at a time</p>
             <p className="lp-map-cta-hint">Color the Map</p>
             {/* Search shown in header on mobile only */}
             <div className="lp-explore-search-wrap lp-search-mobile-only">
@@ -927,35 +927,23 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               <span style={{ color: '#b00020' }}>Afro</span><span style={{ color: '#f5ede0' }}>Plus</span>
             </h3>
             <p className="lp-feature-body lp-sand-reveal">
-              AfroPlus unlocks unlimited hearts, 2× XP on every lesson, the full Reviews page and a completely ad free experience. Start with a 7 day free trial and cancel anytime.
+              AfroPlus unlocks unlimited hearts, 2× XP on every lesson, the full reviews page and a completely ad free experience. Start with a 7 - day free trial and cancel anytime.
             </p>
           </div>
         </div>
 
-        {/* Our Mission row */}
-        <div className="lp-stack-row lp-stack-row--left">
-          <div className="lp-stack-row-text lp-stack-row-text--left">
-            <span className="lp-sand-reveal" style={{ fontFamily: "'Times New Roman', serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em' }}>
-              <span style={{ color: '#b00020' }}>Our</span>{' '}
-              <span style={{ color: '#f5ede0' }}>Mission</span>
-            </span>
-            <p className="lp-sand-reveal">
-              Afroslang's main goal is to help and assist descendants and children of the diaspora to maintain their language culture and ancestral sense of knowing.
-            </p>
-          </div>
-        </div>
-
-        {/* Giving Back row */}
-        <div className="lp-stack-row lp-stack-row--left">
-          <div className="lp-stack-row-text lp-stack-row-text--right">
-            <span className="lp-sand-reveal" style={{ fontFamily: "'Times New Roman', serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em' }}>
-              <span style={{ color: '#b00020' }}>Giving</span>{' '}
-              <span style={{ color: '#f5ede0' }}>Back</span>
-            </span>
-            <p className="lp-sand-reveal">
-              Afroslang will better charity cases in Africa whilst being transparent about where your money is going. All payments: 50% to charity, 50% to the site.
-            </p>
-          </div>
+        {/* Our Mission — merged with Giving Back, centred */}
+        <div className="lp-mission-block lp-reveal">
+          <span className="lp-sand-reveal" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em', textAlign: 'center', display: 'block' }}>
+            <span style={{ color: '#b00020' }}>Our</span>{' '}
+            <span style={{ color: '#f5ede0' }}>Mission</span>
+          </span>
+          <p className="lp-sand-reveal lp-mission-body">
+            Afroslang's main goal is to help and assist descendants and children of the diaspora to maintain their language culture and ancestral sense of knowing.
+          </p>
+          <p className="lp-sand-reveal lp-mission-body">
+            Afroslang will better charity cases in Africa whilst being transparent about where your money is going. All payments: 50% to charity, 50% to the site.
+          </p>
         </div>
 
         {/* Manifesto */}
