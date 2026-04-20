@@ -262,25 +262,35 @@
   animation: lpHeroFadeUp 0.7s ease-out both;
 }
 
-/* ── Yellow glow — builds in after each word lands ── */
+/* ── Per-letter yellow glow — tight radii so it hugs each letter ── */
 @keyframes lpBloodShadow {
   0%   { text-shadow: none; }
-  40%  {
-    text-shadow:
-      0 0 12px rgba(255, 220, 50, 0.3),
-      0 0 28px rgba(255, 200, 0, 0.15);
-  }
   100% {
     text-shadow:
-      0 0 8px  rgba(255, 230, 60, 0.55),
-      0 0 22px rgba(255, 210, 0, 0.45),
-      0 0 48px rgba(255, 180, 0, 0.25),
-      0 2px 6px rgba(0, 0, 0, 0.5);
+      0 0 2px rgba(255, 240, 0, 1),
+      0 0 5px rgba(255, 230, 0, 0.85),
+      0 0 9px rgba(255, 210, 0, 0.55);
+  }
+}
+
+/* Subtle pulse so the glow breathes on each letter */
+@keyframes lpGlowPulse {
+  0%, 100% {
+    text-shadow:
+      0 0 2px rgba(255, 240, 0, 1),
+      0 0 5px rgba(255, 230, 0, 0.85),
+      0 0 9px rgba(255, 210, 0, 0.55);
+  }
+  50% {
+    text-shadow:
+      0 0 3px rgba(255, 245, 20, 1),
+      0 0 7px rgba(255, 230, 0, 0.95),
+      0 0 13px rgba(255, 210, 0, 0.65);
   }
 }
 
 .lp-blood-text {
-  animation: lpBloodShadow 2s ease-out both;
+  animation: lpBloodShadow 1.2s ease-out both, lpGlowPulse 3s ease-in-out 1.2s infinite;
 }
 
 /* CTAs — stacked vertically */
