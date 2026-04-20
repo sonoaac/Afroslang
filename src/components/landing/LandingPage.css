@@ -1193,6 +1193,62 @@
 
 
 /* ════════════════════════════════
+   MANIFESTO BLOCK
+   ════════════════════════════════ */
+.lp-manifesto {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: clamp(48px, 7vw, 96px) clamp(24px, 6vw, 64px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-align: center;
+  position: relative;
+}
+
+.lp-manifesto::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #b00020, transparent);
+}
+
+.lp-manifesto-eyebrow {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #b00020;
+  margin: 0 0 4px;
+}
+
+.lp-manifesto-body {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  line-height: 1.85;
+  color: rgba(245, 237, 224, 0.72);
+  margin: 0;
+}
+
+.lp-manifesto-body strong {
+  color: #f5ede0;
+  font-weight: 900;
+}
+
+@media (max-width: 767px) {
+  .lp-manifesto {
+    padding: 40px 20px 48px;
+    text-align: left;
+  }
+  .lp-manifesto-body { font-size: 0.88rem; line-height: 1.75; }
+}
+
+/* ════════════════════════════════
    FOOTER
    ════════════════════════════════ */
 .lp-footer {

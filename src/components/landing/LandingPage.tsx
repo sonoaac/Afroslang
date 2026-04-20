@@ -952,6 +952,24 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
           </div>
         </div>
 
+        {/* Manifesto */}
+        <div className="lp-manifesto lp-reveal">
+          <p className="lp-manifesto-eyebrow">A word from us</p>
+          <p className="lp-manifesto-body">
+            Afroslang is built to help children and children of the diaspora who have forgotten their native tongue.
+            Unlike our competitors, we aim to scale above 50 languages — well above 100 — think{' '}
+            <strong>1500+</strong>. That's from Urhobo to Laari to languages with less than 10,000 speakers.
+            Until Africa is great. Africa will continue to be great, and we aim to add love and value to that.
+          </p>
+          <p className="lp-manifesto-body">
+            So help us, and bear with us as we progress — every day. Yes, every single day we will progress,
+            update the app and make sure you get your heart's content and money's worth.
+          </p>
+          <p className="lp-manifesto-body">
+            You all are part of this. We cannot be 100% certain in a project this big, so we hope you will
+            help us further better these lessons and interfaces. Together.
+          </p>
+        </div>
 
       </section>
 
