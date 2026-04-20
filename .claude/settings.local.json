@@ -33,7 +33,10 @@
       "Bash(find /c/Users/chuch/Downloads/Afroslang -name vite.config.* -o -name vitest.config.* -o -name jest.config.* -o -name *.test.* -o -name *.spec.*)",
       "Bash(python3 fix_scripts.py)",
       "Bash(npx tsc:*)",
-      "Bash(ls .env*)"
+      "Bash(ls .env*)",
+      "Bash(awk 'NR>=94 && NR<=130 {print NR\": \"$0}' src/components/landing/LandingPage.css)",
+      "Bash(awk 'NR>=280 && NR<=340 {print NR\": \"$0}' src/components/landing/LandingPage.css)",
+      "Bash(awk 'NR>=650 && NR<=670 {print NR\": \"$0}' src/components/landing/LandingPage.css)"
     ]
   }
 }

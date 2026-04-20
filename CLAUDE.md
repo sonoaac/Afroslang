@@ -114,7 +114,7 @@ Tonal languages get `tone-trainer` exercises automatically. `TONAL_LANGUAGES` se
 Dark luxury theme defined in `src/styles/globals.css`:
 - **Brand colors:** `--brand-black: #000000`, `--brand-red: #b00020`, `--brand-green: #35b729`
 - **Background:** `--app-bg` is a radial gradient (dark black + subtle red glow)
-- **Fonts:** Kavoon (primary UI font), Roboto (fallback), and Playfair Display (serif/editorial) — all loaded via Google Fonts in `globals.css`
+- **Fonts:** Plus Jakarta Sans (primary UI font) and Playfair Display (serif/editorial) — loaded via Google Fonts in `globals.css`
 - **Component library:** shadcn/ui in `src/components/ui/` — **do not modify these files directly**
 
 ### Firebase / Backend (`src/firebase.ts`, `src/utils/`, `functions/`)

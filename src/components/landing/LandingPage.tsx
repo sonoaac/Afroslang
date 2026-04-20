@@ -725,7 +725,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     <div className="lp">
       <GlCanvas />
 
-      <header className={`lp-header${headerScrolled ? ' lp-header--scrolled' : ''}`} style={{ justifyContent: 'flex-start', paddingLeft: 270 }}>
+      <header className={`lp-header${headerScrolled ? ' lp-header--scrolled' : ''}`}>
         <div className="lp-header-left" style={{ gap: 6 }}>
           <img src="/Afroslang.png" className="lp-logo" alt="Afroslang" style={{ display: 'block', width: '52px', height: '52px' }} />
           <span className="lp-brand">
@@ -940,10 +940,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               <span style={{ color: '#f5ede0' }}>Mission</span>
             </span>
             <p className="lp-sand-reveal">
-              Afroslang main goal is to help and assist descendants<br />
-              and children of the diaspora to maintain their<br />
-              language culture and ancestral sense<br />
-              of knowing
+              Afroslang's main goal is to help and assist descendants and children of the diaspora to maintain their language culture and ancestral sense of knowing.
             </p>
           </div>
         </div>
@@ -956,10 +953,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               <span style={{ color: '#f5ede0' }}>Back</span>
             </span>
             <p className="lp-sand-reveal">
-              Afroslang will better charity cases in africa as a<br />
-              whole whilst being transparent of where your<br />
-              money is going. All payments 50% go to<br />
-              charity, the other 50% to the site
+              Afroslang will better charity cases in Africa whilst being transparent about where your money is going. All payments: 50% to charity, 50% to the site.
             </p>
           </div>
         </div>

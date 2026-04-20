@@ -37,9 +37,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px 28px;
+  padding: 14px 20px;
   background: transparent;
   transition: background 0.35s ease, backdrop-filter 0.35s ease;
+}
+
+@media (min-width: 768px) {
+  .lp-header { padding: 20px 28px; }
 }
 .lp-header--scrolled {
   background: transparent;
@@ -62,7 +66,7 @@
 }
 
 .lp-brand {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 900;
   font-size: 2.25rem;
   letter-spacing: 0.06em;
@@ -96,7 +100,7 @@
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 8px;
   padding: 7px 18px;
-  font-family: 'Times New Roman', serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -116,7 +120,7 @@
   border: none;
   border-radius: 8px;
   padding: 7px 18px;
-  font-family: 'Times New Roman', serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -218,7 +222,7 @@
 
 
 .lp-stack-title {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: clamp(2.2rem, 6vw, 5rem);
   font-weight: 900;
   line-height: 1.05;
@@ -229,7 +233,7 @@
 }
 
 .lp-stack-tagline {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: clamp(1.15rem, 2.8vw, 1.75rem);
   font-weight: 900;
   font-style: italic;
@@ -284,7 +288,7 @@
   background: #b00020;
   border: none;
   border-radius: 30px 12px 28px 14px / 14px 28px 12px 30px;
-  font-family: 'Times New Roman', serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -326,7 +330,7 @@
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 14px 30px 14px 30px / 30px 14px 30px 14px;
-  font-family: 'Times New Roman', serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.92rem;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -346,7 +350,7 @@
 .lp-btn-guest-text {
   background: none;
   border: none;
-  font-family: 'Times New Roman', serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.82rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.35);
@@ -367,7 +371,7 @@
 }
 
 .lp-langs-eyebrow {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -405,7 +409,7 @@
 }
 
 .lp-map-cta-hint {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: clamp(1.4rem, 3vw, 2rem);
   font-weight: 900;
   text-align: center;
@@ -458,7 +462,7 @@
 }
 
 .lp-langs-name {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
   color: #111;
@@ -551,7 +555,7 @@
 }
 
 .lp-feature-p {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: clamp(1.2rem, 2.4vw, 1.6rem);
   line-height: 1.65;
   margin: 0;
@@ -571,7 +575,7 @@
 }
 
 .lp-feature-heading {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 900;
   font-size: clamp(1.4rem, 2.8vw, 2rem);
   letter-spacing: 0.04em;
@@ -583,7 +587,7 @@
 }
 
 .lp-feature-body {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: clamp(1rem, 1.8vw, 1.3rem);
   line-height: 1.65;
   color: rgba(255, 255, 255, 0.82);
@@ -640,7 +644,7 @@
 
 .lp-stack-row-label {
   display: inline-block;
-  font-family: 'Times New Roman', serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.18em;
@@ -654,12 +658,14 @@
 }
 
 .lp-stack-row-text p {
-  font-family: 'Times New Roman', Georgia, serif;
-  font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(0.95rem, 2.4vw, 1.6rem);
   line-height: 1.65;
   margin: 0;
   max-width: 700px;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* Image block */
@@ -772,7 +778,7 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 50px;
   padding: 11px 40px 11px 40px;
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.9rem;
   color: #fff;
   outline: none;
@@ -879,7 +885,7 @@
   background: none;
   border: none;
   color: rgba(0, 0, 0, 0.5);
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.78rem;
   cursor: pointer;
   padding: 0 0 8px;
@@ -900,7 +906,7 @@
 }
 
 .lp-explore-panel-name {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 1.25rem;
   font-weight: 900;
   color: #f5ede0;
@@ -911,7 +917,7 @@
 }
 
 .lp-explore-panel-fact {
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.8rem;
   line-height: 1.65;
   color: #f5ede0;
@@ -928,7 +934,7 @@
 }
 
 .lp-explore-lang-label {
-  font-family: 'Times New Roman', serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -948,7 +954,7 @@
   border: 1px solid rgba(245, 237, 224, 0.3);
   border-radius: 18px 8px 18px 8px / 8px 18px 8px 18px;
   padding: 10px 32px 10px 14px;
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.88rem;
   color: #f5ede0;
   appearance: none;
@@ -975,7 +981,7 @@
   border: none;
   border-radius: 24px 10px 24px 10px / 10px 24px 10px 24px;
   padding: 12px 16px;
-  font-family: 'Times New Roman', serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -1000,7 +1006,7 @@
 }
 .lp-explore-coming-soon span { font-size: 2rem; }
 .lp-explore-coming-soon p {
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.82rem;
   color: rgba(0, 0, 0, 0.45);
   margin: 0;
@@ -1023,7 +1029,7 @@
   opacity: 0.25;
 }
 .lp-explore-panel-empty p {
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.82rem;
   color: rgba(0, 0, 0, 0.45);
   margin: 0;
@@ -1246,7 +1252,7 @@
 }
 
 .lp-manifesto-eyebrow {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.2em;
@@ -1257,7 +1263,7 @@
 }
 
 .lp-manifesto-body {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: clamp(1rem, 1.8vw, 1.25rem);
   line-height: 1.85;
   color: rgba(245, 237, 224, 0.72);
@@ -1319,7 +1325,7 @@
 }
 
 .lp-footer-brand-name {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 900;
   font-size: 1.3rem;
   color: #fff;
@@ -1330,7 +1336,7 @@
 }
 
 .lp-footer-brand-desc {
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.78rem;
   line-height: 1.65;
   color: rgba(255, 255, 255, 0.38);
@@ -1384,7 +1390,7 @@
 }
 
 .lp-footer-col-title {
-  font-family: 'Times New Roman', serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -1408,7 +1414,7 @@
   background: none;
   border: none;
   padding: 0;
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.78rem;
   color: rgba(255, 255, 255, 0.38);
   cursor: pointer;
@@ -1424,7 +1430,7 @@
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 .lp-footer-ownership-name {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.82rem;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.7);
@@ -1432,7 +1438,7 @@
   letter-spacing: 0.04em;
 }
 .lp-footer-ownership-bio {
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.38);
   line-height: 1.6;
@@ -1440,7 +1446,7 @@
 }
 
 .lp-footer-fact {
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.76rem;
   color: rgba(255, 255, 255, 0.32);
   line-height: 1.45;
@@ -1455,7 +1461,7 @@
   gap: 8px;
   padding: 16px clamp(20px, 5vw, 80px);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.72rem;
   color: rgba(255, 255, 255, 0.22);
 }
@@ -1508,7 +1514,7 @@
 .our-story-close:hover { color: #fff; }
 
 .our-story-title {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 1.6rem;
   font-weight: 900;
   color: #fff;
@@ -1523,7 +1529,7 @@
 }
 
 .our-story-owner {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.85rem;
   color: #b00020;
   letter-spacing: 0.06em;
@@ -1532,7 +1538,7 @@
 }
 
 .our-story-body p {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.98rem;
   line-height: 1.75;
   color: rgba(255, 255, 255, 0.72);
@@ -1666,7 +1672,7 @@
 
 /* DescrambleText renders a .dsc-word span — style that */
 .as-auth-title-wrap .dsc-word {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: clamp(1.7rem, 5vw, 2.3rem);
   font-weight: 900;
   color: #fff;
@@ -1679,7 +1685,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.5);
   margin-bottom: 1rem;
@@ -1714,7 +1720,7 @@
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.38);
-  font-family: 'Times New Roman', serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -1758,7 +1764,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 18px 8px 18px 8px / 8px 18px 8px 18px;
   padding: 1.1rem 1rem 0.45rem;
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.9rem;
   color: #fff;
   outline: none;
@@ -1777,7 +1783,7 @@
   top: 50%;
   left: 1rem;
   transform: translateY(-50%);
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.86rem;
   color: rgba(255, 255, 255, 0.35);
   pointer-events: none;
@@ -1815,7 +1821,7 @@
   width: 100%;
   background: linear-gradient(135deg, #b00020 0%, #700015 100%);
   color: #fff;
-  font-family: 'Times New Roman', serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.88rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -1840,7 +1846,7 @@
   background: none;
   border: none;
   color: rgba(176, 0, 32, 0.5);
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.76rem;
   letter-spacing: 0.05em;
   cursor: pointer;
@@ -1858,7 +1864,7 @@
   align-items: center;
   gap: 0.75rem;
   color: rgba(255, 255, 255, 0.2);
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.72rem;
   margin: 0.2rem 0;
 }
@@ -1877,7 +1883,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px 22px 8px 22px / 22px 8px 22px 8px;
   padding: 0.82rem;
-  font-family: 'Times New Roman', serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.86rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.55);
@@ -1897,7 +1903,7 @@
   border: 1px solid rgba(239, 68, 68, 0.25);
   border-radius: 8px;
   padding: 9px 12px;
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.76rem;
   color: #f87171;
   text-align: center;
@@ -1908,7 +1914,7 @@
   border: 1px solid rgba(53, 183, 41, 0.25);
   border-radius: 8px;
   padding: 9px 12px;
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.76rem;
   color: #6ee65c;
   text-align: center;
@@ -1930,7 +1936,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  font-family: Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.73rem;
   color: rgba(255, 255, 255, 0.38);
   transition: color 0.2s;
@@ -1953,7 +1959,7 @@
   color: #f5ede0;
   -webkit-text-stroke: 0.6px #1a1008;
   paint-order: stroke fill;
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   text-shadow:
     0 1px 0 rgba(30, 18, 6, 0.8),
     0 0 22px rgba(200, 169, 110, calc((1 - var(--sand-p)) * 0.55));
@@ -2009,10 +2015,16 @@
 /* ── Mobile (<768px) ── */
 @media (max-width: 767px) {
 
+  /* Root: prevent ANY horizontal overflow */
+  .lp, .lp-stack, .lp-footer {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
   /* Header */
-  .lp-header { padding: 14px 16px; }
+  .lp-header { padding: 12px 16px; justify-content: center; }
   .lp-logo   { width: 36px; height: 36px; }
-  .lp-brand  { font-size: 1.45rem; }
+  .lp-brand  { font-size: 1.3rem; }
   .lp-header-right { display: none; }
 
   /* Hero top block */
