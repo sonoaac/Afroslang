@@ -155,12 +155,7 @@
   z-index: 0;
 }
 .lp-stack-top::before {
-  width: clamp(180px, 28vw, 340px);
-  height: clamp(180px, 28vw, 340px);
-  top: 10%;
-  left: -8%;
-  background: radial-gradient(ellipse, rgba(176,0,32,0.13) 0%, transparent 70%);
-  animation-duration: 12s;
+  display: none;
 }
 .lp-stack-top::after {
   width: clamp(140px, 22vw, 260px);
