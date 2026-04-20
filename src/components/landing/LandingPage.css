@@ -262,20 +262,20 @@
   animation: lpHeroFadeUp 0.7s ease-out both;
 }
 
-/* ── Blood 3D shadow — builds in after each word lands ── */
+/* ── Yellow glow — builds in after each word lands ── */
 @keyframes lpBloodShadow {
   0%   { text-shadow: none; }
   40%  {
     text-shadow:
-      1px 1px 0 rgba(139,0,0,0.25),
-      2px 2px 0 rgba(80,0,0,0.12);
+      0 0 12px rgba(255, 220, 50, 0.3),
+      0 0 28px rgba(255, 200, 0, 0.15);
   }
   100% {
     text-shadow:
-      1px 1px 0 rgba(139,0,0,0.55),
-      2px 2px 0 rgba(100,0,0,0.35),
-      3px 3px 0 rgba(60,0,0,0.2),
-      5px 5px 14px rgba(0,0,0,0.35);
+      0 0 8px  rgba(255, 230, 60, 0.55),
+      0 0 22px rgba(255, 210, 0, 0.45),
+      0 0 48px rgba(255, 180, 0, 0.25),
+      0 2px 6px rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -331,8 +331,8 @@
 /* AFROSLANG: chars 1–4 = AFRO (white, inherited), chars 5–9 = SLANG (red) */
 .dsc-afroslang .dsc-char:nth-child(n+5) { color: #b00020; }
 
-/* REKINDLE: chars 1–2 = RE (red), chars 3–8 = KINDLE (white, inherited) */
-.dsc-rekindle .dsc-char:nth-child(-n+2) { color: #b00020; }
+/* REKINDLE: all chars white */
+.dsc-rekindle .dsc-char { color: #ffffff; }
 
 /* "I have an account" — outlined ghost button */
 .lp-btn-hero-ghost {

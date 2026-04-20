@@ -755,9 +755,9 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               </span>
               <span
                 className="lp-tagline-sub lp-blood-text"
-                style={{ color: 'rgba(255,255,255,0.75)', display: 'block', animationDelay: `${SUB_DELAY + 900}ms` }}
+                style={{ color: '#ffffff', display: 'block', animationDelay: `${SUB_DELAY + 900}ms`, textTransform: 'uppercase', letterSpacing: '0.05em' }}
               >
-                with your ancestral tongues
+                YOUR ANCESTRAL TONGUES
               </span>
             </p>
           </div>
