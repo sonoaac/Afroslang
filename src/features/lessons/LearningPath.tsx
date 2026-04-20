@@ -53,6 +53,11 @@ export function LearningPath({
   const currentLanguage = currentLanguageId ? getLanguageById(currentLanguageId) : null;
   const langName = currentLanguage?.name ?? currentLanguageId ?? '';
 
+  // Split "Arabic (North African)" → base "Arabic", qualifier "(North African)"
+  const langNameMatch = langName.match(/^([^(]+?)(\s*\(.*\))?$/);
+  const langNameBase = langNameMatch?.[1]?.trim() ?? langName;
+  const langNameQualifier = langNameMatch?.[2]?.trim() ?? '';
+
   // Set document title: "LearnIgbo | Afroslang"
   useEffect(() => {
     if (langName) {
@@ -199,7 +204,12 @@ export function LearningPath({
           </div>
           <div className="lp-logo-text">
             <span className="lp-logo-title">Afroslang</span>
-            <span className="lp-logo-sub">Learn{langName}</span>
+            <span className="lp-logo-sub">
+              Learn{langNameBase}
+              {langNameQualifier && (
+                <span className="lp-logo-sub-qualifier">{langNameQualifier}</span>
+              )}
+            </span>
           </div>
         </div>
 

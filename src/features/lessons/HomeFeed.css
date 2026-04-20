@@ -119,6 +119,17 @@
   letter-spacing: 2px;
   text-transform: uppercase;
   white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.lp-logo-sub-qualifier {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  opacity: 0.75;
+  white-space: nowrap;
 }
 
 /* ── Nav items ── */
