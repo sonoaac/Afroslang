@@ -2015,10 +2015,9 @@
 /* ── Mobile (<768px) ── */
 @media (max-width: 767px) {
 
-  /* Root: prevent ANY horizontal overflow */
-  .lp, .lp-stack, .lp-footer {
-    max-width: 100vw;
-    overflow-x: hidden;
+  /* Clip horizontal overflow without creating a scroll container (preserves sticky header) */
+  .lp-stack, .lp-footer {
+    overflow-x: clip;
   }
 
   /* Header */
