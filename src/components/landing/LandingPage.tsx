@@ -923,8 +923,8 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
             <img src="/Afroplus.png" alt="AfroPlus" className="lp-afroplus-img" />
           </div>
           <div className="lp-feature-text-block lp-feature-text-block--right">
-            <h3 className="lp-feature-heading lp-feature-heading--afroplus lp-sand-reveal">
-              <span style={{ color: '#b00020' }}>Afro</span><span style={{ color: '#f5ede0' }}>Plus</span>
+            <h3 className="lp-feature-heading lp-feature-heading--afroplus lp-sand-reveal" style={{ color: '#b00020' }}>
+              AfroPlus
             </h3>
             <p className="lp-feature-body lp-sand-reveal">
               AfroPlus unlocks unlimited hearts, 2× XP on every lesson, the full reviews page and a completely ad free experience. Start with a 7 - day free trial and cancel anytime.
@@ -934,9 +934,8 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
         {/* Our Mission — merged with Giving Back, centred */}
         <div className="lp-mission-block lp-reveal">
-          <span className="lp-sand-reveal" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em', textAlign: 'center', display: 'block' }}>
-            <span style={{ color: '#b00020' }}>Our</span>{' '}
-            <span style={{ color: '#f5ede0' }}>Mission</span>
+          <span className="lp-sand-reveal" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em', textAlign: 'center', display: 'block', color: '#b00020' }}>
+            Our Mission
           </span>
           <p className="lp-sand-reveal lp-mission-body">
             Afroslang's main goal is to help and assist descendants and children of the diaspora to maintain their language culture and ancestral sense of knowing.
