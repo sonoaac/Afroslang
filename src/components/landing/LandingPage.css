@@ -416,12 +416,16 @@
   font-size: clamp(1.4rem, 3vw, 2rem);
   font-weight: 900;
   text-align: center;
-  margin: 0 0 20px;
+  margin: 16px 0 20px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #ffffff;
   -webkit-text-stroke: 2px #000000;
   paint-order: stroke fill;
+  text-shadow:
+    1px 1px 0 #e6b800,
+    2px 2px 0 #cc9f00,
+    3px 3px 0 #a67c00;
 }
 
 .lp-langs-grid {
