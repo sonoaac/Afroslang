@@ -28,6 +28,27 @@ const VALID_LANGS: AfricanLanguage[] = [
   'somali','berber','moore','lingala','twi','chichewa','wolof'
 ];
 
+// Primary country slug for each language — used to build the URL
+const LANG_COUNTRY: Record<AfricanLanguage, string> = {
+  igbo:     'nigeria',
+  yoruba:   'nigeria',
+  hausa:    'nigeria',
+  amharic:  'ethiopia',
+  somali:   'somalia',
+  arabic:   'egypt',
+  swahili:  'tanzania',
+  zulu:     'south-africa',
+  twi:      'ghana',
+  wolof:    'senegal',
+  moore:    'burkina-faso',
+  lingala:  'dr-congo',
+  shona:    'zimbabwe',
+  chichewa: 'malawi',
+  berber:   'morocco',
+};
+
+const langUrl = (lang: AfricanLanguage) => `/${LANG_COUNTRY[lang]}/${lang}`;
+
 function createDefaultProgress(lang: AfricanLanguage): UserProgress {
   return {
     languageId: lang, xp: 0, level: 1, hearts: 5, heartsResetTime: null,
@@ -57,7 +78,7 @@ function LearnView({
   onBackToLanding, onNavigate, onGoToSignUp, onGoToSubscription,
   onSetCurrentLanguage,
 }: LearnViewProps) {
-  const { lang } = useParams<{ lang: string }>();
+  const { lang } = useParams<{ country: string; lang: string }>();
   const language = lang as AfricanLanguage;
 
   const [subScreen, setSubScreen] = useState<'path' | 'lesson' | 'complete'>('path');
@@ -250,11 +271,12 @@ function App() {
 
     localStorage.removeItem('afroslang_current_language');
 
-    // Pre-select language from URL: /learn/:lang or /:lang (legacy)
+    // Pre-select language from URL: /:country/:lang or /learn/:lang (legacy)
     const path = window.location.pathname;
+    const countryLangMatch = path.match(/^\/[a-z-]+\/([a-z]+)$/);
     const learnMatch = path.match(/^\/learn\/([a-z]+)/);
     const legacyMatch = path.match(/^\/([a-z]+)$/);
-    const urlLang = (learnMatch?.[1] ?? legacyMatch?.[1] ?? '') as AfricanLanguage;
+    const urlLang = (countryLangMatch?.[1] ?? learnMatch?.[1] ?? legacyMatch?.[1] ?? '') as AfricanLanguage;
     if (VALID_LANGS.includes(urlLang)) {
       setPreSelectedLanguage(urlLang);
     }
@@ -285,7 +307,7 @@ function App() {
       const lang = preSelectedLanguage as AfricanLanguage;
       setCurrentLanguage(lang);
       setPreSelectedLanguage(null);
-      navigate(`/learn/${lang}`, { replace: true });
+      navigate(langUrl(lang), { replace: true });
     }
   }, [user, isGuest, loading]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -295,7 +317,7 @@ function App() {
     setCurrentLanguage(lang);
     if (!userProgressMap[lang])
       setUserProgressMap(prev => ({ ...prev, [lang]: createDefaultProgress(lang) }));
-    navigate(`/learn/${lang}`);
+    navigate(langUrl(lang));
   };
 
   const goToLanding = () => navigate('/');
@@ -341,15 +363,15 @@ function App() {
         <LandingPage
           initialSheet={authSheet}
           isLoggedIn={!!user}
-          onContinue={() => currentLanguage && navigate(`/learn/${currentLanguage}`)}
+          onContinue={() => currentLanguage && navigate(langUrl(currentLanguage))}
           onSelectLanguage={handleLanguageSelect}
           onPreSelectLanguage={setPreSelectedLanguage}
           userProgressMap={userProgressMap}
         />
       } />
 
-      {/* Learning path + lesson + complete */}
-      <Route path="/learn/:lang" element={
+      {/* Learning path + lesson + complete — /:country/:lang */}
+      <Route path="/:country/:lang" element={
         authenticated ? appShell(
           <LearnView
             interfaceLanguage={interfaceLanguage}
@@ -372,9 +394,14 @@ function App() {
         ) : <Navigate to="/" replace />
       } />
 
-      {/* Legacy /:lang URLs → redirect to /learn/:lang */}
+      {/* Legacy /learn/:lang → /:country/:lang */}
       {VALID_LANGS.map(lang => (
-        <Route key={lang} path={`/${lang}`} element={<Navigate to={`/learn/${lang}`} replace />} />
+        <Route key={`learn-${lang}`} path={`/learn/${lang}`} element={<Navigate to={langUrl(lang)} replace />} />
+      ))}
+
+      {/* Legacy /:lang → /:country/:lang */}
+      {VALID_LANGS.map(lang => (
+        <Route key={lang} path={`/${lang}`} element={<Navigate to={langUrl(lang)} replace />} />
       ))}
 
       {/* Shop */}
@@ -382,7 +409,7 @@ function App() {
         authenticated ? appShell(
           <ShopScreen
             interfaceLanguage={interfaceLanguage}
-            onBack={() => currentLanguage ? navigate(`/learn/${currentLanguage}`) : goToLanding()}
+            onBack={() => currentLanguage ? navigate(langUrl(currentLanguage)) : goToLanding()}
           />
         ) : <Navigate to="/" replace />
       } />
@@ -391,7 +418,7 @@ function App() {
       <Route path="/leaderboard" element={
         authenticated ? appShell(
           <LeaderboardScreen
-            onBack={() => currentLanguage ? navigate(`/learn/${currentLanguage}`) : goToLanding()}
+            onBack={() => currentLanguage ? navigate(langUrl(currentLanguage as AfricanLanguage)) : goToLanding()}
           />
         ) : <Navigate to="/" replace />
       } />
@@ -403,7 +430,7 @@ function App() {
             userProgressMap={userProgressMap}
             currentLanguage={currentLanguage}
             interfaceLanguage={interfaceLanguage}
-            onBack={() => currentLanguage ? navigate(`/learn/${currentLanguage}`) : goToLanding()}
+            onBack={() => currentLanguage ? navigate(langUrl(currentLanguage as AfricanLanguage)) : goToLanding()}
             onContinueLearning={handleLanguageSelect}
             onChangeInterfaceLanguage={setInterfaceLanguage}
             onGoToShop={() => navigate('/shop')}
@@ -416,7 +443,7 @@ function App() {
         authenticated ? appShell(
           <LatestNews
             interfaceLanguage={interfaceLanguage}
-            onBack={() => currentLanguage ? navigate(`/learn/${currentLanguage}`) : goToLanding()}
+            onBack={() => currentLanguage ? navigate(langUrl(currentLanguage as AfricanLanguage)) : goToLanding()}
           />
         ) : <Navigate to="/" replace />
       } />
