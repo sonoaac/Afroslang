@@ -56,7 +56,7 @@
 }
 
 @media (min-width: 768px) {
-  .lp-header { padding: 20px 28px; justify-content: flex-start; padding-left: 48px; }
+  .lp-header { padding: 20px 28px; justify-content: flex-start; padding-left: 170px; }
   .lp-header::after { height: 120px; }
 }
 
@@ -85,7 +85,10 @@
   color: #ffffff;
   -webkit-text-stroke: 2.5px #000000;
   paint-order: stroke fill;
-  text-shadow: none;
+  text-shadow:
+    1px 1px 0 #000000,
+    2px 2px 0 #111111,
+    3px 3px 0 #222222;
   animation: none; /* no blur animation on the header brand */
 }
 .lp-brand em {
