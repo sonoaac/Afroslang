@@ -2074,7 +2074,8 @@
     width: 100%;
     text-align: center;
     font-size: clamp(1rem, 7vw, 1.3rem);
-    overflow: hidden;
+    overflow: visible;
+    padding-right: 6px;
   }
   .lp-stack-tagline .lp-blood-text { font-size: 1em !important; }
   .lp-tagline-sub { font-size: 0.82rem; }

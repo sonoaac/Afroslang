@@ -758,6 +758,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
               </span>
             </p>
           </div>
+          <p className="lp-langs-eyebrow lp-type-in" style={{ color: '#ffffff', marginTop: '18px' }}>Explore the continent one language at a time</p>
         </div>
 
         {/* ── Interactive Language Explorer ── */}
@@ -767,7 +768,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
         >
           {/* Section header — title + eyebrow only (search moved into left col on desktop) */}
           <div className="lp-explore-header lp-reveal">
-            <p className="lp-langs-eyebrow lp-type-in" style={{ color: '#ffffff' }}>Explore the continent one language at a time</p>
             {/* Search shown in header on mobile only */}
             <div className="lp-explore-search-wrap lp-search-mobile-only">
               <svg className="lp-explore-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
