@@ -909,10 +909,10 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
             <SandbitsIcon size={140} />
           </div>
           <div className="lp-feature-text-block">
-            <h3 className="lp-feature-heading lp-feature-heading--sandbits lp-sand-reveal">
+            <h3 className="lp-feature-heading lp-feature-heading--sandbits lp-reveal">
               Sandbits
             </h3>
-            <p className="lp-feature-body lp-sand-reveal">
+            <p className="lp-feature-body lp-reveal">
               Sandbits are Afroslang's in-game currency used to unlock avatars, backgrounds and cosmetics in the Shop. Earn them by finishing in the top 3 on the weekly leaderboard or converting Diamonds.
             </p>
           </div>
@@ -924,10 +924,10 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
             <img src="/Afroplus.png" alt="AfroPlus" className="lp-afroplus-img" />
           </div>
           <div className="lp-feature-text-block lp-feature-text-block--right">
-            <h3 className="lp-feature-heading lp-feature-heading--afroplus lp-sand-reveal" style={{ color: '#b00020' }}>
+            <h3 className="lp-feature-heading lp-feature-heading--afroplus lp-reveal" style={{ color: '#b00020' }}>
               AfroPlus
             </h3>
-            <p className="lp-feature-body lp-sand-reveal">
+            <p className="lp-feature-body lp-reveal">
               AfroPlus unlocks unlimited hearts, 2× XP on every lesson, the full reviews page and a completely ad free experience. Start with a 7 - day free trial and cancel anytime.
             </p>
           </div>
@@ -935,13 +935,13 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
         {/* Our Mission — merged with Giving Back, centred */}
         <div className="lp-mission-block lp-reveal">
-          <span className="lp-sand-reveal" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em', textAlign: 'center', display: 'block', color: '#b00020' }}>
+          <span className="lp-reveal" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em', textAlign: 'center', display: 'block', color: '#b00020' }}>
             Our Mission
           </span>
-          <p className="lp-sand-reveal lp-mission-body">
+          <p className="lp-reveal lp-mission-body">
             Afroslang's main goal is to help and assist descendants and children of the diaspora to maintain their language culture and ancestral sense of knowing.
           </p>
-          <p className="lp-sand-reveal lp-mission-body">
+          <p className="lp-reveal lp-mission-body">
             Afroslang will better charity cases in Africa whilst being transparent about where your money is going. All payments: 50% to charity, 50% to the site.
           </p>
         </div>
