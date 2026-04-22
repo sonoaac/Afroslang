@@ -196,7 +196,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
   // ── Typewriter reveal observer ────────────────────────────────────────────
   useEffect(() => {
-    if (activePage) return;
     const els = document.querySelectorAll<HTMLElement>('.lp-type-in');
     if (!els.length) return;
     const obs = new IntersectionObserver(
@@ -212,11 +211,10 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     );
     els.forEach(el => obs.observe(el));
     return () => obs.disconnect();
-  }, [activePage]);
+  }, []);
 
   // ── Scroll reveal observer ─────────────────────────────────────────────────
   useEffect(() => {
-    if (activePage) return;
     const els = document.querySelectorAll<HTMLElement>('.lp-reveal');
     if (!els.length) return;
     const obs = new IntersectionObserver(
@@ -232,7 +230,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     );
     els.forEach(el => obs.observe(el));
     return () => obs.disconnect();
-  }, [activePage]);
+  }, []);
 
   // ── Body scroll lock when overlay is open ─────────────────────────────────
   useEffect(() => {
@@ -255,7 +253,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
   // ── Sand-rise scroll driver ────────────────────────────────────────────────
   useEffect(() => {
-    if (activePage) return;
     const update = () => {
       const els = document.querySelectorAll<HTMLElement>('.lp-sand-reveal');
       const viewH = window.innerHeight;
@@ -273,7 +270,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     update();
     window.addEventListener('scroll', update, { passive: true });
     return () => window.removeEventListener('scroll', update);
-  }, [activePage]);
+  }, []);
 
 
 
@@ -713,17 +710,16 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     },
   };
 
-  if (activePage && PAGE_CONTENT[activePage]) {
-    const pg = PAGE_CONTENT[activePage];
-    return (
-      <StaticPage title={pg.title} onBack={() => setActivePage(null)}>
-        {pg.body}
-      </StaticPage>
-    );
-  }
+  const activePg = activePage && PAGE_CONTENT[activePage] ? PAGE_CONTENT[activePage] : null;
 
   return (
-    <div className="lp">
+    <>
+      {activePg && (
+        <StaticPage title={activePg.title} onBack={() => setActivePage(null)}>
+          {activePg.body}
+        </StaticPage>
+      )}
+      <div className="lp" style={{ display: activePg ? 'none' : undefined }}>
       <GlCanvas />
 
       <header className={`lp-header${headerScrolled ? ' lp-header--scrolled' : ''}`}>
@@ -1306,5 +1302,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
         </div>
       </div>
     </div>
+    </>
   );
 }
