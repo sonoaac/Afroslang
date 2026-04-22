@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { InterfaceLanguage, AfricanLanguage, UserProgress, Lesson } from './types';
 import { LandingPage } from './components/landing/LandingPage';
 import { GlCanvas } from './components/landing/GlCanvas';
@@ -21,126 +22,283 @@ import { saveUserProgress } from './utils/userData';
 import { addWeeklyXP, getCurrentWeekIdFromDB, getUserLeague } from './utils/leaderboardUtils';
 import { isXpBoostActive, getBackgroundStyle } from './utils/currencyUtils';
 
-type Screen = 'auth' | 'interface-select' | 'path' | 'lesson' | 'complete' | 'leaderboard' | 'subscription' | 'payment-success' | 'feedback' | 'shop' | 'latest-news' | 'profile';
+// ── Shared types ─────────────────────────────────────────────────────────────
+const VALID_LANGS: AfricanLanguage[] = [
+  'swahili','hausa','yoruba','igbo','zulu','amharic','arabic','shona',
+  'somali','berber','moore','lingala','twi','chichewa','wolof'
+];
 
-function App() {
-  const { user, userData, setUserData, isGuest, loading, logout, setGuestMode } = useAuth();
-  const [currentScreen, setCurrentScreen] = useState<Screen>('auth');
-  const showIntro = false;
-  const handleIntroComplete = useCallback(() => {}, []);
+function createDefaultProgress(lang: AfricanLanguage): UserProgress {
+  return {
+    languageId: lang, xp: 0, level: 1, hearts: 5, heartsResetTime: null,
+    streak: 0, lastPracticeDate: null, streakDays: [], lessonsCompleted: 0,
+    wordsLearned: 0, mistakeCount: 0, completedLessons: [], currentStage: 1
+  };
+}
 
-  // Detect Stripe payment redirect: ?payment_success=1
-  const [paymentSuccessReturn] = useState<boolean>(
-    () => new URLSearchParams(window.location.search).has('payment_success')
-  );
+// ── LearnView — manages path / lesson / complete sub-screens ─────────────────
+interface LearnViewProps {
+  interfaceLanguage: InterfaceLanguage;
+  userProgressMap: Record<string, UserProgress>;
+  setUserProgressMap: React.Dispatch<React.SetStateAction<Record<string, UserProgress>>>;
+  userData: any;
+  user: any;
+  isGuest: boolean;
+  onBackToLanding: () => void;
+  onNavigate: (screen: string) => void;
+  onGoToSignUp: () => void;
+  onGoToSubscription: () => void;
+  onSetCurrentLanguage: (lang: AfricanLanguage) => void;
+}
 
-  // Track whether the user was already authenticated when the app loaded
-  // (returning user — they don't go through LandingPage so no splash)
-  const wasAuthOnLoad = useRef<boolean | null>(null);
-  const [authSheet, setAuthSheet] = useState<'login' | 'signup' | null>(null);
-  const [preSelectedLanguage, setPreSelectedLanguage] = useState<string | null>(null);
-  const [interfaceLanguage, setInterfaceLanguage] = useState<InterfaceLanguage>('en');
-  const [currentLanguage, setCurrentLanguage] = useState<AfricanLanguage | null>(null);
-  const [userProgressMap, setUserProgressMap] = useState<Record<string, UserProgress>>({});
+function LearnView({
+  interfaceLanguage, userProgressMap, setUserProgressMap,
+  userData, user, isGuest,
+  onBackToLanding, onNavigate, onGoToSignUp, onGoToSubscription,
+  onSetCurrentLanguage,
+}: LearnViewProps) {
+  const { lang } = useParams<{ lang: string }>();
+  const language = lang as AfricanLanguage;
 
-  // Valid language slugs — used to parse URL on load / back navigation
-  const VALID_LANGS: AfricanLanguage[] = [
-    'swahili','hausa','yoruba','igbo','zulu','amharic','arabic','shona',
-    'somali','berber','moore','lingala','twi','chichewa','wolof'
-  ];
-  const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
+  const [subScreen, setSubScreen] = useState<'path' | 'lesson' | 'complete'>('path');
+  const [activeLesson, setActiveLesson]   = useState<Lesson | null>(null);
   const [lastCompletedXP, setLastCompletedXP] = useState(0);
 
-  // Load progress from localStorage on mount
+  useEffect(() => {
+    onSetCurrentLanguage(language);
+    // Ensure progress entry exists
+    setUserProgressMap(prev =>
+      prev[language] ? prev : { ...prev, [language]: createDefaultProgress(language) }
+    );
+    setSubScreen('path');
+  }, [language]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const getCurrentProgress = (): UserProgress => {
+    const unlimitedHearts = userData?.subscription?.active ? 999 : 5;
+    const progress = userProgressMap[language];
+    if (!progress) return { ...createDefaultProgress(language), hearts: unlimitedHearts };
+    return { ...progress, hearts: unlimitedHearts };
+  };
+
+  const handleStartLesson = (lesson: Lesson) => {
+    if (!lesson?.exercises?.length) return;
+    setActiveLesson(lesson);
+    setSubScreen('lesson');
+  };
+
+  const handleLessonComplete = async (xpEarned: number, heartsLost: number, heartsGained: number) => {
+    if (!language || !activeLesson) return;
+    setLastCompletedXP(xpEarned);
+
+    if (user && !isGuest) {
+      await saveUserProgress(user.uid, language, activeLesson.id, xpEarned, heartsLost);
+      try {
+        const weekId = await getCurrentWeekIdFromDB();
+        const userLeague = await getUserLeague(user.uid, weekId);
+        await addWeeklyXP(
+          user.uid, userLeague || 'Copper',
+          userData?.username || 'User', xpEarned,
+          userData?.subscription?.active || false, weekId
+        );
+      } catch {}
+    }
+
+    setUserProgressMap(prev => {
+      const current = prev[language] || createDefaultProgress(language);
+      const shouldCountXP = user && !isGuest;
+      const newXp    = shouldCountXP ? current.xp + xpEarned : current.xp;
+      const newLevel = shouldCountXP ? Math.floor(newXp / 100) + 1 : current.level;
+
+      let newHearts    = Math.min(5, current.hearts - heartsLost + heartsGained);
+      let newResetTime = current.heartsResetTime;
+      if (newHearts === 0) newResetTime = Date.now() + 7 * 60 * 60 * 1000;
+      else if (newHearts > 0 && current.heartsResetTime) newResetTime = null;
+
+      const today = new Date();
+      const todayStr = today.toDateString();
+      const todayDay = today.getDate();
+      const todayMonth = today.getMonth();
+      const todayYear  = today.getFullYear();
+      const lastDate   = current.lastPracticeDate;
+      let newStreak  = shouldCountXP ? current.streak : 0;
+      let streakDays = shouldCountXP ? (current.streakDays || []) : [];
+
+      if (shouldCountXP && (!lastDate || lastDate !== todayStr)) {
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        if (lastDate === yesterday.toDateString()) {
+          newStreak += 1;
+        } else if (!lastDate) {
+          newStreak = 1;
+        } else {
+          newStreak = 1;
+          const lastDateObj = new Date(lastDate);
+          if (lastDateObj.getMonth() !== todayMonth || lastDateObj.getFullYear() !== todayYear) {
+            streakDays = [];
+          }
+        }
+        if (todayMonth === new Date().getMonth() && todayYear === new Date().getFullYear()
+            && !streakDays.includes(todayDay)) {
+          streakDays = [...streakDays, todayDay].sort((a, b) => a - b);
+        }
+      }
+
+      const completedLessons = (current.completedLessons || []).includes(activeLesson.id)
+        ? current.completedLessons
+        : [...(current.completedLessons || []), activeLesson.id];
+
+      return {
+        ...prev,
+        [language]: {
+          ...current, xp: newXp, level: newLevel, hearts: newHearts,
+          heartsResetTime: newResetTime, streak: newStreak,
+          lastPracticeDate: shouldCountXP ? todayStr : current.lastPracticeDate,
+          streakDays, lessonsCompleted: current.lessonsCompleted + 1,
+          wordsLearned: current.wordsLearned + 3,
+          mistakeCount: heartsLost > 0 ? current.mistakeCount + heartsLost : current.mistakeCount,
+          completedLessons
+        }
+      };
+    });
+
+    setSubScreen('complete');
+  };
+
+  if (subScreen === 'lesson' && activeLesson) {
+    return (
+      <LessonScreen
+        interfaceLanguage={interfaceLanguage}
+        lesson={activeLesson}
+        languageId={language}
+        languageName={getLanguageById(language)?.name || ''}
+        hearts={getCurrentProgress().hearts}
+        heartsData={userData?.heartsData}
+        isSubscribed={userData?.subscription?.active || false}
+        xpBoostActive={isXpBoostActive(userData)}
+        userId={user?.uid}
+        userName={userData?.name || user?.displayName || undefined}
+        isGuest={isGuest}
+        onComplete={handleLessonComplete}
+        onExit={() => setSubScreen('path')}
+        onBackToLanguageSelect={onBackToLanding}
+        onGoToSignUp={onGoToSignUp}
+        onGoToSubscription={onGoToSubscription}
+      />
+    );
+  }
+
+  if (subScreen === 'complete') {
+    return (
+      <LessonComplete
+        interfaceLanguage={interfaceLanguage}
+        xpEarned={lastCompletedXP}
+        onContinue={() => setSubScreen('path')}
+        onBackToLanguageSelect={onBackToLanding}
+      />
+    );
+  }
+
+  return (
+    <LearningPath
+      interfaceLanguage={interfaceLanguage}
+      stages={getStagesForLanguage(language)}
+      progress={getCurrentProgress()}
+      onStartLesson={handleStartLesson}
+      onBackToLanguageSelect={onBackToLanding}
+      onNavigate={onNavigate}
+      currentLanguageId={language}
+    />
+  );
+}
+
+// ── App ───────────────────────────────────────────────────────────────────────
+function App() {
+  const navigate = useNavigate();
+  const { user, userData, isGuest, loading, logout, setGuestMode } = useAuth();
+
+  const [authSheet, setAuthSheet]           = useState<'login' | 'signup' | null>(null);
+  const [preSelectedLanguage, setPreSelectedLanguage] = useState<string | null>(null);
+  const [interfaceLanguage, setInterfaceLanguage]     = useState<InterfaceLanguage>('en');
+  const [currentLanguage, setCurrentLanguage]         = useState<AfricanLanguage | null>(null);
+  const [userProgressMap, setUserProgressMap]         = useState<Record<string, UserProgress>>({});
+
+  const wasAuthOnLoad   = useRef<boolean | null>(null);
+  const paymentSuccess  = new URLSearchParams(window.location.search).has('payment_success');
+
+  // Unused — satisfies useCallback lint
+  const handleIntroComplete = useCallback(() => {}, []);
+  void handleIntroComplete;
+
+  // ── Load from localStorage ────────────────────────────────────────────────
   useEffect(() => {
     const savedInterface = localStorage.getItem('afroslang_interface');
-    const savedProgress = localStorage.getItem('afroslang_progress');
-    const savedCurrentLang = localStorage.getItem('afroslang_current_language');
+    const savedProgress  = localStorage.getItem('afroslang_progress');
 
-    if (savedInterface) {
-      setInterfaceLanguage(savedInterface as InterfaceLanguage);
-    }
+    if (savedInterface) setInterfaceLanguage(savedInterface as InterfaceLanguage);
 
     if (savedProgress) {
       const progress = JSON.parse(savedProgress);
-      
-      // Check and reset hearts if 24 hours passed, and normalize data
-      const updatedProgress = { ...progress };
-      Object.keys(updatedProgress).forEach(langId => {
-        const prog = updatedProgress[langId];
-        // Ensure completedLessons is always an array
-        if (!prog.completedLessons) {
-          prog.completedLessons = [];
-        }
-        if (prog.heartsResetTime && Date.now() >= prog.heartsResetTime) {
-          prog.hearts = 5;
-          prog.heartsResetTime = null;
+      Object.keys(progress).forEach(langId => {
+        const p = progress[langId];
+        if (!p.completedLessons) p.completedLessons = [];
+        if (p.heartsResetTime && Date.now() >= p.heartsResetTime) {
+          p.hearts = 5; p.heartsResetTime = null;
         }
       });
-      setUserProgressMap(updatedProgress);
+      setUserProgressMap(progress);
     }
 
-    // Always start from interface selection for a fresh experience
-    // Users can manually navigate to their previous language if needed
-    // Don't auto-load saved language - let users choose fresh each time
+    localStorage.removeItem('afroslang_current_language');
 
-    // Clear any saved current language to ensure fresh start
-    if (savedCurrentLang) {
-      localStorage.removeItem('afroslang_current_language');
-    }
-
-    // Parse URL on initial load — e.g. afroslang.com/igbo → go to Igbo path
-    const urlLang = window.location.pathname.slice(1).toLowerCase() as AfricanLanguage;
+    // Pre-select language from URL: /learn/:lang or /:lang (legacy)
+    const path = window.location.pathname;
+    const learnMatch = path.match(/^\/learn\/([a-z]+)/);
+    const legacyMatch = path.match(/^\/([a-z]+)$/);
+    const urlLang = (learnMatch?.[1] ?? legacyMatch?.[1] ?? '') as AfricanLanguage;
     if (VALID_LANGS.includes(urlLang)) {
-      // Replace the current history entry so state is attached
-      window.history.replaceState({ screen: 'path', lang: urlLang }, '', `/${urlLang}`);
-      // Language will be set once auth resolves (handled in auth effect below)
       setPreSelectedLanguage(urlLang);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Browser back/forward button support
+  // ── Persist to localStorage ───────────────────────────────────────────────
   useEffect(() => {
-    const handlePopState = (e: PopStateEvent) => {
-      const state = e.state as { screen?: string; lang?: string } | null;
-      if (state?.screen === 'path' && state?.lang) {
-        const lang = state.lang as AfricanLanguage;
-        setCurrentLanguage(lang);
-        setCurrentScreen('path');
-      } else {
-        // Back to landing
-        setCurrentScreen('auth');
-        setCurrentLanguage(null);
-        window.history.replaceState(null, '', '/');
-      }
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
-  // Save progress to localStorage whenever it changes
-  useEffect(() => {
-    if (Object.keys(userProgressMap).length > 0) {
+    if (Object.keys(userProgressMap).length > 0)
       localStorage.setItem('afroslang_progress', JSON.stringify(userProgressMap));
-    }
   }, [userProgressMap]);
-
-  useEffect(() => {
-    if (currentLanguage) {
-      localStorage.setItem('afroslang_current_language', currentLanguage);
-    }
-  }, [currentLanguage]);
 
   useEffect(() => {
     localStorage.setItem('afroslang_interface', interfaceLanguage);
   }, [interfaceLanguage]);
 
+  // ── Record whether user was already authed on load ────────────────────────
+  useEffect(() => {
+    if (!loading && wasAuthOnLoad.current === null)
+      wasAuthOnLoad.current = !!(user || isGuest);
+  }, [loading, user, isGuest]);
 
-  const goToLanding = () => {
-    window.history.pushState(null, '', '/');
-    setCurrentScreen('auth');
-    setCurrentLanguage(null);
+  // ── Auth state → navigate ─────────────────────────────────────────────────
+  useEffect(() => {
+    if (loading || !(user || isGuest)) return;
+    if (paymentSuccess) {
+      navigate('/payment-success', { replace: true });
+    } else if (wasAuthOnLoad.current === false && preSelectedLanguage) {
+      const lang = preSelectedLanguage as AfricanLanguage;
+      setCurrentLanguage(lang);
+      setPreSelectedLanguage(null);
+      navigate(`/learn/${lang}`, { replace: true });
+    }
+  }, [user, isGuest, loading]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  const handleLanguageSelect = (languageId: string) => {
+    const lang = languageId as AfricanLanguage;
+    setCurrentLanguage(lang);
+    if (!userProgressMap[lang])
+      setUserProgressMap(prev => ({ ...prev, [lang]: createDefaultProgress(lang) }));
+    navigate(`/learn/${lang}`);
   };
+
+  const goToLanding = () => navigate('/');
 
   const handleGoToSignIn = async () => {
     if (user) await logout();
@@ -156,408 +314,137 @@ function App() {
     goToLanding();
   };
 
-  const handleLanguageToLearnSelect = (languageId: string) => {
-    const lang = languageId as AfricanLanguage;
-    setCurrentLanguage(lang);
+  void handleGoToSignIn;
 
-    // Initialize progress if not exists
-    if (!userProgressMap[lang]) {
-      const newProgress: UserProgress = {
-        languageId: lang,
-        xp: 0,
-        level: 1,
-        hearts: 5,
-        heartsResetTime: null,
-        streak: 0,
-        lastPracticeDate: null,
-        streakDays: [],
-        lessonsCompleted: 0,
-        wordsLearned: 0,
-        mistakeCount: 0,
-        completedLessons: [],
-        currentStage: 1
-      };
-      setUserProgressMap(prev => ({ ...prev, [lang]: newProgress }));
-    }
+  const authenticated = !!(user || isGuest);
+  const appBg = getBackgroundStyle(userData?.equippedBackground);
 
-    // Update browser URL so back button and refresh work
-    window.history.pushState({ screen: 'path', lang }, '', `/${lang}`);
-    setCurrentScreen('path');
-  };
-
-  const handleStartLesson = (lesson: Lesson) => {
-    // Check if lesson has exercises before starting
-    if (!lesson || !lesson.exercises || lesson.exercises.length === 0) {
-      console.error('Lesson has no exercises:', lesson);
-      return;
-    }
-    setActiveLesson(lesson);
-    setCurrentScreen('lesson');
-  };
-
-  const handleLessonComplete = async (xpEarned: number, heartsLost: number, heartsGained: number) => {
-    if (!currentLanguage || !activeLesson) return;
-
-    setLastCompletedXP(xpEarned);
-
-    // Save to Firebase if user is authenticated
-    if (user && !isGuest) {
-      await saveUserProgress(user.uid, currentLanguage, activeLesson.id, xpEarned, heartsLost);
-
-      // Add XP to leaderboard
-      try {
-        const weekId = await getCurrentWeekIdFromDB();
-        const userLeague = await getUserLeague(user.uid, weekId);
-        const league = userLeague || 'Copper'; // Default to Copper if no league found
-
-        await addWeeklyXP(
-          user.uid,
-          league,
-          userData?.username || 'User',
-          xpEarned,
-          userData?.subscription?.active || false,
-          weekId
-        );
-      } catch (error) {
-        console.error('Error adding XP to leaderboard:', error);
-      }
-
-    }
-
-    setUserProgressMap(prev => {
-      const current = prev[currentLanguage] || {
-        languageId: currentLanguage,
-        xp: 0,
-        level: 1,
-        hearts: 5,
-        heartsResetTime: null,
-        streak: 0,
-        lastPracticeDate: null,
-        streakDays: [],
-        lessonsCompleted: 0,
-        wordsLearned: 0,
-        mistakeCount: 0,
-        completedLessons: [],
-        currentStage: 1
-      };
-
-      // Only count XP and streaks for authenticated users (not guests or users without accounts)
-      const shouldCountXP = user && !isGuest;
-      
-      const newXp = shouldCountXP ? current.xp + xpEarned : current.xp;
-      const newLevel = shouldCountXP ? Math.floor(newXp / 100) + 1 : current.level;
-      
-      // Calculate new hearts: subtract lost, add gained, max at 5
-      let newHearts = Math.min(5, current.hearts - heartsLost + heartsGained);
-      let newResetTime = current.heartsResetTime;
-
-      if (newHearts === 0) {
-        // Set reset time to 7 hours from now
-        newResetTime = Date.now() + (7 * 60 * 60 * 1000);
-      } else if (newHearts > 0 && current.heartsResetTime) {
-        // If they had no hearts but now have some, clear the reset timer
-        newResetTime = null;
-      }
-
-      // Update streak - only for authenticated users (not guests)
-      const today = new Date();
-      const todayDateString = today.toDateString();
-      const todayDay = today.getDate();
-      const todayMonth = today.getMonth();
-      const todayYear = today.getFullYear();
-      
-      const lastDate = current.lastPracticeDate;
-      let newStreak = shouldCountXP ? current.streak : 0;
-      let streakDays = shouldCountXP ? (current.streakDays || []) : [];
-
-      if (shouldCountXP && (!lastDate || lastDate !== todayDateString)) {
-        // Check if last practice was yesterday
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayDateString = yesterday.toDateString();
-        
-        if (lastDate === yesterdayDateString) {
-          // Consecutive day - increment streak
-          newStreak += 1;
-        } else if (!lastDate) {
-          // First time practicing - start streak at 1
-          newStreak = 1;
-        } else {
-          // Streak broken (last practice was more than 1 day ago) - reset to 1
-          newStreak = 1;
-          // Only clear streakDays if switching to a new month
-          const lastDateObj = new Date(lastDate);
-          const isDifferentMonth = lastDateObj.getMonth() !== todayMonth || lastDateObj.getFullYear() !== todayYear;
-          if (isDifferentMonth) {
-            streakDays = [];
-          }
-        }
-        
-        // Add today to streak days if it's the current month
-        const isCurrentMonth = todayMonth === new Date().getMonth() && todayYear === new Date().getFullYear();
-        if (isCurrentMonth && !streakDays.includes(todayDay)) {
-          streakDays = [...streakDays, todayDay].sort((a, b) => a - b);
-        }
-      }
-      
-      // Update lastPracticeDate only for authenticated users
-      const newLastPracticeDate = shouldCountXP ? todayDateString : current.lastPracticeDate;
-
-      // Add lesson to completed list if not already there
-      const currentCompletedLessons = current.completedLessons || [];
-      const completedLessons = currentCompletedLessons.includes(activeLesson.id)
-        ? currentCompletedLessons
-        : [...currentCompletedLessons, activeLesson.id];
-
-      return {
-        ...prev,
-        [currentLanguage]: {
-          ...current,
-          xp: newXp,
-          level: newLevel,
-          hearts: newHearts,
-          heartsResetTime: newResetTime,
-          streak: newStreak,
-          lastPracticeDate: newLastPracticeDate,
-          streakDays: streakDays,
-          lessonsCompleted: current.lessonsCompleted + 1,
-          wordsLearned: current.wordsLearned + 3,
-          mistakeCount: heartsLost > 0 ? current.mistakeCount + heartsLost : current.mistakeCount,
-          completedLessons
-        }
-      };
-    });
-
-    setCurrentScreen('complete');
-  };
-
-  const handleContinueAfterComplete = () => {
-    setCurrentScreen('path');
-  };
-
-  const handleExitLesson = () => {
-    setCurrentScreen('path');
-  };
-
-
-  const getCurrentProgress = (): UserProgress => {
-    const unlimitedHearts = userData?.subscription?.active ? 999 : 5;
-    
-    if (!currentLanguage) {
-      return {
-        languageId: 'swahili',
-        xp: 0,
-        level: 1,
-        hearts: unlimitedHearts,
-        heartsResetTime: null,
-        streak: 0,
-        lastPracticeDate: null,
-        streakDays: [],
-        lessonsCompleted: 0,
-        wordsLearned: 0,
-        mistakeCount: 0,
-        completedLessons: [],
-        currentStage: 1
-      };
-    }
-
-    const progress = userProgressMap[currentLanguage];
-    if (!progress) {
-      return {
-        languageId: currentLanguage,
-        xp: 0,
-        level: 1,
-        hearts: unlimitedHearts,
-        heartsResetTime: null,
-        streak: 0,
-        lastPracticeDate: null,
-        streakDays: [],
-        lessonsCompleted: 0,
-        wordsLearned: 0,
-        mistakeCount: 0,
-        completedLessons: [],
-        currentStage: 1
-      };
-    }
-
-    // Override hearts for subscribers
-    return {
-      ...progress,
-      hearts: unlimitedHearts
-    };
-  };
-
-  // Record whether the user was already authenticated when the app first loaded.
-  // This runs once after Firebase resolves the initial auth state.
-  useEffect(() => {
-    if (!loading && wasAuthOnLoad.current === null) {
-      wasAuthOnLoad.current = !!(user || isGuest);
-    }
-  }, [loading, user, isGuest]);
-
-  // Handle authentication state changes:
-  // — Just signed in / signed up this session → go to path if a language was pre-selected,
-  //   otherwise stay on LandingPage (they can pick from the explorer)
-  // — Returning authenticated user → stay on LandingPage (they click "Continue Learning")
-  // — Stripe payment return → show SuccessPage
-  useEffect(() => {
-    if (!loading && (user || isGuest) && currentScreen === 'auth') {
-      if (paymentSuccessReturn) {
-        setCurrentScreen('payment-success');
-      } else if (wasAuthOnLoad.current === false) {
-        // User just authenticated this session
-        if (preSelectedLanguage) {
-          handleLanguageToLearnSelect(preSelectedLanguage);
-          setPreSelectedLanguage(null);
-        }
-        // If no pre-selected language, stay on LandingPage (isLoggedIn=true, pick from explorer)
-      }
-      // wasAuthOnLoad.current === true means returning user → LandingPage stays shown
-    }
-  }, [user, isGuest, loading, currentScreen, paymentSuccessReturn, preSelectedLanguage]);
-
-  // 1. Logo intro — disabled (showIntro is always false)
-  void showIntro; void handleIntroComplete;
-
-  // Show loading screen while checking authentication
   if (loading) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ background: 'var(--app-bg)' }}
-      >
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--app-bg)' }}>
         <div className="text-white text-xl">Loading Afroslang...</div>
       </div>
     );
   }
 
-  // LandingPage — also shown when 'interface-select' is requested (InterfaceLanguageSelector removed)
-  if (currentScreen === 'auth' || currentScreen === 'interface-select') {
-    return (
-      <LandingPage
-        initialSheet={authSheet}
-        isLoggedIn={!!user}
-        onContinue={() => {
-          if (currentLanguage) handleLanguageToLearnSelect(currentLanguage);
-          // else stay on LandingPage — user can pick a language from the explorer
-        }}
-        onSelectLanguage={handleLanguageToLearnSelect}
-        onPreSelectLanguage={setPreSelectedLanguage}
-        userProgressMap={userProgressMap}
-      />
-    );
-  }
-
-  const appBg = getBackgroundStyle(userData?.equippedBackground);
-
-  return (
+  const appShell = (children: React.ReactNode) => (
     <div style={{ minHeight: '100dvh', background: appBg }}>
       <GlCanvas />
-
-      {currentScreen === 'path' && currentLanguage && (
-        <LearningPath
-          interfaceLanguage={interfaceLanguage}
-          stages={getStagesForLanguage(currentLanguage)}
-          progress={getCurrentProgress()}
-          onStartLesson={handleStartLesson}
-          onBackToLanguageSelect={goToLanding}
-          onNavigate={(screen) => {
-            if (screen === 'leaderboard') {
-              setCurrentScreen('leaderboard');
-            } else if (screen === 'shop') {
-              setCurrentScreen('shop');
-            } else if (screen === 'latest-news') {
-              setCurrentScreen('latest-news');
-            } else if (screen === 'profile' || screen === 'settings') {
-              setCurrentScreen('profile');
-            } else if (screen === 'quests') {
-              // reserved
-            }
-          }}
-          currentLanguageId={currentLanguage}
-        />
-      )}
-
-        {currentScreen === 'lesson' && currentLanguage && activeLesson && (
-          <LessonScreen
-            interfaceLanguage={interfaceLanguage}
-            lesson={activeLesson}
-            languageId={currentLanguage}
-            languageName={getLanguageById(currentLanguage)?.name || ''}
-            hearts={getCurrentProgress().hearts}
-            heartsData={userData?.heartsData}
-            isSubscribed={userData?.subscription?.active || false}
-            xpBoostActive={isXpBoostActive(userData)}
-            userId={user?.uid}
-            userName={userData?.name || user?.displayName || undefined}
-            isGuest={isGuest}
-            onComplete={handleLessonComplete}
-            onExit={handleExitLesson}
-            onBackToLanguageSelect={goToLanding}
-            onGoToSignUp={handleGoToSignUp}
-            onGoToSubscription={() => setCurrentScreen('subscription')}
-          />
-        )}
-
-      {currentScreen === 'complete' && (
-        <LessonComplete
-          interfaceLanguage={interfaceLanguage}
-          xpEarned={lastCompletedXP}
-          onContinue={handleContinueAfterComplete}
-          onBackToLanguageSelect={goToLanding}
-        />
-      )}
-
-      {currentScreen === 'leaderboard' && (
-        <LeaderboardScreen
-          onBack={() => setCurrentScreen('path')}
-        />
-      )}
-
-      {currentScreen === 'subscription' && (
-        <SubscriptionPage
-          onBack={() => setCurrentScreen('interface-select')}
-        />
-      )}
-
-      {currentScreen === 'payment-success' && (
-        <SuccessPage
-          onContinue={() => setCurrentScreen('interface-select')}
-        />
-      )}
-
-      {currentScreen === 'feedback' && (
-        <FeedbackPage
-          onBack={() => setCurrentScreen('interface-select')}
-        />
-      )}
-
-      {currentScreen === 'shop' && (
-        <ShopScreen
-          interfaceLanguage={interfaceLanguage}
-          onBack={() => setCurrentScreen('path')}
-        />
-      )}
-
-      {currentScreen === 'latest-news' && (
-        <LatestNews
-          interfaceLanguage={interfaceLanguage}
-          onBack={() => setCurrentScreen('path')}
-        />
-      )}
-
-      {currentScreen === 'profile' && (
-        <ProfileScreen
-          userProgressMap={userProgressMap}
-          currentLanguage={currentLanguage}
-          interfaceLanguage={interfaceLanguage}
-          onBack={() => setCurrentScreen('path')}
-          onContinueLearning={handleLanguageToLearnSelect}
-          onChangeInterfaceLanguage={setInterfaceLanguage}
-          onGoToShop={() => setCurrentScreen('shop')}
-        />
-      )}
+      {children}
     </div>
+  );
+
+  return (
+    <Routes>
+      {/* Landing / auth */}
+      <Route path="/" element={
+        <LandingPage
+          initialSheet={authSheet}
+          isLoggedIn={!!user}
+          onContinue={() => currentLanguage && navigate(`/learn/${currentLanguage}`)}
+          onSelectLanguage={handleLanguageSelect}
+          onPreSelectLanguage={setPreSelectedLanguage}
+          userProgressMap={userProgressMap}
+        />
+      } />
+
+      {/* Learning path + lesson + complete */}
+      <Route path="/learn/:lang" element={
+        authenticated ? appShell(
+          <LearnView
+            interfaceLanguage={interfaceLanguage}
+            userProgressMap={userProgressMap}
+            setUserProgressMap={setUserProgressMap}
+            userData={userData}
+            user={user}
+            isGuest={isGuest}
+            onBackToLanding={goToLanding}
+            onNavigate={(screen) => {
+              if (screen === 'leaderboard') navigate('/leaderboard');
+              else if (screen === 'shop') navigate('/shop');
+              else if (screen === 'latest-news') navigate('/news');
+              else if (screen === 'profile' || screen === 'settings') navigate('/profile');
+            }}
+            onGoToSignUp={handleGoToSignUp}
+            onGoToSubscription={() => navigate('/subscription')}
+            onSetCurrentLanguage={setCurrentLanguage}
+          />
+        ) : <Navigate to="/" replace />
+      } />
+
+      {/* Legacy /:lang URLs → redirect to /learn/:lang */}
+      {VALID_LANGS.map(lang => (
+        <Route key={lang} path={`/${lang}`} element={<Navigate to={`/learn/${lang}`} replace />} />
+      ))}
+
+      {/* Shop */}
+      <Route path="/shop" element={
+        authenticated ? appShell(
+          <ShopScreen
+            interfaceLanguage={interfaceLanguage}
+            onBack={() => currentLanguage ? navigate(`/learn/${currentLanguage}`) : goToLanding()}
+          />
+        ) : <Navigate to="/" replace />
+      } />
+
+      {/* Leaderboard */}
+      <Route path="/leaderboard" element={
+        authenticated ? appShell(
+          <LeaderboardScreen
+            onBack={() => currentLanguage ? navigate(`/learn/${currentLanguage}`) : goToLanding()}
+          />
+        ) : <Navigate to="/" replace />
+      } />
+
+      {/* Profile */}
+      <Route path="/profile" element={
+        authenticated ? appShell(
+          <ProfileScreen
+            userProgressMap={userProgressMap}
+            currentLanguage={currentLanguage}
+            interfaceLanguage={interfaceLanguage}
+            onBack={() => currentLanguage ? navigate(`/learn/${currentLanguage}`) : goToLanding()}
+            onContinueLearning={handleLanguageSelect}
+            onChangeInterfaceLanguage={setInterfaceLanguage}
+            onGoToShop={() => navigate('/shop')}
+          />
+        ) : <Navigate to="/" replace />
+      } />
+
+      {/* Latest news */}
+      <Route path="/news" element={
+        authenticated ? appShell(
+          <LatestNews
+            interfaceLanguage={interfaceLanguage}
+            onBack={() => currentLanguage ? navigate(`/learn/${currentLanguage}`) : goToLanding()}
+          />
+        ) : <Navigate to="/" replace />
+      } />
+
+      {/* Subscription */}
+      <Route path="/subscription" element={
+        authenticated ? appShell(
+          <SubscriptionPage onBack={goToLanding} />
+        ) : <Navigate to="/" replace />
+      } />
+
+      {/* Payment success */}
+      <Route path="/payment-success" element={
+        authenticated ? appShell(
+          <SuccessPage onContinue={goToLanding} />
+        ) : <Navigate to="/" replace />
+      } />
+
+      {/* Feedback */}
+      <Route path="/feedback" element={
+        authenticated ? appShell(
+          <FeedbackPage onBack={goToLanding} />
+        ) : <Navigate to="/" replace />
+      } />
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
