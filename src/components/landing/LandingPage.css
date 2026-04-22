@@ -56,7 +56,7 @@
 }
 
 @media (min-width: 768px) {
-  .lp-header { padding: 20px 28px; }
+  .lp-header { padding: 20px 28px; justify-content: flex-start; padding-left: 48px; }
   .lp-header::after { height: 120px; }
 }
 
