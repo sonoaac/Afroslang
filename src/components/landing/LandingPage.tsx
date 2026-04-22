@@ -196,6 +196,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
   // ── Typewriter reveal observer ────────────────────────────────────────────
   useEffect(() => {
+    if (activePage) return;
     const els = document.querySelectorAll<HTMLElement>('.lp-type-in');
     if (!els.length) return;
     const obs = new IntersectionObserver(
@@ -211,10 +212,11 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     );
     els.forEach(el => obs.observe(el));
     return () => obs.disconnect();
-  }, []);
+  }, [activePage]);
 
   // ── Scroll reveal observer ─────────────────────────────────────────────────
   useEffect(() => {
+    if (activePage) return;
     const els = document.querySelectorAll<HTMLElement>('.lp-reveal');
     if (!els.length) return;
     const obs = new IntersectionObserver(
@@ -230,7 +232,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     );
     els.forEach(el => obs.observe(el));
     return () => obs.disconnect();
-  }, []);
+  }, [activePage]);
 
   // ── Body scroll lock when overlay is open ─────────────────────────────────
   useEffect(() => {
@@ -253,18 +255,17 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
   // ── Sand-rise scroll driver ────────────────────────────────────────────────
   useEffect(() => {
+    if (activePage) return;
     const update = () => {
       const els = document.querySelectorAll<HTMLElement>('.lp-sand-reveal');
       const viewH = window.innerHeight;
       els.forEach(el => {
         const rect = el.getBoundingClientRect();
         const center = rect.top + rect.height / 2;
-        const norm = center / viewH; // 1=bottom 0=top
-        // Bell: 0 at edges, 1 when centered
+        const norm = center / viewH;
         let p = norm > 0.5
           ? Math.max(0, Math.min(1, (1 - norm) * 2.4))
           : Math.max(0, Math.min(1, norm * 2.4));
-        // Smoothstep
         p = p * p * (3 - 2 * p);
         el.style.setProperty('--sand-p', p.toFixed(3));
       });
@@ -272,7 +273,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     update();
     window.addEventListener('scroll', update, { passive: true });
     return () => window.removeEventListener('scroll', update);
-  }, []);
+  }, [activePage]);
 
 
 
