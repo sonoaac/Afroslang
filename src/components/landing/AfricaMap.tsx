@@ -11,10 +11,11 @@ const ISO3_TO_ISO2: Record<string, string> = {
   TGO:'TG', TUN:'TN', UGA:'UG', ESH:'EH', ZMB:'ZM', ZWE:'ZW',
 };
 
-// Name-based fallback for countries whose iso_a3 is '-99' in some GeoJSON sources
-const NAME_TO_ISO3: Record<string, string> = {
-  'south sudan': 'SSD',
-  'w. sahara':   'ESH',
+// Remap non-standard GeoJSON IDs to correct ISO 3166-1 alpha-3 codes.
+// The holtzy world.geojson uses legacy IDs for some countries (e.g. South Sudan
+// appears as "SDS" with no iso_a3 property instead of the standard "SSD").
+const GEO_ISO_ALIAS: Record<string, string> = {
+  SDS: 'SSD', // South Sudan
 };
 
 const COUNTRY_NAMES: Record<string, string> = {
@@ -117,21 +118,17 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
       } catch { return; }
       if (cancelled) return;
 
-      const resolveIso3 = (f: any): string | null => {
-        const a3 = f.properties.iso_a3;
-        if (a3 && a3 !== '-99') return a3;
-        const id = f.id;
-        if (id && id !== '-99') return id;
-        // Fallback: match by country name for problematic entries like South Sudan
-        const name = (f.properties.name || f.properties.NAME || '').toLowerCase().trim();
-        return NAME_TO_ISO3[name] ?? null;
-      };
+      const isoSet = new Set(Object.keys(COUNTRY_COLORS));
 
-      const isoSet   = new Set(Object.keys(COUNTRY_COLORS));
-      const features = geoData.features.filter((f: any) => {
-        const iso3 = resolveIso3(f);
-        return iso3 !== null && isoSet.has(iso3);
-      });
+      // Preprocess: attach _resolvedISO to every feature so the correct code
+      // is available in both the filter and the render loop without re-deriving it.
+      const features = geoData.features
+        .map((f: any) => {
+          const rawId = f.properties.iso_a3 || f.id;
+          const iso3  = GEO_ISO_ALIAS[rawId] ?? rawId; // translate e.g. "SDS" → "SSD"
+          return { ...f, _resolvedISO: iso3 };
+        })
+        .filter((f: any) => isoSet.has(f._resolvedISO));
 
       const proj = d3.geoMercator()
         .center([20, -1])
@@ -145,7 +142,7 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
       let activeISO3: string | null = null;
 
       features.forEach((feat: any) => {
-        const iso3   = resolveIso3(feat)!;
+        const iso3   = feat._resolvedISO;
         const colors = COUNTRY_COLORS[iso3];
         if (!colors) return;
 
