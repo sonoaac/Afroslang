@@ -7,8 +7,14 @@ const ISO3_TO_ISO2: Record<string, string> = {
   GHA:'GH', GIN:'GN', GNB:'GW', CIV:'CI', KEN:'KE', LSO:'LS', LBR:'LR',
   LBY:'LY', MDG:'MG', MWI:'MW', MLI:'ML', MRT:'MR', MUS:'MU', MAR:'MA',
   MOZ:'MZ', NAM:'NA', NER:'NE', NGA:'NG', RWA:'RW', STP:'ST', SEN:'SN',
-  SYC:'SC', SLE:'SL', SOM:'SO', ZAF:'ZA', SSD:'SS', SDN:'SD', TZA:'TZ',
+  SYC:'SC', SLE:'SL', SOM:'SO', ZAF:'ZA', SSD:'SS', SDS:'SS', SDN:'SD', TZA:'TZ',
   TGO:'TG', TUN:'TN', UGA:'UG', ESH:'EH', ZMB:'ZM', ZWE:'ZW',
+};
+
+// Name-based fallback for countries whose iso_a3 is '-99' in some GeoJSON sources
+const NAME_TO_ISO3: Record<string, string> = {
+  'south sudan': 'SSD',
+  'w. sahara':   'ESH',
 };
 
 const COUNTRY_NAMES: Record<string, string> = {
@@ -111,10 +117,21 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
       } catch { return; }
       if (cancelled) return;
 
+      const resolveIso3 = (f: any): string | null => {
+        const a3 = f.properties.iso_a3;
+        if (a3 && a3 !== '-99') return a3;
+        const id = f.id;
+        if (id && id !== '-99') return id;
+        // Fallback: match by country name for problematic entries like South Sudan
+        const name = (f.properties.name || f.properties.NAME || '').toLowerCase().trim();
+        return NAME_TO_ISO3[name] ?? null;
+      };
+
       const isoSet   = new Set(Object.keys(COUNTRY_COLORS));
-      const features = geoData.features.filter((f: any) =>
-        isoSet.has(f.properties.iso_a3 || f.id)
-      );
+      const features = geoData.features.filter((f: any) => {
+        const iso3 = resolveIso3(f);
+        return iso3 !== null && isoSet.has(iso3);
+      });
 
       const proj = d3.geoMercator()
         .center([20, -1])
@@ -128,7 +145,7 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
       let activeISO3: string | null = null;
 
       features.forEach((feat: any) => {
-        const iso3   = feat.properties.iso_a3 || feat.id;
+        const iso3   = resolveIso3(feat)!;
         const colors = COUNTRY_COLORS[iso3];
         if (!colors) return;
 
