@@ -9,8 +9,29 @@ import {
   SANDBITS_PER_DIAMOND,
   purchaseCosmetic,
   buyDiamondPack,
+  getBackgroundStyle,
   CosmeticItem,
 } from '../../utils/currencyUtils';
+
+// Card-scale preview gradients — more saturated/visible than the full-page versions
+const BG_CARD_GRADIENT: Record<string, string> = {
+  bg_default: 'radial-gradient(ellipse 120% 80% at 30% 20%, rgba(176,0,32,0.55) 0%, rgba(0,0,0,0) 60%), linear-gradient(135deg, #0a0000 0%, #1f000b 55%, #0a0000 100%)',
+  bg_savanna: 'radial-gradient(ellipse 120% 80% at 50% 90%, rgba(244,163,0,0.55) 0%, rgba(0,0,0,0) 60%), linear-gradient(160deg, #100500 0%, #2a0e00 45%, #0e0300 100%)',
+  bg_market:  'radial-gradient(ellipse 120% 80% at 35% 45%, rgba(220,60,0,0.55) 0%, rgba(0,0,0,0) 60%), linear-gradient(135deg, #100000 0%, #260600 50%, #0a0000 100%)',
+  bg_night:   'radial-gradient(ellipse 120% 80% at 70% 10%, rgba(50,80,220,0.55) 0%, rgba(0,0,0,0) 65%), linear-gradient(160deg, #000010 0%, #00001a 55%, #000008 100%)',
+  bg_forest:  'radial-gradient(ellipse 120% 80% at 20% 65%, rgba(0,160,60,0.55) 0%, rgba(0,0,0,0) 65%), linear-gradient(150deg, #000800 0%, #001800 50%, #000500 100%)',
+  bg_ocean:   'radial-gradient(ellipse 120% 80% at 65% 25%, rgba(0,120,220,0.55) 0%, rgba(0,0,0,0) 65%), linear-gradient(145deg, #000810 0%, #001428 50%, #000508 100%)',
+};
+
+// Accent overlays visible on the card thumbnail
+const BG_ACCENT: Record<string, string> = {
+  bg_default: '🏜️',
+  bg_savanna: '🌅',
+  bg_market:  '🏮',
+  bg_night:   '✨',
+  bg_forest:  '🌿',
+  bg_ocean:   '🌊',
+};
 
 interface ShopScreenProps {
   interfaceLanguage: InterfaceLanguage;
@@ -50,6 +71,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
   const [cart, setCart] = useState<Record<string, CartItem>>({});
   const [toast, setToast] = useState<string | null>(null);
   const [checkingOut, setCheckingOut] = useState(false);
+  const [previewBg, setPreviewBg] = useState<string | null>(null);
   const cartScrollRef = useRef<HTMLUListElement>(null);
 
   const sandbits = userData?.sandbits ?? 0;
@@ -193,6 +215,15 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
         .sh-cart-go-btn:active { transform: translateY(1px); background: #a93226; }
         .afroplus-card-bg { background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.72)), url('/Afroplus.png'); background-size: cover; background-position: center; }
         .afroplus-card-bg:hover { box-shadow: 0 8px 32px rgba(192,57,43,0.35) !important; }
+        .bg-preview-card { border-radius: 12px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .bg-preview-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.6); }
+        .bg-preview-card:hover .bg-preview-hint { opacity: 1; }
+        .bg-preview-hint { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.45); opacity: 0; transition: opacity 0.2s; font-size: 0.78em; font-weight: 700; letter-spacing: 1px; color: #fff; text-transform: uppercase; }
+        @keyframes bg-preview-in { from { opacity: 0; } to { opacity: 1; } }
+        .bg-fullscreen-preview { position: fixed; inset: 0; z-index: 9998; display: flex; flex-direction: column; animation: bg-preview-in 0.25s ease; }
+        .bg-preview-stars { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+        .bg-preview-star { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; animation: star-twinkle 3s ease-in-out infinite; }
+        @keyframes star-twinkle { 0%,100% { opacity: 0.2; } 50% { opacity: 1; } }
         .checkout-btn { background: #c0392b; color: #fff; border: none; font-family: inherit; font-size: 1.4em; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; padding: 0.8em; cursor: pointer; transition: background 0.15s; box-shadow: 0 4px 18px rgba(192,57,43,0.4); width: 100%; }
         .checkout-btn:hover { background: #e74c3c; }
         .checkout-btn:disabled { background: #3a3a3a; cursor: not-allowed; box-shadow: none; }
@@ -379,38 +410,65 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
             {tab === 'backgrounds' && (
               <div>
                 <SectionLabel>{isEn ? 'PURCHASE BACKGROUNDS WITH SANDBITS' : 'ACHETEZ DES FONDS AVEC DES SABLEBITS'}</SectionLabel>
+                <p style={{ color: '#555', fontSize: '0.72em', marginBottom: '1.25em', letterSpacing: 0.5 }}>
+                  {isEn ? 'Hover or tap a card to preview · click again to dismiss' : 'Survolez ou appuyez pour prévisualiser'}
+                </p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '1em' }}>
                   {BACKGROUNDS.map(item => {
                     const isOwned = ownedBackgrounds.includes(item.id);
                     const inCart = cart[item.id];
                     const canAfford = sandbits >= item.price;
+                    const cardGrad = BG_CARD_GRADIENT[item.id] || BG_CARD_GRADIENT['bg_default'];
                     return (
-                      <div key={item.id} className="sh-card">
-                        <CardBadge cls="bg-badge">BG</CardBadge>
-                        <span className="sh-card-icon">{item.emoji}</span>
-                        <p style={{ color: '#fff', fontWeight: 700, fontSize: '0.95em', margin: 0, textAlign: 'center' }}>{item.name}</p>
-                        {item.price === 0
-                          ? <p style={{ color: '#27ae60', fontSize: '0.75em', fontWeight: 700, margin: 0 }}>{isEn ? 'Free' : 'Gratuit'}</p>
-                          : <p style={{ color: '#f0a800', fontSize: '0.75em', fontWeight: 600, margin: 0 }}>🪙 {item.price}</p>
-                        }
-                        {isOwned ? (
-                          <div style={{ background: 'rgba(39,174,96,0.12)', border: '1px solid rgba(39,174,96,0.3)', borderRadius: 6, padding: '3px 12px', color: '#27ae60', fontSize: '0.72em', fontWeight: 700 }}>
-                            {isEn ? 'Owned' : 'Possédé'}
+                      <div key={item.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
+                        {/* Preview thumbnail — clicking opens fullscreen */}
+                        <div
+                          className="bg-preview-card"
+                          style={{ height: 110, background: cardGrad, border: `2px solid ${previewBg === item.id ? '#c0392b' : 'rgba(255,255,255,0.08)'}` }}
+                          onClick={() => setPreviewBg(previewBg === item.id ? null : item.id)}
+                        >
+                          {/* Decorative accent */}
+                          <div style={{ position: 'absolute', bottom: 8, left: 0, right: 0, textAlign: 'center', fontSize: '1.8em', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.8))', userSelect: 'none' }}>
+                            {BG_ACCENT[item.id]}
                           </div>
-                        ) : (
-                          <button
-                            className={`sh-add-btn sb${inCart ? ' added' : ''}`}
-                            disabled={!canAfford && !inCart}
-                            style={{ opacity: !canAfford && !inCart ? 0.5 : 1 }}
-                            onClick={() => {
-                              if (!canAfford) return showToast(isEn ? `Need ${item.price} Sandbits` : `Il faut ${item.price} Sablebits`);
-                              addToCart({ id: item.id, name: item.name, price: 0, currency: 'sandbits', type: 'background', icon: item.emoji, quantity: 1, sandbits: item.price, max: 1, cosmeticRef: item, cosmeticType: 'background' });
-                              showToast(isEn ? `${item.name} added!` : `${item.name} ajouté!`);
-                            }}
-                          >
-                            {inCart ? '✓ In Cart' : `+ ${isEn ? 'Add' : 'Ajouter'}`}
-                          </button>
-                        )}
+                          {/* Badge */}
+                          <span className="bg-badge" style={{ position: 'absolute', top: '0.4em', left: '0.4em', fontSize: '0.52em', fontWeight: 800, padding: '0.2em 0.5em', borderRadius: 4, letterSpacing: 1, textTransform: 'uppercase' }}>BG</span>
+                          {isOwned && (
+                            <span style={{ position: 'absolute', top: '0.4em', right: '0.4em', fontSize: '0.52em', fontWeight: 800, padding: '0.2em 0.5em', borderRadius: 4, background: 'rgba(39,174,96,0.25)', color: '#27ae60', border: '1px solid rgba(39,174,96,0.4)' }}>
+                              {isEn ? 'OWNED' : 'POSSÉDÉ'}
+                            </span>
+                          )}
+                          <div className="bg-preview-hint">
+                            {isEn ? '👁 Preview' : '👁 Aperçu'}
+                          </div>
+                        </div>
+
+                        {/* Card info row */}
+                        <div style={{ background: '#161616', border: '1px solid #222', borderRadius: 10, padding: '0.75em 0.85em', display: 'flex', flexDirection: 'column', gap: '0.4em' }}>
+                          <p style={{ color: '#fff', fontWeight: 700, fontSize: '0.9em', margin: 0 }}>{item.name}</p>
+                          {item.price === 0
+                            ? <p style={{ color: '#27ae60', fontSize: '0.72em', fontWeight: 700, margin: 0 }}>{isEn ? 'Free · Owned' : 'Gratuit · Possédé'}</p>
+                            : <p style={{ color: '#f0a800', fontSize: '0.72em', fontWeight: 600, margin: 0 }}>🪙 {item.price}</p>
+                          }
+                          {isOwned ? (
+                            <div style={{ background: 'rgba(39,174,96,0.12)', border: '1px solid rgba(39,174,96,0.3)', borderRadius: 5, padding: '2px 10px', color: '#27ae60', fontSize: '0.7em', fontWeight: 700, textAlign: 'center' }}>
+                              {isEn ? 'Owned' : 'Possédé'}
+                            </div>
+                          ) : (
+                            <button
+                              className={`sh-add-btn sb${inCart ? ' added' : ''}`}
+                              disabled={!canAfford && !inCart}
+                              style={{ opacity: !canAfford && !inCart ? 0.5 : 1 }}
+                              onClick={() => {
+                                if (!canAfford) return showToast(isEn ? `Need ${item.price} Sandbits` : `Il faut ${item.price} Sablebits`);
+                                addToCart({ id: item.id, name: item.name, price: 0, currency: 'sandbits', type: 'background', icon: item.emoji, quantity: 1, sandbits: item.price, max: 1, cosmeticRef: item, cosmeticType: 'background' });
+                                showToast(isEn ? `${item.name} added!` : `${item.name} ajouté!`);
+                              }}
+                            >
+                              {inCart ? '✓ In Cart' : `+ ${isEn ? 'Add' : 'Ajouter'}`}
+                            </button>
+                          )}
+                        </div>
                       </div>
                     );
                   })}
@@ -421,6 +479,101 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
           </div>
 
           <CharityBar isEn={isEn} />
+
+          {/* ── FULLSCREEN BG PREVIEW OVERLAY ── */}
+          {previewBg && (() => {
+            const item = BACKGROUNDS.find(b => b.id === previewBg)!;
+            const isOwned = ownedBackgrounds.includes(item.id);
+            const inCart = cart[item.id];
+            const canAfford = sandbits >= item.price;
+            const stars = item.id === 'bg_night'
+              ? Array.from({ length: 40 }, (_, i) => ({
+                  left: `${(i * 37 + 7) % 100}%`,
+                  top: `${(i * 53 + 13) % 100}%`,
+                  delay: `${(i * 0.2) % 3}s`,
+                  size: i % 3 === 0 ? 3 : 2,
+                }))
+              : [];
+            return (
+              <div className="bg-fullscreen-preview" style={{ background: getBackgroundStyle(previewBg) }}>
+                {/* Night sky stars */}
+                {stars.length > 0 && (
+                  <div className="bg-preview-stars">
+                    {stars.map((s, i) => (
+                      <div key={i} className="bg-preview-star" style={{ left: s.left, top: s.top, animationDelay: s.delay, width: s.size, height: s.size }} />
+                    ))}
+                  </div>
+                )}
+
+                {/* Top bar */}
+                <div style={{ padding: '1em 1.25em', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                  <button
+                    style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontFamily: 'inherit', fontSize: '0.85em', fontWeight: 700, padding: '0.4em 0.9em', borderRadius: 6, cursor: 'pointer' }}
+                    onClick={() => setPreviewBg(null)}
+                  >
+                    ✕ {isEn ? 'Close Preview' : 'Fermer'}
+                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+                    <span style={{ fontSize: '1.4em' }}>{BG_ACCENT[item.id]}</span>
+                    <span style={{ color: '#fff', fontWeight: 800, fontSize: '1em', letterSpacing: 1 }}>{item.name}</span>
+                    <span className="bg-badge" style={{ fontSize: '0.6em', fontWeight: 800, padding: '0.2em 0.6em', borderRadius: 4, letterSpacing: 1 }}>BG</span>
+                  </div>
+                  <div style={{ fontSize: '0.75em', color: 'rgba(255,255,255,0.45)', fontStyle: 'italic' }}>
+                    {isEn ? 'Preview mode' : 'Aperçu'}
+                  </div>
+                </div>
+
+                {/* Center content */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1.5em', padding: '2em' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '5em', filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.8))', marginBottom: '0.3em' }}>{BG_ACCENT[item.id]}</div>
+                    <h2 style={{ color: '#fff', fontWeight: 900, fontSize: 'clamp(1.5rem, 6vw, 2.8rem)', letterSpacing: 3, textTransform: 'uppercase', margin: 0, textShadow: '0 2px 20px rgba(0,0,0,0.8)' }}>
+                      {item.name}
+                    </h2>
+                    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8em', margin: '0.4em 0 0', letterSpacing: 2, textTransform: 'uppercase' }}>
+                      {isEn ? 'This is how your app will look' : 'Votre application aura cet aspect'}
+                    </p>
+                  </div>
+
+                  {/* Price / action */}
+                  <div style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 14, padding: '1.25em 2em', textAlign: 'center', minWidth: 220 }}>
+                    {item.price === 0 ? (
+                      <p style={{ color: '#27ae60', fontWeight: 700, fontSize: '1em', margin: 0 }}>✓ {isEn ? 'Free · Already Owned' : 'Gratuit · Déjà possédé'}</p>
+                    ) : isOwned ? (
+                      <p style={{ color: '#27ae60', fontWeight: 700, fontSize: '1em', margin: 0 }}>✓ {isEn ? 'Owned' : 'Possédé'}</p>
+                    ) : (
+                      <>
+                        <p style={{ color: '#f0a800', fontWeight: 800, fontSize: '1.3em', margin: '0 0 0.75em' }}>🪙 {item.price} Sandbits</p>
+                        <button
+                          className={`sh-add-btn sb${inCart ? ' added' : ''}`}
+                          disabled={!canAfford && !inCart}
+                          style={{ opacity: !canAfford && !inCart ? 0.5 : 1, fontSize: '0.9em', padding: '0.65em 1.5em' }}
+                          onClick={() => {
+                            if (!canAfford) return showToast(isEn ? `Need ${item.price} Sandbits` : `Il faut ${item.price} Sablebits`);
+                            addToCart({ id: item.id, name: item.name, price: 0, currency: 'sandbits', type: 'background', icon: item.emoji, quantity: 1, sandbits: item.price, max: 1, cosmeticRef: item, cosmeticType: 'background' });
+                            showToast(isEn ? `${item.name} added to cart!` : `${item.name} ajouté!`);
+                          }}
+                        >
+                          {inCart ? `✓ ${isEn ? 'In Cart' : 'Dans le panier'}` : `+ ${isEn ? 'Add to Cart' : 'Ajouter au panier'}`}
+                        </button>
+                        {!canAfford && (
+                          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.7em', margin: '0.6em 0 0' }}>
+                            {isEn ? `You have ${sandbits} Sandbits` : `Vous avez ${sandbits} Sablebits`}
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Tap anywhere to close */}
+                <div
+                  style={{ position: 'absolute', inset: 0, zIndex: -1 }}
+                  onClick={() => setPreviewBg(null)}
+                />
+              </div>
+            );
+          })()}
         </div>
       )}
 
