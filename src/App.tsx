@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useNavigate, useParams } from 'react-router-do
 import { InterfaceLanguage, AfricanLanguage, UserProgress, Lesson } from './types';
 import { LandingPage } from './components/landing/LandingPage';
 import { GlCanvas } from './components/landing/GlCanvas';
+import { SavannaCanvas } from './components/landing/SavannaCanvas';
 
 import { LearningPath } from './features/lessons/LearningPath';
 import { LessonScreen } from './features/lessons/LessonScreen';
@@ -349,9 +350,11 @@ function App() {
     );
   }
 
+  const equippedBg = userData?.equippedBackground ?? 'bg_default';
+
   const appShell = (children: React.ReactNode) => (
     <div style={{ minHeight: '100dvh', background: appBg }}>
-      <GlCanvas />
+      {equippedBg === 'bg_savanna' ? <SavannaCanvas /> : <GlCanvas />}
       {children}
     </div>
   );

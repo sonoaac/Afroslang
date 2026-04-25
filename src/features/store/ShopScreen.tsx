@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { SandbitsIcon } from '../../components/ui/SandbitsIcon';
+import { SavannaCanvas } from '../../components/landing/SavannaCanvas';
 import { InterfaceLanguage } from '../../types';
 import {
   DIAMOND_PACKS,
@@ -486,6 +487,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
             const isOwned = ownedBackgrounds.includes(item.id);
             const inCart = cart[item.id];
             const canAfford = sandbits >= item.price;
+            const isSavanna = item.id === 'bg_savanna';
             const stars = item.id === 'bg_night'
               ? Array.from({ length: 40 }, (_, i) => ({
                   left: `${(i * 37 + 7) % 100}%`,
@@ -495,7 +497,13 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
                 }))
               : [];
             return (
-              <div className="bg-fullscreen-preview" style={{ background: getBackgroundStyle(previewBg) }}>
+              <div className="bg-fullscreen-preview" style={{ background: isSavanna ? 'rgb(28,14,4)' : getBackgroundStyle(previewBg) }}>
+                {/* Savanna live canvas */}
+                {isSavanna && (
+                  <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+                    <SavannaCanvas preview />
+                  </div>
+                )}
                 {/* Night sky stars */}
                 {stars.length > 0 && (
                   <div className="bg-preview-stars">

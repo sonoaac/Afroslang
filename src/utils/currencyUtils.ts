@@ -74,7 +74,7 @@ export const BACKGROUNDS: CosmeticItem[] = [
 export function getBackgroundStyle(bgId: string | undefined): string {
   switch (bgId) {
     case 'bg_savanna':
-      return 'radial-gradient(1200px 700px at 50% 80%, rgba(244,163,0,0.28) 0%, rgba(0,0,0,0) 65%), linear-gradient(160deg, #0d0400 0%, #1a0800 45%, #0a0300 100%)';
+      return 'linear-gradient(180deg, #1c0e04 0%, #110700 100%)';
     case 'bg_market':
       return 'radial-gradient(900px 500px at 30% 40%, rgba(220,60,0,0.22) 0%, rgba(0,0,0,0) 60%), linear-gradient(135deg, #0a0000 0%, #1a0505 50%, #050000 100%)';
     case 'bg_night':
