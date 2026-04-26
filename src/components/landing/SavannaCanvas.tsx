@@ -1,229 +1,202 @@
 import { useEffect, useRef } from 'react';
 
-// Savanna-tuned WebGL shader — same structure as GlCanvas but shifted to
-// warm amber/terracotta. Ribbons become dusty ochre, sky base is dark burnt amber.
-const VERT = `
-  attribute vec2 pos;
-  void main() {
-    gl_Position = vec4(pos, 0.0, 1.0);
-  }
-`;
+// Savanna sunset palette
+const FG  = '#0a0400';   // near-black dark brown — trees & ground
+const BG1 = '#8B0000';   // deep crimson (top-left)
+const BG2 = '#c0392b';   // burnt red
+const BG3 = '#e67e22';   // amber orange (bottom-right)
 
-const FRAG = `
-  precision highp float;
-  uniform vec2 u_res;
-  uniform float u_time;
+const NS = 'http://www.w3.org/2000/svg';
 
-  void main() {
-    vec2 FC = gl_FragCoord.xy;
-    vec2 r  = u_res;
-    float t = u_time;
-    vec2 p  = (FC * 2.0 - r) / r.y;
-    vec3 c  = vec3(0.0);
-
-    for (float i = 0.0; i < 42.0; i++) {
-      float a = i / 1.5 + t * 0.5;
-      vec2 q  = p;
-      q.x = q.x + sin(q.y * 19.0 + t * 2.0 + i) *
-            29.0 * smoothstep(0.0, -2.0, q.y);
-      float d = length(q - vec2(cos(a), sin(a)) *
-                       (0.4 * smoothstep(0.0, 0.5, -q.y)));
-      // Warm amber/terracotta dust ribbons (vs. cold golden-gray in GlCanvas)
-      c = c + vec3(0.72, 0.32, 0.06) * (0.015 / d);
-    }
-
-    // Dark burnt-amber base sky instead of near-black
-    vec3 col = c * c + vec3(0.11, 0.048, 0.010);
-    gl_FragColor = vec4(col, 1.0);
-  }
-`;
-
-// Acacia silhouette SVG — flat-top African acacia trees + ground plane
-const ACACIA_SVG = `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax meet">
-  <!-- Ground plane -->
-  <rect x="0" y="295" width="1440" height="25" fill="#0a0400"/>
-
-  <!-- Far-distance acacia (small, right) -->
-  <rect x="1180" y="240" width="5" height="55" fill="#0a0400"/>
-  <ellipse cx="1182" cy="232" rx="30" ry="10" fill="#0a0400"/>
-  <ellipse cx="1155" cy="236" rx="18" ry="7" fill="#0a0400"/>
-  <ellipse cx="1210" cy="235" rx="20" ry="7" fill="#0a0400"/>
-
-  <!-- Mid-distance giraffe silhouette (left-center) -->
-  <rect x="390" y="195" width="9" height="100" fill="#0a0400"/>
-  <rect x="392" y="140" width="6" height="60" fill="#0a0400"/>
-  <ellipse cx="395" cy="136" rx="8" ry="10" fill="#0a0400"/>
-  <rect x="382" y="260" width="6" height="35" fill="#0a0400"/>
-  <rect x="395" y="260" width="6" height="35" fill="#0a0400"/>
-
-  <!-- Large left acacia -->
-  <rect x="118" y="170" width="10" height="125" fill="#0a0400"/>
-  <ellipse cx="123" cy="155" rx="68" ry="20" fill="#0a0400"/>
-  <ellipse cx="80"  cy="162" rx="40" ry="14" fill="#0a0400"/>
-  <ellipse cx="166" cy="160" rx="44" ry="15" fill="#0a0400"/>
-  <ellipse cx="123" cy="148" rx="52" ry="12" fill="#0a0400"/>
-
-  <!-- Medium acacia center-left -->
-  <rect x="520" y="210" width="8" height="85" fill="#0a0400"/>
-  <ellipse cx="524" cy="198" rx="50" ry="16" fill="#0a0400"/>
-  <ellipse cx="488" cy="204" rx="30" ry="11" fill="#0a0400"/>
-  <ellipse cx="560" cy="203" rx="33" ry="12" fill="#0a0400"/>
-  <ellipse cx="524" cy="193" rx="38" ry="10" fill="#0a0400"/>
-
-  <!-- Tall skinny acacia center-right -->
-  <rect x="870" y="185" width="7" height="110" fill="#0a0400"/>
-  <ellipse cx="873" cy="172" rx="56" ry="17" fill="#0a0400"/>
-  <ellipse cx="832" cy="179" rx="34" ry="12" fill="#0a0400"/>
-  <ellipse cx="914" cy="177" rx="36" ry="13" fill="#0a0400"/>
-  <ellipse cx="873" cy="165" rx="44" ry="11" fill="#0a0400"/>
-
-  <!-- Small shrub far left -->
-  <rect x="32" y="268" width="5" height="27" fill="#0a0400"/>
-  <ellipse cx="34" cy="262" rx="22" ry="9" fill="#0a0400"/>
-
-  <!-- Small shrub right -->
-  <rect x="1340" y="272" width="5" height="23" fill="#0a0400"/>
-  <ellipse cx="1342" cy="266" rx="20" ry="8" fill="#0a0400"/>
-
-  <!-- Large right acacia -->
-  <rect x="1260" y="192" width="9" height="103" fill="#0a0400"/>
-  <ellipse cx="1264" cy="178" rx="62" ry="19" fill="#0a0400"/>
-  <ellipse cx="1220" cy="185" rx="38" ry="13" fill="#0a0400"/>
-  <ellipse cx="1306" cy="184" rx="40" ry="14" fill="#0a0400"/>
-  <ellipse cx="1264" cy="172" rx="48" ry="12" fill="#0a0400"/>
-</svg>
-`;
-
-function compile(gl: WebGLRenderingContext, src: string, type: number): WebGLShader {
-  const s = gl.createShader(type)!;
-  gl.shaderSource(s, src);
-  gl.compileShader(s);
-  return s;
+function rand(a: number, b: number) {
+  return Math.random() * (a - b) + b;
 }
 
-interface SavannaCanvasProps {
-  /** When true, renders as a contained block (for shop previews). Default: fixed fullscreen. */
+function jitter(n: number, pct = 0.2) {
+  return n + n * rand(pct, -pct);
+}
+
+function makeDefs(svg: SVGSVGElement, W: number, H: number) {
+  const defs = document.createElementNS(NS, 'defs');
+
+  function makeFilter(id: string, scale: number) {
+    const f = document.createElementNS(NS, 'filter');
+    f.id = id;
+    const turb = document.createElementNS(NS, 'feTurbulence');
+    turb.setAttribute('result', 'T');
+    turb.setAttribute('baseFrequency', '0.005');
+    turb.setAttribute('numOctaves', '2');
+    turb.setAttribute('seed', '0');
+    const disp = document.createElementNS(NS, 'feDisplacementMap');
+    disp.setAttribute('in', 'SourceGraphic');
+    disp.setAttribute('in2', 'T');
+    disp.setAttribute('scale', String(scale));
+    f.appendChild(turb);
+    f.appendChild(disp);
+    return f;
+  }
+
+  defs.appendChild(makeFilter('sv-gnd', 25));
+  defs.appendChild(makeFilter('sv-tree', 4));
+
+  // Diagonal sunset gradient
+  const grad = document.createElementNS(NS, 'linearGradient');
+  grad.id = 'sv-grad';
+  grad.setAttribute('x1', '0'); grad.setAttribute('y1', '0');
+  grad.setAttribute('x2', '1'); grad.setAttribute('y2', '1');
+  [[BG1,'0%'],[BG2,'50%'],[BG3,'100%']].forEach(([color, offset]) => {
+    const s = document.createElementNS(NS, 'stop');
+    s.setAttribute('offset', offset);
+    s.setAttribute('stop-color', color);
+    grad.appendChild(s);
+  });
+  defs.appendChild(grad);
+
+  // Background rect filled with gradient
+  svg.appendChild(defs);
+  const bg = document.createElementNS(NS, 'rect');
+  bg.setAttribute('width', String(W));
+  bg.setAttribute('height', String(H));
+  bg.setAttribute('fill', 'url(#sv-grad)');
+  svg.appendChild(bg);
+}
+
+function addTree(parent: SVGGElement, pos: number, width: number, sceneH: number, branchWeight: number) {
+  const w = jitter(width, 0.5);
+  const h = sceneH;
+  const hasBranch = Math.round(rand(0, branchWeight));
+  let d: string;
+
+  if (!hasBranch) {
+    d = `M${pos},-10 L${pos+w},-10 L${pos+w},${h} L${pos},${h} Z`;
+  } else {
+    const side      = Math.round(Math.random());
+    const bw        = w / 2;
+    const bx        = rand(w, w * 1.5);
+    const by        = rand(h / 6, h / 2);
+    const angle     = Math.atan(bx / by);
+    const reattach  = (bx + bw) / Math.tan(angle);
+    if (side === 0) {
+      d = `M${pos},-10 L${pos},${by} L${pos-bx},0 L${pos-bx-bw},-10 L${pos},${reattach} L${pos},${h} L${pos+w},${h} L${pos+w},-10 Z`;
+    } else {
+      d = `M${pos},-10 L${pos+w},-10 L${pos+w},${by} L${pos+w+bx},-10 L${pos+w+bx+bw},-10 L${pos+w},${reattach} L${pos+w},${h} L${pos},${h} Z`;
+    }
+  }
+
+  const path = document.createElementNS(NS, 'path');
+  path.setAttribute('d', d);
+  path.setAttribute('fill', FG);
+  path.setAttribute('filter', 'url(#sv-tree)');
+  parent.appendChild(path);
+}
+
+function addLayer(svg: SVGSVGElement, W: number, H: number, opts: {
+  screenPct:    number;
+  treeFreq:     number;
+  treeWidth:    number;
+  branchWeight: number;
+  opacity?:     number;
+}) {
+  const g = document.createElementNS(NS, 'g');
+  if (opts.opacity !== undefined) g.style.opacity = String(opts.opacity);
+
+  const groundH = opts.screenPct * H;
+  const rect    = document.createElementNS(NS, 'rect');
+  rect.setAttribute('fill', FG);
+  rect.setAttribute('filter', 'url(#sv-gnd)');
+  rect.setAttribute('height', String(groundH));
+  rect.setAttribute('width',  String(W + 30));
+  rect.setAttribute('x', '-15');
+  rect.setAttribute('y', String(H - groundH + 15));
+  g.appendChild(rect);
+
+  const freq     = jitter(opts.treeFreq, 0.3);
+  const numTrees = Math.max(2, Math.floor(W / freq));
+  for (let i = 0; i < numTrees; i++) {
+    addTree(g, rand(0, W), opts.treeWidth, H, opts.branchWeight);
+  }
+
+  svg.appendChild(g);
+}
+
+function addTopBar(svg: SVGSVGElement, W: number, H: number) {
+  const g    = document.createElementNS(NS, 'g');
+  const rect = document.createElementNS(NS, 'rect');
+  rect.setAttribute('fill', FG);
+  rect.setAttribute('filter', 'url(#sv-gnd)');
+  rect.setAttribute('height', String(H * 0.15 + 25));
+  rect.setAttribute('width', String(W + 30));
+  rect.setAttribute('x', '-25');
+  rect.setAttribute('y', '-25');
+  g.appendChild(rect);
+  svg.appendChild(g);
+}
+
+export interface SavannaCanvasProps {
   preview?: boolean;
 }
 
 export function SavannaCanvas({ preview = false }: SavannaCanvasProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const svgRef  = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const wrap = wrapRef.current;
+    const svg  = svgRef.current;
+    if (!wrap || !svg) return;
 
-    const gl = canvas.getContext('webgl');
-    if (!gl) return;
+    function build() {
+      if (!wrap || !svg) return;
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
 
-    const dpr = preview ? 1 : (window.devicePixelRatio || 1);
+      const W = wrap.clientWidth  || window.innerWidth;
+      const H = wrap.clientHeight || window.innerHeight;
 
-    function resize() {
-      if (preview) {
-        const rect = canvas!.parentElement?.getBoundingClientRect();
-        const w = rect?.width  || 400;
-        const h = rect?.height || 300;
-        canvas!.width  = w * dpr;
-        canvas!.height = h * dpr;
-        canvas!.style.width  = w + 'px';
-        canvas!.style.height = h + 'px';
-      } else {
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-        canvas!.width  = w * dpr;
-        canvas!.height = h * dpr;
-        canvas!.style.width  = w + 'px';
-        canvas!.style.height = h + 'px';
-      }
-      gl!.viewport(0, 0, canvas!.width, canvas!.height);
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      svg.setAttribute('width',   String(W));
+      svg.setAttribute('height',  String(H));
+
+      makeDefs(svg, W, H);
+
+      // Far background silhouettes — faint
+      addLayer(svg, W, H, {
+        screenPct: 0.01, treeFreq: 100, treeWidth: 20,
+        branchWeight: 2, opacity: 0.3,
+      });
+
+      // Main foreground ground + trees
+      addLayer(svg, W, H, {
+        screenPct: 0.15, treeFreq: 300, treeWidth: 40,
+        branchWeight: 0.95,
+      });
+
+      // Dark top bar
+      addTopBar(svg, W, H);
     }
-    resize();
-    if (!preview) window.addEventListener('resize', resize);
 
-    const vs = compile(gl, VERT, gl.VERTEX_SHADER);
-    const fs = compile(gl, FRAG, gl.FRAGMENT_SHADER);
-    const prog = gl.createProgram()!;
-    gl.attachShader(prog, vs);
-    gl.attachShader(prog, fs);
-    gl.bindAttribLocation(prog, 0, 'pos');
-    gl.linkProgram(prog);
-    gl.useProgram(prog);
+    build();
 
-    const buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(0);
-    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+    const ro = new ResizeObserver(build);
+    ro.observe(wrap);
+    return () => ro.disconnect();
+  }, []);
 
-    const uRes  = gl.getUniformLocation(prog, 'u_res');
-    const uTime = gl.getUniformLocation(prog, 'u_time');
-
-    let scrollT = 0;
-    let rafId: number;
-
-    const onScroll = () => {
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      scrollT = maxScroll > 0 ? (window.scrollY / maxScroll) * 12 : 0;
-    };
-    if (!preview) window.addEventListener('scroll', onScroll, { passive: true });
-
-    // Preview mode: gently animate time so the canvas isn't static
-    let previewT = 0;
-
-    function draw() {
-      const t = preview ? (previewT += 0.008) : scrollT;
-      gl!.uniform2f(uRes, canvas!.width, canvas!.height);
-      gl!.uniform1f(uTime, t);
-      gl!.drawArrays(gl!.TRIANGLES, 0, 3);
-      rafId = requestAnimationFrame(draw);
-    }
-    draw();
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      if (!preview) {
-        window.removeEventListener('resize', resize);
-        window.removeEventListener('scroll', onScroll);
-      }
-    };
-  }, [preview]);
-
-  const fixedStyle: React.CSSProperties = {
-    position: 'fixed',
-    inset: 0,
-    width: '100vw',
-    height: '100vh',
-    display: 'block',
-    zIndex: 0,
+  const outerStyle: React.CSSProperties = {
+    position:      preview ? 'absolute' : 'fixed',
+    inset:         0,
+    overflow:      'hidden',
+    zIndex:        preview ? undefined : 0,
     pointerEvents: 'none',
-  };
-
-  const previewStyle: React.CSSProperties = {
-    position: 'absolute',
-    inset: 0,
-    width: '100%',
-    height: '100%',
-    display: 'block',
+    width:         preview ? '100%' : '100vw',
+    height:        preview ? '100%' : '100vh',
   };
 
   return (
-    <div style={{ position: preview ? 'relative' : 'fixed', inset: 0, zIndex: preview ? undefined : 0, pointerEvents: 'none', width: preview ? '100%' : '100vw', height: preview ? '100%' : '100vh' }}>
-      {/* WebGL canvas */}
-      <canvas ref={canvasRef} style={preview ? previewStyle : fixedStyle} />
-
-      {/* Acacia silhouette overlay — sits above canvas, below all content */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          width: '100%',
-          height: preview ? '55%' : '45vh',
-          zIndex: preview ? 1 : 1,
-          pointerEvents: 'none',
-        }}
-        dangerouslySetInnerHTML={{ __html: ACACIA_SVG }}
+    <div ref={wrapRef} style={outerStyle}>
+      <svg
+        ref={svgRef}
+        xmlns={NS}
+        style={{ display: 'block', width: '100%', height: '100%' }}
       />
     </div>
   );

@@ -19,7 +19,7 @@ import {
 // Card-scale preview gradients — more saturated/visible than the full-page versions
 const BG_CARD_GRADIENT: Record<string, string> = {
   bg_default: 'radial-gradient(ellipse 120% 80% at 30% 20%, rgba(176,0,32,0.55) 0%, rgba(0,0,0,0) 60%), linear-gradient(135deg, #0a0000 0%, #1f000b 55%, #0a0000 100%)',
-  bg_savanna: 'radial-gradient(ellipse 120% 80% at 50% 90%, rgba(244,163,0,0.55) 0%, rgba(0,0,0,0) 60%), linear-gradient(160deg, #100500 0%, #2a0e00 45%, #0e0300 100%)',
+  bg_savanna: 'linear-gradient(45deg, #8B0000 0%, #c0392b 50%, #e67e22 100%)',
   bg_market:  'radial-gradient(ellipse 120% 80% at 35% 45%, rgba(220,60,0,0.55) 0%, rgba(0,0,0,0) 60%), linear-gradient(135deg, #100000 0%, #260600 50%, #0a0000 100%)',
   bg_night:   'radial-gradient(ellipse 120% 80% at 80% 15%, rgba(124,58,237,0.45) 0%, rgba(0,0,0,0) 60%), radial-gradient(ellipse 80% 80% at 10% 90%, rgba(6,182,212,0.35) 0%, rgba(0,0,0,0) 55%), linear-gradient(180deg, #05070d 0%, #0b0f14 100%)',
   bg_forest:  'radial-gradient(ellipse 120% 80% at 20% 65%, rgba(0,160,60,0.55) 0%, rgba(0,0,0,0) 65%), linear-gradient(150deg, #000800 0%, #001800 50%, #000500 100%)',
