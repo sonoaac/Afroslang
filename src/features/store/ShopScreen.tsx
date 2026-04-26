@@ -20,7 +20,7 @@ const BG_CARD_GRADIENT: Record<string, string> = {
   bg_default: 'radial-gradient(ellipse 120% 80% at 30% 20%, rgba(176,0,32,0.55) 0%, rgba(0,0,0,0) 60%), linear-gradient(135deg, #0a0000 0%, #1f000b 55%, #0a0000 100%)',
   bg_savanna: 'radial-gradient(ellipse 120% 80% at 50% 90%, rgba(244,163,0,0.55) 0%, rgba(0,0,0,0) 60%), linear-gradient(160deg, #100500 0%, #2a0e00 45%, #0e0300 100%)',
   bg_market:  'radial-gradient(ellipse 120% 80% at 35% 45%, rgba(220,60,0,0.55) 0%, rgba(0,0,0,0) 60%), linear-gradient(135deg, #100000 0%, #260600 50%, #0a0000 100%)',
-  bg_night:   'radial-gradient(ellipse 120% 80% at 70% 10%, rgba(50,80,220,0.55) 0%, rgba(0,0,0,0) 65%), linear-gradient(160deg, #000010 0%, #00001a 55%, #000008 100%)',
+  bg_night:   'radial-gradient(ellipse 120% 80% at 50% 40%, rgba(200,220,255,0.18) 0%, rgba(0,0,0,0) 60%), linear-gradient(180deg, #000000 0%, #03060f 55%, #060c18 100%)',
   bg_forest:  'radial-gradient(ellipse 120% 80% at 20% 65%, rgba(0,160,60,0.55) 0%, rgba(0,0,0,0) 65%), linear-gradient(150deg, #000800 0%, #001800 50%, #000500 100%)',
   bg_ocean:   'radial-gradient(ellipse 120% 80% at 65% 25%, rgba(0,120,220,0.55) 0%, rgba(0,0,0,0) 65%), linear-gradient(145deg, #000810 0%, #001428 50%, #000508 100%)',
   bg_cloudy:  'radial-gradient(ellipse 120% 80% at 50% 30%, rgba(180,210,255,0.45) 0%, rgba(0,0,0,0) 65%), linear-gradient(180deg, #062b6e 0%, #0d3d8a 50%, #1a5099 100%)',
@@ -492,34 +492,25 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
             const canAfford = sandbits >= item.price;
             const isSavanna = item.id === 'bg_savanna';
             const isCloudy  = item.id === 'bg_cloudy';
-            const stars = item.id === 'bg_night'
-              ? Array.from({ length: 40 }, (_, i) => ({
-                  left: `${(i * 37 + 7) % 100}%`,
-                  top: `${(i * 53 + 13) % 100}%`,
-                  delay: `${(i * 0.2) % 3}s`,
-                  size: i % 3 === 0 ? 3 : 2,
-                }))
-              : [];
+            const isNight   = item.id === 'bg_night';
             return (
-              <div className="bg-fullscreen-preview" style={{ background: isSavanna ? 'rgb(28,14,4)' : isCloudy ? 'rgb(5,55,128)' : getBackgroundStyle(previewBg) }}>
+              <div className="bg-fullscreen-preview" style={{ background: isSavanna ? 'rgb(28,14,4)' : isCloudy ? 'rgb(5,55,128)' : isNight ? 'rgb(0,0,0)' : getBackgroundStyle(previewBg) }}>
                 {/* Savanna live canvas */}
                 {isSavanna && (
                   <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
                     <SavannaCanvas preview />
                   </div>
                 )}
-                {/* Cloudy live canvas */}
+                {/* Storm Clouds live canvas */}
                 {isCloudy && (
                   <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
                     <CloudyCanvas preview />
                   </div>
                 )}
-                {/* Night sky stars */}
-                {stars.length > 0 && (
-                  <div className="bg-preview-stars">
-                    {stars.map((s, i) => (
-                      <div key={i} className="bg-preview-star" style={{ left: s.left, top: s.top, animationDelay: s.delay, width: s.size, height: s.size }} />
-                    ))}
+                {/* Night Sky live canvas */}
+                {isNight && (
+                  <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+                    <CloudyCanvas variant="night" preview />
                   </div>
                 )}
 

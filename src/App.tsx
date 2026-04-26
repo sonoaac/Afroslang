@@ -355,7 +355,7 @@ function App() {
 
   const appShell = (children: React.ReactNode) => (
     <div style={{ minHeight: '100dvh', background: appBg }}>
-      {equippedBg === 'bg_savanna' ? <SavannaCanvas /> : equippedBg === 'bg_cloudy' ? <CloudyCanvas /> : <GlCanvas />}
+      {equippedBg === 'bg_savanna' ? <SavannaCanvas /> : equippedBg === 'bg_cloudy' ? <CloudyCanvas /> : equippedBg === 'bg_night' ? <CloudyCanvas variant="night" /> : <GlCanvas />}
       {children}
     </div>
   );
