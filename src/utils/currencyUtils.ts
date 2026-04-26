@@ -68,6 +68,7 @@ export const BACKGROUNDS: CosmeticItem[] = [
   { id: 'bg_night',     name: 'Night Sky',      emoji: '🌃',  price: 400 },
   { id: 'bg_forest',    name: 'Deep Forest',    emoji: '🌿',  price: 200 },
   { id: 'bg_ocean',     name: 'Ocean Blue',     emoji: '🌊',  price: 350 },
+  { id: 'bg_cloudy',   name: 'Storm Clouds',   emoji: '⛈️',  price: 275 },
 ];
 
 /** CSS gradient for each background ID, applied to the app root. */
@@ -83,6 +84,8 @@ export function getBackgroundStyle(bgId: string | undefined): string {
       return 'radial-gradient(900px 600px at 20% 60%, rgba(0,130,50,0.18) 0%, rgba(0,0,0,0) 65%), linear-gradient(150deg, #000500 0%, #001000 50%, #000300 100%)';
     case 'bg_ocean':
       return 'radial-gradient(1000px 600px at 60% 20%, rgba(0,100,200,0.18) 0%, rgba(0,0,0,0) 65%), linear-gradient(145deg, #000508 0%, #000f18 50%, #000305 100%)';
+    case 'bg_cloudy':
+      return 'linear-gradient(0deg, #3a6fa8 0%, #1a5099 50%, #053780 100%)';
     default: // bg_default — Sandy Desert (current default dark warm)
       return 'radial-gradient(1200px 600px at 25% 20%, rgba(176, 0, 32, 0.35) 0%, rgba(0,0,0,0) 60%), linear-gradient(135deg, #000000 0%, #120007 55%, #000000 100%)';
   }

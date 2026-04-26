@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { SandbitsIcon } from '../../components/ui/SandbitsIcon';
 import { SavannaCanvas } from '../../components/landing/SavannaCanvas';
+import { CloudyCanvas } from '../../components/landing/CloudyCanvas';
 import { InterfaceLanguage } from '../../types';
 import {
   DIAMOND_PACKS,
@@ -22,6 +23,7 @@ const BG_CARD_GRADIENT: Record<string, string> = {
   bg_night:   'radial-gradient(ellipse 120% 80% at 70% 10%, rgba(50,80,220,0.55) 0%, rgba(0,0,0,0) 65%), linear-gradient(160deg, #000010 0%, #00001a 55%, #000008 100%)',
   bg_forest:  'radial-gradient(ellipse 120% 80% at 20% 65%, rgba(0,160,60,0.55) 0%, rgba(0,0,0,0) 65%), linear-gradient(150deg, #000800 0%, #001800 50%, #000500 100%)',
   bg_ocean:   'radial-gradient(ellipse 120% 80% at 65% 25%, rgba(0,120,220,0.55) 0%, rgba(0,0,0,0) 65%), linear-gradient(145deg, #000810 0%, #001428 50%, #000508 100%)',
+  bg_cloudy:  'radial-gradient(ellipse 120% 80% at 50% 30%, rgba(180,210,255,0.45) 0%, rgba(0,0,0,0) 65%), linear-gradient(180deg, #062b6e 0%, #0d3d8a 50%, #1a5099 100%)',
 };
 
 // Accent overlays visible on the card thumbnail
@@ -32,6 +34,7 @@ const BG_ACCENT: Record<string, string> = {
   bg_night:   '✨',
   bg_forest:  '🌿',
   bg_ocean:   '🌊',
+  bg_cloudy:  '⛈️',
 };
 
 interface ShopScreenProps {
@@ -488,6 +491,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
             const inCart = cart[item.id];
             const canAfford = sandbits >= item.price;
             const isSavanna = item.id === 'bg_savanna';
+            const isCloudy  = item.id === 'bg_cloudy';
             const stars = item.id === 'bg_night'
               ? Array.from({ length: 40 }, (_, i) => ({
                   left: `${(i * 37 + 7) % 100}%`,
@@ -497,11 +501,17 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
                 }))
               : [];
             return (
-              <div className="bg-fullscreen-preview" style={{ background: isSavanna ? 'rgb(28,14,4)' : getBackgroundStyle(previewBg) }}>
+              <div className="bg-fullscreen-preview" style={{ background: isSavanna ? 'rgb(28,14,4)' : isCloudy ? 'rgb(5,55,128)' : getBackgroundStyle(previewBg) }}>
                 {/* Savanna live canvas */}
                 {isSavanna && (
                   <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
                     <SavannaCanvas preview />
+                  </div>
+                )}
+                {/* Cloudy live canvas */}
+                {isCloudy && (
+                  <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+                    <CloudyCanvas preview />
                   </div>
                 )}
                 {/* Night sky stars */}

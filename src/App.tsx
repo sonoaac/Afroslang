@@ -4,6 +4,7 @@ import { InterfaceLanguage, AfricanLanguage, UserProgress, Lesson } from './type
 import { LandingPage } from './components/landing/LandingPage';
 import { GlCanvas } from './components/landing/GlCanvas';
 import { SavannaCanvas } from './components/landing/SavannaCanvas';
+import { CloudyCanvas } from './components/landing/CloudyCanvas';
 
 import { LearningPath } from './features/lessons/LearningPath';
 import { LessonScreen } from './features/lessons/LessonScreen';
@@ -354,7 +355,7 @@ function App() {
 
   const appShell = (children: React.ReactNode) => (
     <div style={{ minHeight: '100dvh', background: appBg }}>
-      {equippedBg === 'bg_savanna' ? <SavannaCanvas /> : <GlCanvas />}
+      {equippedBg === 'bg_savanna' ? <SavannaCanvas /> : equippedBg === 'bg_cloudy' ? <CloudyCanvas /> : <GlCanvas />}
       {children}
     </div>
   );
