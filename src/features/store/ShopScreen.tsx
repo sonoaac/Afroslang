@@ -32,7 +32,7 @@ const BG_ACCENT: Record<string, string> = {
   bg_default: '🏜️',
   bg_savanna: '🌅',
   bg_market:  '🏮',
-  bg_night:   '✨',
+  bg_night:   '🌌',
   bg_forest:  '🌿',
   bg_ocean:   '🌊',
   bg_cloudy:  '⛈️',
