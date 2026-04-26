@@ -83,7 +83,7 @@ export function getBackgroundStyle(bgId: string | undefined): string {
     case 'bg_forest':
       return 'hsl(200,40%,18%)';
     case 'bg_ocean':
-      return 'radial-gradient(1000px 600px at 60% 20%, rgba(0,100,200,0.18) 0%, rgba(0,0,0,0) 65%), linear-gradient(145deg, #000508 0%, #000f18 50%, #000305 100%)';
+      return 'linear-gradient(180deg, #1a8aaa 0%, #0d4a6a 50%, #0a1e2a 100%)';
     case 'bg_cloudy':
       return 'linear-gradient(0deg, #3a6fa8 0%, #1a5099 50%, #053780 100%)';
     default: // bg_default — Sandy Desert (current default dark warm)

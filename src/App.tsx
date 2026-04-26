@@ -7,6 +7,7 @@ import { SavannaCanvas } from './components/landing/SavannaCanvas';
 import { CloudyCanvas } from './components/landing/CloudyCanvas';
 import { NightSkyCanvas } from './components/landing/NightSkyCanvas';
 import { DeepForestCanvas } from './components/landing/DeepForestCanvas';
+import { OceanCanvas } from './components/landing/OceanCanvas';
 
 import { LearningPath } from './features/lessons/LearningPath';
 import { LessonScreen } from './features/lessons/LessonScreen';
@@ -357,7 +358,7 @@ function App() {
 
   const appShell = (children: React.ReactNode) => (
     <div style={{ minHeight: '100dvh', background: appBg }}>
-      {equippedBg === 'bg_savanna' ? <SavannaCanvas /> : equippedBg === 'bg_cloudy' ? <CloudyCanvas /> : equippedBg === 'bg_night' ? <NightSkyCanvas /> : equippedBg === 'bg_forest' ? <DeepForestCanvas /> : <GlCanvas />}
+      {equippedBg === 'bg_savanna' ? <SavannaCanvas /> : equippedBg === 'bg_cloudy' ? <CloudyCanvas /> : equippedBg === 'bg_night' ? <NightSkyCanvas /> : equippedBg === 'bg_forest' ? <DeepForestCanvas /> : equippedBg === 'bg_ocean' ? <OceanCanvas /> : <GlCanvas />}
       {children}
     </div>
   );
