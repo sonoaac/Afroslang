@@ -4,6 +4,7 @@ import { SandbitsIcon } from '../../components/ui/SandbitsIcon';
 import { SavannaCanvas } from '../../components/landing/SavannaCanvas';
 import { CloudyCanvas } from '../../components/landing/CloudyCanvas';
 import { NightSkyCanvas } from '../../components/landing/NightSkyCanvas';
+import { DeepForestCanvas } from '../../components/landing/DeepForestCanvas';
 import { InterfaceLanguage } from '../../types';
 import {
   DIAMOND_PACKS,
@@ -22,7 +23,7 @@ const BG_CARD_GRADIENT: Record<string, string> = {
   bg_savanna: 'linear-gradient(45deg, #8B0000 0%, #c0392b 50%, #e67e22 100%)',
   bg_market:  'radial-gradient(ellipse 120% 80% at 35% 45%, rgba(220,60,0,0.55) 0%, rgba(0,0,0,0) 60%), linear-gradient(135deg, #100000 0%, #260600 50%, #0a0000 100%)',
   bg_night:   'radial-gradient(ellipse 120% 80% at 80% 15%, rgba(124,58,237,0.45) 0%, rgba(0,0,0,0) 60%), radial-gradient(ellipse 80% 80% at 10% 90%, rgba(6,182,212,0.35) 0%, rgba(0,0,0,0) 55%), linear-gradient(180deg, #05070d 0%, #0b0f14 100%)',
-  bg_forest:  'radial-gradient(ellipse 120% 80% at 20% 65%, rgba(0,160,60,0.55) 0%, rgba(0,0,0,0) 65%), linear-gradient(150deg, #000800 0%, #001800 50%, #000500 100%)',
+  bg_forest:  'linear-gradient(180deg, hsl(200,40%,12%) 0%, hsl(200,40%,18%) 50%, hsl(140,35%,12%) 100%)',
   bg_ocean:   'radial-gradient(ellipse 120% 80% at 65% 25%, rgba(0,120,220,0.55) 0%, rgba(0,0,0,0) 65%), linear-gradient(145deg, #000810 0%, #001428 50%, #000508 100%)',
   bg_cloudy:  'radial-gradient(ellipse 120% 80% at 50% 30%, rgba(180,210,255,0.45) 0%, rgba(0,0,0,0) 65%), linear-gradient(180deg, #062b6e 0%, #0d3d8a 50%, #1a5099 100%)',
 };
@@ -494,8 +495,9 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
             const isSavanna = item.id === 'bg_savanna';
             const isCloudy  = item.id === 'bg_cloudy';
             const isNight   = item.id === 'bg_night';
+            const isForest  = item.id === 'bg_forest';
             return (
-              <div className="bg-fullscreen-preview" style={{ background: isSavanna ? 'rgb(28,14,4)' : isCloudy ? 'rgb(5,55,128)' : isNight ? '#0b0f14' : getBackgroundStyle(previewBg) }}>
+              <div className="bg-fullscreen-preview" style={{ background: isSavanna ? 'rgb(28,14,4)' : isCloudy ? 'rgb(5,55,128)' : isNight ? '#0b0f14' : isForest ? 'hsl(200,40%,18%)' : getBackgroundStyle(previewBg) }}>
                 {/* Savanna live canvas */}
                 {isSavanna && (
                   <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
@@ -506,6 +508,12 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
                 {isCloudy && (
                   <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
                     <CloudyCanvas preview />
+                  </div>
+                )}
+                {/* Deep Forest live canvas */}
+                {isForest && (
+                  <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+                    <DeepForestCanvas preview />
                   </div>
                 )}
                 {/* Night Sky live canvas */}

@@ -81,7 +81,7 @@ export function getBackgroundStyle(bgId: string | undefined): string {
     case 'bg_night':
       return 'radial-gradient(1200px 800px at 80% 10%, rgba(124,58,237,0.25), transparent 60%), radial-gradient(1000px 700px at 10% 90%, rgba(6,182,212,0.22), transparent 55%), #0b0f14';
     case 'bg_forest':
-      return 'radial-gradient(900px 600px at 20% 60%, rgba(0,130,50,0.18) 0%, rgba(0,0,0,0) 65%), linear-gradient(150deg, #000500 0%, #001000 50%, #000300 100%)';
+      return 'hsl(200,40%,18%)';
     case 'bg_ocean':
       return 'radial-gradient(1000px 600px at 60% 20%, rgba(0,100,200,0.18) 0%, rgba(0,0,0,0) 65%), linear-gradient(145deg, #000508 0%, #000f18 50%, #000305 100%)';
     case 'bg_cloudy':
