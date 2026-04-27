@@ -153,8 +153,10 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
   const [panelOpen, setPanelOpen]                 = useState(false);
   const [exploreVisible, setExploreVisible]       = useState(false);
   const [headerScrolled, setHeaderScrolled]       = useState(false);
+  const [ctaPassed, setCtaPassed]                 = useState(false);
   const [activePage, setActivePage]               = useState<string | null>(null);
   const exploreSectionRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
   // Tracks last active tab so form content stays rendered during close animation
   const lastSheetRef = useRef<'login' | 'signup'>('signup');
   if (sheet) lastSheetRef.current = sheet;
@@ -177,7 +179,12 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
   }, []);
 
   useEffect(() => {
-    const onScroll = () => setHeaderScrolled(window.scrollY > 60);
+    const onScroll = () => {
+      setHeaderScrolled(window.scrollY > 60);
+      if (ctaRef.current) {
+        setCtaPassed(ctaRef.current.getBoundingClientRect().bottom < 0);
+      }
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -722,13 +729,20 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
       <div className="lp" style={{ display: activePg ? 'none' : undefined }}>
       <GlCanvas />
 
-      <header className={`lp-header${headerScrolled ? ' lp-header--scrolled' : ''}`}>
+      <header className={`lp-header${headerScrolled ? ' lp-header--scrolled' : ''}${ctaPassed ? ' lp-header--cta-up' : ''}`}>
         <div className="lp-header-left" style={{ gap: 6 }}>
           <img src="/Afroslang.png" className="lp-logo" alt="Afroslang" style={{ display: 'block', width: '52px', height: '52px' }} />
           <span className="lp-brand">
             AFRO
             <em style={{ color: '#b00020', WebkitTextStroke: '2.5px #000', marginLeft: 2 }}>SLANG</em>
           </span>
+        </div>
+        <div className="lp-header-cta-wrap">
+          {isLoggedIn ? (
+            <button className="lp-btn-header-cta" onClick={onContinue ?? undefined}>Continue →</button>
+          ) : (
+            <button className="lp-btn-header-cta" onClick={() => setSheet('signup')}>Get Started</button>
+          )}
         </div>
       </header>
 
@@ -883,7 +897,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
         </div>
 
         {/* CTAs below map */}
-        <div className="lp-map-ctas">
+        <div className="lp-map-ctas" ref={ctaRef}>
           {isLoggedIn ? (
             <button className="lp-btn-hero-primary" onClick={onContinue ?? scrollToExplorer}>
               Continue Learning →

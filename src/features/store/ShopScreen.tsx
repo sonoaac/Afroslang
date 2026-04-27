@@ -83,6 +83,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
 
   const sandbits = userData?.sandbits ?? 0;
   const diamonds = userData?.diamonds ?? 0;
+  const isPremium = userData?.subscription?.active ?? false;
   const ownedAvatars: string[] = userData?.ownedAvatars ?? ['avatar_default'];
   const ownedBackgrounds: string[] = userData?.ownedBackgrounds ?? ['bg_default'];
   const cartCount = Object.values(cart).reduce((s, i) => s + i.quantity, 0);
@@ -376,21 +377,30 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
                 <SectionLabel>{isEn ? 'PURCHASE AVATARS WITH SANDBITS' : 'ACHETEZ DES AVATARS AVEC DES SABLEBITS'}</SectionLabel>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '1em' }}>
                   {AVATARS.map(item => {
-                    const isOwned = ownedAvatars.includes(item.id);
+                    const isOwned = ownedAvatars.includes(item.id) || (item.plusOnly && isPremium);
                     const inCart = cart[item.id];
                     const canAfford = sandbits >= item.price;
                     return (
                       <div key={item.id} className="sh-card">
                         <CardBadge cls="av-badge">AVATAR</CardBadge>
-                        <span className="sh-card-icon">{item.emoji}</span>
+                        {item.image
+                          ? <img src={item.image} alt={item.name} style={{ width: 56, height: 56, objectFit: 'contain', borderRadius: 8, marginBottom: 2 }} />
+                          : <span className="sh-card-icon">{item.emoji}</span>
+                        }
                         <p style={{ color: '#fff', fontWeight: 700, fontSize: '0.95em', margin: 0, textAlign: 'center' }}>{item.name}</p>
-                        {item.price === 0
-                          ? <p style={{ color: '#27ae60', fontSize: '0.75em', fontWeight: 700, margin: 0 }}>{isEn ? 'Free' : 'Gratuit'}</p>
-                          : <p style={{ color: '#f0a800', fontSize: '0.75em', fontWeight: 600, margin: 0 }}>🪙 {item.price}</p>
+                        {item.plusOnly
+                          ? <p style={{ color: '#b00020', fontSize: '0.72em', fontWeight: 700, margin: 0 }}>AfroPlus</p>
+                          : item.price === 0
+                            ? <p style={{ color: '#27ae60', fontSize: '0.75em', fontWeight: 700, margin: 0 }}>{isEn ? 'Free' : 'Gratuit'}</p>
+                            : <p style={{ color: '#f0a800', fontSize: '0.75em', fontWeight: 600, margin: 0 }}>🪙 {item.price}</p>
                         }
                         {isOwned ? (
                           <div style={{ background: 'rgba(39,174,96,0.12)', border: '1px solid rgba(39,174,96,0.3)', borderRadius: 6, padding: '3px 12px', color: '#27ae60', fontSize: '0.72em', fontWeight: 700 }}>
                             {isEn ? 'Owned' : 'Possédé'}
+                          </div>
+                        ) : item.plusOnly ? (
+                          <div style={{ background: 'rgba(176,0,32,0.12)', border: '1px solid rgba(176,0,32,0.3)', borderRadius: 6, padding: '3px 12px', color: '#b00020', fontSize: '0.72em', fontWeight: 700 }}>
+                            {isEn ? 'Plus Only' : 'Plus Seulement'}
                           </div>
                         ) : (
                           <button

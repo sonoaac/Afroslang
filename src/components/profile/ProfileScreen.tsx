@@ -57,7 +57,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const handleEquip = async (itemId: string, type: 'avatar' | 'background') => {
     if (isGuest || !user) return;
     const ownedList = type === 'avatar' ? ownedAvatars : ownedBackgrounds;
-    if (!ownedList.includes(itemId)) { onGoToShop?.(); return; }
+    const avatarMeta = type === 'avatar' ? AVATARS.find(a => a.id === itemId) : null;
+    const isPlusOwned = avatarMeta?.plusOnly && isPremium;
+    if (!ownedList.includes(itemId) && !isPlusOwned) { onGoToShop?.(); return; }
     setEquipping(itemId);
     await equipItem(itemId, type);
     setEquipping(null);
@@ -87,9 +89,11 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         {/* Avatar + identity */}
         <div className="ps-identity">
           <div className="ps-avatar">
-            {equippedAvatarItem.id === 'avatar_default'
-              ? <span className="ps-avatar-initials">{initials}</span>
-              : <span className="ps-avatar-emoji">{equippedAvatarItem.emoji}</span>
+            {equippedAvatarItem.image
+              ? <img src={equippedAvatarItem.image} alt={equippedAvatarItem.name} className="ps-avatar-img" />
+              : equippedAvatarItem.id === 'avatar_default'
+                ? <span className="ps-avatar-initials">{initials}</span>
+                : <span className="ps-avatar-emoji">{equippedAvatarItem.emoji}</span>
             }
             {isPremium && <span className="ps-avatar-crown" aria-label="Premium">👑</span>}
           </div>
@@ -124,21 +128,25 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             <h3 className="ps-section-title">{isEn ? 'Avatar' : 'Avatar'}</h3>
             <div className="ps-cosmetic-grid">
               {AVATARS.map(avatar => {
-                const owned    = ownedAvatars.includes(avatar.id);
+                const owned    = ownedAvatars.includes(avatar.id) || (avatar.plusOnly && isPremium);
                 const equipped = equippedAvatarId === avatar.id;
                 const busy     = equipping === avatar.id;
+                const lockTitle = avatar.plusOnly ? `${avatar.name} — AfroPlus` : `${avatar.name} — ${avatar.price} SB`;
                 return (
                   <button
                     key={avatar.id}
                     className={`ps-cosmetic-item${equipped ? ' ps-cosmetic-item--equipped' : ''}${!owned ? ' ps-cosmetic-item--locked' : ''}`}
                     onClick={() => handleEquip(avatar.id, 'avatar')}
                     disabled={busy}
-                    title={owned ? avatar.name : `${avatar.name} — ${avatar.price} SB`}
+                    title={owned ? avatar.name : lockTitle}
                   >
-                    <span className="ps-cosmetic-emoji">{avatar.emoji}</span>
+                    {avatar.image
+                      ? <img src={avatar.image} alt={avatar.name} className="ps-cosmetic-img" />
+                      : <span className="ps-cosmetic-emoji">{avatar.emoji}</span>
+                    }
                     <span className="ps-cosmetic-name">{avatar.name}</span>
                     {equipped && <span className="ps-cosmetic-check">✓</span>}
-                    {!owned && <span className="ps-cosmetic-lock">🔒</span>}
+                    {!owned && <span className="ps-cosmetic-lock">{avatar.plusOnly ? '⭐' : '🔒'}</span>}
                   </button>
                 );
               })}

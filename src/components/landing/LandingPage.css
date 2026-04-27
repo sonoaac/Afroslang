@@ -107,6 +107,54 @@
   gap: 8px;
 }
 
+/* ── Scroll-up CTA in header (mobile only) ── */
+.lp-brand {
+  transition: opacity 0.28s ease, max-width 0.28s ease;
+  max-width: 240px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.lp-header-cta-wrap {
+  display: none; /* hidden until cta-up on mobile */
+}
+
+/* Compact Get Started / Continue button that appears in header */
+.lp-btn-header-cta {
+  background: #b00020;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 12px rgba(176,0,32,0.4);
+  transition: background 0.18s, transform 0.15s;
+}
+.lp-btn-header-cta:active { transform: scale(0.96); }
+
+@media (max-width: 767px) {
+  /* When user has scrolled past the body Get Started */
+  .lp-header--cta-up {
+    justify-content: space-between;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .lp-header--cta-up .lp-brand {
+    opacity: 0;
+    max-width: 0;
+  }
+  .lp-header--cta-up .lp-header-cta-wrap {
+    display: flex;
+    align-items: center;
+  }
+}
+
 .lp-btn-login {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.22);

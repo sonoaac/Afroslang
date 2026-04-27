@@ -29,8 +29,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 1px solid rgba(255,255,255,0.18);
   background: rgba(6,3,1,0.82);
@@ -87,6 +87,13 @@
   font-weight: 800;
   color: #fff;
   letter-spacing: 0.05em;
+}
+
+.ps-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
 }
 
 .ps-avatar-crown {
@@ -271,6 +278,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 15px 16px;
+  min-height: 48px;
   background: rgba(255,255,255,0.03);
   border-bottom: 1px solid rgba(255,255,255,0.05);
   color: rgba(255,255,255,0.85);
@@ -391,7 +399,7 @@
 /* Cosmetic grid */
 .ps-cosmetic-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(clamp(72px, 22vw, 110px), 1fr));
   gap: 8px;
 }
 
@@ -433,6 +441,13 @@
 .ps-cosmetic-emoji {
   font-size: 1.8rem;
   line-height: 1;
+}
+
+.ps-cosmetic-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 8px;
 }
 
 .ps-cosmetic-name {

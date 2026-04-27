@@ -50,10 +50,12 @@ export interface CosmeticItem {
   emoji: string;
   price: number; // SB cost (0 = free)
   image?: string; // path under /public (optional, falls back to emoji)
+  plusOnly?: boolean; // automatically owned by AfroPlus subscribers
 }
 
 export const AVATARS: CosmeticItem[] = [
-  { id: 'avatar_default',   name: 'Default',    emoji: '🐦',  price: 0 },
+  { id: 'avatar_default',   name: 'Default',    emoji: '🐦',  price: 0,   image: '/Afroslang.png' },
+  { id: 'avatar_afroplus',  name: 'AfroPlus',   emoji: '⭐',  price: 0,   image: '/Afroplus.png', plusOnly: true },
   { id: 'avatar_warrior',   name: 'Warrior',    emoji: '🗡️',  price: 200 },
   { id: 'avatar_scholar',   name: 'Scholar',    emoji: '📚',  price: 150 },
   { id: 'avatar_chief',     name: 'Chief',      emoji: '👑',  price: 350 },

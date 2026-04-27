@@ -33,7 +33,7 @@
 }
 
 .ls-exit-btn {
-  width: 36px; height: 36px; flex-shrink: 0;
+  width: 44px; height: 44px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   background: rgba(176,0,32,0.12);
   border: 1px solid rgba(176,0,32,0.3);
@@ -64,7 +64,7 @@
 }
 
 .ls-home-btn {
-  width: 36px; height: 36px; flex-shrink: 0;
+  width: 44px; height: 44px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.1);
@@ -314,7 +314,7 @@
 @media (min-width: 640px) {
   .ls-header { padding: 12px 24px; }
   .ls-body { padding: 28px 24px 140px; }
-  .ls-exit-btn, .ls-home-btn { width: 42px; height: 42px; }
+  .ls-exit-btn, .ls-home-btn { width: 44px; height: 44px; }
   .ls-option-btn { padding: 20px 18px; min-height: 80px; font-size: 1rem; }
   .ls-btn-check, .ls-btn-next { font-size: 1rem; }
 }
