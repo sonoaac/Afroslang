@@ -23,8 +23,9 @@
   display: inline-flex;
   overflow: hidden;
   vertical-align: bottom;
-  /* Slight padding so descenders aren't clipped */
+  /* Padding so descenders (bottom) and last-glyph right edge aren't clipped */
   padding-bottom: 0.06em;
+  padding-right: 0.07em;
   line-height: inherit;
 }
 

@@ -110,8 +110,8 @@
 /* ── Scroll-up CTA in header (mobile only) ── */
 .lp-brand {
   transition: opacity 0.28s ease, max-width 0.28s ease;
-  max-width: 240px;
-  overflow: hidden;
+  max-width: none;       /* no clipping on desktop */
+  overflow: visible;
   white-space: nowrap;
 }
 
@@ -139,6 +139,11 @@
 .lp-btn-header-cta:active { transform: scale(0.96); }
 
 @media (max-width: 767px) {
+  /* Contain the brand text so it can animate to max-width: 0 */
+  .lp-brand {
+    max-width: 240px;
+    overflow: hidden;
+  }
   /* When user has scrolled past the body Get Started */
   .lp-header--cta-up {
     justify-content: space-between;
