@@ -277,7 +277,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
                   ← {isEn ? 'Back' : 'Retour'}
                 </button>
                 <div style={{ fontSize: '1.5em', fontWeight: 900, letterSpacing: 2, color: '#fff', textShadow: '0 0 18px rgba(192,57,43,0.7)' }}>
-                  🌍 <span style={{ color: '#ff6b55' }}>Afroslang</span>
+                  <img src="/Afroslang.png" alt="Afroslang" style={{ width: 28, height: 28, objectFit: 'contain', verticalAlign: 'middle' }} /> <span style={{ color: '#ff6b55' }}>Afroslang</span>
                 </div>
               </div>
               <div style={{ fontSize: '0.65em', color: '#555', letterSpacing: 2, textTransform: 'uppercase', marginTop: '0.15em' }}>
