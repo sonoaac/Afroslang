@@ -29,7 +29,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [showConfirmLogout, setShowConfirmLogout] = useState(false);
   const [equipping, setEquipping] = useState<string | null>(null);
 
-  const username   = userData?.username || user?.displayName || (isGuest ? 'Guest' : 'User');
+  const isEn = interfaceLanguage === 'en';
+  const username   = userData?.username || user?.displayName || (isGuest ? (isEn ? 'Guest' : 'Invité') : 'User');
   const email      = userData?.email    || user?.email    || '';
   const initials   = username.slice(0, 2).toUpperCase();
   const isPremium  = userData?.subscription?.active ?? false;
@@ -77,7 +78,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             <path d="M19 12H5M12 5l-7 7 7 7" />
           </svg>
         </button>
-        <h1 className="ps-title">Profile</h1>
+        <h1 className="ps-title">{isEn ? 'Profile' : 'Profil'}</h1>
         <div className="ps-header-spacer" />
       </header>
 
@@ -95,7 +96,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           <h2 className="ps-username">{username}</h2>
           {email && <p className="ps-email">{email}</p>}
           <span className={`ps-badge ${isPremium ? 'ps-badge--premium' : 'ps-badge--free'}`}>
-            {isPremium ? 'Plus Member' : isGuest ? 'Guest' : 'Free'}
+            {isPremium ? (isEn ? 'Plus Member' : 'Membre Plus') : isGuest ? (isEn ? 'Guest' : 'Invité') : (isEn ? 'Free' : 'Gratuit')}
           </span>
         </div>
 
@@ -103,24 +104,24 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         <div className="ps-stats">
           <div className="ps-stat">
             <span className="ps-stat-value">{totalXP.toLocaleString()}</span>
-            <span className="ps-stat-label">Total XP</span>
+            <span className="ps-stat-label">{isEn ? 'Total XP' : 'XP Total'}</span>
           </div>
           <div className="ps-stat-divider" />
           <div className="ps-stat">
             <span className="ps-stat-value">{highestStreak}</span>
-            <span className="ps-stat-label">Day Streak</span>
+            <span className="ps-stat-label">{isEn ? 'Day Streak' : 'Série'}</span>
           </div>
           <div className="ps-stat-divider" />
           <div className="ps-stat">
             <span className="ps-stat-value">{totalLessons}</span>
-            <span className="ps-stat-label">Lessons</span>
+            <span className="ps-stat-label">{isEn ? 'Lessons' : 'Leçons'}</span>
           </div>
         </div>
 
         {/* Avatar customisation */}
         {!isGuest && (
           <div className="ps-section">
-            <h3 className="ps-section-title">Avatar</h3>
+            <h3 className="ps-section-title">{isEn ? 'Avatar' : 'Avatar'}</h3>
             <div className="ps-cosmetic-grid">
               {AVATARS.map(avatar => {
                 const owned    = ownedAvatars.includes(avatar.id);
@@ -148,7 +149,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         {/* Background customisation */}
         {!isGuest && (
           <div className="ps-section">
-            <h3 className="ps-section-title">Background</h3>
+            <h3 className="ps-section-title">{isEn ? 'Background' : 'Arrière-plan'}</h3>
             <div className="ps-cosmetic-grid">
               {BACKGROUNDS.map(bg => {
                 const owned    = ownedBackgrounds.includes(bg.id);
@@ -172,8 +173,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             </div>
             {!isGuest && (
               <p className="ps-cosmetic-hint">
-                Locked items can be purchased in the{' '}
-                <button className="ps-cosmetic-shop-link" onClick={onGoToShop}>Shop</button>
+                {isEn ? 'Locked items can be purchased in the' : 'Les éléments verrouillés peuvent être achetés dans la'}{' '}
+                <button className="ps-cosmetic-shop-link" onClick={onGoToShop}>{isEn ? 'Shop' : 'Boutique'}</button>
               </p>
             )}
           </div>
@@ -182,7 +183,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         {/* Continue Learning */}
         {resumeLanguage && resumeProgress && (
           <div className="ps-section">
-            <h3 className="ps-section-title">Continue Learning</h3>
+            <h3 className="ps-section-title">{isEn ? 'Continue Learning' : 'Continuer à apprendre'}</h3>
             <button
               className="ps-continue-card"
               onClick={() => onContinueLearning(resumeLanguage)}
@@ -192,7 +193,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <div className="ps-continue-info">
                   <span className="ps-continue-lang">{resumeLangMeta?.name ?? resumeLanguage}</span>
                   <span className="ps-continue-meta">
-                    Level {resumeProgress.level ?? 1} · {(resumeProgress.xp ?? 0).toLocaleString()} XP · {resumeProgress.completedLessons?.length ?? 0} lessons done
+                    {isEn ? 'Level' : 'Niveau'} {resumeProgress.level ?? 1} · {(resumeProgress.xp ?? 0).toLocaleString()} XP · {resumeProgress.completedLessons?.length ?? 0} {isEn ? 'lessons done' : 'leçons terminées'}
                   </span>
                 </div>
               </div>
@@ -206,7 +207,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         {/* All languages with progress */}
         {activeLanguages.length > 1 && (
           <div className="ps-section">
-            <h3 className="ps-section-title">My Languages</h3>
+            <h3 className="ps-section-title">{isEn ? 'My Languages' : 'Mes Langues'}</h3>
             <div className="ps-lang-list">
               {activeLanguages.map(([langId, prog]) => {
                 const meta = getLanguageById(langId as AfricanLanguage);
@@ -230,10 +231,10 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
         {/* Settings */}
         <div className="ps-section">
-          <h3 className="ps-section-title">Settings</h3>
+          <h3 className="ps-section-title">{isEn ? 'Settings' : 'Paramètres'}</h3>
           <div className="ps-settings-list">
             <div className="ps-setting-row">
-              <span className="ps-setting-label">Interface Language</span>
+              <span className="ps-setting-label">{isEn ? 'Interface Language' : 'Langue de l\'interface'}</span>
               <div className="ps-lang-toggle">
                 <button
                   className={`ps-lang-toggle-btn${interfaceLanguage === 'en' ? ' ps-lang-toggle-btn--active' : ''}`}
@@ -246,13 +247,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               </div>
             </div>
             <div className="ps-setting-row ps-setting-row--link">
-              <span className="ps-setting-label">Privacy Policy</span>
+              <span className="ps-setting-label">{isEn ? 'Privacy Policy' : 'Politique de confidentialité'}</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <path d="M9 18l6-6-6-6" />
               </svg>
             </div>
             <div className="ps-setting-row ps-setting-row--link">
-              <span className="ps-setting-label">Terms of Service</span>
+              <span className="ps-setting-label">{isEn ? 'Terms of Service' : 'Conditions d\'utilisation'}</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <path d="M9 18l6-6-6-6" />
               </svg>
@@ -264,15 +265,15 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         <div className="ps-section ps-section--danger">
           {!showConfirmLogout ? (
             <button className="ps-signout-btn" onClick={() => setShowConfirmLogout(true)} disabled={signingOut}>
-              Sign Out
+              {isEn ? 'Sign Out' : 'Se déconnecter'}
             </button>
           ) : (
             <div className="ps-confirm-logout">
-              <p className="ps-confirm-text">Are you sure you want to sign out?</p>
+              <p className="ps-confirm-text">{isEn ? 'Are you sure you want to sign out?' : 'Voulez-vous vraiment vous déconnecter ?'}</p>
               <div className="ps-confirm-row">
-                <button className="ps-confirm-cancel" onClick={() => setShowConfirmLogout(false)}>Cancel</button>
+                <button className="ps-confirm-cancel" onClick={() => setShowConfirmLogout(false)}>{isEn ? 'Cancel' : 'Annuler'}</button>
                 <button className="ps-confirm-yes" onClick={handleLogout} disabled={signingOut}>
-                  {signingOut ? 'Signing out…' : 'Yes, Sign Out'}
+                  {signingOut ? (isEn ? 'Signing out…' : 'Déconnexion…') : (isEn ? 'Yes, Sign Out' : 'Oui, se déconnecter')}
                 </button>
               </div>
             </div>

@@ -1,13 +1,16 @@
 import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Trophy, ChevronLeft } from 'lucide-react';
+import { InterfaceLanguage } from '../../types';
 
 interface LeaderboardScreenProps {
   onBack: () => void;
+  interfaceLanguage: InterfaceLanguage;
 }
 
-export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ onBack }) => {
+export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ onBack, interfaceLanguage }) => {
   const { user } = useAuth();
+  const isEn = interfaceLanguage === 'en';
 
   const lbFont = "'Times New Roman', Georgia, serif";
   const lbRed = '#b00020';
@@ -55,7 +58,7 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ onBack }) 
             }}
           >
             <ChevronLeft style={{ width: 16, height: 16 }} strokeWidth={2} />
-            Back
+            {isEn ? 'Back' : 'Retour'}
           </button>
 
           <div style={{ textAlign: 'center', flex: 1, minWidth: 0, overflow: 'hidden' }}>
@@ -74,7 +77,7 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ onBack }) 
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
               }}>
-                Leaderboard
+                {isEn ? 'Leaderboard' : 'Classement'}
               </h1>
             </div>
           </div>
@@ -103,10 +106,10 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ onBack }) 
               textShadow: lbShadow,
               wordBreak: 'break-word',
             }}>
-              <span style={{ color: lbRed }}>Create an Account</span>
-              <span style={{ color: lbText }}> or </span>
-              <span style={{ color: lbRed }}>Sign in</span>
-              <span style={{ color: lbText }}> to start tracking your progress vs Friends</span>
+              <span style={{ color: lbRed }}>{isEn ? 'Create an Account' : 'Créer un compte'}</span>
+              <span style={{ color: lbText }}>{isEn ? ' or ' : ' ou '}</span>
+              <span style={{ color: lbRed }}>{isEn ? 'Sign in' : 'Se connecter'}</span>
+              <span style={{ color: lbText }}>{isEn ? ' to start tracking your progress vs Friends' : ' pour suivre ta progression face aux amis'}</span>
             </p>
             <p style={{
               color: lbMuted,
@@ -116,7 +119,7 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ onBack }) 
               textShadow: lbShadow,
               maxWidth: 360,
             }}>
-              Compete weekly. Climb the leagues. Rise to the top.
+              {isEn ? 'Compete weekly. Climb the leagues. Rise to the top.' : 'Concours hebdomadaires. Monte les ligues. Atteins le sommet.'}
             </p>
           </div>
         ) : (
@@ -134,7 +137,7 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ onBack }) 
               letterSpacing: '0.02em',
               textShadow: lbShadow,
             }}>
-              Coming Soon
+              {isEn ? 'Coming Soon' : 'Bientôt disponible'}
             </p>
             <p style={{
               color: lbMuted,
@@ -145,7 +148,7 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ onBack }) 
               textShadow: lbShadow,
               lineHeight: 1.6,
             }}>
-              The leaderboard is being built. Your XP is already being tracked — be ready when it launches.
+              {isEn ? 'The leaderboard is being built. Your XP is already being tracked — be ready when it launches.' : 'Le classement est en cours de construction. Ton XP est déjà enregistré — sois prêt pour le lancement.'}
             </p>
           </div>
         )}

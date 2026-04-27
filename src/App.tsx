@@ -426,6 +426,7 @@ function App() {
         authenticated ? appShell(
           <LeaderboardScreen
             onBack={() => currentLanguage ? navigate(langUrl(currentLanguage as AfricanLanguage)) : goToLanding()}
+            interfaceLanguage={interfaceLanguage}
           />
         ) : <Navigate to="/" replace />
       } />
