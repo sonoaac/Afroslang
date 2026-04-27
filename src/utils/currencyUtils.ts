@@ -55,7 +55,8 @@ export interface CosmeticItem {
 
 export const AVATARS: CosmeticItem[] = [
   { id: 'avatar_default',   name: 'Default',    emoji: '🐦',  price: 0,   image: '/Afroslang.png' },
-  { id: 'avatar_afroplus',  name: 'AfroPlus',   emoji: '⭐',  price: 0,   image: '/Afroplus.png', plusOnly: true },
+  { id: 'avatar_afroplus',  name: 'AfroPlus',   emoji: '⭐',  price: 0,   image: '/Afroplus.png',  plusOnly: true },
+  { id: 'avatar_afroplus_f', name: 'AfroPlus F', emoji: '⭐', price: 0,   image: '/AfroplusF.png', plusOnly: true },
   { id: 'avatar_warrior',   name: 'Warrior',    emoji: '🗡️',  price: 200 },
   { id: 'avatar_scholar',   name: 'Scholar',    emoji: '📚',  price: 150 },
   { id: 'avatar_chief',     name: 'Chief',      emoji: '👑',  price: 350 },
