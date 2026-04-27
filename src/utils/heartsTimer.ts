@@ -165,38 +165,51 @@ export const formatTimeRemaining = (milliseconds: number): string => {
 /**
  * Guest mode hearts management
  */
+/** Parse and clamp localStorage guest hearts — prevents tampering (e.g. setting currentHearts: 999). */
+function parseGuestHeartsData(raw: unknown): HeartsData {
+  const now = Date.now();
+  const obj = typeof raw === 'object' && raw !== null ? (raw as Record<string, unknown>) : {};
+  return {
+    currentHearts: Math.min(Math.max(0, Math.floor(Number(obj.currentHearts) || 0)), MAX_HEARTS),
+    // Reject future timestamps — that's impossible legitimately and would grant free regen
+    lastResetTime: typeof obj.lastResetTime === 'number' && obj.lastResetTime <= now
+      ? obj.lastResetTime
+      : now,
+    maxHearts: MAX_HEARTS,
+  };
+}
+
 export const getGuestHeartsStatus = (): HeartsData => {
   try {
     const saved = localStorage.getItem('afroslang_guest_hearts');
     if (saved) {
-      const heartsData = JSON.parse(saved) as HeartsData;
-      const currentTime = Date.now();
-      const heartsToRestore = calculateHeartsFromTime(heartsData.lastResetTime, currentTime);
-      
+      const heartsData = parseGuestHeartsData(JSON.parse(saved));
+      const now = Date.now();
+      const heartsToRestore = calculateHeartsFromTime(heartsData.lastResetTime, now);
+
       if (heartsToRestore > 0 && heartsData.currentHearts < MAX_HEARTS) {
-        const newHearts = Math.min(heartsData.currentHearts + heartsToRestore, MAX_HEARTS);
         const newHeartsData: HeartsData = {
-          currentHearts: newHearts,
-          lastResetTime: currentTime,
+          currentHearts: Math.min(heartsData.currentHearts + heartsToRestore, MAX_HEARTS),
+          lastResetTime: now,
           maxHearts: MAX_HEARTS,
         };
         localStorage.setItem('afroslang_guest_hearts', JSON.stringify(newHeartsData));
         return newHeartsData;
       }
-      
+
+      // Write back sanitised data in case the stored value was tampered
+      localStorage.setItem('afroslang_guest_hearts', JSON.stringify(heartsData));
       return heartsData;
     }
   } catch (error) {
     console.error('Error loading guest hearts:', error);
   }
-  
-  // Initialize guest hearts
+
   const initialHeartsData: HeartsData = {
     currentHearts: MAX_HEARTS,
     lastResetTime: Date.now(),
-    maxHearts: MAX_HEARTS
+    maxHearts: MAX_HEARTS,
   };
-  
   localStorage.setItem('afroslang_guest_hearts', JSON.stringify(initialHeartsData));
   return initialHeartsData;
 };
@@ -204,27 +217,19 @@ export const getGuestHeartsStatus = (): HeartsData => {
 export const updateGuestHearts = (heartsLost: number): HeartsData => {
   try {
     const saved = localStorage.getItem('afroslang_guest_hearts');
-    const heartsData = saved ? JSON.parse(saved) as HeartsData : {
-      currentHearts: MAX_HEARTS,
-      lastResetTime: Date.now(),
-      maxHearts: MAX_HEARTS
-    };
-    
-    const newHearts = Math.max(0, heartsData.currentHearts - heartsLost);
+    const heartsData = saved
+      ? parseGuestHeartsData(JSON.parse(saved))
+      : { currentHearts: MAX_HEARTS, lastResetTime: Date.now(), maxHearts: MAX_HEARTS };
+
     const updatedHeartsData: HeartsData = {
       ...heartsData,
-      currentHearts: newHearts
+      currentHearts: Math.max(0, heartsData.currentHearts - heartsLost),
     };
-    
     localStorage.setItem('afroslang_guest_hearts', JSON.stringify(updatedHeartsData));
     return updatedHeartsData;
   } catch (error) {
     console.error('Error updating guest hearts:', error);
-    return {
-      currentHearts: MAX_HEARTS,
-      lastResetTime: Date.now(),
-      maxHearts: MAX_HEARTS
-    };
+    return { currentHearts: MAX_HEARTS, lastResetTime: Date.now(), maxHearts: MAX_HEARTS };
   }
 };
 

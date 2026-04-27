@@ -6,7 +6,23 @@ service cloud.firestore {
     // Users can read and write their own document only.
     // The Cloud Function (admin SDK) bypasses these rules entirely.
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && currencyDeltaOk();
+
+      // sandbits and diamonds can only decrease (or stay the same) via client writes.
+      // Increases are only permitted from the admin SDK (Cloud Functions).
+      // This blocks console-based balance manipulation.
+      function currencyDeltaOk() {
+        let sbBefore = resource.data.get('sandbits', 0);
+        let sbAfter  = request.resource.data.get('sandbits', sbBefore);
+        let dBefore  = resource.data.get('diamonds', 0);
+        let dAfter   = request.resource.data.get('diamonds', dBefore);
+        return sbAfter <= sbBefore && sbAfter >= 0
+            && dAfter  <= dBefore  && dAfter  >= 0;
+      }
     }
 
     // ── Leaderboard ────────────────────────────────────────────────────────

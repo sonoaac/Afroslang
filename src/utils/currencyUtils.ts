@@ -1,4 +1,4 @@
-import { doc, updateDoc, increment } from 'firebase/firestore';
+import { doc, updateDoc, increment, runTransaction } from 'firebase/firestore';
 import { db } from '../firebase';
 import { UserData } from './userData';
 
@@ -122,60 +122,82 @@ export async function awardLeaderboardSandbits(userId: string, rank: 1 | 2 | 3):
 /** Convert diamonds → sandbits (1 diamond = 50 SB). */
 export async function convertDiamondsToSandbits(
   userId: string,
-  userData: UserData,
+  _userData: UserData,
   diamondsToSpend: number,
 ): Promise<Partial<UserData> | null> {
-  const currentDiamonds = userData.diamonds ?? 0;
-  if (currentDiamonds < diamondsToSpend || diamondsToSpend < 1) return null;
+  if (diamondsToSpend < 1) return null;
 
-  const sandbitsGained = diamondsToSpend * SANDBITS_PER_DIAMOND;
-  const newDiamonds = currentDiamonds - diamondsToSpend;
-  const newSandbits = (userData.sandbits ?? 0) + sandbitsGained;
+  // Transaction: read current balance from Firestore before deducting (prevents TOCTOU)
+  return runTransaction(db, async (tx) => {
+    const userRef = doc(db, 'users', userId);
+    const snap = await tx.get(userRef);
+    if (!snap.exists()) return null;
 
-  await updateDoc(doc(db, 'users', userId), {
-    diamonds: newDiamonds,
-    sandbits: newSandbits,
+    const current = snap.data();
+    const currentDiamonds = current.diamonds ?? 0;
+    if (currentDiamonds < diamondsToSpend) return null;
+
+    const newDiamonds = currentDiamonds - diamondsToSpend;
+    const newSandbits = (current.sandbits ?? 0) + diamondsToSpend * SANDBITS_PER_DIAMOND;
+    tx.update(userRef, { diamonds: newDiamonds, sandbits: newSandbits });
+    return { diamonds: newDiamonds, sandbits: newSandbits };
   });
-
-  return { diamonds: newDiamonds, sandbits: newSandbits };
 }
 
 /** Purchase a cosmetic (avatar or background) with sandbits. */
 export async function purchaseCosmetic(
   userId: string,
-  userData: UserData,
+  _userData: UserData,
   item: CosmeticItem,
   type: 'avatar' | 'background',
 ): Promise<Partial<UserData> | null> {
-  const currentSandbits = userData.sandbits ?? 0;
-  if (currentSandbits < item.price) return null;
+  const ownedKey    = type === 'avatar' ? 'ownedAvatars'      : 'ownedBackgrounds';
+  const equippedKey = type === 'avatar' ? 'equippedAvatar'     : 'equippedBackground';
+  const userRef     = doc(db, 'users', userId);
 
-  const ownedKey = type === 'avatar' ? 'ownedAvatars' : 'ownedBackgrounds';
-  const equippedKey = type === 'avatar' ? 'equippedAvatar' : 'equippedBackground';
-  const currentOwned: string[] = (userData as any)[ownedKey] ?? [];
+  // Transaction: read authoritative balance from Firestore before deducting
+  return runTransaction(db, async (tx) => {
+    const snap = await tx.get(userRef);
+    if (!snap.exists()) return null;
 
-  if (currentOwned.includes(item.id)) {
-    // Already owned — just equip it (free)
-    await updateDoc(doc(db, 'users', userId), { [equippedKey]: item.id });
-    return { [equippedKey]: item.id };
-  }
+    const current     = snap.data();
+    const currentOwned: string[] = current[ownedKey] ?? [];
 
-  const newSandbits = currentSandbits - item.price;
-  const newOwned = [...currentOwned, item.id];
-  await updateDoc(doc(db, 'users', userId), {
-    sandbits: newSandbits,
-    [ownedKey]: newOwned,
-    [equippedKey]: item.id,
+    if (currentOwned.includes(item.id)) {
+      // Already owned — just equip (free)
+      tx.update(userRef, { [equippedKey]: item.id });
+      return { [equippedKey]: item.id };
+    }
+
+    const currentSandbits = current.sandbits ?? 0;
+    if (currentSandbits < item.price) return null;
+
+    const newSandbits = currentSandbits - item.price;
+    const newOwned    = [...currentOwned, item.id];
+    tx.update(userRef, { sandbits: newSandbits, [ownedKey]: newOwned, [equippedKey]: item.id });
+    return { sandbits: newSandbits, [ownedKey]: newOwned, [equippedKey]: item.id };
   });
-
-  return { sandbits: newSandbits, [ownedKey]: newOwned, [equippedKey]: item.id };
 }
+
+// Only redirect to known Stripe payment origins
+const STRIPE_PAYMENT_ORIGINS = new Set(['https://buy.stripe.com', 'https://checkout.stripe.com']);
 
 /** Redirect user to buy a diamond pack via Stripe. */
 export function buyDiamondPack(pack: typeof DIAMOND_PACKS[number], userId: string, userEmail: string): void {
   if (!pack.paymentLink) {
     // eslint-disable-next-line no-console
     console.warn('Diamond payment link not configured for pack:', pack.id);
+    return;
+  }
+  let dest: URL;
+  try {
+    dest = new URL(pack.paymentLink);
+  } catch {
+    console.error('Invalid payment link URL for pack:', pack.id);
+    return;
+  }
+  if (!STRIPE_PAYMENT_ORIGINS.has(dest.origin)) {
+    console.error('Blocked redirect to unexpected payment origin:', dest.origin);
     return;
   }
   const returnUrl = `${window.location.origin}?diamonds_success=1&pack=${pack.diamonds}`;
