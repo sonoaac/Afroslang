@@ -232,6 +232,48 @@ export const stripeWebhook = functions
   });
 
 // ---------------------------------------------------------------------------
+// Server-side login rate limiting
+// Tracks failed attempts per email hash in _rateLimit/{emailHash}
+// ---------------------------------------------------------------------------
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 min
+const RATE_LIMIT_MAX       = 5;
+
+export const checkLoginRateLimit = functions.https.onCall(async (data) => {
+  const { emailHash } = data as { emailHash?: unknown };
+  if (!emailHash || typeof emailHash !== 'string' || emailHash.length !== 64) {
+    throw new functions.https.HttpsError('invalid-argument', 'Invalid request');
+  }
+  const ref = db.doc(`_rateLimit/login_${emailHash}`);
+  const now = Date.now();
+  const snap = await ref.get();
+  if (!snap.exists) return { allowed: true, attemptsLeft: RATE_LIMIT_MAX };
+  const attempts: number[] = ((snap.data()!.attempts ?? []) as number[])
+    .filter((t: number) => now - t < RATE_LIMIT_WINDOW_MS);
+  if (attempts.length >= RATE_LIMIT_MAX) {
+    const oldestInWindow = Math.min(...attempts);
+    return { allowed: false, until: oldestInWindow + RATE_LIMIT_WINDOW_MS, attemptsLeft: 0 };
+  }
+  return { allowed: true, attemptsLeft: RATE_LIMIT_MAX - attempts.length };
+});
+
+export const recordLoginFailure = functions.https.onCall(async (data) => {
+  const { emailHash } = data as { emailHash?: unknown };
+  if (!emailHash || typeof emailHash !== 'string' || emailHash.length !== 64) {
+    throw new functions.https.HttpsError('invalid-argument', 'Invalid request');
+  }
+  const ref = db.doc(`_rateLimit/login_${emailHash}`);
+  const now = Date.now();
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const existing: number[] = snap.exists ? ((snap.data()!.attempts ?? []) as number[]) : [];
+    const pruned = existing.filter((t: number) => now - t < RATE_LIMIT_WINDOW_MS);
+    pruned.push(now);
+    tx.set(ref, { attempts: pruned, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+  });
+  return { recorded: true };
+});
+
+// ---------------------------------------------------------------------------
 // Look up a Firestore userId by matching the Stripe customer ID stored on
 // the user doc. Used as a fallback when metadata.userId is absent (e.g. for
 // subscriptions created via Payment Links before we started storing metadata).

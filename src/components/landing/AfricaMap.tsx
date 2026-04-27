@@ -169,7 +169,7 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
             tooltip.style.opacity = '1';
             tooltip.style.left    = `${event.clientX + 14}px`;
             tooltip.style.top     = `${event.clientY - 44}px`;
-            tooltip.innerHTML     = `<strong>${COUNTRY_NAMES[iso3] ?? iso3}</strong>`;
+            tooltip.textContent   = COUNTRY_NAMES[iso3] ?? iso3;
           })
           .on('mouseleave', function(this: SVGPathElement) {
             tooltip.style.opacity = '0';

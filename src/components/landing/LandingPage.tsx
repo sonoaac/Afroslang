@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+import { getApp } from 'firebase/app';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { auth, db } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { DescrambleText } from '../ui/DescrambleText';
@@ -392,11 +394,17 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     setShowSignupPwd(false);
   };
 
+  // ── Email hashing (privacy — never send raw email to rate-limit fn) ─────────
+  const hashEmail = async (email: string): Promise<string> => {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(email));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError(''); setLoginSuccess('');
 
-    // Rate limit check
+    // Fast-path: localStorage cache check
     const { locked, minutesLeft } = checkLocked();
     if (locked) {
       setLoginError(`Too many failed attempts. Try again in ${minutesLeft} minute${minutesLeft !== 1 ? 's' : ''}.`);
@@ -409,10 +417,38 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
     setLoginLoading(true);
     try {
+      // Server-side rate limit check (authoritative)
+      try {
+        const functions = getFunctions(getApp(), 'us-central1');
+        const checkRateLimit = httpsCallable(functions, 'checkLoginRateLimit');
+        const emailHash = await hashEmail(email);
+        const result = await checkRateLimit({ emailHash }) as { data: { allowed: boolean; until?: number; attemptsLeft: number } };
+        if (!result.data.allowed) {
+          const until = result.data.until ?? Date.now() + LOCKOUT_MS;
+          const mins  = Math.ceil((until - Date.now()) / 60000);
+          setRl({ count: MAX_ATTEMPTS, until });
+          setLoginError(`Too many failed attempts. Try again in ${mins} minute${mins !== 1 ? 's' : ''}.`);
+          setLoginLoading(false);
+          return;
+        }
+      } catch {
+        // Function unavailable — fall through to localStorage fallback
+      }
+
       await signInWithEmailAndPassword(auth, email, loginPassword);
       clearRl();
       closeSheet();
     } catch (err: any) {
+      // Record failure server-side (best-effort)
+      try {
+        const functions = getFunctions(getApp(), 'us-central1');
+        const recordFailure = httpsCallable(functions, 'recordLoginFailure');
+        const emailHash = await hashEmail(email);
+        await recordFailure({ emailHash });
+      } catch {
+        // Ignore — localStorage fallback below is the safety net
+      }
+
       const remaining = recordFailedLogin();
       const base = friendlyAuthError(err?.code ?? '');
       if (remaining > 0 && remaining <= 3) {

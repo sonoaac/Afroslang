@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { InterfaceLanguage } from '../../types';
 import './InterfaceLanguageSelectorSocial.css';
 
@@ -99,6 +99,15 @@ const AFRICAN_COUNTRIES: CountryData[] = [
 ];
 
 const MOBILE_FIRST_COUNT = 27;
+
+// Safely render text that may contain <strong>...</strong> tags as React elements
+function renderWithStrong(text: string): React.ReactNode {
+  const parts = text.split(/(<strong>.*?<\/strong>)/g);
+  return parts.map((part, i) => {
+    const match = part.match(/^<strong>(.*?)<\/strong>$/);
+    return match ? <strong key={i}>{match[1]}</strong> : part;
+  });
+}
 
 const DID_YOU_KNOW = {
   en: [
@@ -403,11 +412,9 @@ export function InterfaceLanguageSelector({
           <div className="ils-info-body">
             <div className="ils-facts-grid">
               {DID_YOU_KNOW[isEn ? 'en' : 'fr'].map((fact, i) => (
-                <div
-                  key={i}
-                  className="ils-fact-card"
-                  dangerouslySetInnerHTML={{ __html: fact.text }}
-                />
+                <div key={i} className="ils-fact-card">
+                  {renderWithStrong(fact.text)}
+                </div>
               ))}
             </div>
           </div>
