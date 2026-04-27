@@ -186,8 +186,8 @@ export function OceanCanvas({ preview = false }: OceanCanvasProps) {
       if (!canvas) return;
       if (preview) {
         const rect = canvas.parentElement?.getBoundingClientRect();
-        const w = rect?.width  || 400;
-        const h = rect?.height || 300;
+        const w = rect?.width  || window.innerWidth;
+        const h = rect?.height || window.innerHeight;
         canvas.width  = w * dpr;
         canvas.height = h * dpr;
         canvas.style.width  = w + 'px';
@@ -201,7 +201,15 @@ export function OceanCanvas({ preview = false }: OceanCanvasProps) {
       gl!.viewport(0, 0, canvas.width, canvas.height);
     }
     resize();
-    if (!preview) window.addEventListener('resize', resize);
+    // Re-measure after layout settles (needed for preview mode on mobile)
+    const rafSettle = requestAnimationFrame(resize);
+    let ro: ResizeObserver | null = null;
+    if (preview && canvas.parentElement) {
+      ro = new ResizeObserver(resize);
+      ro.observe(canvas.parentElement);
+    } else {
+      window.addEventListener('resize', resize);
+    }
 
     const vs   = compile(gl, VERT, gl.VERTEX_SHADER);
     const fs   = compile(gl, FRAG, gl.FRAGMENT_SHADER);
@@ -235,6 +243,8 @@ export function OceanCanvas({ preview = false }: OceanCanvasProps) {
 
     return () => {
       cancelAnimationFrame(rafId);
+      cancelAnimationFrame(rafSettle);
+      ro?.disconnect();
       if (!preview) window.removeEventListener('resize', resize);
     };
   }, [preview]);

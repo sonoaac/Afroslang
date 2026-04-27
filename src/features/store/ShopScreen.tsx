@@ -226,12 +226,32 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
         .bg-preview-card { border-radius: 12px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
         .bg-preview-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.6); }
         .bg-preview-card:hover .bg-preview-hint { opacity: 1; }
+        .bg-preview-card:active { transform: scale(0.97); }
         .bg-preview-hint { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.45); opacity: 0; transition: opacity 0.2s; font-size: 0.78em; font-weight: 700; letter-spacing: 1px; color: #fff; text-transform: uppercase; }
+        @media (hover: none) { .bg-preview-hint { opacity: 0.6; } }
         @keyframes bg-preview-in { from { opacity: 0; } to { opacity: 1; } }
-        .bg-fullscreen-preview { position: fixed; inset: 0; z-index: 9998; display: flex; flex-direction: column; animation: bg-preview-in 0.25s ease; }
+        .bg-fullscreen-preview { position: fixed; inset: 0; z-index: 9998; display: flex; flex-direction: column; animation: bg-preview-in 0.25s ease; overflow: hidden; }
         .bg-preview-stars { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
         .bg-preview-star { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; animation: star-twinkle 3s ease-in-out infinite; }
         @keyframes star-twinkle { 0%,100% { opacity: 0.2; } 50% { opacity: 1; } }
+        .bg-preview-topbar { padding: 0.9em 1.25em; display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255,255,255,0.08); gap: 0.5em; flex-shrink: 0; min-height: 56px; box-sizing: border-box; }
+        .bg-preview-close-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-family: inherit; font-size: 0.85em; font-weight: 700; padding: 0.5em 0.9em; border-radius: 6px; cursor: pointer; min-height: 44px; min-width: 44px; white-space: nowrap; flex-shrink: 0; }
+        .bg-preview-topbar-mid { display: flex; align-items: center; gap: 0.5em; flex: 1; justify-content: center; min-width: 0; overflow: hidden; }
+        .bg-preview-topbar-mid span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bg-preview-topbar-mode { font-size: 0.75em; color: rgba(255,255,255,0.45); font-style: italic; white-space: nowrap; flex-shrink: 0; }
+        .bg-preview-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5em; padding: 2em; overflow-y: auto; min-height: 0; }
+        .bg-preview-emoji { font-size: clamp(2.8em, 14vw, 5em); filter: drop-shadow(0 8px 24px rgba(0,0,0,0.8)); margin-bottom: 0.25em; }
+        .bg-preview-action { background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 1.25em 2em; text-align: center; width: min(300px, 100%); box-sizing: border-box; }
+        @media (max-width: 600px) {
+          .bg-preview-topbar { padding: 0.6em 0.85em; min-height: 52px; }
+          .bg-preview-topbar-mode { display: none; }
+          .bg-preview-center { padding: 1.25em 1em; gap: 0.9em; }
+          .bg-preview-action { padding: 1em 1.25em; }
+          .sh-tab-btn { padding: 0.9em 0.9em; font-size: 0.78em; }
+        }
+        @media (max-width: 400px) {
+          .sh-tab-btn { padding: 0.85em 0.6em; font-size: 0.72em; letter-spacing: 0; }
+        }
         .checkout-btn { background: #c0392b; color: #fff; border: none; font-family: inherit; font-size: 1.4em; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; padding: 0.8em; cursor: pointer; transition: background 0.15s; box-shadow: 0 4px 18px rgba(192,57,43,0.4); width: 100%; }
         .checkout-btn:hover { background: #e74c3c; }
         .checkout-btn:disabled { background: #3a3a3a; cursor: not-allowed; box-shadow: none; }
@@ -430,7 +450,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
                 <p style={{ color: '#555', fontSize: '0.72em', marginBottom: '1.25em', letterSpacing: 0.5 }}>
                   {isEn ? 'Hover or tap a card to preview · click again to dismiss' : 'Survolez ou appuyez pour prévisualiser'}
                 </p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '1em' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '1em' }}>
                   {BACKGROUNDS.map(item => {
                     const isOwned = ownedBackgrounds.includes(item.id);
                     const inCart = cart[item.id];
@@ -542,28 +562,25 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
                 )}
 
                 {/* Top bar */}
-                <div style={{ padding: '1em 1.25em', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                  <button
-                    style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontFamily: 'inherit', fontSize: '0.85em', fontWeight: 700, padding: '0.4em 0.9em', borderRadius: 6, cursor: 'pointer' }}
-                    onClick={() => setPreviewBg(null)}
-                  >
-                    ✕ {isEn ? 'Close Preview' : 'Fermer'}
+                <div className="bg-preview-topbar">
+                  <button className="bg-preview-close-btn" onClick={() => setPreviewBg(null)}>
+                    ✕ {isEn ? 'Close' : 'Fermer'}
                   </button>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
-                    <span style={{ fontSize: '1.4em' }}>{BG_ACCENT[item.id]}</span>
+                  <div className="bg-preview-topbar-mid">
+                    <span style={{ fontSize: '1.4em', flexShrink: 0 }}>{BG_ACCENT[item.id]}</span>
                     <span style={{ color: '#fff', fontWeight: 800, fontSize: '1em', letterSpacing: 1 }}>{item.name}</span>
-                    <span className="bg-badge" style={{ fontSize: '0.6em', fontWeight: 800, padding: '0.2em 0.6em', borderRadius: 4, letterSpacing: 1 }}>BG</span>
+                    <span className="bg-badge" style={{ fontSize: '0.6em', fontWeight: 800, padding: '0.2em 0.6em', borderRadius: 4, letterSpacing: 1, flexShrink: 0 }}>BG</span>
                   </div>
-                  <div style={{ fontSize: '0.75em', color: 'rgba(255,255,255,0.45)', fontStyle: 'italic' }}>
-                    {isEn ? 'Preview mode' : 'Aperçu'}
+                  <div className="bg-preview-topbar-mode">
+                    {isEn ? 'Preview' : 'Aperçu'}
                   </div>
                 </div>
 
                 {/* Center content */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1.5em', padding: '2em' }}>
+                <div className="bg-preview-center">
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '5em', filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.8))', marginBottom: '0.3em' }}>{BG_ACCENT[item.id]}</div>
-                    <h2 style={{ color: '#fff', fontWeight: 900, fontSize: 'clamp(1.5rem, 6vw, 2.8rem)', letterSpacing: 3, textTransform: 'uppercase', margin: 0, textShadow: '0 2px 20px rgba(0,0,0,0.8)' }}>
+                    <div className="bg-preview-emoji">{BG_ACCENT[item.id]}</div>
+                    <h2 style={{ color: '#fff', fontWeight: 900, fontSize: 'clamp(1.2rem, 5vw, 2.8rem)', letterSpacing: 3, textTransform: 'uppercase', margin: 0, textShadow: '0 2px 20px rgba(0,0,0,0.8)' }}>
                       {item.name}
                     </h2>
                     <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8em', margin: '0.4em 0 0', letterSpacing: 2, textTransform: 'uppercase' }}>
@@ -572,7 +589,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
                   </div>
 
                   {/* Price / action */}
-                  <div style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 14, padding: '1.25em 2em', textAlign: 'center', minWidth: 220 }}>
+                  <div className="bg-preview-action">
                     {item.price === 0 ? (
                       <p style={{ color: '#27ae60', fontWeight: 700, fontSize: '1em', margin: 0 }}>✓ {isEn ? 'Free · Already Owned' : 'Gratuit · Déjà possédé'}</p>
                     ) : isOwned ? (
