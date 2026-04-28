@@ -1,5 +1,6 @@
 import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import { logger } from './logger';
 
 export interface HeartsData {
   currentHearts: number;
@@ -76,7 +77,7 @@ export const getCurrentHeartsStatus = async (userId: string): Promise<HeartsData
     
     return initialHeartsData;
   } catch (error) {
-    console.error('Error getting hearts status:', error);
+    logger.error('Error getting hearts status:', error);
     return {
       currentHearts: MAX_HEARTS,
       lastResetTime: Date.now(),
@@ -122,7 +123,7 @@ export const updateHearts = async (userId: string, heartsLost: number): Promise<
       maxHearts: MAX_HEARTS
     };
   } catch (error) {
-    console.error('Error updating hearts:', error);
+    logger.error('Error updating hearts:', error);
     return {
       currentHearts: MAX_HEARTS,
       lastResetTime: Date.now(),
@@ -202,7 +203,7 @@ export const getGuestHeartsStatus = (): HeartsData => {
       return heartsData;
     }
   } catch (error) {
-    console.error('Error loading guest hearts:', error);
+    logger.error('Error loading guest hearts:', error);
   }
 
   const initialHeartsData: HeartsData = {
@@ -228,7 +229,7 @@ export const updateGuestHearts = (heartsLost: number): HeartsData => {
     localStorage.setItem('afroslang_guest_hearts', JSON.stringify(updatedHeartsData));
     return updatedHeartsData;
   } catch (error) {
-    console.error('Error updating guest hearts:', error);
+    logger.error('Error updating guest hearts:', error);
     return { currentHearts: MAX_HEARTS, lastResetTime: Date.now(), maxHearts: MAX_HEARTS };
   }
 };

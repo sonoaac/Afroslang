@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { SUBSCRIPTION_PLANS, PREMIUM_FEATURES } from '../../utils/stripeConfig';
+import { logger } from '../../utils/logger';
 import { Crown, Check, Star, Zap, Heart, BarChart3, Trophy, ChevronLeft } from 'lucide-react';
 
 interface SubscriptionPageProps {
@@ -48,8 +49,8 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({ onBack }) =>
       window.location.href = paymentUrl;
       
     } catch (error) {
-      console.error('Subscription error:', error);
-      alert(`Error: ${error.message || 'Something went wrong. Please try again.'}`);
+      logger.error('Subscription error:', error);
+      alert('Something went wrong. Please try again.');
     } finally {
       setLoading(null);
     }

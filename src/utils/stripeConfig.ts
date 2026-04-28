@@ -1,8 +1,8 @@
 import { loadStripe, Stripe } from '@stripe/stripe-js';
 
-// Stripe configuration
+// Stripe configuration — only the publishable key belongs on the client.
+// The secret key lives exclusively in Cloud Functions (functions/src/index.ts).
 export const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_...';
-export const STRIPE_SECRET_KEY = import.meta.env.VITE_STRIPE_SECRET_KEY || 'sk_test_...';
 
 // Initialize Stripe
 let stripePromise: Promise<Stripe | null>;

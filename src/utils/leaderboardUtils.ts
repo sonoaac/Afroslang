@@ -1,5 +1,6 @@
 import { doc, setDoc, updateDoc, increment, getDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
+import { logger } from "./logger";
 
 // League system with 7 tiers
 export const LEAGUES = ["Copper", "Bronze", "Silver", "Gold", "Platinum", "Diamond", "Stars"] as const;
@@ -102,7 +103,7 @@ export async function addWeeklyXP(
       { merge: true }
     );
   } catch (error) {
-    console.error("Error adding weekly XP:", error);
+    logger.error("Error adding weekly XP:", error);
     throw error;
   }
 }

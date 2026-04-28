@@ -22,15 +22,9 @@ export const SignUp: React.FC<SignUpProps> = ({ onSuccess, onSwitchToLogin }) =>
     setError('');
 
     try {
-      console.log('Attempting to create user with email:', email);
-      console.log('Firebase auth instance:', auth);
-      console.log('Firebase auth app:', auth.app);
-      
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      console.log('User created successfully:', user.uid);
 
-      // Create user document in Firestore
       await setDoc(doc(db, "users", user.uid), {
         username,
         email,
@@ -40,13 +34,9 @@ export const SignUp: React.FC<SignUpProps> = ({ onSuccess, onSwitchToLogin }) =>
         createdAt: new Date().toISOString(),
         languages: {}
       });
-      console.log('User data saved to Firestore');
 
       onSuccess();
     } catch (error: any) {
-      console.error('Signup error:', error);
-      console.error('Error code:', error.code);
-      console.error('Error message:', error.message);
       
       // Provide more specific error messages
       if (error.code === 'auth/configuration-not-found') {

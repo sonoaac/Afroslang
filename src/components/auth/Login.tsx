@@ -20,9 +20,7 @@ export const Login: React.FC<LoginProps> = ({ onSuccess, onSwitchToSignUp, onGue
     setError('');
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      console.log("Logged in:", user.uid);
+      await signInWithEmailAndPassword(auth, email, password);
       onSuccess();
     } catch (error: any) {
       setError(error.message);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { logger } from '../../utils/logger';
 import { BarChart3, TrendingUp, Target, Lightbulb, ChevronLeft, Award, Zap, BookOpen } from 'lucide-react';
 
 interface FeedbackPageProps {
@@ -74,7 +75,7 @@ export const FeedbackPage: React.FC<FeedbackPageProps> = ({ onBack }) => {
         analyzeWeakAreas(progress);
       }
     } catch (error) {
-      console.error('Error loading user progress:', error);
+      logger.error('Error loading user progress:', error);
     } finally {
       setLoading(false);
     }

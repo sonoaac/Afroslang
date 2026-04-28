@@ -3,6 +3,7 @@ import { User, onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import { UserData, loadUserData, createGuestUser, saveGuestProgress } from '../utils/userData';
 import { getCurrentHeartsStatus } from '../utils/heartsTimer';
+import { logger } from '../utils/logger';
 import { equipCosmetic } from '../utils/currencyUtils';
 
 interface AuthContextType {
@@ -72,7 +73,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUserData(null);
       setIsGuest(false);
     } catch (error) {
-      console.error('Error signing out:', error);
+      logger.error('Error signing out:', error);
     }
   };
 

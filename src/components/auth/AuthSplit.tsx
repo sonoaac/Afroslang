@@ -66,8 +66,7 @@ export const AuthSplit: React.FC<AuthSplitProps> = ({
     setLoginSuccess('');
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
-      console.log('Logged in:', userCredential.user.uid);
+      await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
       onSuccess?.();
     } catch (error: any) {
       setLoginError(error?.message || 'Login failed.');
@@ -99,7 +98,6 @@ export const AuthSplit: React.FC<AuthSplitProps> = ({
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, signupEmail, signupPassword);
       const user = userCredential.user;
-      console.log('User created successfully:', user.uid);
 
       await setDoc(doc(db, 'users', user.uid), {
         username: fullName,
