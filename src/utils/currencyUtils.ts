@@ -200,7 +200,7 @@ export function buyDiamondPack(pack: typeof DIAMOND_PACKS[number], userId: strin
     console.error('Blocked redirect to unexpected payment origin:', dest.origin);
     return;
   }
-  const returnUrl = `${window.location.origin}?diamonds_success=1&pack=${pack.diamonds}`;
+  const returnUrl = `${window.location.origin}?diamonds_success=1`;
   const url = `${pack.paymentLink}?client_reference_id=${encodeURIComponent(userId)}&prefilled_email=${encodeURIComponent(userEmail)}&redirect_url=${encodeURIComponent(returnUrl)}`;
   window.location.href = url;
 }

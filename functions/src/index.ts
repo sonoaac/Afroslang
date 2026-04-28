@@ -20,6 +20,13 @@ function getStripe(): Stripe {
 const MAX_FREE_HEARTS = 5;
 const UNLIMITED_HEARTS = 999;
 
+// Map checkout amount_total (cents) → diamonds granted
+const DIAMOND_PACK_AMOUNTS: Record<number, number> = {
+  199: 1,   // $1.99
+  499: 5,   // $4.99
+  999: 10,  // $9.99
+};
+
 // ---------------------------------------------------------------------------
 // Helper — write subscription state to the user's Firestore doc
 // ---------------------------------------------------------------------------
@@ -120,7 +127,23 @@ export const stripeWebhook = functions
             break;
           }
 
-          if (session.mode !== 'subscription' || !session.subscription) break;
+          // ── One-time diamond pack purchase ─────────────────────────────────
+          if (session.mode === 'payment') {
+            const diamonds = DIAMOND_PACK_AMOUNTS[session.amount_total ?? 0];
+            if (!diamonds) {
+              console.warn('[afroslang] Unknown diamond pack amount:', session.amount_total);
+              break;
+            }
+            await db.doc(`users/${userId}`).update({
+              diamonds: admin.firestore.FieldValue.increment(diamonds),
+              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
+            console.log(`[afroslang] Credited ${diamonds} diamond(s) to user ${userId}`);
+            break;
+          }
+
+          // ── Subscription checkout ───────────────────────────────────────────
+          if (!session.subscription) break;
 
           // Fetch the full subscription to determine plan + renewal date
           const sub = await getStripe().subscriptions.retrieve(

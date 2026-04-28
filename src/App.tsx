@@ -240,7 +240,7 @@ function LearnView({
 // ── App ───────────────────────────────────────────────────────────────────────
 function App() {
   const navigate = useNavigate();
-  const { user, userData, isGuest, loading, logout, setGuestMode } = useAuth();
+  const { user, userData, isGuest, loading, logout, setGuestMode, refreshUserData } = useAuth();
 
   const [authSheet, setAuthSheet]           = useState<'login' | 'signup' | null>(null);
   const [preSelectedLanguage, setPreSelectedLanguage] = useState<string | null>(null);
@@ -248,8 +248,10 @@ function App() {
   const [currentLanguage, setCurrentLanguage]         = useState<AfricanLanguage | null>(null);
   const [userProgressMap, setUserProgressMap]         = useState<Record<string, UserProgress>>({});
 
-  const wasAuthOnLoad   = useRef<boolean | null>(null);
-  const paymentSuccess  = new URLSearchParams(window.location.search).has('payment_success');
+  const wasAuthOnLoad     = useRef<boolean | null>(null);
+  const paymentSuccess    = new URLSearchParams(window.location.search).has('payment_success');
+  const diamondsSuccess   = new URLSearchParams(window.location.search).has('diamonds_success');
+  const [diamondsToast, setDiamondsToast] = useState<string | null>(null);
 
   // Unused — satisfies useCallback lint
   const handleIntroComplete = useCallback(() => {}, []);
@@ -302,6 +304,42 @@ function App() {
     if (!loading && wasAuthOnLoad.current === null)
       wasAuthOnLoad.current = !!(user || isGuest);
   }, [loading, user, isGuest]);
+
+  // ── Diamonds purchase return — poll briefly then show toast ─────────────────
+  const diamondsBeforePurchase = useRef<number>(-1);
+  useEffect(() => {
+    if (!diamondsSuccess || loading || !user) return;
+
+    // Capture baseline and clear URL param
+    diamondsBeforePurchase.current = userData?.diamonds ?? 0;
+    const url = new URL(window.location.href);
+    url.searchParams.delete('diamonds_success');
+    window.history.replaceState({}, '', url.toString());
+
+    setDiamondsToast('checking');
+
+    // Poll up to 20 s (10 × 2 s) for webhook to credit diamonds
+    let attempts = 0;
+    const interval = setInterval(async () => {
+      attempts++;
+      await refreshUserData();
+      if (attempts >= 10) {
+        clearInterval(interval);
+        setDiamondsToast(prev => prev === 'checking' ? 'pending' : prev);
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [diamondsSuccess, loading, user]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // When diamonds actually land, upgrade the toast to success
+  useEffect(() => {
+    if (diamondsBeforePurchase.current < 0) return;
+    if ((userData?.diamonds ?? 0) > diamondsBeforePurchase.current) {
+      setDiamondsToast('success');
+      diamondsBeforePurchase.current = -1;
+    }
+  }, [userData?.diamonds]);
 
   // ── Auth state → navigate ─────────────────────────────────────────────────
   useEffect(() => {
@@ -363,7 +401,26 @@ function App() {
     </div>
   );
 
+  // ── Diamonds toast UI ────────────────────────────────────────────────────────
+  const diamondsToastEl = diamondsToast && (
+    <div style={{
+      position: 'fixed', bottom: '1.5rem', left: '50%', transform: 'translateX(-50%)',
+      zIndex: 9999, background: '#111', border: '1px solid rgba(255,255,255,0.15)',
+      borderLeft: `3px solid ${diamondsToast === 'success' ? '#35b729' : diamondsToast === 'pending' ? '#f59e0b' : '#60a5fa'}`,
+      color: '#fff', fontFamily: "'Times New Roman', serif", fontSize: '0.9rem',
+      padding: '0.75rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.6rem',
+      boxShadow: '0 4px 24px rgba(0,0,0,0.5)', whiteSpace: 'nowrap', maxWidth: '90vw',
+    }}>
+      {diamondsToast === 'success'  && <span>💎 Diamonds added to your account!</span>}
+      {diamondsToast === 'checking' && <span>💎 Adding your diamonds…</span>}
+      {diamondsToast === 'pending'  && <span>💎 Payment received — diamonds will appear shortly.</span>}
+      <button onClick={() => setDiamondsToast(null)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '1rem', padding: 0, marginLeft: '0.5rem' }}>✕</button>
+    </div>
+  );
+
   return (
+    <>
+    {diamondsToastEl}
     <Routes>
       {/* Landing / auth */}
       <Route path="/" element={
@@ -480,6 +537,7 @@ function App() {
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   );
 }
 

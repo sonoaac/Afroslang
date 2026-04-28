@@ -28,11 +28,7 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({ onBack }) =>
 
     try {
       const plan = SUBSCRIPTION_PLANS[planType];
-      
-      console.log('Plan selected:', plan);
-      console.log('Payment link:', plan.paymentLink);
-      
-      // Check if payment link exists
+
       if (!plan.paymentLink) {
         throw new Error('Payment link not configured for this plan');
       }
