@@ -22,7 +22,7 @@ export const DIAMOND_PACKS = [
     diamonds: 1,
     price: 1.99,
     label: '1 Diamond',
-    paymentLink: '', // TODO: add Stripe Payment Link URL
+    paymentLink: 'https://buy.stripe.com/6oU00k3jm8Js9NMdQvdjO07',
   },
   {
     id: 'diamonds_5',
@@ -30,14 +30,14 @@ export const DIAMOND_PACKS = [
     price: 4.99,
     label: '5 Diamonds',
     highlight: true,
-    paymentLink: '', // TODO: add Stripe Payment Link URL
+    paymentLink: 'https://buy.stripe.com/9B600kg68e3M1hgh2HdjO08',
   },
   {
     id: 'diamonds_10',
     diamonds: 10,
     price: 9.99,
     label: '10 Diamonds',
-    paymentLink: '', // TODO: add Stripe Payment Link URL
+    paymentLink: 'https://buy.stripe.com/7sYcN61bee3MbVU13JdjO09',
   },
 ] as const;
 
@@ -184,11 +184,6 @@ const STRIPE_PAYMENT_ORIGINS = new Set(['https://buy.stripe.com', 'https://check
 
 /** Redirect user to buy a diamond pack via Stripe. */
 export function buyDiamondPack(pack: typeof DIAMOND_PACKS[number], userId: string, userEmail: string): void {
-  if (!pack.paymentLink) {
-    // eslint-disable-next-line no-console
-    console.warn('Diamond payment link not configured for pack:', pack.id);
-    return;
-  }
   let dest: URL;
   try {
     dest = new URL(pack.paymentLink);

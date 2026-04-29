@@ -3,18 +3,22 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // ── Users ──────────────────────────────────────────────────────────────
-    // Users can read and write their own document only.
-    // The Cloud Function (admin SDK) bypasses these rules entirely.
+    // Users can read and write (update) their own document.
+    // Document creation is done by Cloud Functions (admin SDK) — client creates
+    // are implicitly denied because resource.data is null, causing rule functions
+    // to throw, which Firestore treats as a deny.
     match /users/{userId} {
       allow read: if request.auth != null && request.auth.uid == userId;
 
       allow write: if request.auth != null
         && request.auth.uid == userId
-        && currencyDeltaOk();
+        && currencyDeltaOk()
+        && subscriptionUnchanged()
+        && heartsOk()
+        && ownedItemsOk();
 
-      // sandbits and diamonds can only decrease (or stay the same) via client writes.
-      // Increases are only permitted from the admin SDK (Cloud Functions).
-      // This blocks console-based balance manipulation.
+      // Sandbits and diamonds can only decrease (spending) via client writes.
+      // Increases come exclusively from Cloud Functions (admin SDK).
       function currencyDeltaOk() {
         let sbBefore = resource.data.get('sandbits', 0);
         let sbAfter  = request.resource.data.get('sandbits', sbBefore);
@@ -23,14 +27,49 @@ service cloud.firestore {
         return sbAfter <= sbBefore && sbAfter >= 0
             && dAfter  <= dBefore  && dAfter  >= 0;
       }
+
+      // Subscription state is set exclusively by the Stripe webhook (admin SDK).
+      // Clients cannot self-activate AfroPlus.
+      function subscriptionUnchanged() {
+        let before = resource.data.get('subscription', null);
+        let after  = request.resource.data.get('subscription', null);
+        return before == after;
+      }
+
+      // Hearts: free-tier max is 5. Only Cloud Functions can write 999 (AfroPlus).
+      // Once at 999 (set by the subscription webhook), the client may maintain it.
+      function heartsOk() {
+        let hBefore = resource.data.get('hearts', 5);
+        let hAfter  = request.resource.data.get('hearts', hBefore);
+        return (hBefore == 999 && hAfter == 999)
+            || (hBefore != 999 && hAfter >= 0 && hAfter <= 5);
+      }
+
+      // Owned cosmetics: new items may only be added when sandbits decrease.
+      // This prevents adding items to the owned list without spending sandbits.
+      function ownedItemsOk() {
+        let avBefore  = resource.data.get('ownedAvatars', []);
+        let avAfter   = request.resource.data.get('ownedAvatars', avBefore);
+        let bgBefore  = resource.data.get('ownedBackgrounds', []);
+        let bgAfter   = request.resource.data.get('ownedBackgrounds', bgBefore);
+        let sbBefore  = resource.data.get('sandbits', 0);
+        let sbAfter   = request.resource.data.get('sandbits', sbBefore);
+        let newItems  = avAfter.removeAll(avBefore).size()
+                      + bgAfter.removeAll(bgBefore).size();
+        return newItems == 0 || (newItems > 0 && sbAfter < sbBefore);
+      }
     }
 
     // ── Leaderboard ────────────────────────────────────────────────────────
-    // Any authenticated user can read leaderboard data.
-    // Only authenticated users can write their own leaderboard entry.
     match /leaderboards/{weekId}/{league}/{userId} {
       allow read: if request.auth != null;
       allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ── Rate-limit records (server-side login tracking) ────────────────────
+    // Written exclusively by Cloud Functions — clients have no direct access.
+    match /_rateLimit/{document} {
+      allow read, write: if false;
     }
 
     // ── Deny everything else ───────────────────────────────────────────────
