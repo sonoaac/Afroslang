@@ -19,6 +19,8 @@ import {
   CosmeticItem,
 } from '../../utils/currencyUtils';
 import { SUBSCRIPTION_PLANS } from '../../utils/stripeConfig';
+import { isNativePlatform } from '../../utils/platformUtils';
+import { purchaseDiamondPack as rcBuyDiamonds, purchaseAfroPlus as rcSubscribe, restoreRCPurchases } from '../../utils/revenueCatUtils';
 
 const BG_CARD_GRADIENT: Record<string, string> = {
   bg_default: 'radial-gradient(ellipse 120% 80% at 30% 20%, rgba(176,0,32,0.55) 0%, rgba(0,0,0,0) 60%), linear-gradient(135deg, #0a0000 0%, #1f000b 55%, #0a0000 100%)',
@@ -71,25 +73,59 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
     setTimeout(() => setToast(null), 2800);
   };
 
-  const handleBuyDiamonds = (pack: typeof DIAMOND_PACKS[number]) => {
+  const handleBuyDiamonds = async (pack: typeof DIAMOND_PACKS[number]) => {
     if (!user || isGuest) {
       return showToast(isEn ? 'Sign in to purchase diamonds.' : 'Connectez-vous pour acheter des diamants.');
     }
-    buyDiamondPack(pack, user.uid, user.email ?? '');
+    if (isNativePlatform()) {
+      setPurchasing(pack.id);
+      const result = await rcBuyDiamonds(pack.id);
+      setPurchasing(null);
+      if (result.status === 'success') {
+        showToast(isEn ? '✓ Diamonds purchased! Balance updates in a moment.' : '✓ Diamants achetés! Solde mis à jour bientôt.');
+      } else if (result.status === 'error') {
+        showToast(isEn ? `Purchase failed: ${result.message}` : `Achat échoué: ${result.message}`);
+      }
+      // 'cancelled' — user dismissed the store sheet, do nothing
+    } else {
+      buyDiamondPack(pack, user.uid, user.email ?? '');
+    }
   };
 
-  const handleSubscribe = (planType: 'monthly' | 'yearly') => {
+  const handleSubscribe = async (planType: 'monthly' | 'yearly') => {
     if (!user || isGuest) {
       return showToast(isEn ? 'Sign in to subscribe.' : 'Connectez-vous pour vous abonner.');
     }
-    const plan = SUBSCRIPTION_PLANS[planType];
-    try {
-      const dest = new URL(plan.paymentLink);
-      if (!STRIPE_ORIGINS.has(dest.origin)) return;
-    } catch { return; }
-    const returnUrl = `${window.location.origin}?payment_success=1`;
-    const url = `${plan.paymentLink}?client_reference_id=${encodeURIComponent(user.uid)}&prefilled_email=${encodeURIComponent(user.email ?? '')}&redirect_url=${encodeURIComponent(returnUrl)}`;
-    window.location.href = url;
+    if (isNativePlatform()) {
+      setPurchasing(`subscribe_${planType}`);
+      const result = await rcSubscribe(planType);
+      setPurchasing(null);
+      if (result.status === 'success') {
+        showToast(isEn ? '✓ Welcome to AfroPlus! Benefits activate shortly.' : '✓ Bienvenue dans AfroPlus! Avantages activés bientôt.');
+      } else if (result.status === 'error') {
+        showToast(isEn ? `Subscription failed: ${result.message}` : `Abonnement échoué: ${result.message}`);
+      }
+    } else {
+      const plan = SUBSCRIPTION_PLANS[planType];
+      try {
+        const dest = new URL(plan.paymentLink);
+        if (!STRIPE_ORIGINS.has(dest.origin)) return;
+      } catch { return; }
+      const returnUrl = `${window.location.origin}?payment_success=1`;
+      const url = `${plan.paymentLink}?client_reference_id=${encodeURIComponent(user.uid)}&prefilled_email=${encodeURIComponent(user.email ?? '')}&redirect_url=${encodeURIComponent(returnUrl)}`;
+      window.location.href = url;
+    }
+  };
+
+  const handleRestorePurchases = async () => {
+    if (!isNativePlatform()) return;
+    showToast(isEn ? 'Restoring purchases...' : 'Restauration en cours...');
+    const result = await restoreRCPurchases();
+    if (result.status === 'success') {
+      showToast(isEn ? '✓ Purchases restored!' : '✓ Achats restaurés!');
+    } else if (result.status === 'error') {
+      showToast(isEn ? `Restore failed: ${result.message}` : `Restauration échouée: ${result.message}`);
+    }
   };
 
   const handleBuyCosmetic = async (item: CosmeticItem, type: 'avatar' | 'background') => {
@@ -259,8 +295,14 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
                     <p style={{ color: '#fff', fontWeight: 700, fontSize: '1em', margin: 0, textAlign: 'center' }}>{pack.label}</p>
                     <p style={{ color: '#666', fontSize: '0.72em', margin: 0, textAlign: 'center' }}>= {pack.diamonds * SANDBITS_PER_DIAMOND} Sandbits</p>
                     <p style={{ color: '#6ab4ff', fontWeight: 800, fontSize: '1.15em', margin: '0.2em 0 0' }}>${pack.price.toFixed(2)}</p>
-                    <button className="sh-btn red" onClick={() => handleBuyDiamonds(pack)}>
-                      {isEn ? `Buy $${pack.price.toFixed(2)}` : `Acheter $${pack.price.toFixed(2)}`}
+                    <button
+                      className="sh-btn red"
+                      disabled={purchasing === pack.id}
+                      onClick={() => handleBuyDiamonds(pack)}
+                    >
+                      {purchasing === pack.id
+                        ? (isEn ? 'Processing...' : 'En cours...')
+                        : isEn ? `Buy $${pack.price.toFixed(2)}` : `Acheter $${pack.price.toFixed(2)}`}
                     </button>
                   </div>
                 ))}
@@ -298,11 +340,26 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
                         {isEn ? 'Yearly $39.99 · Save 44%' : 'Annuel 39,99$ · −44%'}
                       </button>
                     </div>
-                    <button className="sh-btn red" style={{ fontSize: '0.9em', padding: '0.75em' }} onClick={() => handleSubscribe(planChoice)}>
-                      {isEn
-                        ? `Subscribe${planChoice === 'yearly' ? ' · Best Value' : ''}`
-                        : `S'abonner${planChoice === 'yearly' ? ' · Meilleur prix' : ''}`}
+                    <button
+                      className="sh-btn red"
+                      style={{ fontSize: '0.9em', padding: '0.75em' }}
+                      disabled={purchasing === `subscribe_${planChoice}`}
+                      onClick={() => handleSubscribe(planChoice)}
+                    >
+                      {purchasing === `subscribe_${planChoice}`
+                        ? (isEn ? 'Processing...' : 'En cours...')
+                        : isEn
+                          ? `Subscribe${planChoice === 'yearly' ? ' · Best Value' : ''}`
+                          : `S'abonner${planChoice === 'yearly' ? ' · Meilleur prix' : ''}`}
                     </button>
+                    {isNativePlatform() && (
+                      <button
+                        style={{ background: 'none', border: 'none', color: '#555', fontFamily: 'inherit', fontSize: '0.72em', cursor: 'pointer', marginTop: '0.5em', textDecoration: 'underline' }}
+                        onClick={handleRestorePurchases}
+                      >
+                        {isEn ? 'Restore purchases' : 'Restaurer les achats'}
+                      </button>
+                    )}
                   </div>
                 )}
               </div>

@@ -5,6 +5,7 @@ import { UserData, loadUserData, createGuestUser, saveGuestProgress } from '../u
 import { getCurrentHeartsStatus } from '../utils/heartsTimer';
 import { logger } from '../utils/logger';
 import { equipCosmetic } from '../utils/currencyUtils';
+import { initRevenueCat, resetRevenueCat } from '../utils/revenueCatUtils';
 
 interface AuthContextType {
   user: User | null;
@@ -46,6 +47,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(false);
 
       if (firebaseUser) {
+        // Init RevenueCat for native platforms (no-op on web)
+        initRevenueCat(firebaseUser.uid).catch(() => {});
         // Fetch Firestore data in the background — does NOT block loading screen
         loadUserData(firebaseUser.uid).then(async (data) => {
           if (data && !data.subscription?.active) {
@@ -68,6 +71,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
+      await resetRevenueCat();
       await signOut(auth);
       setUser(null);
       setUserData(null);

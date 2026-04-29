@@ -297,6 +297,136 @@ export const recordLoginFailure = functions.https.onCall(async (data) => {
 });
 
 // ---------------------------------------------------------------------------
+// RevenueCat webhook
+// Handles IAP events from iOS App Store and Google Play.
+// Auth: RevenueCat sends Authorization header with the webhook secret set
+// in the RevenueCat Dashboard → Project → Integrations → Webhooks.
+// Set the secret via: firebase functions:secrets:set RC_WEBHOOK_SECRET
+// ---------------------------------------------------------------------------
+
+// Maps RevenueCat product ID → diamonds granted (must match client-side RC_DIAMONDS_MAP)
+const RC_DIAMOND_PRODUCTS: Record<string, number> = {
+  'com.afroslang.app.diamonds_1':  1,
+  'com.afroslang.app.diamonds_5':  5,
+  'com.afroslang.app.diamonds_10': 10,
+};
+
+const RC_SUBSCRIPTION_PRODUCTS = new Set([
+  'com.afroslang.app.afroplus_monthly',
+  'com.afroslang.app.afroplus_yearly',
+]);
+
+function rcPlanFromProductId(productId: string): 'monthly' | 'yearly' {
+  return productId.includes('yearly') ? 'yearly' : 'monthly';
+}
+
+export const revenueCatWebhook = functions
+  .runWith({ secrets: ['RC_WEBHOOK_SECRET'] })
+  .https.onRequest(async (req, res) => {
+    if (req.method !== 'POST') {
+      res.status(405).send('Method Not Allowed');
+      return;
+    }
+
+    // Verify shared secret
+    const rcSecret = process.env.RC_WEBHOOK_SECRET;
+    const authHeader = req.headers['authorization'] ?? '';
+    if (!rcSecret || authHeader !== rcSecret) {
+      console.error('[RC] Webhook auth failed');
+      res.status(401).send('Unauthorized');
+      return;
+    }
+
+    const body = req.body as { event?: Record<string, any> };
+    const event = body?.event;
+    if (!event) {
+      res.status(400).send('Missing event');
+      return;
+    }
+
+    const userId: string | undefined = event.app_user_id ?? event.original_app_user_id;
+    const productId: string | undefined = event.product_id;
+    const eventType: string | undefined = event.type;
+
+    if (!userId || !productId || !eventType) {
+      console.warn('[RC] Missing required event fields', { userId, productId, eventType });
+      res.json({ received: true });
+      return;
+    }
+
+    try {
+      switch (eventType) {
+        // ── New subscription or renewal ──────────────────────────────────────
+        case 'INITIAL_PURCHASE':
+        case 'RENEWAL':
+        case 'RESUBSCRIBE': {
+          if (!RC_SUBSCRIPTION_PRODUCTS.has(productId)) break;
+          const plan = rcPlanFromProductId(productId);
+          const expiresMs = event.expiration_at_ms ?? null;
+          await db.doc(`users/${userId}`).update({
+            subscription: {
+              active: true,
+              plan,
+              store: event.store ?? 'APP_STORE',
+              renewsAt: expiresMs,
+              stripeSubId: null,
+              stripeCustomerId: null,
+            },
+            hearts: UNLIMITED_HEARTS,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+          console.log(`[RC] Subscription ACTIVE (${plan}) for user ${userId}`);
+          break;
+        }
+
+        // ── Subscription cancelled or expired ────────────────────────────────
+        case 'CANCELLATION':
+        case 'EXPIRATION': {
+          if (!RC_SUBSCRIPTION_PRODUCTS.has(productId)) break;
+          await db.doc(`users/${userId}`).update({
+            subscription: {
+              active: false,
+              plan: null,
+              store: null,
+              renewsAt: null,
+              stripeSubId: null,
+              stripeCustomerId: null,
+            },
+            hearts: MAX_FREE_HEARTS,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+          console.log(`[RC] Subscription CANCELLED for user ${userId}`);
+          break;
+        }
+
+        // ── Diamond pack purchase (consumable) ───────────────────────────────
+        case 'NON_SUBSCRIPTION_PURCHASE': {
+          const diamonds = RC_DIAMOND_PRODUCTS[productId];
+          if (!diamonds) {
+            console.warn('[RC] Unknown consumable product:', productId);
+            break;
+          }
+          await db.doc(`users/${userId}`).update({
+            diamonds: admin.firestore.FieldValue.increment(diamonds),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+          console.log(`[RC] Credited ${diamonds} diamond(s) to user ${userId}`);
+          break;
+        }
+
+        default:
+          console.log(`[RC] Unhandled event type: ${eventType}`);
+      }
+    } catch (err) {
+      console.error('[RC] Error processing event:', err);
+      res.status(500).send('Internal error');
+      return;
+    }
+
+    res.json({ received: true });
+  });
+
+// ---------------------------------------------------------------------------
 // Look up a Firestore userId by matching the Stripe customer ID stored on
 // the user doc. Used as a fallback when metadata.userId is absent (e.g. for
 // subscriptions created via Payment Links before we started storing metadata).

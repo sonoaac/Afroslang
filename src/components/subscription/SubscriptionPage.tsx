@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { SUBSCRIPTION_PLANS, PREMIUM_FEATURES } from '../../utils/stripeConfig';
 import { logger } from '../../utils/logger';
-import { Crown, Check, Star, Zap, Heart, BarChart3, Trophy, ChevronLeft } from 'lucide-react';
+import { isNativePlatform } from '../../utils/platformUtils';
+import { purchaseAfroPlus as rcSubscribe, restoreRCPurchases } from '../../utils/revenueCatUtils';
+import { Crown, ChevronLeft } from 'lucide-react';
 
 interface SubscriptionPageProps {
   onBack: () => void;
@@ -15,41 +17,38 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({ onBack }) =>
 
   const handleSubscribe = async (planType: 'monthly' | 'yearly') => {
     if (isGuest || !user) {
-      alert('Please create an account or sign in to subscribe to AfroSlang Plus. This ensures your subscription is properly linked to your account.');
+      alert('Please create an account or sign in to subscribe to AfroSlang Plus.');
       return;
     }
-
-    if (!userData?.username) {
-      alert('Please complete your profile by setting a username before subscribing. This helps us personalize your experience.');
-      return;
-    }
-
     setLoading(planType);
-
     try {
-      const plan = SUBSCRIPTION_PLANS[planType];
-
-      if (!plan.paymentLink) {
-        throw new Error('Payment link not configured for this plan');
+      if (isNativePlatform()) {
+        // Native (iOS / Android) — use RevenueCat / IAP
+        const result = await rcSubscribe(planType);
+        if (result.status === 'error') {
+          alert(`Subscription failed: ${result.message}`);
+        }
+        // 'success' and 'cancelled' both handled silently here;
+        // success will be reflected when the RC webhook updates Firestore
+      } else {
+        // Web — redirect to Stripe Payment Link
+        const plan = SUBSCRIPTION_PLANS[planType];
+        const returnUrl = `${window.location.origin}?payment_success=1`;
+        const paymentUrl = `${plan.paymentLink}?client_reference_id=${encodeURIComponent(user.uid)}&prefilled_email=${encodeURIComponent(user.email ?? '')}&prefilled_name=${encodeURIComponent(userData?.username ?? '')}&redirect_url=${encodeURIComponent(returnUrl)}`;
+        window.location.href = paymentUrl;
       }
-      
-      // Build the return URL so Stripe can redirect back to this app.
-      // In Stripe Dashboard → Payment Link → After payment, set redirect to:
-      //   https://<your-domain>?payment_success=1
-      // We append it here as a hint; for Payment Links the final redirect is
-      // controlled by the Dashboard setting.
-      const returnUrl = `${window.location.origin}?payment_success=1`;
-      const paymentUrl = `${plan.paymentLink}?client_reference_id=${encodeURIComponent(user.uid)}&prefilled_email=${encodeURIComponent(user.email ?? '')}&prefilled_name=${encodeURIComponent(userData.username ?? '')}&redirect_url=${encodeURIComponent(returnUrl)}`;
-
-      // Navigate in the same tab so the success redirect lands back here
-      window.location.href = paymentUrl;
-      
     } catch (error) {
       logger.error('Subscription error:', error);
       alert('Something went wrong. Please try again.');
     } finally {
       setLoading(null);
     }
+  };
+
+  const handleRestore = async () => {
+    if (!isNativePlatform()) return;
+    const result = await restoreRCPurchases();
+    if (result.status === 'error') alert(`Restore failed: ${result.message}`);
   };
 
   const isSubscribed = userData?.subscription?.active;
@@ -235,8 +234,18 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({ onBack }) =>
               )}
             </button>
             <p style={{ color: subDim, fontSize: '0.75rem', fontFamily: subFont, margin: 0, letterSpacing: '0.04em' }}>
-              Cancel anytime. Secure payment powered by Stripe.
+              {isNativePlatform()
+                ? 'Cancel anytime in your App Store / Play Store subscriptions.'
+                : 'Cancel anytime. Secure payment powered by Stripe.'}
             </p>
+            {isNativePlatform() && (
+              <button
+                onClick={handleRestore}
+                style={{ background: 'none', border: 'none', color: subDim, fontFamily: subFont, fontSize: '0.72rem', cursor: 'pointer', marginTop: '0.5rem', textDecoration: 'underline' }}
+              >
+                Restore purchases
+              </button>
+            )}
           </div>
         </div>
 
