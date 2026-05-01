@@ -11,7 +11,6 @@ import {
   DIAMOND_PACKS,
   AVATARS,
   BACKGROUNDS,
-  SANDBITS_PER_DIAMOND,
   purchaseCosmetic,
   equipCosmetic,
   buyDiamondPack,
@@ -61,6 +60,8 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
   const [purchasing, setPurchasing] = useState<string | null>(null);
   const [previewBg, setPreviewBg] = useState<string | null>(null);
   const [planChoice, setPlanChoice] = useState<'monthly' | 'yearly'>('yearly');
+  const [diamondCardOpen, setDiamondCardOpen] = useState(false);
+  const [selectedPackId, setSelectedPackId] = useState('diamonds_5');
 
   const sandbits = userData?.sandbits ?? 0;
   const diamonds = userData?.diamonds ?? 0;
@@ -239,7 +240,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
 
       <div className="shop-view">
         {/* Header */}
-        <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75em', padding: '0.9em 1.25em', background: 'linear-gradient(160deg, #1a0a00 0%, #2a1000 60%, #180800 100%)', borderBottom: '3px solid #c0392b', position: 'sticky', top: 0, zIndex: 100 }}>
+        <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75em', padding: '0.9em 1.25em', background: '#0d0d0d', borderBottom: '1px solid #181818', position: 'sticky', top: 0, zIndex: 100 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
               <button onClick={onBack}
@@ -269,7 +270,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
         </header>
 
         {/* Tab nav */}
-        <nav style={{ display: 'flex', background: '#111', borderBottom: '1px solid #1e1e1e', padding: '0 1.25em' }}>
+        <nav style={{ display: 'flex', background: '#0d0d0d', borderBottom: '1px solid #181818', padding: '0 1.25em' }}>
           {(['store', 'avatars', 'backgrounds'] as ShopTab[]).map(t => (
             <button key={t} className={`sh-tab-btn${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>
               {t === 'store' ? '💎 Store' : t === 'avatars' ? '🎭 Avatars' : `🖼️ ${isEn ? 'Backgrounds' : 'Fonds'}`}
@@ -282,30 +283,57 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
           {/* ── STORE ── */}
           {tab === 'store' && (
             <div>
-              <SectionLabel>{isEn ? 'BUY DIAMONDS WITH REAL MONEY' : 'ACHETEZ DES DIAMANTS AVEC DE L\'ARGENT RÉEL'}</SectionLabel>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '1em', marginBottom: '2.5em' }}>
-                {DIAMOND_PACKS.map(pack => (
-                  <div key={pack.id} className={`sh-card${(pack as any).highlight ? ' featured' : ''}`}>
-                    <CardBadge cls={(pack as any).highlight ? 'best-badge' : 'store-badge'}>
-                      {(pack as any).highlight ? 'BEST VALUE' : 'STORE'}
-                    </CardBadge>
-                    <span className="sh-card-icon" style={{ animation: 'shimmer-dia 2.5s ease-in-out infinite' }}>
-                      {'💎'.repeat(Math.min(pack.diamonds, 3))}{pack.diamonds > 3 ? '+' : ''}
-                    </span>
-                    <p style={{ color: '#fff', fontWeight: 700, fontSize: '1em', margin: 0, textAlign: 'center' }}>{pack.label}</p>
-                    <p style={{ color: '#666', fontSize: '0.72em', margin: 0, textAlign: 'center' }}>= {pack.diamonds * SANDBITS_PER_DIAMOND} Sandbits</p>
-                    <p style={{ color: '#6ab4ff', fontWeight: 800, fontSize: '1.15em', margin: '0.2em 0 0' }}>${pack.price.toFixed(2)}</p>
-                    <button
-                      className="sh-btn red"
-                      disabled={purchasing === pack.id}
-                      onClick={() => handleBuyDiamonds(pack)}
-                    >
-                      {purchasing === pack.id
-                        ? (isEn ? 'Processing...' : 'En cours...')
-                        : isEn ? `Buy $${pack.price.toFixed(2)}` : `Acheter $${pack.price.toFixed(2)}`}
-                    </button>
+              <SectionLabel>{isEn ? 'DIAMONDS' : 'DIAMANTS'}</SectionLabel>
+              <div
+                className="sh-card"
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '1em', padding: '1.5em 1.5em 1.25em', border: '1px solid rgba(106,180,255,0.25)', borderRadius: 14, cursor: 'pointer', marginBottom: '2.5em' }}
+                onClick={() => setDiamondCardOpen(o => !o)}
+              >
+                <CardBadge cls="store-badge">💎 DIAMONDS</CardBadge>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25em', width: '100%', paddingTop: '0.5em' }}>
+                  <span style={{ fontSize: '2.5em', animation: 'shimmer-dia 2.5s ease-in-out infinite', filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.7))' }}>💎</span>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ color: '#fff', fontWeight: 800, fontSize: '1.2em', margin: 0 }}>{isEn ? 'Diamond Packs' : 'Packs Diamants'}</p>
+                    <p style={{ color: '#6ab4ff', fontSize: '0.75em', margin: '0.25em 0 0' }}>$1.99 · $4.99 · $9.99</p>
                   </div>
-                ))}
+                  <span style={{ color: '#444', fontSize: '0.85em', transition: 'transform 0.2s', transform: diamondCardOpen ? 'rotate(180deg)' : 'none', display: 'inline-block' }}>▼</span>
+                </div>
+                {diamondCardOpen && (
+                  <div style={{ width: '100%' }} onClick={e => e.stopPropagation()}>
+                    <div className="plan-toggle" style={{ marginBottom: '0.85em' }}>
+                      {DIAMOND_PACKS.map(pack => (
+                        <button
+                          key={pack.id}
+                          className={`plan-btn${selectedPackId === pack.id ? ' active' : ''}`}
+                          onClick={() => setSelectedPackId(pack.id)}
+                          style={{ lineHeight: 1.4 }}
+                        >
+                          {pack.diamonds}💎{'\n'}${pack.price.toFixed(2)}{(pack as any).highlight ? ' ✦' : ''}
+                        </button>
+                      ))}
+                    </div>
+                    {(() => {
+                      const pack = DIAMOND_PACKS.find(p => p.id === selectedPackId) ?? DIAMOND_PACKS[1];
+                      return (
+                        <>
+                          {(pack as any).highlight && (
+                            <p style={{ color: '#6ab4ff', fontSize: '0.68em', fontWeight: 800, letterSpacing: 1, margin: '0 0 0.5em', textAlign: 'center', textTransform: 'uppercase' }}>⭐ {isEn ? 'Best Value' : 'Meilleur prix'}</p>
+                          )}
+                          <button
+                            className="sh-btn red"
+                            style={{ fontSize: '0.9em', padding: '0.75em' }}
+                            disabled={purchasing === pack.id}
+                            onClick={() => handleBuyDiamonds(pack)}
+                          >
+                            {purchasing === pack.id
+                              ? (isEn ? 'Processing...' : 'En cours...')
+                              : isEn ? `Buy ${pack.diamonds}💎 · $${pack.price.toFixed(2)}` : `Acheter ${pack.diamonds}💎 · $${pack.price.toFixed(2)}`}
+                          </button>
+                        </>
+                      );
+                    })()}
+                  </div>
+                )}
               </div>
 
               {/* AfroPlus */}
