@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
-import { UserData, loadUserData, createGuestUser, saveGuestProgress } from '../utils/userData';
+import { UserData, loadUserData, createGuestUser, saveGuestProgress, loadGuestProgress } from '../utils/userData';
 import { getCurrentHeartsStatus } from '../utils/heartsTimer';
 import { logger } from '../utils/logger';
 import { equipCosmetic } from '../utils/currencyUtils';
@@ -20,6 +20,8 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const GUEST_SESSION_KEY = 'afro_guest_session';
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -41,17 +43,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      // Unblock the UI immediately — Firebase Auth resolved (local, fast)
       setUser(firebaseUser);
-      setIsGuest(false);
       setLoading(false);
 
       if (firebaseUser) {
+        setIsGuest(false);
         // Init RevenueCat for native platforms (no-op on web)
         initRevenueCat(firebaseUser.uid).catch(() => {});
         // Fetch Firestore data in the background — does NOT block loading screen
         loadUserData(firebaseUser.uid).then(async (data) => {
-          if (data && !data.subscription?.active) {
+          if (!data) {
+            // No Firestore doc found. Retry once after 1.5 s to handle the
+            // signup race condition (setDoc is fire-and-forget in LandingPage).
+            await new Promise(r => setTimeout(r, 1500));
+            data = await loadUserData(firebaseUser.uid).catch(() => null);
+            if (!data) {
+              // Still no doc — orphaned Firebase Auth session (account deleted
+              // or never fully created). Sign out so the user sees a clean state.
+              await signOut(auth);
+              return;
+            }
+          }
+          if (!data.subscription?.active) {
             const heartsStatus = await getCurrentHeartsStatus(firebaseUser.uid);
             setUserData({ ...data, hearts: heartsStatus.currentHearts, heartsData: heartsStatus });
           } else {
@@ -62,7 +75,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
       } else {
         setUserData(null);
-        // Guest mode is not auto-restored on load — users always start from LandingPage
+        // Restore guest session if it was active in this browser tab before
+        // the hard refresh — sessionStorage survives refresh but not tab close.
+        if (sessionStorage.getItem(GUEST_SESSION_KEY)) {
+          setIsGuest(true);
+          setUserData(loadGuestProgress() ?? createGuestUser());
+        } else {
+          setIsGuest(false);
+        }
       }
     });
 
@@ -72,6 +92,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       await resetRevenueCat();
+      sessionStorage.removeItem(GUEST_SESSION_KEY);
       await signOut(auth);
       setUser(null);
       setUserData(null);
@@ -103,10 +124,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const handleSetGuestMode = (guestMode: boolean) => {
     setIsGuest(guestMode);
     if (guestMode) {
-      const guestUser = createGuestUser();
+      sessionStorage.setItem(GUEST_SESSION_KEY, '1');
+      const guestUser = loadGuestProgress() ?? createGuestUser();
       setUserData(guestUser);
       saveGuestProgress(guestUser);
     } else {
+      sessionStorage.removeItem(GUEST_SESSION_KEY);
       setUserData(null);
     }
   };
