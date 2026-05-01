@@ -312,15 +312,9 @@
   animation: lpHeroFadeUp 0.7s ease-out both;
 }
 
-/* ── Hard 3D yellow line — zero blur, stacked offsets per letter ── */
 @keyframes lpBloodShadow {
   0%   { text-shadow: none; }
-  100% {
-    text-shadow:
-      1px 1px 0 #e6b800,
-      2px 2px 0 #cc9f00,
-      3px 3px 0 #a67c00;
-  }
+  100% { text-shadow: none; }
 }
 
 .lp-blood-text {
@@ -470,10 +464,6 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #ffffff;
-  text-shadow:
-    1px 1px 0 #e6b800,
-    2px 2px 0 #cc9f00,
-    3px 3px 0 #a67c00;
 }
 
 .lp-langs-grid {
