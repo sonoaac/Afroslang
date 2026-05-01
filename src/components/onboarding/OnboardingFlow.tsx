@@ -5,22 +5,117 @@ import { useState, useEffect, useCallback } from 'react';
 const LANGUAGES = [
   { id: 'swahili',  label: 'Swahili',  flag: '🇰🇪', region: 'East Africa' },
   { id: 'yoruba',   label: 'Yoruba',   flag: '🇳🇬', region: 'West Africa' },
-  { id: 'hausa',    label: 'Hausa',    flag: '🌍',  region: 'West Africa' },
-  { id: 'igbo',     label: 'Igbo',     flag: '🦅',  region: 'Nigeria' },
+  { id: 'hausa',    label: 'Hausa',    flag: '🇳🇬', region: 'West Africa' },
+  { id: 'igbo',     label: 'Igbo',     flag: '🇳🇬', region: 'Nigeria' },
   { id: 'zulu',     label: 'Zulu',     flag: '🇿🇦', region: 'South Africa' },
   { id: 'amharic',  label: 'Amharic',  flag: '🇪🇹', region: 'East Africa' },
-  { id: 'arabic',   label: 'Arabic',   flag: '🌙',  region: 'North Africa' },
+  { id: 'arabic',   label: 'Arabic',   flag: '🇪🇬', region: 'North Africa' },
 ];
 
 const SOURCES = [
-  { id: 'tiktok',    label: 'TikTok',     emoji: '🎵' },
-  { id: 'instagram', label: 'Instagram',  emoji: '📸' },
-  { id: 'twitter',   label: 'Twitter/X',  emoji: '🐦' },
-  { id: 'friend',    label: 'A Friend',   emoji: '🤝' },
-  { id: 'appstore',  label: 'App Store',  emoji: '📱' },
-  { id: 'youtube',   label: 'YouTube',    emoji: '▶️' },
-  { id: 'google',    label: 'Google',     emoji: '🔍' },
+  { id: 'tiktok',    label: 'TikTok' },
+  { id: 'instagram', label: 'Instagram' },
+  { id: 'twitter',   label: 'Twitter/X' },
+  { id: 'friend',    label: 'A Friend' },
+  { id: 'appstore',  label: 'App Store' },
+  { id: 'youtube',   label: 'YouTube' },
+  { id: 'google',    label: 'Google' },
 ];
+
+// ── Social media SVG icons ────────────────────────────────────────────────────
+
+function IconTikTok() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 48 48" fill="none">
+      <rect width="48" height="48" rx="10" fill="#000"/>
+      <path d="M34.1 14.5a8.7 8.7 0 01-5.4-5.5h-4.5v20.6a4.1 4.1 0 01-4.1 3.7 4.1 4.1 0 01-4.1-4.1 4.1 4.1 0 014.1-4.1c.4 0 .8.06 1.1.15V20.7a8.7 8.7 0 00-1.1-.07 8.7 8.7 0 00-8.7 8.7 8.7 8.7 0 008.7 8.7 8.7 8.7 0 008.7-8.7V19.6a13.4 13.4 0 007.8 2.5v-4.5a8.7 8.7 0 01-2.5-.6z" fill="white"/>
+      <path d="M34.1 14.5a8.7 8.7 0 01-5.4-5.5h-4.5v20.6a4.1 4.1 0 01-4.1 3.7 4.1 4.1 0 01-4.1-4.1 4.1 4.1 0 014.1-4.1c.4 0 .8.06 1.1.15V20.7a8.7 8.7 0 00-1.1-.07 8.7 8.7 0 00-8.7 8.7 8.7 8.7 0 008.7 8.7 8.7 8.7 0 008.7-8.7V19.6a13.4 13.4 0 007.8 2.5v-4.5a8.7 8.7 0 01-2.5-.6z" fill="#69C9D0" opacity="0.5"/>
+    </svg>
+  );
+}
+
+function IconInstagram() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 48 48" fill="none">
+      <defs>
+        <radialGradient id="ig1" cx="30%" cy="107%" r="120%">
+          <stop offset="0%" stopColor="#fdf497"/>
+          <stop offset="10%" stopColor="#fdf497"/>
+          <stop offset="50%" stopColor="#fd5949"/>
+          <stop offset="68%" stopColor="#d6249f"/>
+          <stop offset="100%" stopColor="#285AEB"/>
+        </radialGradient>
+      </defs>
+      <rect width="48" height="48" rx="12" fill="url(#ig1)"/>
+      <rect x="11" y="11" width="26" height="26" rx="7" stroke="white" strokeWidth="2.5" fill="none"/>
+      <circle cx="24" cy="24" r="7" stroke="white" strokeWidth="2.5" fill="none"/>
+      <circle cx="33" cy="15" r="2" fill="white"/>
+    </svg>
+  );
+}
+
+function IconTwitterX() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 48 48" fill="none">
+      <rect width="48" height="48" rx="10" fill="#000"/>
+      <path d="M28.4 21.5L38.3 10h-2.4L27.4 20l-7.2-10H11l10.4 14.5L11 38h2.4l9.1-10.1 7.3 10.1H39L28.4 21.5zm-3.2 3.6l-1-1.5L14.3 12h3.6l6.9 9.5 1 1.5 9 12.5h-3.6l-5.9-8.4z" fill="white"/>
+    </svg>
+  );
+}
+
+function IconFriend() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 48 48" fill="none">
+      <rect width="48" height="48" rx="10" fill="#4CAF50"/>
+      <circle cx="18" cy="18" r="6" stroke="white" strokeWidth="2.5" fill="none"/>
+      <path d="M6 38c0-6.6 5.4-12 12-12" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+      <circle cx="32" cy="16" r="5" stroke="white" strokeWidth="2" fill="none"/>
+      <path d="M38 34c0-5.5-4.5-10-10-10" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none"/>
+    </svg>
+  );
+}
+
+function IconAppStore() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 48 48" fill="none">
+      <rect width="48" height="48" rx="10" fill="#0070C9"/>
+      <path d="M24 9.5c-1.8 0-3.4 1-4.3 2.5L9.8 29.5a5 5 0 004.3 7.5h19.8a5 5 0 004.3-7.5L28.3 12C27.4 10.5 25.8 9.5 24 9.5z" fill="white"/>
+      <path d="M19 33h10M24 18v8" stroke="#0070C9" strokeWidth="3" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
+function IconYouTube() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 48 48" fill="none">
+      <rect width="48" height="48" rx="10" fill="#FF0000"/>
+      <rect x="8" y="14" width="32" height="20" rx="5" fill="#FF0000" stroke="white" strokeWidth="2"/>
+      <path d="M21 19l12 5-12 5V19z" fill="white"/>
+    </svg>
+  );
+}
+
+function IconGoogle() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 48 48" fill="none">
+      <rect width="48" height="48" rx="10" fill="white"/>
+      <path d="M43.6 24.5c0-1.4-.12-2.8-.35-4.1H24v7.8h11c-.5 2.5-1.9 4.6-4 6v5h6.5c3.8-3.5 6.1-8.7 6.1-14.7z" fill="#4285F4"/>
+      <path d="M24 44c5.4 0 10-1.8 13.3-4.8l-6.5-5c-1.8 1.2-4.1 1.9-6.8 1.9-5.2 0-9.7-3.5-11.3-8.3H5v5.2C8.3 39.4 15.6 44 24 44z" fill="#34A853"/>
+      <path d="M12.7 27.8a12 12 0 010-7.6V15H5A19.8 19.8 0 005 33l7.7-5.2z" fill="#FBBC05"/>
+      <path d="M24 12.1c2.9 0 5.5 1 7.5 2.9l5.6-5.6C33.9 6.3 29.3 4.2 24 4.2c-8.4 0-15.7 4.6-19 11.4l7.7 5.2C14.3 15.6 18.8 12.1 24 12.1z" fill="#EA4335"/>
+    </svg>
+  );
+}
+
+const SOURCE_ICON: Record<string, React.ReactNode> = {
+  tiktok:    <IconTikTok />,
+  instagram: <IconInstagram />,
+  twitter:   <IconTwitterX />,
+  friend:    <IconFriend />,
+  appstore:  <IconAppStore />,
+  youtube:   <IconYouTube />,
+  google:    <IconGoogle />,
+};
 
 const LEVELS = [
   { id: 'zero',   label: "I'm brand new",          bars: 0 },
@@ -211,7 +306,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               style={{ width: 100, height: 100, animation: 'ob-bounce 2.4s ease-in-out infinite' }} />
             <div style={{ textAlign: 'center' }}>
               <p style={{ color: '#fff', fontFamily: FONT, fontWeight: 900, fontSize: '2rem', margin: '0 0 0.3rem', letterSpacing: 1 }}>
-                Afro<span style={{ color: GREEN }}>slang</span>
+                Afro<span style={{ color: '#b00020' }}>slang</span>
               </p>
               <p style={{ color: 'rgba(255,255,255,0.45)', fontFamily: FONT, fontSize: '0.85rem', margin: 0, letterSpacing: 0.5 }}>
                 The living dictionary of African street slang
@@ -269,7 +364,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey}>
           <ProgressBar />
           <div className="ob-content ob-anim" style={{ gap: '1.25rem' }}>
-            <div style={{ fontSize: '3.5em', animation: 'ob-bounce 1.6s ease-in-out infinite' }}>🎯</div>
+            <img src="/Afroslang.png" alt="Afro" className="ob-mascot"
+              style={{ animation: 'ob-bounce 1.6s ease-in-out infinite' }} />
             <p className="ob-heading" style={{ fontSize: '1.35rem' }}>Just 7 quick questions</p>
             <p className="ob-sub" style={{ maxWidth: 270 }}>
               I'll use your answers to build your perfect Afroslang course
@@ -374,7 +470,9 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                 <button key={src.id}
                   className={`ob-row-btn${discovery === src.id ? ' sel' : ''}`}
                   onClick={() => setDiscovery(src.id)}>
-                  <span style={{ fontSize: '1.35em', minWidth: 28, textAlign: 'center' }}>{src.emoji}</span>
+                  <span style={{ minWidth: 30, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {SOURCE_ICON[src.id]}
+                  </span>
                   <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.92em' }}>{src.label}</span>
                   {discovery === src.id && (
                     <span style={{ color: GREEN, marginLeft: 'auto', fontWeight: 900 }}>✓</span>
