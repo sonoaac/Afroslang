@@ -11,6 +11,7 @@ import { AfricaMap } from './AfricaMap';
 import { GlCanvas } from './GlCanvas';
 import { SandbitsIcon } from '../ui/SandbitsIcon';
 import './LandingPage.css';
+import { OnboardingFlow } from '../onboarding/OnboardingFlow';
 
 // Drop-in only — no scramble chars. from === to so only phase 1 (drop-in) runs.
 const AFROSLANG_CHARS = 'AFROSLANG'.split('').map(ch => ({ from: ch, to: ch }));
@@ -146,6 +147,15 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
   );
 
   const [sheet, setSheet] = useState<SheetMode>(initialSheet ?? null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  const openOnboarding = () => setShowOnboarding(true);
+  const handleOBSignIn = () => { setShowOnboarding(false); setSheet('login'); };
+  const handleOBComplete = (lang: string, _plan: 'plus' | 'free') => {
+    setShowOnboarding(false);
+    if (lang) onPreSelectLanguage?.(lang);
+    setSheet('signup');
+  };
 
   // Explorer section state
   const [exploreSearch, setExploreSearch]         = useState('');
@@ -296,7 +306,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     } else {
       setPendingLanguage(selectedLanguage);
       onPreSelectLanguage?.(selectedLanguage);
-      setSheet('signup');
+      setShowOnboarding(true);
       setPanelOpen(false);
     }
   };
@@ -777,7 +787,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
           {isLoggedIn ? (
             <button className="lp-btn-header-cta" onClick={onContinue ?? undefined}>Continue →</button>
           ) : (
-            <button className="lp-btn-header-cta" onClick={() => setSheet('signup')}>Get Started</button>
+            <button className="lp-btn-header-cta" onClick={openOnboarding}>Get Started</button>
           )}
         </div>
       </header>
@@ -940,7 +950,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
             </button>
           ) : (
             <div className="lp-stack-ctas-row">
-              <button className="lp-btn-hero-primary" onClick={() => setSheet('signup')}>
+              <button className="lp-btn-hero-primary" onClick={openOnboarding}>
                 Get Started
               </button>
               <button className="lp-btn-hero-ghost" onClick={() => setSheet('login')}>
@@ -1352,6 +1362,14 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
         </div>
       </div>
     </div>
+
+    {/* Onboarding overlay — renders above everything, triggered by Get Started */}
+    {showOnboarding && (
+      <OnboardingFlow
+        onSignIn={handleOBSignIn}
+        onComplete={handleOBComplete}
+      />
+    )}
     </>
   );
 }
