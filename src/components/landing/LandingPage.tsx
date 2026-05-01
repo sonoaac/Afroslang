@@ -48,6 +48,7 @@ interface LandingPageProps {
   onContinue?: () => void;
   onSelectLanguage?: (languageId: string) => void;
   onPreSelectLanguage?: (languageId: string) => void;
+  onGoToSubscription?: () => void;
   userProgressMap?: Record<string, { completedLessons: string[] }>;
 }
 
@@ -136,7 +137,7 @@ const EXPLORE_COUNTRIES: ExploreCountry[] = [
 ];
 
 
-export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLanguage, onPreSelectLanguage, userProgressMap = {} }: LandingPageProps) {
+export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLanguage, onPreSelectLanguage, onGoToSubscription, userProgressMap = {} }: LandingPageProps) {
   const { setGuestMode, isGuest } = useAuth();
 
   // Countries unlocked by completing at least 1 lesson in any of their languages
@@ -148,10 +149,12 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
   const [sheet, setSheet] = useState<SheetMode>(initialSheet ?? null);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const pendingPlanRef = useRef<'plus' | 'free'>('free');
 
   const openOnboarding = () => setShowOnboarding(true);
   const handleOBSignIn = () => { setShowOnboarding(false); setSheet('login'); };
-  const handleOBComplete = (lang: string, _plan: 'plus' | 'free') => {
+  const handleOBComplete = (lang: string, plan: 'plus' | 'free') => {
+    pendingPlanRef.current = plan;
     setShowOnboarding(false);
     if (lang) onPreSelectLanguage?.(lang);
     setSheet('signup');
@@ -532,6 +535,10 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
         languages: {},
       }).catch(() => {});
       closeSheet();
+      if (pendingPlanRef.current === 'plus') {
+        onGoToSubscription?.();
+        pendingPlanRef.current = 'free';
+      }
     } catch (err: any) {
       setSignupError(friendlyAuthError(err?.code ?? ''));
     } finally {

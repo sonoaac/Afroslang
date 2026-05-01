@@ -430,6 +430,7 @@ function App() {
           onContinue={() => currentLanguage && navigate(langUrl(currentLanguage))}
           onSelectLanguage={handleLanguageSelect}
           onPreSelectLanguage={setPreSelectedLanguage}
+          onGoToSubscription={() => navigate('/subscription')}
           userProgressMap={userProgressMap}
         />
       } />
