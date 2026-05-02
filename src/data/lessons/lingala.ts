@@ -1,4 +1,4 @@
-import { Lesson } from '../types';
+import { Lesson } from '../../types';
 
 export const lingalaLessons: Lesson[] = [
   // Stage 1, Mission 1: Greetings

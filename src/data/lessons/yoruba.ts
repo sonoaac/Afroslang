@@ -1,4 +1,4 @@
-import { Lesson } from '../types';
+import { Lesson } from '../../types';
 
 export const yorubaLessons: Lesson[] = [
   // STAGE 1 - MISSION 1: GREETINGS (20 questions, 10 will be randomly selected)

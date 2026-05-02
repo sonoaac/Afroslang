@@ -1,4 +1,4 @@
-import { Lesson } from '../types';
+import { Lesson } from '../../types';
 
 export const swahiliLessons: Lesson[] = [
   // VOCABULARY LESSONS (40 questions)
