@@ -499,7 +499,7 @@ function SignalBars({ count }: { count: number }) {
 
 interface OnboardingFlowProps {
   onSignIn: () => void;
-  onComplete: (selectedLanguage: string, plan: 'plus' | 'free') => void;
+  onComplete: (selectedLanguage: string, plan: 'plus' | 'free', placementScore: number) => void;
 }
 
 export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
@@ -1098,13 +1098,15 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
 
   // ── STEP 13: Results + account creation ────────────────────────────────────
   if (step === 13) {
-    const questions = PLACEMENT_QUESTIONS[selectedLang] ?? [];
-    const score     = placementAnswers.filter((a, i) => a === questions[i]?.ans).length;
-    const total     = questions.length;
-    const pct       = total > 0 ? Math.round((score / total) * 100) : 0;
-    const stage     = score >= Math.round(total * 0.8) ? 3 : score >= Math.round(total * 0.5) ? 2 : 1;
-    const stageLabel = stage === 3 ? t('advanced') : stage === 2 ? t('intermediate') : t('beginner');
-    const msg        = stage === 3 ? t('affirmAdv') : stage === 2 ? t('affirmMid') : t('affirmBeg');
+    const questions   = PLACEMENT_QUESTIONS[selectedLang] ?? [];
+    const score       = placementAnswers.filter((a, i) => a === questions[i]?.ans).length;
+    const total       = questions.length;
+    const scoreFrac   = total > 0 ? score / total : 0;
+    const pct         = Math.round(scoreFrac * 100);
+    // Map score to starting stage (only 70%+ gets placed ahead)
+    const startStage  = scoreFrac >= 1.0 ? 5 : scoreFrac >= 0.90 ? 4 : scoreFrac >= 0.80 ? 3 : scoreFrac >= 0.70 ? 2 : 1;
+    const stageLabel  = startStage === 1 ? t('beginner') : startStage <= 3 ? t('intermediate') : t('advanced');
+    const msg         = startStage >= 4 ? t('affirmAdv') : startStage >= 2 ? t('affirmMid') : t('affirmBeg');
 
     return (
       <Overlay>
@@ -1119,7 +1121,9 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               </p>
               <p className="ob-heading" style={{ marginTop: '0.3rem', fontSize: '1.1rem' }}>{msg}</p>
               <p className="ob-sub" style={{ marginTop: '0.35rem' }}>
-                {t('startAt')}{' '}<strong style={{ color: '#fff' }}>{stageLabel}</strong>{t('levelWord') ? ` ${t('levelWord')}` : ''}
+                {t('startAt')}{' '}<strong style={{ color: '#fff' }}>
+                  {iface === 'fr' ? `Étape ${startStage}` : `Stage ${startStage}`}
+                </strong>{' — '}<span style={{ opacity: 0.75 }}>{stageLabel}</span>
               </p>
             </div>
             <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 230 }}>
@@ -1135,7 +1139,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
           </div>
           <Wave />
           <div className="ob-bottom">
-            <button className="ob-btn-primary" onClick={() => onComplete(selectedLang, selectedPlan)}>
+            <button className="ob-btn-primary" onClick={() => onComplete(selectedLang, selectedPlan, scoreFrac)}>
               {t('createAccount')}
             </button>
             {selectedPlan === 'plus' && (

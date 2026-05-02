@@ -354,6 +354,27 @@ function App() {
     }
   }, [user, isGuest, loading]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ── Placement score: pre-unlock lessons based on test result ──────────────
+  const handleSetPlacementScore = (languageId: string, scoreFrac: number) => {
+    if (scoreFrac < 0.70) return; // below 70% → start from the beginning
+    const lang   = languageId as AfricanLanguage;
+    const stages = getStagesForLanguage(lang);
+    // Determine how many whole stages to skip (1 stage per 10% above 70%, max 4)
+    const stagesToSkip = scoreFrac >= 1.0 ? 4 : scoreFrac >= 0.90 ? 3 : scoreFrac >= 0.80 ? 2 : 1;
+    const preCompleted = stages
+      .slice(0, stagesToSkip)
+      .flatMap(s => s.lessons ?? [])
+      .map(l => l.id);
+    if (!preCompleted.length) return;
+    setUserProgressMap(prev => ({
+      ...prev,
+      [lang]: {
+        ...(prev[lang] ?? createDefaultProgress(lang)),
+        completedLessons: preCompleted,
+      },
+    }));
+  };
+
   // ── Helpers ───────────────────────────────────────────────────────────────
   const handleLanguageSelect = (languageId: string) => {
     const lang = languageId as AfricanLanguage;
@@ -431,6 +452,7 @@ function App() {
           onSelectLanguage={handleLanguageSelect}
           onPreSelectLanguage={setPreSelectedLanguage}
           onGoToSubscription={() => navigate('/subscription')}
+          onSetPlacementScore={handleSetPlacementScore}
           userProgressMap={userProgressMap}
         />
       } />

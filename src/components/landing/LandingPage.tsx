@@ -49,6 +49,7 @@ interface LandingPageProps {
   onSelectLanguage?: (languageId: string) => void;
   onPreSelectLanguage?: (languageId: string) => void;
   onGoToSubscription?: () => void;
+  onSetPlacementScore?: (lang: string, score: number) => void;
   userProgressMap?: Record<string, { completedLessons: string[] }>;
 }
 
@@ -137,7 +138,7 @@ const EXPLORE_COUNTRIES: ExploreCountry[] = [
 ];
 
 
-export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLanguage, onPreSelectLanguage, onGoToSubscription, userProgressMap = {} }: LandingPageProps) {
+export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLanguage, onPreSelectLanguage, onGoToSubscription, onSetPlacementScore, userProgressMap = {} }: LandingPageProps) {
   const { setGuestMode, isGuest } = useAuth();
 
   // Countries unlocked by completing at least 1 lesson in any of their languages
@@ -149,12 +150,16 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
   const [sheet, setSheet] = useState<SheetMode>(initialSheet ?? null);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const pendingPlanRef = useRef<'plus' | 'free'>('free');
+  const pendingPlanRef  = useRef<'plus' | 'free'>('free');
+  const pendingScoreRef = useRef<number>(0);
+  const pendingLangRef  = useRef<string>('');
 
   const openOnboarding = () => setShowOnboarding(true);
   const handleOBSignIn = () => { setShowOnboarding(false); setSheet('login'); };
-  const handleOBComplete = (lang: string, plan: 'plus' | 'free') => {
-    pendingPlanRef.current = plan;
+  const handleOBComplete = (lang: string, plan: 'plus' | 'free', placementScore: number) => {
+    pendingPlanRef.current  = plan;
+    pendingScoreRef.current = placementScore;
+    pendingLangRef.current  = lang;
     setShowOnboarding(false);
     if (lang) onPreSelectLanguage?.(lang);
     setSheet('signup');
@@ -534,11 +539,16 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
         createdAt: new Date().toISOString(),
         languages: {},
       }).catch(() => {});
+      if (pendingScoreRef.current > 0 && pendingLangRef.current) {
+        onSetPlacementScore?.(pendingLangRef.current, pendingScoreRef.current);
+      }
       closeSheet();
       if (pendingPlanRef.current === 'plus') {
         onGoToSubscription?.();
         pendingPlanRef.current = 'free';
       }
+      pendingScoreRef.current = 0;
+      pendingLangRef.current  = '';
     } catch (err: any) {
       setSignupError(friendlyAuthError(err?.code ?? ''));
     } finally {
