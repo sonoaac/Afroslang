@@ -1,115 +1,331 @@
 import { useState, useEffect, useCallback } from 'react';
 
+// ── Bilingual UI strings ──────────────────────────────────────────────────────
+
+const UI = {
+  en: {
+    langToggle: '🇫🇷 Je parle français',
+    tagline: 'The living dictionary of African street slang',
+    newUser: 'New to Afroslang?',
+    getStarted: 'GET STARTED',
+    signIn: 'Already have an account? SIGN IN',
+    hiThere: "👋 Hi there! I'm ",
+    mascotName: 'Afro!',
+    guide: 'Your African slang guide',
+    continue: 'CONTINUE',
+    questionsHeading: 'Just answer a few questions for me',
+    questionsSub: "I'll use your answers to build your perfect Afroslang course",
+    letsGo: "LET'S GO 🔥",
+    whatLearn: 'What would you like to learn?',
+    courseBuilding: 'COURSE BUILDING...',
+    joinFriends: 'Get ready to join your friends learning African slang!',
+    personalizing: 'Personalizing your experience...',
+    howHeard: 'How did you hear about Afroslang?',
+    howMuchSlang: 'How much slang do you know?',
+    affirm: "Ayy, that's what I'm talking about! 🔥",
+    settingUp: 'Setting things up...',
+    whyLearning: 'Why are you learning?',
+    selectAll: 'Select all that apply',
+    routineTitle: "Let's set up a vibe routine!",
+    routineSub: "A daily habit is the secret to mastering African slang. We'll help you stay consistent.",
+    soundsGood: 'SOUNDS GOOD 🙌',
+    dailyGoalQ: "What's your daily goal?",
+    lockedIn: "I'M LOCKED IN 🔒",
+    howStart: 'How do you want to get started?',
+    recommended: '⭐ RECOMMENDED',
+    plusTagline: 'Faster progress · no ads · unlimited hearts',
+    startPlus: 'START AFROPLUS',
+    learnFree: 'Learn for free',
+    freeTagline: 'Core features, with ads',
+    continueFree: 'CONTINUE FOR FREE',
+    placementLabel: 'Placement check',
+    createAccount: 'CREATE ACCOUNT & SAVE PROGRESS',
+    saveProg: 'Create a free account to save your progress and start learning!',
+    afroplusHint: "You'll be set up with AfroPlus after signing up",
+    startAt: "You'll start at",
+    levelWord: 'level',
+    beginner: 'Beginner',
+    intermediate: 'Intermediate',
+    advanced: 'Advanced',
+    affirmAdv: "You're lowkey fluent! 🔥",
+    affirmMid: "You've got a solid base! 💪",
+    affirmBeg: 'Ready to start from the roots! 🌱',
+  },
+  fr: {
+    langToggle: '🇬🇧 I speak English',
+    tagline: 'Le dictionnaire vivant du slang africain',
+    newUser: 'Nouveau sur Afroslang ?',
+    getStarted: 'COMMENCER',
+    signIn: 'Déjà un compte ? SE CONNECTER',
+    hiThere: '👋 Salut ! Je suis ',
+    mascotName: 'Afro !',
+    guide: 'Ton guide du slang africain',
+    continue: 'CONTINUER',
+    questionsHeading: 'Réponds juste à quelques questions',
+    questionsSub: "J'utiliserai tes réponses pour créer ton cours Afroslang parfait",
+    letsGo: "C'EST PARTI 🔥",
+    whatLearn: "Qu'est-ce que tu voudrais apprendre ?",
+    courseBuilding: 'COURS EN COURS...',
+    joinFriends: "Prépare-toi à rejoindre tes amis qui apprennent le slang africain !",
+    personalizing: 'Personnalisation de ton expérience...',
+    howHeard: "Comment as-tu entendu parler d'Afroslang ?",
+    howMuchSlang: 'Combien de slang connais-tu ?',
+    affirm: "Voilà, c'est ce que je voulais entendre ! 🔥",
+    settingUp: 'On prépare tout...',
+    whyLearning: 'Pourquoi tu apprends ?',
+    selectAll: 'Sélectionne tout ce qui s\'applique',
+    routineTitle: 'Mettons en place une routine !',
+    routineSub: "Une habitude quotidienne est le secret pour maîtriser le slang africain. On t'aidera à rester constant(e).",
+    soundsGood: 'SUPER ! 🙌',
+    dailyGoalQ: 'Quel est ton objectif quotidien ?',
+    lockedIn: "C'EST PARTI ! 🔒",
+    howStart: 'Comment veux-tu commencer ?',
+    recommended: '⭐ RECOMMANDÉ',
+    plusTagline: 'Progrès plus rapide · sans pubs · cœurs illimités',
+    startPlus: 'DÉMARRER AFROPLUS',
+    learnFree: 'Apprendre gratuitement',
+    freeTagline: 'Fonctionnalités de base, avec pubs',
+    continueFree: 'CONTINUER GRATUITEMENT',
+    placementLabel: 'Évaluation de niveau',
+    createAccount: 'CRÉER UN COMPTE & SAUVEGARDER',
+    saveProg: "Crée un compte gratuit pour sauvegarder ta progression et commencer à apprendre !",
+    afroplusHint: "Tu seras configuré avec AfroPlus après ton inscription",
+    startAt: 'Tu commenceras au niveau',
+    levelWord: '',
+    beginner: 'Débutant',
+    intermediate: 'Intermédiaire',
+    advanced: 'Avancé',
+    affirmAdv: 'Tu es carrément à l\'aise ! 🔥',
+    affirmMid: 'Tu as une bonne base ! 💪',
+    affirmBeg: 'Prêt(e) à commencer depuis les bases ! 🌱',
+  },
+} as const;
+
 // ── Static data ───────────────────────────────────────────────────────────────
 
 const LANGUAGES = [
-  { id: 'swahili',  label: 'Swahili',  flag: '🇰🇪', region: 'East Africa' },
-  { id: 'yoruba',   label: 'Yoruba',   flag: '🇳🇬', region: 'West Africa' },
-  { id: 'hausa',    label: 'Hausa',    flag: '🇳🇬', region: 'West Africa' },
-  { id: 'igbo',     label: 'Igbo',     flag: '🇳🇬', region: 'Nigeria' },
-  { id: 'zulu',     label: 'Zulu',     flag: '🇿🇦', region: 'South Africa' },
-  { id: 'amharic',  label: 'Amharic',  flag: '🇪🇹', region: 'East Africa' },
-  { id: 'arabic',   label: 'Arabic',   flag: '🇪🇬', region: 'North Africa' },
+  { id: 'swahili',  label: 'Swahili',  flag: '🇰🇪', region: 'East Africa',  regionFr: "Afrique de l'Est" },
+  { id: 'yoruba',   label: 'Yoruba',   flag: '🇳🇬', region: 'West Africa',  regionFr: "Afrique de l'Ouest" },
+  { id: 'hausa',    label: 'Hausa',    flag: '🇳🇬', region: 'West Africa',  regionFr: "Afrique de l'Ouest" },
+  { id: 'igbo',     label: 'Igbo',     flag: '🇳🇬', region: 'Nigeria',      regionFr: 'Nigeria' },
+  { id: 'zulu',     label: 'Zulu',     flag: '🇿🇦', region: 'South Africa', regionFr: 'Afrique du Sud' },
+  { id: 'amharic',  label: 'Amharic',  flag: '🇪🇹', region: 'East Africa',  regionFr: "Afrique de l'Est" },
+  { id: 'arabic',   label: 'Arabic',   flag: '🇪🇬', region: 'North Africa', regionFr: 'Afrique du Nord' },
 ];
 
 const SOURCES = [
-  { id: 'tiktok',    label: 'TikTok' },
-  { id: 'instagram', label: 'Instagram' },
-  { id: 'facebook',  label: 'Facebook' },
-  { id: 'twitter',   label: 'Twitter/X' },
-  { id: 'friend',    label: 'A Friend' },
-  { id: 'appstore',  label: 'App Store' },
-  { id: 'youtube',   label: 'YouTube' },
-  { id: 'google',    label: 'Google' },
-  { id: 'other',     label: 'Other' },
+  { id: 'tiktok',    label: 'TikTok',     labelFr: 'TikTok' },
+  { id: 'instagram', label: 'Instagram',  labelFr: 'Instagram' },
+  { id: 'facebook',  label: 'Facebook',   labelFr: 'Facebook' },
+  { id: 'twitter',   label: 'Twitter/X',  labelFr: 'Twitter/X' },
+  { id: 'friend',    label: 'A Friend',   labelFr: 'Un ami' },
+  { id: 'appstore',  label: 'App Store',  labelFr: 'App Store' },
+  { id: 'youtube',   label: 'YouTube',    labelFr: 'YouTube' },
+  { id: 'google',    label: 'Google',     labelFr: 'Google' },
+  { id: 'other',     label: 'Other',      labelFr: 'Autre' },
 ];
 
-type PlacementQ = { q: string; opts: string[]; ans: string };
+type PlacementQ = { q: string; qFr: string; opts: string[]; ans: string };
+
+// French translations for option words used in placement answers
+const OPTION_FR: Record<string, string> = {
+  'Hello / How are you': 'Bonjour / Comment vas-tu',
+  'Goodbye': 'Au revoir',
+  'Thank you': 'Merci',
+  'Please': "S'il te plaît",
+  'Sorry': 'Désolé(e)',
+  'Yes': 'Oui',
+  'No': 'Non',
+  'Maybe': 'Peut-être',
+  'Later': 'Plus tard',
+  'Never': 'Jamais',
+  'Water': 'Eau',
+  'Food': 'Nourriture',
+  'Food/Eating': 'Nourriture/Manger',
+  'Fire': 'Feu',
+  'Earth': 'Terre',
+  'Wind': 'Vent',
+  'House': 'Maison',
+  'House/Home': 'Maison/Foyer',
+  'Home/Homestead': 'Foyer',
+  'Mother': 'Mère',
+  'Father': 'Père',
+  'Sister': 'Sœur',
+  'Brother': 'Frère',
+  'Aunt': 'Tante',
+  'Grandmother': 'Grand-mère',
+  'Friend': 'Ami(e)',
+  'Younger sibling': 'Cadet(te)',
+  'Child': 'Enfant',
+  'Children': 'Enfants',
+  'Elders': 'Anciens',
+  'Elder': 'Ancien',
+  'Baby': 'Bébé',
+  'Boy': 'Garçon',
+  'Girl': 'Fille',
+  'One': 'Un',
+  'Two': 'Deux',
+  'Three': 'Trois',
+  'Four': 'Quatre',
+  'Ten': 'Dix',
+  'Work': 'Travail',
+  'Play': 'Jouer',
+  'Sleep': 'Dormir',
+  'Eat': 'Manger',
+  'Market': 'Marché',
+  'School': 'École',
+  'Farm': 'Ferme',
+  'Road': 'Route',
+  'River': 'Rivière',
+  'Money': 'Argent',
+  'Clothes': 'Vêtements',
+  'Book': 'Livre',
+  'Person': 'Personne',
+  'Animal': 'Animal',
+  'Animals': 'Animaux',
+  'God/Lord/King': 'Dieu/Seigneur/Roi',
+  'Teacher': 'Professeur',
+  'Enemy': 'Ennemi',
+  'Stranger': 'Étranger',
+  'Chief': 'Chef',
+  'Good morning': 'Bonjour (matin)',
+  'Good night': 'Bonne nuit',
+  'Welcome': 'Bienvenue',
+  'Be careful': 'Fais attention',
+  'Hurry up': 'Dépêche-toi',
+  'Hurry': 'Se dépêcher',
+  'Wait': 'Attends',
+  "Let's go / Come on": 'Allons-y / Allez',
+  'Stop': 'Arrête',
+  'Look': 'Regarde',
+  'No problem / It is fine': 'Pas de problème / Ça va',
+  'I am angry': 'Je suis en colère',
+  'Help me': 'Aide-moi',
+  'Happiness': 'Bonheur',
+  'Anger': 'Colère',
+  'Love/Compassion': 'Amour/Compassion',
+  'Sadness': 'Tristesse',
+  'What color': 'Quelle couleur',
+  'How many days': 'Combien de jours',
+  'Where to go': 'Où aller',
+  'Who is it': 'Qui est-ce',
+  'Sickness': 'Maladie',
+  'Joy': 'Joie',
+  'Journey': 'Voyage',
+  'Elephant': 'Éléphant',
+  'Cheetah': 'Guépard',
+  'Lion': 'Lion',
+  'Snake': 'Serpent',
+  'Little': 'Peu',
+  'Always': 'Toujours',
+  'Very much': 'Beaucoup',
+  'OK / Alright': "OK / D'accord",
+  'Strong': 'Fort',
+  'Clever/Skilled': 'Intelligent/Habile',
+  'Rich': 'Riche',
+  'Tall': 'Grand',
+  'And/Plus': 'Et/Plus',
+  'But': 'Mais',
+  'Or': 'Ou',
+  'So': 'Donc',
+  'Moon': 'Lune',
+  'Star': 'Étoile',
+  'Sun/Day': 'Soleil/Jour',
+  'Rain': 'Pluie',
+  'Traders': 'Commerçants',
+  'Sorry / Peace': 'Désolé / Paix',
+  'Go well / Goodbye': 'Bonne route / Au revoir',
+  'I love you': "Je t'aime",
+  'My love/dear': 'Mon amour/chéri(e)',
+  'God willing / Hopefully': 'Si Dieu le veut',
+  'I promise': 'Je promets',
+  'Right now': 'Maintenant',
+};
 
 const PLACEMENT_QUESTIONS: Record<string, PlacementQ[]> = {
   swahili: [
-    { q: 'What does "Habari" mean?',               opts: ['Hello / How are you', 'Goodbye', 'Thank you', 'Water'],          ans: 'Hello / How are you' },
-    { q: 'How do you say "one" in Swahili?',       opts: ['Mbili', 'Moja', 'Tatu', 'Nne'],                                  ans: 'Moja' },
-    { q: 'What does "Asante" mean?',               opts: ['Please', 'Sorry', 'Thank you', 'Yes'],                           ans: 'Thank you' },
-    { q: '"Chakula" means?',                       opts: ['Water', 'Food', 'House', 'Book'],                                ans: 'Food' },
-    { q: 'What does "Ndio" mean?',                 opts: ['No', 'Maybe', 'Yes', 'Later'],                                   ans: 'Yes' },
-    { q: '"Mama" in Swahili means?',               opts: ['Sister', 'Mother', 'Aunt', 'Friend'],                            ans: 'Mother' },
-    { q: 'What does "Simba" mean?',                opts: ['Elephant', 'Cheetah', 'Lion', 'Snake'],                          ans: 'Lion' },
-    { q: 'How do you say "water" in Swahili?',     opts: ['Mto', 'Maji', 'Chai', 'Maziwa'],                                 ans: 'Maji' },
-    { q: '"Karibu" means?',                        opts: ['Be careful', 'Welcome', 'Hurry up', 'Wait'],                     ans: 'Welcome' },
-    { q: 'What does "Kwaheri" mean?',              opts: ['Good morning', 'Goodbye', 'Good night', 'Hello'],                ans: 'Goodbye' },
+    { q: 'What does "Habari" mean?',           qFr: 'Que signifie « Habari » ?',               opts: ['Hello / How are you','Goodbye','Thank you','Water'],       ans: 'Hello / How are you' },
+    { q: 'How do you say "one" in Swahili?',   qFr: 'Comment dit-on "un" en swahili ?',         opts: ['Mbili','Moja','Tatu','Nne'],                               ans: 'Moja' },
+    { q: 'What does "Asante" mean?',           qFr: 'Que signifie « Asante » ?',               opts: ['Please','Sorry','Thank you','Yes'],                        ans: 'Thank you' },
+    { q: '"Chakula" means?',                   qFr: '« Chakula » signifie ?',                  opts: ['Water','Food','House','Book'],                             ans: 'Food' },
+    { q: 'What does "Ndio" mean?',             qFr: 'Que signifie « Ndio » ?',                 opts: ['No','Maybe','Yes','Later'],                                ans: 'Yes' },
+    { q: '"Mama" in Swahili means?',           qFr: '« Mama » en swahili signifie ?',          opts: ['Sister','Mother','Aunt','Friend'],                         ans: 'Mother' },
+    { q: 'What does "Simba" mean?',            qFr: 'Que signifie « Simba » ?',                opts: ['Elephant','Cheetah','Lion','Snake'],                       ans: 'Lion' },
+    { q: 'How do you say "water" in Swahili?', qFr: 'Comment dit-on "eau" en swahili ?',       opts: ['Mto','Maji','Chai','Maziwa'],                              ans: 'Maji' },
+    { q: '"Karibu" means?',                    qFr: '« Karibu » signifie ?',                   opts: ['Be careful','Welcome','Hurry up','Wait'],                  ans: 'Welcome' },
+    { q: 'What does "Kwaheri" mean?',          qFr: 'Que signifie « Kwaheri » ?',              opts: ['Good morning','Goodbye','Good night','Hello / How are you'], ans: 'Goodbye' },
   ],
   yoruba: [
-    { q: 'How do you say "Good morning" in Yoruba?', opts: ['Bawo ni', 'E kaaro', 'E kaasan', 'Ẹ ku irole'],              ans: 'E kaaro' },
-    { q: 'What does "Ese" mean in Yoruba?',          opts: ['Hello', 'Goodbye', 'Thank you', 'Please'],                   ans: 'Thank you' },
-    { q: '"Omi" in Yoruba means?',                   opts: ['Food', 'Water', 'Fire', 'Wind'],                             ans: 'Water' },
-    { q: 'What does "Bẹẹni" mean?',                  opts: ['No', 'Yes', 'Maybe', 'Never'],                               ans: 'Yes' },
-    { q: '"Ounjẹ" means?',                           opts: ['Water', 'House', 'Food', 'Money'],                           ans: 'Food' },
-    { q: 'How do you say "one" in Yoruba?',          opts: ['Èjì', 'Ọ̀kan', 'Ẹ̀ta', 'Ẹ̀rin'],                             ans: 'Ọ̀kan' },
-    { q: 'What does "Aburo" mean?',                  opts: ['Mother', 'Younger sibling', 'Friend', 'Father'],             ans: 'Younger sibling' },
-    { q: '"Ilé" in Yoruba means?',                   opts: ['Road', 'Market', 'House/Home', 'School'],                    ans: 'House/Home' },
-    { q: 'What does "Àánú" mean?',                   opts: ['Happiness', 'Anger', 'Love/Compassion', 'Sadness'],          ans: 'Love/Compassion' },
-    { q: '"Ọjọ melo" asks about?',                   opts: ['What color', 'How many days', 'Where to go', 'Who is it'],  ans: 'How many days' },
+    { q: 'How do you say "Good morning" in Yoruba?', qFr: 'Comment dit-on "Bonjour" en yoruba ?',     opts: ['Bawo ni','E kaaro','E kaasan','Ẹ ku irole'],             ans: 'E kaaro' },
+    { q: 'What does "Ese" mean in Yoruba?',          qFr: 'Que signifie « Ese » en yoruba ?',          opts: ['Hello / How are you','Goodbye','Thank you','Please'],   ans: 'Thank you' },
+    { q: '"Omi" in Yoruba means?',                   qFr: '« Omi » en yoruba signifie ?',              opts: ['Food','Water','Fire','Wind'],                           ans: 'Water' },
+    { q: 'What does "Bẹẹni" mean?',                  qFr: 'Que signifie « Bẹẹni » ?',                  opts: ['No','Yes','Maybe','Never'],                             ans: 'Yes' },
+    { q: '"Ounjẹ" means?',                           qFr: '« Ounjẹ » signifie ?',                      opts: ['Water','House','Food','Money'],                         ans: 'Food' },
+    { q: 'How do you say "one" in Yoruba?',          qFr: 'Comment dit-on "un" en yoruba ?',           opts: ['Èjì','Ọ̀kan','Ẹ̀ta','Ẹ̀rin'],                           ans: 'Ọ̀kan' },
+    { q: 'What does "Aburo" mean?',                  qFr: 'Que signifie « Aburo » ?',                  opts: ['Mother','Younger sibling','Friend','Father'],           ans: 'Younger sibling' },
+    { q: '"Ilé" in Yoruba means?',                   qFr: '« Ilé » en yoruba signifie ?',              opts: ['Road','Market','House/Home','School'],                  ans: 'House/Home' },
+    { q: 'What does "Àánú" mean?',                   qFr: 'Que signifie « Àánú » ?',                   opts: ['Happiness','Anger','Love/Compassion','Sadness'],        ans: 'Love/Compassion' },
+    { q: '"Ọjọ melo" asks about?',                   qFr: '« Ọjọ melo » pose une question sur ?',      opts: ['What color','How many days','Where to go','Who is it'], ans: 'How many days' },
   ],
   hausa: [
-    { q: 'How do you say "Hello" in Hausa?',       opts: ['Nagode', 'Sannu', 'Barka', 'Lafiya'],                          ans: 'Sannu' },
-    { q: 'What does "Nagode" mean?',               opts: ['Hello', 'Goodbye', 'Thank you', 'Please'],                     ans: 'Thank you' },
-    { q: '"Ruwa" in Hausa means?',                 opts: ['Fire', 'Water', 'Food', 'Earth'],                              ans: 'Water' },
-    { q: 'What does "Ɗaya" mean?',                 opts: ['Two', 'Three', 'One', 'Four'],                                 ans: 'One' },
-    { q: '"Gida" means?',                          opts: ['School', 'Market', 'House/Home', 'Farm'],                      ans: 'House/Home' },
-    { q: 'What does "Abinci" mean?',               opts: ['Water', 'Food', 'Money', 'Clothes'],                           ans: 'Food' },
-    { q: '"Yaro" means?',                          opts: ['Girl', 'Boy', 'Elder', 'Baby'],                                ans: 'Boy' },
-    { q: 'How do you say "Yes" in Hausa?',         opts: ["A'a", 'Haka ne', 'Kwai', 'Ee'],                               ans: 'Ee' },
-    { q: 'What does "Aiki" mean?',                 opts: ['Play', 'Work', 'Sleep', 'Eat'],                                ans: 'Work' },
-    { q: '"Rana" in Hausa means?',                 opts: ['Moon', 'Star', 'Sun/Day', 'Rain'],                             ans: 'Sun/Day' },
+    { q: 'How do you say "Hello" in Hausa?',   qFr: 'Comment dit-on "Bonjour" en haoussa ?',   opts: ['Nagode','Sannu','Barka','Lafiya'],                          ans: 'Sannu' },
+    { q: 'What does "Nagode" mean?',           qFr: 'Que signifie « Nagode » ?',               opts: ['Hello / How are you','Goodbye','Thank you','Please'],      ans: 'Thank you' },
+    { q: '"Ruwa" in Hausa means?',             qFr: '« Ruwa » en haoussa signifie ?',          opts: ['Fire','Water','Food','Earth'],                             ans: 'Water' },
+    { q: 'What does "Ɗaya" mean?',             qFr: 'Que signifie « Ɗaya » ?',                 opts: ['Two','Three','One','Four'],                                ans: 'One' },
+    { q: '"Gida" means?',                      qFr: '« Gida » signifie ?',                     opts: ['School','Market','House/Home','Farm'],                     ans: 'House/Home' },
+    { q: 'What does "Abinci" mean?',           qFr: 'Que signifie « Abinci » ?',               opts: ['Water','Food','Money','Clothes'],                          ans: 'Food' },
+    { q: '"Yaro" means?',                      qFr: '« Yaro » signifie ?',                     opts: ['Girl','Boy','Elder','Baby'],                               ans: 'Boy' },
+    { q: 'How do you say "Yes" in Hausa?',     qFr: 'Comment dit-on "Oui" en haoussa ?',       opts: ["A'a",'Haka ne','Kwai','Ee'],                               ans: 'Ee' },
+    { q: 'What does "Aiki" mean?',             qFr: 'Que signifie « Aiki » ?',                 opts: ['Play','Work','Sleep','Eat'],                               ans: 'Work' },
+    { q: '"Rana" in Hausa means?',             qFr: '« Rana » en haoussa signifie ?',          opts: ['Moon','Star','Sun/Day','Rain'],                            ans: 'Sun/Day' },
   ],
   igbo: [
-    { q: 'How do you greet in Igbo?',              opts: ['Ndewo', 'Daalu', 'Biko', 'Ọ dị mma'],                          ans: 'Ndewo' },
-    { q: 'What does "Daalu" mean?',                opts: ['Please', 'Thank you', 'Goodbye', 'Sorry'],                     ans: 'Thank you' },
-    { q: '"Mmiri" in Igbo means?',                 opts: ['Food', 'Water', 'Fire', 'Earth'],                              ans: 'Water' },
-    { q: 'What does "Ọ dị mma" mean?',             opts: ['No problem / It is fine', 'I am angry', 'Goodbye', 'Help me'], ans: 'No problem / It is fine' },
-    { q: 'What does "Nnę" mean?',                  opts: ['Father', 'Mother', 'Sister', 'Grandmother'],                   ans: 'Mother' },
-    { q: '"Otu" in Igbo means?',                   opts: ['One', 'Two', 'Group', 'Road'],                                 ans: 'One' },
-    { q: 'What does "Ulo" mean?',                  opts: ['Road', 'House', 'Market', 'Farm'],                             ans: 'House' },
-    { q: '"Biko" means?',                          opts: ['Thank you', 'Please', 'Yes', 'No'],                            ans: 'Please' },
-    { q: 'What does "Ụmụ" mean?',                  opts: ['Elders', 'Children', 'Animals', 'Traders'],                   ans: 'Children' },
-    { q: '"Ọrịa" means?',                          opts: ['Market', 'Sickness', 'Joy', 'Journey'],                        ans: 'Sickness' },
+    { q: 'How do you greet in Igbo?',          qFr: 'Comment salue-t-on en igbo ?',            opts: ['Ndewo','Daalu','Biko','Ọ dị mma'],                         ans: 'Ndewo' },
+    { q: 'What does "Daalu" mean?',            qFr: 'Que signifie « Daalu » ?',                opts: ['Please','Thank you','Goodbye','Sorry'],                    ans: 'Thank you' },
+    { q: '"Mmiri" in Igbo means?',             qFr: '« Mmiri » en igbo signifie ?',            opts: ['Food','Water','Fire','Earth'],                             ans: 'Water' },
+    { q: 'What does "Ọ dị mma" mean?',         qFr: 'Que signifie « Ọ dị mma » ?',             opts: ['No problem / It is fine','I am angry','Goodbye','Help me'], ans: 'No problem / It is fine' },
+    { q: 'What does "Nnę" mean?',              qFr: 'Que signifie « Nnę » ?',                  opts: ['Father','Mother','Sister','Grandmother'],                  ans: 'Mother' },
+    { q: '"Otu" in Igbo means?',               qFr: '« Otu » en igbo signifie ?',              opts: ['One','Two','Friend','Road'],                               ans: 'One' },
+    { q: 'What does "Ulo" mean?',              qFr: 'Que signifie « Ulo » ?',                  opts: ['Road','House','Market','Farm'],                            ans: 'House' },
+    { q: '"Biko" means?',                      qFr: '« Biko » signifie ?',                     opts: ['Thank you','Please','Yes','No'],                           ans: 'Please' },
+    { q: 'What does "Ụmụ" mean?',              qFr: 'Que signifie « Ụmụ » ?',                  opts: ['Elders','Children','Animals','Traders'],                   ans: 'Children' },
+    { q: '"Ọrịa" means?',                      qFr: '« Ọrịa » signifie ?',                     opts: ['Market','Sickness','Joy','Journey'],                       ans: 'Sickness' },
   ],
   zulu: [
-    { q: 'How do you say "Hello" in Zulu?',        opts: ['Sawubona', 'Ngiyabonga', 'Hamba kahle', 'Yebo'],               ans: 'Sawubona' },
-    { q: 'What does "Ngiyabonga" mean?',           opts: ['Please', 'I love you', 'Thank you', 'Sorry'],                  ans: 'Thank you' },
-    { q: '"Amanzi" means?',                        opts: ['Food', 'Fire', 'Water', 'Earth'],                              ans: 'Water' },
-    { q: 'What does "Yebo" mean?',                 opts: ['No', 'Yes', 'Maybe', 'Later'],                                 ans: 'Yes' },
-    { q: '"Ukudla" in Zulu means?',                opts: ['Water', 'Clothes', 'Food', 'Money'],                           ans: 'Food' },
-    { q: 'What does "Hamba kahle" mean?',          opts: ['Good morning', 'Welcome', 'Go well / Goodbye', 'Hurry'],       ans: 'Go well / Goodbye' },
-    { q: '"Umuntu" means?',                        opts: ['Animal', 'Person', 'Chief', 'Elder'],                          ans: 'Person' },
-    { q: 'What does "Nkosi" mean?',               opts: ['Friend', 'Enemy', 'God/Lord/King', 'Teacher'],                 ans: 'God/Lord/King' },
-    { q: '"Umuzi" means?',                         opts: ['School', 'Market', 'Home/Homestead', 'River'],                 ans: 'Home/Homestead' },
-    { q: 'What does "Uxolo" mean?',               opts: ['Thank you', 'Sorry / Peace', 'Goodbye', 'Welcome'],            ans: 'Sorry / Peace' },
+    { q: 'How do you say "Hello" in Zulu?',    qFr: 'Comment dit-on "Bonjour" en zoulou ?',    opts: ['Sawubona','Ngiyabonga','Hamba kahle','Yebo'],               ans: 'Sawubona' },
+    { q: 'What does "Ngiyabonga" mean?',       qFr: 'Que signifie « Ngiyabonga » ?',           opts: ['Please','I love you','Thank you','Sorry'],                 ans: 'Thank you' },
+    { q: '"Amanzi" means?',                    qFr: '« Amanzi » signifie ?',                   opts: ['Food','Fire','Water','Earth'],                             ans: 'Water' },
+    { q: 'What does "Yebo" mean?',             qFr: 'Que signifie « Yebo » ?',                 opts: ['No','Yes','Maybe','Later'],                                ans: 'Yes' },
+    { q: '"Ukudla" in Zulu means?',            qFr: '« Ukudla » en zoulou signifie ?',         opts: ['Water','Clothes','Food','Money'],                          ans: 'Food' },
+    { q: 'What does "Hamba kahle" mean?',      qFr: 'Que signifie « Hamba kahle » ?',          opts: ['Good morning','Welcome','Go well / Goodbye','Hurry'],      ans: 'Go well / Goodbye' },
+    { q: '"Umuntu" means?',                    qFr: '« Umuntu » signifie ?',                   opts: ['Animal','Person','Chief','Elder'],                         ans: 'Person' },
+    { q: 'What does "Nkosi" mean?',            qFr: 'Que signifie « Nkosi » ?',               opts: ['Friend','Enemy','God/Lord/King','Teacher'],                ans: 'God/Lord/King' },
+    { q: '"Umuzi" means?',                     qFr: '« Umuzi » signifie ?',                    opts: ['School','Market','Home/Homestead','River'],                ans: 'Home/Homestead' },
+    { q: 'What does "Uxolo" mean?',            qFr: 'Que signifie « Uxolo » ?',               opts: ['Thank you','Sorry / Peace','Goodbye','Welcome'],           ans: 'Sorry / Peace' },
   ],
   amharic: [
-    { q: 'How do you say "Hello" in Amharic?',    opts: ['Ameseginalehu', 'Selam', 'Betam', 'Gobez'],                     ans: 'Selam' },
-    { q: 'What does "Ameseginalehu" mean?',       opts: ['Hello', 'Goodbye', 'Thank you', 'Please'],                     ans: 'Thank you' },
-    { q: '"Wuha" means?',                          opts: ['Food', 'Water', 'Fire', 'Land'],                               ans: 'Water' },
-    { q: 'What does "Awo" mean?',                  opts: ['No', 'Yes', 'Maybe', 'Good'],                                  ans: 'Yes' },
-    { q: '"Migib" in Amharic means?',              opts: ['Water', 'House', 'Food', 'School'],                            ans: 'Food' },
-    { q: 'What does "Ishi" mean?',                 opts: ['No', 'Never', 'OK / Alright', 'Goodbye'],                     ans: 'OK / Alright' },
-    { q: '"Lij" means?',                           opts: ['Elder', 'Child', 'King', 'Friend'],                            ans: 'Child' },
-    { q: 'What does "Betam" mean?',                opts: ['Little', 'Never', 'Very much', 'Always'],                     ans: 'Very much' },
-    { q: '"Gobez" means?',                         opts: ['Strong', 'Clever/Skilled', 'Rich', 'Tall'],                    ans: 'Clever/Skilled' },
-    { q: 'What does "Lijoch" mean?',               opts: ['Elders', 'Children', 'Friends', 'Animals'],                   ans: 'Children' },
+    { q: 'How do you say "Hello" in Amharic?', qFr: 'Comment dit-on "Bonjour" en amharique ?', opts: ['Ameseginalehu','Selam','Betam','Gobez'],                    ans: 'Selam' },
+    { q: 'What does "Ameseginalehu" mean?',    qFr: 'Que signifie « Ameseginalehu » ?',        opts: ['Hello / How are you','Goodbye','Thank you','Please'],      ans: 'Thank you' },
+    { q: '"Wuha" means?',                      qFr: '« Wuha » signifie ?',                     opts: ['Food','Water','Fire','Earth'],                             ans: 'Water' },
+    { q: 'What does "Awo" mean?',              qFr: 'Que signifie « Awo » ?',                  opts: ['No','Yes','Maybe','Good'],                                 ans: 'Yes' },
+    { q: '"Migib" in Amharic means?',          qFr: '« Migib » en amharique signifie ?',       opts: ['Water','House','Food','School'],                           ans: 'Food' },
+    { q: 'What does "Ishi" mean?',             qFr: 'Que signifie « Ishi » ?',                 opts: ['No','Never','OK / Alright','Goodbye'],                     ans: 'OK / Alright' },
+    { q: '"Lij" means?',                       qFr: '« Lij » signifie ?',                      opts: ['Elder','Child','God/Lord/King','Friend'],                  ans: 'Child' },
+    { q: 'What does "Betam" mean?',            qFr: 'Que signifie « Betam » ?',                opts: ['Little','Never','Very much','Always'],                     ans: 'Very much' },
+    { q: '"Gobez" means?',                     qFr: '« Gobez » signifie ?',                    opts: ['Strong','Clever/Skilled','Rich','Tall'],                   ans: 'Clever/Skilled' },
+    { q: 'What does "Lijoch" mean?',           qFr: 'Que signifie « Lijoch » ?',               opts: ['Elders','Children','Friends','Animals'],                   ans: 'Children' },
   ],
   arabic: [
-    { q: 'How do you say "Hello" in Egyptian Arabic?', opts: ['Shukran', 'Ahlan wa sahlan', "Ma'a salama", 'Aywa'],       ans: 'Ahlan wa sahlan' },
-    { q: 'What does "Shukran" mean?',              opts: ['Please', 'Goodbye', 'Thank you', 'Sorry'],                     ans: 'Thank you' },
-    { q: '"Moya" in Arabic means?',                opts: ['Fire', 'Earth', 'Water', 'Wind'],                              ans: 'Water' },
-    { q: 'What does "Aywa" mean?',                 opts: ['No', 'Yes', 'Maybe', 'Later'],                                 ans: 'Yes' },
-    { q: '"Akl" means?',                           opts: ['Water', 'Money', 'Food/Eating', 'House'],                      ans: 'Food/Eating' },
-    { q: "What does \"Ma'a salama\" mean?",        opts: ['Good morning', 'Welcome', 'Goodbye', 'Good night'],            ans: 'Goodbye' },
-    { q: '"Wahid" in Arabic means?',               opts: ['Two', 'One', 'Three', 'Ten'],                                  ans: 'One' },
-    { q: 'What does "Yalla" mean?',                opts: ['Wait', "Let's go / Come on", 'Stop', 'Look'],                  ans: "Let's go / Come on" },
-    { q: '"Habibi" means?',                        opts: ['Enemy', 'My love/dear', 'Teacher', 'Stranger'],                ans: 'My love/dear' },
-    { q: 'What does "Inshallah" mean?',            opts: ['Never', 'God willing / Hopefully', 'I promise', 'Right now'], ans: 'God willing / Hopefully' },
+    { q: 'How do you say "Hello" in Arabic?',  qFr: 'Comment dit-on "Bonjour" en arabe ?',     opts: ['Shukran','Ahlan wa sahlan',"Ma'a salama",'Aywa'],          ans: 'Ahlan wa sahlan' },
+    { q: 'What does "Shukran" mean?',          qFr: 'Que signifie « Shukran » ?',              opts: ['Please','Goodbye','Thank you','Sorry'],                    ans: 'Thank you' },
+    { q: '"Moya" in Arabic means?',            qFr: '« Moya » en arabe signifie ?',            opts: ['Fire','Earth','Water','Wind'],                             ans: 'Water' },
+    { q: 'What does "Aywa" mean?',             qFr: 'Que signifie « Aywa » ?',                 opts: ['No','Yes','Maybe','Later'],                                ans: 'Yes' },
+    { q: '"Akl" means?',                       qFr: '« Akl » signifie ?',                      opts: ['Water','Money','Food/Eating','House'],                     ans: 'Food/Eating' },
+    { q: "What does \"Ma'a salama\" mean?",    qFr: "Que signifie « Ma'a salama » ?",           opts: ['Good morning','Welcome','Goodbye','Good night'],           ans: 'Goodbye' },
+    { q: '"Wahid" in Arabic means?',           qFr: '« Wahid » en arabe signifie ?',           opts: ['Two','One','Three','Ten'],                                 ans: 'One' },
+    { q: 'What does "Yalla" mean?',            qFr: 'Que signifie « Yalla » ?',                opts: ['Wait',"Let's go / Come on",'Stop','Look'],                 ans: "Let's go / Come on" },
+    { q: '"Habibi" means?',                    qFr: '« Habibi » signifie ?',                   opts: ['Enemy','My love/dear','Teacher','Stranger'],               ans: 'My love/dear' },
+    { q: 'What does "Inshallah" mean?',        qFr: 'Que signifie « Inshallah » ?',            opts: ['Never','God willing / Hopefully','I promise','Right now'], ans: 'God willing / Hopefully' },
   ],
 };
 
@@ -223,28 +439,28 @@ const SOURCE_ICONS: Record<string, () => React.ReactElement> = {
 };
 
 const LEVELS = [
-  { id: 'zero',   label: "I'm brand new",         bars: 0 },
-  { id: 'some',   label: 'I know some words',      bars: 1 },
-  { id: 'convo',  label: 'I can hold a convo',     bars: 2 },
-  { id: 'fluent', label: "I'm lowkey fluent",       bars: 3 },
-  { id: 'native', label: "I'm basically a native",  bars: 4 },
+  { id: 'zero',   label: "I'm brand new",          labelFr: 'Je suis débutant(e)',              bars: 0 },
+  { id: 'some',   label: 'I know some words',       labelFr: 'Je connais quelques mots',         bars: 1 },
+  { id: 'convo',  label: 'I can hold a convo',      labelFr: 'Je peux tenir une conversation',   bars: 2 },
+  { id: 'fluent', label: "I'm lowkey fluent",        labelFr: "Je suis plutôt à l'aise",          bars: 3 },
+  { id: 'native', label: "I'm basically a native",   labelFr: 'Je parle presque comme un natif',  bars: 4 },
 ];
 
 const GOALS = [
-  { id: 'roots',   label: 'Stay connected to roots', emoji: '🌍' },
-  { id: 'culture', label: 'Support my culture',       emoji: '✊' },
-  { id: 'fun',     label: 'Just for fun',             emoji: '😄' },
-  { id: 'travel',  label: 'Travel',                  emoji: '✈️' },
-  { id: 'career',  label: 'Career',                  emoji: '💼' },
-  { id: 'fam',     label: 'Connect with fam',         emoji: '👨‍👩‍👧‍👦' },
-  { id: 'other',   label: 'Other',                   emoji: '💡' },
+  { id: 'roots',   label: 'Stay connected to roots', labelFr: 'Rester connecté à mes racines', emoji: '🌍' },
+  { id: 'culture', label: 'Support my culture',       labelFr: 'Soutenir ma culture',            emoji: '✊' },
+  { id: 'fun',     label: 'Just for fun',             labelFr: 'Juste pour le fun',              emoji: '😄' },
+  { id: 'travel',  label: 'Travel',                   labelFr: 'Voyager',                        emoji: '✈️' },
+  { id: 'career',  label: 'Career',                   labelFr: 'Carrière',                       emoji: '💼' },
+  { id: 'fam',     label: 'Connect with fam',         labelFr: 'Se connecter avec la famille',   emoji: '👨‍👩‍👧‍👦' },
+  { id: 'other',   label: 'Other',                    labelFr: 'Autre',                          emoji: '💡' },
 ];
 
 const DAILY = [
-  { id: '5',  label: '5 min',   subtitle: 'Chill' },
-  { id: '10', label: '10 min',  subtitle: 'Regular' },
-  { id: '15', label: '15 min',  subtitle: 'Serious' },
-  { id: '20', label: '20+ min', subtitle: 'Extreme' },
+  { id: '5',  label: '5 min',   subtitle: 'Chill',   subtitleFr: 'Tranquille' },
+  { id: '10', label: '10 min',  subtitle: 'Regular', subtitleFr: 'Régulier'   },
+  { id: '15', label: '15 min',  subtitle: 'Serious', subtitleFr: 'Sérieux'    },
+  { id: '20', label: '20+ min', subtitle: 'Extreme', subtitleFr: 'Extrême'    },
 ];
 
 const GREEN = '#4CAF50';
@@ -289,14 +505,23 @@ interface OnboardingFlowProps {
 export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   const [step, setStep]           = useState(0);
   const [animKey, setAnimKey]     = useState(0);
-  const [selectedLang, setSelectedLang]     = useState('');
-  const [discovery, setDiscovery]           = useState('');
-  const [level, setLevel]                   = useState('');
-  const [goals, setGoals]                   = useState<string[]>([]);
-  const [dailyGoal, setDailyGoal]           = useState('');
-  const [selectedPlan, setSelectedPlan]     = useState<'plus' | 'free'>('free');
-  const [placementQ, setPlacementQ]         = useState(0);
+  const [iface, setIface]         = useState<'en' | 'fr'>('en');
+  const [selectedLang, setSelectedLang]         = useState('');
+  const [discovery, setDiscovery]               = useState('');
+  const [level, setLevel]                       = useState('');
+  const [goals, setGoals]                       = useState<string[]>([]);
+  const [dailyGoal, setDailyGoal]               = useState('');
+  const [selectedPlan, setSelectedPlan]         = useState<'plus' | 'free'>('free');
+  const [placementQ, setPlacementQ]             = useState(0);
   const [placementAnswers, setPlacementAnswers] = useState<string[]>([]);
+
+  const t = (key: keyof typeof UI['en']) => UI[iface][key];
+
+  const toggleIface = () => {
+    const next = iface === 'en' ? 'fr' : 'en';
+    setIface(next);
+    localStorage.setItem('afroslang_interface', next);
+  };
 
   const go = useCallback((n: number) => {
     setStep(n);
@@ -306,8 +531,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   const next = useCallback(() => go(step + 1), [step, go]);
 
   useEffect(() => {
-    if (step === 4) { const t = setTimeout(() => go(5), 2800); return () => clearTimeout(t); }
-    if (step === 7) { const t = setTimeout(() => go(8), 2200); return () => clearTimeout(t); }
+    if (step === 4) { const t2 = setTimeout(() => go(5), 2800); return () => clearTimeout(t2); }
+    if (step === 7) { const t2 = setTimeout(() => go(8), 2200); return () => clearTimeout(t2); }
   }, [step, go]);
 
   const progress = step < 1 ? 0 : Math.min(100, Math.round((step / TOTAL_Q) * 100));
@@ -325,6 +550,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       setPlacementQ(q => q + 1);
     }
   };
+
+  const optDisplay = (opt: string) => iface === 'fr' ? (OPTION_FR[opt] ?? opt) : opt;
 
   // ── Shared CSS ──────────────────────────────────────────────────────────────
 
@@ -378,7 +605,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
     .ob-row-btn:hover { border-color:${GREEN}; background:rgba(76,175,80,0.08); }
     .ob-row-btn.sel  { border-color:${GREEN}; background:rgba(76,175,80,0.12); }
     .ob-row-btn-plain { border-color:#1e1e1e !important; background:#161616 !important; cursor:pointer; }
-    .ob-row-btn-plain:active { background:rgba(76,175,80,0.08) !important; border-color:${GREEN} !important; }
+    .ob-row-btn-plain:active { background:rgba(176,0,32,0.12) !important; border-color:${RED} !important; }
     .ob-check { width:20px; height:20px; border-radius:6px; border:2px solid #333; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.15s, border-color 0.15s; }
     .ob-check.on { background:${GREEN}; border-color:${GREEN}; }
     .ob-bubble {
@@ -400,6 +627,15 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
     .ob-mascot { width:90px; height:90px; object-fit:contain; filter:drop-shadow(0 4px 18px rgba(176,0,32,0.45)); }
     .ob-heading { color:#fff; font-family:${FONT}; font-weight:800; font-size:1.25rem; text-align:center; line-height:1.2; margin:0; }
     .ob-sub { color:rgba(255,255,255,0.5); font-family:${FONT}; font-size:0.85rem; text-align:center; line-height:1.5; margin:0; }
+    .ob-lang-toggle {
+      position:absolute; top:12px; right:12px; z-index:10;
+      background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+      border-radius:20px; padding:0.35rem 0.75rem;
+      color:rgba(255,255,255,0.75); font-family:${FONT}; font-size:0.72rem;
+      font-weight:700; cursor:pointer; letter-spacing:0.3px;
+      transition:background 0.15s, border-color 0.15s;
+    }
+    .ob-lang-toggle:hover { background:rgba(255,255,255,0.14); border-color:rgba(255,255,255,0.3); }
   `;
 
   const ProgressBar = () => (
@@ -419,16 +655,17 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   if (step === 0) {
     return (
       <Overlay>
-        <div className="ob-card">
+        <div className="ob-card" style={{ position: 'relative' }}>
+          <button className="ob-lang-toggle" onClick={toggleIface}>{t('langToggle')}</button>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1.2rem', padding: '2rem 1.5rem' }} className="ob-anim">
             <img src="/Afroslang.png" alt="Afroslang" className="ob-mascot"
               style={{ width: 100, height: 100, animation: 'ob-bounce 2.4s ease-in-out infinite' }} />
             <div style={{ textAlign: 'center' }}>
               <p style={{ color: '#fff', fontFamily: FONT, fontWeight: 900, fontSize: '2rem', margin: '0 0 0.3rem', letterSpacing: 1 }}>
-                Afro<span style={{ color: '#b00020' }}>slang</span>
+                Afro<span style={{ color: RED }}>slang</span>
               </p>
               <p style={{ color: 'rgba(255,255,255,0.45)', fontFamily: FONT, fontSize: '0.85rem', margin: 0, letterSpacing: 0.5 }}>
-                The living dictionary of African street slang
+                {t('tagline')}
               </p>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
@@ -440,12 +677,10 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
           <Wave />
           <div style={{ background: RED, padding: '1.4rem 1.25rem 2.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
             <p style={{ color: '#fff', fontFamily: FONT, fontWeight: 700, fontSize: '0.8rem', textAlign: 'center', margin: 0, letterSpacing: 1, textTransform: 'uppercase', opacity: 0.75 }}>
-              New to Afroslang?
+              {t('newUser')}
             </p>
-            <button className="ob-btn-primary" onClick={() => go(1)}>GET STARTED</button>
-            <button className="ob-btn-outline" onClick={onSignIn}>
-              Already have an account? SIGN IN
-            </button>
+            <button className="ob-btn-primary" onClick={() => go(1)}>{t('getStarted')}</button>
+            <button className="ob-btn-outline" onClick={onSignIn}>{t('signIn')}</button>
           </div>
         </div>
       </Overlay>
@@ -462,13 +697,13 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
             <img src="/Afroslang.png" alt="Afro" className="ob-mascot"
               style={{ animation: 'ob-bounce 1.8s ease-in-out infinite' }} />
             <div className="ob-bubble-speech">
-              👋 Hi there! I'm <strong>Afro!</strong>
-              <br /><span style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.82em' }}>Your African slang guide</span>
+              {t('hiThere')}<strong>{t('mascotName')}</strong>
+              <br /><span style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.82em' }}>{t('guide')}</span>
             </div>
           </div>
           <Wave />
           <div className="ob-bottom">
-            <button className="ob-btn-primary" onClick={next}>CONTINUE</button>
+            <button className="ob-btn-primary" onClick={next}>{t('continue')}</button>
           </div>
         </div>
       </Overlay>
@@ -482,38 +717,35 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey}>
           <ProgressBar />
           <div className="ob-content ob-anim" style={{ alignItems: 'flex-start', justifyContent: 'center', gap: '1.6rem', padding: '2rem 1.4rem' }}>
-            {/* Chat row: small mascot + typing dots bubble */}
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem' }}>
               <img src="/Afroslang.png" alt="Afro" style={{
                 width: 44, height: 44, borderRadius: '50%', objectFit: 'contain',
-                border: '2px solid rgba(76,175,80,0.5)', flexShrink: 0,
-                filter: 'drop-shadow(0 2px 8px rgba(76,175,80,0.35))',
+                border: '2px solid rgba(176,0,32,0.5)', flexShrink: 0,
+                filter: 'drop-shadow(0 2px 8px rgba(176,0,32,0.35))',
               }} />
-              <div className="ob-bubble" style={{ borderRadius: '18px 18px 18px 4px', padding: '0.75rem 1rem' }}>
+              <div className="ob-bubble">
                 <div className="ob-dot-1" style={{ width: 9, height: 9, borderRadius: '50%', background: RED }} />
                 <div className="ob-dot-2" style={{ width: 9, height: 9, borderRadius: '50%', background: RED }} />
                 <div className="ob-dot-3" style={{ width: 9, height: 9, borderRadius: '50%', background: RED }} />
               </div>
             </div>
-            {/* Main heading */}
             <div>
               <p className="ob-heading" style={{ textAlign: 'left', fontSize: '1.5rem', lineHeight: 1.2 }}>
-                Just answer a few questions for me
+                {t('questionsHeading')}
               </p>
               <p className="ob-sub" style={{ textAlign: 'left', marginTop: '0.55rem' }}>
-                I'll use your answers to build your perfect Afroslang course
+                {t('questionsSub')}
               </p>
             </div>
-            {/* 7-dot indicator */}
             <div style={{ display: 'flex', gap: '0.45em' }}>
               {[...Array(7)].map((_, i) => (
-                <div key={i} style={{ width: 30, height: 7, borderRadius: 4, background: 'rgba(76,175,80,0.22)', border: '1px solid rgba(76,175,80,0.4)' }} />
+                <div key={i} style={{ width: 30, height: 7, borderRadius: 4, background: 'rgba(176,0,32,0.2)', border: '1px solid rgba(176,0,32,0.4)' }} />
               ))}
             </div>
           </div>
           <Wave />
           <div className="ob-bottom">
-            <button className="ob-btn-primary" onClick={next}>LET'S GO 🔥</button>
+            <button className="ob-btn-primary" onClick={next}>{t('letsGo')}</button>
           </div>
         </div>
       </Overlay>
@@ -527,9 +759,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey}>
           <ProgressBar />
           <div className="ob-content-top ob-anim" style={{ paddingTop: '1.25rem' }}>
-            <p className="ob-heading" style={{ width: '100%', marginBottom: '0.4rem' }}>
-              What would you like to learn?
-            </p>
+            <p className="ob-heading" style={{ width: '100%', marginBottom: '0.4rem' }}>{t('whatLearn')}</p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {LANGUAGES.map(lang => (
                 <button key={lang.id}
@@ -538,20 +768,18 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                   <span style={{ fontSize: '1.55em', minWidth: 28, textAlign: 'center' }}>{lang.flag}</span>
                   <div style={{ flex: 1 }}>
                     <p style={{ color: '#fff', fontWeight: 700, margin: 0, fontSize: '0.94em' }}>{lang.label}</p>
-                    <p style={{ color: 'rgba(255,255,255,0.38)', margin: 0, fontSize: '0.73em' }}>{lang.region}</p>
+                    <p style={{ color: 'rgba(255,255,255,0.38)', margin: 0, fontSize: '0.73em' }}>
+                      {iface === 'fr' ? lang.regionFr : lang.region}
+                    </p>
                   </div>
-                  {selectedLang === lang.id && (
-                    <span style={{ color: GREEN, fontSize: '1em', fontWeight: 900 }}>✓</span>
-                  )}
+                  {selectedLang === lang.id && <span style={{ color: GREEN, fontSize: '1em', fontWeight: 900 }}>✓</span>}
                 </button>
               ))}
             </div>
           </div>
           <Wave />
           <div className="ob-bottom">
-            <button className="ob-btn-primary" disabled={!selectedLang} onClick={next}>
-              CONTINUE
-            </button>
+            <button className="ob-btn-primary" disabled={!selectedLang} onClick={next}>{t('continue')}</button>
           </div>
         </div>
       </Overlay>
@@ -568,12 +796,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
             <img src="/Afroslang.png" alt="Building" className="ob-mascot"
               style={{ animation: 'ob-bounce 0.75s ease-in-out infinite' }} />
             <div style={{ textAlign: 'center' }}>
-              <p className="ob-heading" style={{ fontSize: '1.15rem', marginBottom: '0.35rem' }}>
-                COURSE BUILDING...
-              </p>
-              <p className="ob-sub">
-                Get ready to join your friends learning African slang!
-              </p>
+              <p className="ob-heading" style={{ fontSize: '1.15rem', marginBottom: '0.35rem' }}>{t('courseBuilding')}</p>
+              <p className="ob-sub">{t('joinFriends')}</p>
             </div>
             <div style={{ width: '100%', background: 'rgba(255,255,255,0.07)', borderRadius: 8, height: 8, overflow: 'hidden' }}>
               <div style={{ height: '100%', background: RED, borderRadius: 8, animation: 'ob-barfill 2.5s ease-out both' }} />
@@ -582,7 +806,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
           <Wave />
           <div style={{ background: RED, padding: '1.1rem 1.2rem 1.9rem' }}>
             <p style={{ color: '#fff', fontWeight: 700, textAlign: 'center', fontFamily: FONT, margin: 0, fontSize: '0.88rem', animation: 'ob-pulse 1.1s ease-in-out infinite' }}>
-              Personalizing your experience...
+              {t('personalizing')}
             </p>
           </div>
         </div>
@@ -597,28 +821,26 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey}>
           <ProgressBar />
           <div className="ob-content-top ob-anim" style={{ paddingTop: '1.25rem' }}>
-            <p className="ob-heading" style={{ width: '100%', marginBottom: '0.35rem' }}>
-              How did you hear about Afroslang?
-            </p>
+            <p className="ob-heading" style={{ width: '100%', marginBottom: '0.35rem' }}>{t('howHeard')}</p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {SOURCES.map(src => (
                 <button key={src.id}
                   className={`ob-row-btn${discovery === src.id ? ' sel' : ''}`}
                   onClick={() => setDiscovery(src.id)}>
                   <span style={{ minWidth: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {SOURCE_ICONS[src.id] ? SOURCE_ICONS[src.id]() : null}
+                    {SOURCE_ICONS[src.id]?.()}
                   </span>
-                  <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.92em' }}>{src.label}</span>
-                  {discovery === src.id && (
-                    <span style={{ color: GREEN, marginLeft: 'auto', fontWeight: 900 }}>✓</span>
-                  )}
+                  <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.92em' }}>
+                    {iface === 'fr' ? src.labelFr : src.label}
+                  </span>
+                  {discovery === src.id && <span style={{ color: GREEN, marginLeft: 'auto', fontWeight: 900 }}>✓</span>}
                 </button>
               ))}
             </div>
           </div>
           <Wave />
           <div className="ob-bottom">
-            <button className="ob-btn-primary" disabled={!discovery} onClick={next}>CONTINUE</button>
+            <button className="ob-btn-primary" disabled={!discovery} onClick={next}>{t('continue')}</button>
           </div>
         </div>
       </Overlay>
@@ -632,24 +854,24 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey}>
           <ProgressBar />
           <div className="ob-content ob-anim" style={{ justifyContent: 'flex-start', paddingTop: '1.5rem', gap: '0.9rem' }}>
-            <p className="ob-heading" style={{ width: '100%' }}>How much slang do you know?</p>
+            <p className="ob-heading" style={{ width: '100%' }}>{t('howMuchSlang')}</p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
               {LEVELS.map(lvl => (
                 <button key={lvl.id}
                   className={`ob-row-btn${level === lvl.id ? ' sel' : ''}`}
                   onClick={() => setLevel(lvl.id)}>
                   <SignalBars count={lvl.bars} />
-                  <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.92em', flex: 1 }}>{lvl.label}</span>
-                  {level === lvl.id && (
-                    <span style={{ color: GREEN, fontWeight: 900 }}>✓</span>
-                  )}
+                  <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.92em', flex: 1 }}>
+                    {iface === 'fr' ? lvl.labelFr : lvl.label}
+                  </span>
+                  {level === lvl.id && <span style={{ color: GREEN, fontWeight: 900 }}>✓</span>}
                 </button>
               ))}
             </div>
           </div>
           <Wave />
           <div className="ob-bottom">
-            <button className="ob-btn-primary" disabled={!level} onClick={next}>CONTINUE</button>
+            <button className="ob-btn-primary" disabled={!level} onClick={next}>{t('continue')}</button>
           </div>
         </div>
       </Overlay>
@@ -666,41 +888,41 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
             <img src="/Afroslang.png" alt="Excited" className="ob-mascot"
               style={{ width: 110, height: 110, animation: 'ob-bounce 0.65s ease-in-out infinite' }} />
             <div className="ob-bubble-speech" style={{ fontSize: '1.05rem' }}>
-              Ayy, that's what I'm talking about! 🔥
+              {t('affirm')}
             </div>
             <p className="ob-sub" style={{ animation: 'ob-pulse 1.4s ease-in-out infinite' }}>
-              Setting things up...
+              {t('settingUp')}
             </p>
           </div>
           <Wave />
           <div style={{ background: RED, padding: '1.1rem 1.2rem 1.9rem' }}>
-            <button className="ob-btn-primary" onClick={next}>CONTINUE</button>
+            <button className="ob-btn-primary" onClick={next}>{t('continue')}</button>
           </div>
         </div>
       </Overlay>
     );
   }
 
-  // ── STEP 8: Learning goal (multi-select) ────────────────────────────────────
+  // ── STEP 8: Learning goal ───────────────────────────────────────────────────
   if (step === 8) {
     return (
       <Overlay>
         <div className="ob-card" key={animKey}>
           <ProgressBar />
           <div className="ob-content-top ob-anim" style={{ paddingTop: '1.1rem' }}>
-            <p className="ob-heading" style={{ width: '100%' }}>Why are you learning?</p>
-            <p className="ob-sub" style={{ width: '100%', textAlign: 'left', marginBottom: '0.1rem' }}>Select all that apply</p>
+            <p className="ob-heading" style={{ width: '100%' }}>{t('whyLearning')}</p>
+            <p className="ob-sub" style={{ width: '100%', textAlign: 'left', marginBottom: '0.1rem' }}>{t('selectAll')}</p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.48rem' }}>
               {GOALS.map(g => (
                 <button key={g.id}
                   className={`ob-row-btn${goals.includes(g.id) ? ' sel' : ''}`}
                   onClick={() => toggleGoal(g.id)}>
                   <span style={{ fontSize: '1.2em', minWidth: 26, textAlign: 'center' }}>{g.emoji}</span>
-                  <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.9em', flex: 1 }}>{g.label}</span>
+                  <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.9em', flex: 1 }}>
+                    {iface === 'fr' ? g.labelFr : g.label}
+                  </span>
                   <div className={`ob-check${goals.includes(g.id) ? ' on' : ''}`}>
-                    {goals.includes(g.id) && (
-                      <span style={{ color: '#fff', fontSize: '0.68em', fontWeight: 900, lineHeight: 1 }}>✓</span>
-                    )}
+                    {goals.includes(g.id) && <span style={{ color: '#fff', fontSize: '0.68em', fontWeight: 900, lineHeight: 1 }}>✓</span>}
                   </div>
                 </button>
               ))}
@@ -708,9 +930,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
           </div>
           <Wave />
           <div className="ob-bottom">
-            <button className="ob-btn-primary" disabled={goals.length === 0} onClick={next}>
-              CONTINUE
-            </button>
+            <button className="ob-btn-primary" disabled={goals.length === 0} onClick={next}>{t('continue')}</button>
           </div>
         </div>
       </Overlay>
@@ -725,29 +945,26 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
           <ProgressBar />
           <div className="ob-content ob-anim" style={{ gap: '1.4rem' }}>
             <div style={{ fontSize: '3.4em', animation: 'ob-bounce 1.7s ease-in-out infinite' }}>⏰</div>
-            <p className="ob-heading">Let's set up a vibe routine!</p>
-            <p className="ob-sub" style={{ maxWidth: 275 }}>
-              A daily habit is the secret to mastering African slang.
-              We'll help you stay consistent.
-            </p>
+            <p className="ob-heading">{t('routineTitle')}</p>
+            <p className="ob-sub" style={{ maxWidth: 275 }}>{t('routineSub')}</p>
           </div>
           <Wave />
           <div className="ob-bottom">
-            <button className="ob-btn-primary" onClick={next}>SOUNDS GOOD 🙌</button>
+            <button className="ob-btn-primary" onClick={next}>{t('soundsGood')}</button>
           </div>
         </div>
       </Overlay>
     );
   }
 
-  // ── STEP 10: Daily goal (rectangle list, no emoji) ──────────────────────────
+  // ── STEP 10: Daily goal ─────────────────────────────────────────────────────
   if (step === 10) {
     return (
       <Overlay>
         <div className="ob-card" key={animKey}>
           <ProgressBar />
           <div className="ob-content ob-anim" style={{ justifyContent: 'flex-start', paddingTop: '1.5rem', gap: '0.9rem' }}>
-            <p className="ob-heading" style={{ width: '100%' }}>What's your daily goal?</p>
+            <p className="ob-heading" style={{ width: '100%' }}>{t('dailyGoalQ')}</p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
               {DAILY.map(d => (
                 <button key={d.id}
@@ -755,20 +972,18 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                   onClick={() => setDailyGoal(d.id)}>
                   <div style={{ flex: 1 }}>
                     <p style={{ color: '#fff', fontWeight: 700, margin: 0, fontSize: '0.94em' }}>{d.label}</p>
-                    <p style={{ color: 'rgba(255,255,255,0.38)', margin: 0, fontSize: '0.73em' }}>{d.subtitle}</p>
+                    <p style={{ color: 'rgba(255,255,255,0.38)', margin: 0, fontSize: '0.73em' }}>
+                      {iface === 'fr' ? d.subtitleFr : d.subtitle}
+                    </p>
                   </div>
-                  {dailyGoal === d.id && (
-                    <span style={{ color: GREEN, fontWeight: 900 }}>✓</span>
-                  )}
+                  {dailyGoal === d.id && <span style={{ color: GREEN, fontWeight: 900 }}>✓</span>}
                 </button>
               ))}
             </div>
           </div>
           <Wave />
           <div className="ob-bottom">
-            <button className="ob-btn-primary" disabled={!dailyGoal} onClick={next}>
-              I'M LOCKED IN 🔒
-            </button>
+            <button className="ob-btn-primary" disabled={!dailyGoal} onClick={next}>{t('lockedIn')}</button>
           </div>
         </div>
       </Overlay>
@@ -788,9 +1003,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey}>
           <ProgressBar />
           <div className="ob-content ob-anim" style={{ gap: '1.2rem' }}>
-            <p className="ob-heading" style={{ fontSize: '1.2rem' }}>How do you want to get started?</p>
+            <p className="ob-heading" style={{ fontSize: '1.2rem' }}>{t('howStart')}</p>
 
-            {/* AfroPlus card */}
             <div style={{
               width: '100%', background: 'linear-gradient(145deg,#071407,#0d200d)',
               border: `2px solid ${GREEN}`, borderRadius: 18, padding: '1.25rem',
@@ -802,32 +1016,31 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                 padding: '0.28em 0.9em', borderRadius: 20, letterSpacing: 1,
                 fontFamily: FONT, whiteSpace: 'nowrap', textTransform: 'uppercase',
               }}>
-                ⭐ RECOMMENDED
+                {t('recommended')}
               </div>
               <p style={{ color: GREEN, fontWeight: 900, fontSize: '1.1rem', margin: '0.5rem 0 0.2rem', fontFamily: FONT }}>
                 AfroPlus ⚡
               </p>
               <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8em', margin: '0 0 0.9rem', fontFamily: FONT }}>
-                Faster progress · no ads · unlimited hearts
+                {t('plusTagline')}
               </p>
               <button className="ob-btn-primary" style={{ background: GREEN, color: BLACK, padding: '0.8em' }}>
-                START AFROPLUS
+                {t('startPlus')}
               </button>
             </div>
 
-            {/* Free card */}
             <div style={{
               width: '100%', background: '#181818', border: '1.5px solid #2a2a2a',
               borderRadius: 18, padding: '1.1rem', cursor: 'pointer',
             }} onClick={() => startPlan('free')}>
               <p style={{ color: '#fff', fontWeight: 800, fontSize: '0.97rem', margin: '0 0 0.2rem', fontFamily: FONT }}>
-                Learn for free
+                {t('learnFree')}
               </p>
               <p style={{ color: 'rgba(255,255,255,0.38)', fontSize: '0.78em', margin: '0 0 0.8rem', fontFamily: FONT }}>
-                Core features, with ads
+                {t('freeTagline')}
               </p>
               <button className="ob-btn-outline" style={{ borderColor: '#333', color: 'rgba(255,255,255,0.55)', padding: '0.65em' }}>
-                CONTINUE FOR FREE
+                {t('continueFree')}
               </button>
             </div>
           </div>
@@ -849,10 +1062,9 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey}>
           <ProgressBar />
           <div className="ob-content-top ob-anim" style={{ paddingTop: '1.3rem', gap: '1rem' }}>
-            {/* Placement header */}
             <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <p style={{ color: 'rgba(255,255,255,0.45)', fontFamily: FONT, fontSize: '0.78rem', margin: 0 }}>
-                Placement check
+                {t('placementLabel')}
               </p>
               <p style={{ color: RED, fontFamily: FONT, fontSize: '0.78rem', margin: 0, fontWeight: 700 }}>
                 {placementQ + 1} / {questions.length}
@@ -862,10 +1074,9 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               <div style={{ height: '100%', background: RED, borderRadius: 4, width: `${qProgress}%`, transition: 'width 0.3s' }} />
             </div>
 
-            {/* Question (re-animate on each new Q) */}
             <div key={`pq-${placementQ}`} className="ob-anim" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
               <p className="ob-heading" style={{ textAlign: 'left', fontSize: '1.05rem', lineHeight: 1.35 }}>
-                {currentQ.q}
+                {iface === 'fr' ? currentQ.qFr : currentQ.q}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {currentQ.opts.map(opt => (
@@ -873,7 +1084,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                     className="ob-row-btn ob-row-btn-plain"
                     onClick={() => handlePlacementAnswer(opt)}
                     style={{ padding: '0.85rem 1rem' }}>
-                    <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.9em' }}>{opt}</span>
+                    <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.9em' }}>{optDisplay(opt)}</span>
                   </button>
                 ))}
               </div>
@@ -885,15 +1096,15 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
     );
   }
 
-  // ── STEP 13: Placement results + account creation ───────────────────────────
+  // ── STEP 13: Results + account creation ────────────────────────────────────
   if (step === 13) {
     const questions = PLACEMENT_QUESTIONS[selectedLang] ?? [];
     const score     = placementAnswers.filter((a, i) => a === questions[i]?.ans).length;
     const total     = questions.length;
     const pct       = total > 0 ? Math.round((score / total) * 100) : 0;
     const stage     = score >= Math.round(total * 0.8) ? 3 : score >= Math.round(total * 0.5) ? 2 : 1;
-    const stageLabel = stage === 3 ? 'Advanced' : stage === 2 ? 'Intermediate' : 'Beginner';
-    const msg        = stage === 3 ? "You're lowkey fluent! 🔥" : stage === 2 ? "You've got a solid base! 💪" : "Ready to start from the roots! 🌱";
+    const stageLabel = stage === 3 ? t('advanced') : stage === 2 ? t('intermediate') : t('beginner');
+    const msg        = stage === 3 ? t('affirmAdv') : stage === 2 ? t('affirmMid') : t('affirmBeg');
 
     return (
       <Overlay>
@@ -908,11 +1119,9 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               </p>
               <p className="ob-heading" style={{ marginTop: '0.3rem', fontSize: '1.1rem' }}>{msg}</p>
               <p className="ob-sub" style={{ marginTop: '0.35rem' }}>
-                You'll start at{' '}
-                <strong style={{ color: '#fff' }}>{stageLabel}</strong> level
+                {t('startAt')}{' '}<strong style={{ color: '#fff' }}>{stageLabel}</strong>{t('levelWord') ? ` ${t('levelWord')}` : ''}
               </p>
             </div>
-            {/* Score dots */}
             <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 230 }}>
               {questions.map((q, i) => (
                 <div key={i} style={{
@@ -922,18 +1131,16 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                 }} />
               ))}
             </div>
-            <p className="ob-sub" style={{ fontSize: '0.8em', maxWidth: 260 }}>
-              Create a free account to save your progress and start learning!
-            </p>
+            <p className="ob-sub" style={{ fontSize: '0.8em', maxWidth: 260 }}>{t('saveProg')}</p>
           </div>
           <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" onClick={() => onComplete(selectedLang, selectedPlan)}>
-              CREATE ACCOUNT &amp; SAVE PROGRESS
+              {t('createAccount')}
             </button>
             {selectedPlan === 'plus' && (
               <p style={{ color: '#fff', fontFamily: FONT, fontSize: '0.74em', textAlign: 'center', margin: 0, opacity: 0.8 }}>
-                You'll be set up with AfroPlus after signing up
+                {t('afroplusHint')}
               </p>
             )}
           </div>
