@@ -125,6 +125,32 @@ function IconTikTok() {
   );
 }
 
+function IconInstagram() {
+  return (
+    <img src="/instagrampng.jpg" width={28} height={28}
+      style={{ borderRadius: 8, objectFit: 'cover', display: 'block', flexShrink: 0 }}
+      alt="Instagram" />
+  );
+}
+
+function IconFacebook() {
+  return (
+    <img src="/facebookimg.jpg" width={28} height={28}
+      style={{ borderRadius: '50%', objectFit: 'cover', display: 'block', flexShrink: 0 }}
+      alt="Facebook" />
+  );
+}
+
+function IconFriend() {
+  return (
+    <div style={{ width: 28, height: 28, background: '#2a2a2a', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+      <img src="/familyiconsimg.jpg" width={22} height={22}
+        style={{ objectFit: 'contain', display: 'block', filter: 'invert(1)' }}
+        alt="A Friend" />
+    </div>
+  );
+}
+
 function IconTwitterX() {
   return (
     <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
@@ -184,16 +210,16 @@ function IconGoogle() {
   );
 }
 
-const SOURCE_ICON: Record<string, React.ReactNode> = {
-  tiktok:    <IconTikTok />,
-  instagram: <img src="/instagrampng.jpg" width={28} height={28} style={{ borderRadius: 8, objectFit: 'cover' }} alt="Instagram" />,
-  facebook:  <img src="/facebookimg.jpg"  width={28} height={28} style={{ borderRadius: 8, objectFit: 'cover' }} alt="Facebook" />,
-  twitter:   <IconTwitterX />,
-  friend:    <img src="/familyiconsimg.jpg" width={28} height={28} style={{ borderRadius: 8, objectFit: 'cover' }} alt="A Friend" />,
-  appstore:  <IconAppStore />,
-  youtube:   <IconYouTube />,
-  google:    <IconGoogle />,
-  other:     <IconOther />,
+const SOURCE_ICONS: Record<string, () => React.ReactElement> = {
+  tiktok:    IconTikTok,
+  instagram: IconInstagram,
+  facebook:  IconFacebook,
+  twitter:   IconTwitterX,
+  friend:    IconFriend,
+  appstore:  IconAppStore,
+  youtube:   IconYouTube,
+  google:    IconGoogle,
+  other:     IconOther,
 };
 
 const LEVELS = [
@@ -579,7 +605,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                   className={`ob-row-btn${discovery === src.id ? ' sel' : ''}`}
                   onClick={() => setDiscovery(src.id)}>
                   <span style={{ minWidth: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {SOURCE_ICON[src.id]}
+                    {SOURCE_ICONS[src.id] ? SOURCE_ICONS[src.id]() : null}
                   </span>
                   <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.92em' }}>{src.label}</span>
                   {discovery === src.id && (
