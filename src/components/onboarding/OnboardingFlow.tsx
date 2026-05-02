@@ -244,10 +244,11 @@ const DAILY = [
   { id: '5',  label: '5 min',   subtitle: 'Chill' },
   { id: '10', label: '10 min',  subtitle: 'Regular' },
   { id: '15', label: '15 min',  subtitle: 'Serious' },
-  { id: '20', label: '20+ min', subtitle: 'No cap' },
+  { id: '20', label: '20+ min', subtitle: 'Extreme' },
 ];
 
 const GREEN = '#4CAF50';
+const RED   = '#b00020';
 const BLACK = '#000000';
 const DARK  = '#0d0d0d';
 const FONT  = "'Plus Jakarta Sans', sans-serif";
@@ -260,7 +261,7 @@ function Wave() {
   return (
     <svg viewBox="0 0 390 28" xmlns="http://www.w3.org/2000/svg"
       style={{ display: 'block', width: '100%', flexShrink: 0, marginBottom: -1 }}>
-      <path d="M0,14 Q65,0 130,14 Q195,28 260,14 Q325,0 390,14 L390,28 L0,28 Z" fill={GREEN} />
+      <path d="M0,14 Q65,0 130,14 Q195,28 260,14 Q325,0 390,14 L390,28 L0,28 Z" fill={RED} />
     </svg>
   );
 }
@@ -344,7 +345,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       background:${DARK}; position:relative; overflow:hidden;
     }
     .ob-progress { height:3px; background:rgba(255,255,255,0.08); flex-shrink:0; }
-    .ob-progress-fill { height:100%; background:${GREEN}; transition:width 0.4s ease; }
+    .ob-progress-fill { height:100%; background:${RED}; transition:width 0.4s ease; }
     .ob-content {
       flex:1; display:flex; flex-direction:column;
       align-items:center; justify-content:center;
@@ -355,7 +356,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       align-items:center; justify-content:flex-start;
       padding:1.1rem 1.2rem 0; overflow-y:auto; gap:0.7rem;
     }
-    .ob-bottom { background:${GREEN}; padding:1.2rem 1.2rem 2.2rem; display:flex; flex-direction:column; gap:0.7rem; flex-shrink:0; }
+    .ob-bottom { background:${RED}; padding:1.2rem 1.2rem 2.2rem; display:flex; flex-direction:column; gap:0.7rem; flex-shrink:0; }
     .ob-btn-primary {
       background:${BLACK}; color:#fff; border:none; border-radius:30px;
       padding:1rem; font-size:0.97rem; font-weight:800; font-family:${FONT};
@@ -364,7 +365,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
     .ob-btn-primary:disabled { opacity:0.45; cursor:not-allowed; }
     .ob-btn-primary:not(:disabled):active { opacity:0.8; }
     .ob-btn-outline {
-      background:transparent; color:${BLACK}; border:2px solid ${BLACK}; border-radius:30px;
+      background:transparent; color:#fff; border:2px solid rgba(255,255,255,0.7); border-radius:30px;
       padding:0.85rem; font-size:0.92rem; font-weight:700; font-family:${FONT};
       cursor:pointer; width:100%; letter-spacing:0.5px;
     }
@@ -381,12 +382,12 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
     .ob-check { width:20px; height:20px; border-radius:6px; border:2px solid #333; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.15s, border-color 0.15s; }
     .ob-check.on { background:${GREEN}; border-color:${GREEN}; }
     .ob-bubble {
-      background:#1c1c1c; border:1.5px solid rgba(76,175,80,0.35);
+      background:#1c1c1c; border:1.5px solid rgba(176,0,32,0.45);
       border-radius:18px 18px 18px 4px; padding:0.75rem 1rem;
       display:flex; align-items:center; gap:6px;
     }
     .ob-bubble-speech {
-      background:#1c1c1c; border:1.5px solid rgba(76,175,80,0.35);
+      background:#1c1c1c; border:1.5px solid rgba(176,0,32,0.45);
       border-radius:18px; padding:1rem 1.2rem; color:#fff;
       font-family:${FONT}; font-size:1rem; font-weight:600;
       text-align:center; max-width:270px; position:relative; line-height:1.45;
@@ -394,9 +395,9 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
     .ob-bubble-speech::before {
       content:''; position:absolute; top:-10px; left:50%; transform:translateX(-50%);
       width:0; height:0; border-left:9px solid transparent;
-      border-right:9px solid transparent; border-bottom:10px solid rgba(76,175,80,0.35);
+      border-right:9px solid transparent; border-bottom:10px solid rgba(176,0,32,0.45);
     }
-    .ob-mascot { width:90px; height:90px; object-fit:contain; filter:drop-shadow(0 4px 18px rgba(76,175,80,0.45)); }
+    .ob-mascot { width:90px; height:90px; object-fit:contain; filter:drop-shadow(0 4px 18px rgba(176,0,32,0.45)); }
     .ob-heading { color:#fff; font-family:${FONT}; font-weight:800; font-size:1.25rem; text-align:center; line-height:1.2; margin:0; }
     .ob-sub { color:rgba(255,255,255,0.5); font-family:${FONT}; font-size:0.85rem; text-align:center; line-height:1.5; margin:0; }
   `;
@@ -437,8 +438,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
             </div>
           </div>
           <Wave />
-          <div style={{ background: GREEN, padding: '1.4rem 1.25rem 2.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-            <p style={{ color: BLACK, fontFamily: FONT, fontWeight: 700, fontSize: '0.8rem', textAlign: 'center', margin: 0, letterSpacing: 1, textTransform: 'uppercase', opacity: 0.7 }}>
+          <div style={{ background: RED, padding: '1.4rem 1.25rem 2.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+            <p style={{ color: '#fff', fontFamily: FONT, fontWeight: 700, fontSize: '0.8rem', textAlign: 'center', margin: 0, letterSpacing: 1, textTransform: 'uppercase', opacity: 0.75 }}>
               New to Afroslang?
             </p>
             <button className="ob-btn-primary" onClick={() => go(1)}>GET STARTED</button>
@@ -489,9 +490,9 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                 filter: 'drop-shadow(0 2px 8px rgba(76,175,80,0.35))',
               }} />
               <div className="ob-bubble" style={{ borderRadius: '18px 18px 18px 4px', padding: '0.75rem 1rem' }}>
-                <div className="ob-dot-1" style={{ width: 9, height: 9, borderRadius: '50%', background: GREEN }} />
-                <div className="ob-dot-2" style={{ width: 9, height: 9, borderRadius: '50%', background: GREEN }} />
-                <div className="ob-dot-3" style={{ width: 9, height: 9, borderRadius: '50%', background: GREEN }} />
+                <div className="ob-dot-1" style={{ width: 9, height: 9, borderRadius: '50%', background: RED }} />
+                <div className="ob-dot-2" style={{ width: 9, height: 9, borderRadius: '50%', background: RED }} />
+                <div className="ob-dot-3" style={{ width: 9, height: 9, borderRadius: '50%', background: RED }} />
               </div>
             </div>
             {/* Main heading */}
@@ -575,12 +576,12 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               </p>
             </div>
             <div style={{ width: '100%', background: 'rgba(255,255,255,0.07)', borderRadius: 8, height: 8, overflow: 'hidden' }}>
-              <div style={{ height: '100%', background: GREEN, borderRadius: 8, animation: 'ob-barfill 2.5s ease-out both' }} />
+              <div style={{ height: '100%', background: RED, borderRadius: 8, animation: 'ob-barfill 2.5s ease-out both' }} />
             </div>
           </div>
           <Wave />
-          <div style={{ background: GREEN, padding: '1.1rem 1.2rem 1.9rem' }}>
-            <p style={{ color: BLACK, fontWeight: 700, textAlign: 'center', fontFamily: FONT, margin: 0, fontSize: '0.88rem', animation: 'ob-pulse 1.1s ease-in-out infinite' }}>
+          <div style={{ background: RED, padding: '1.1rem 1.2rem 1.9rem' }}>
+            <p style={{ color: '#fff', fontWeight: 700, textAlign: 'center', fontFamily: FONT, margin: 0, fontSize: '0.88rem', animation: 'ob-pulse 1.1s ease-in-out infinite' }}>
               Personalizing your experience...
             </p>
           </div>
@@ -672,7 +673,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
             </p>
           </div>
           <Wave />
-          <div style={{ background: GREEN, padding: '1.1rem 1.2rem 1.9rem' }}>
+          <div style={{ background: RED, padding: '1.1rem 1.2rem 1.9rem' }}>
             <button className="ob-btn-primary" onClick={next}>CONTINUE</button>
           </div>
         </div>
@@ -853,12 +854,12 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               <p style={{ color: 'rgba(255,255,255,0.45)', fontFamily: FONT, fontSize: '0.78rem', margin: 0 }}>
                 Placement check
               </p>
-              <p style={{ color: GREEN, fontFamily: FONT, fontSize: '0.78rem', margin: 0, fontWeight: 700 }}>
+              <p style={{ color: RED, fontFamily: FONT, fontSize: '0.78rem', margin: 0, fontWeight: 700 }}>
                 {placementQ + 1} / {questions.length}
               </p>
             </div>
             <div style={{ width: '100%', height: 4, background: 'rgba(255,255,255,0.08)', borderRadius: 4 }}>
-              <div style={{ height: '100%', background: GREEN, borderRadius: 4, width: `${qProgress}%`, transition: 'width 0.3s' }} />
+              <div style={{ height: '100%', background: RED, borderRadius: 4, width: `${qProgress}%`, transition: 'width 0.3s' }} />
             </div>
 
             {/* Question (re-animate on each new Q) */}
@@ -902,7 +903,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
             <img src="/Afroslang.png" alt="Mascot" className="ob-mascot"
               style={{ width: 100, height: 100, animation: 'ob-bounce 1.8s ease-in-out infinite' }} />
             <div style={{ textAlign: 'center' }}>
-              <p style={{ color: GREEN, fontWeight: 900, fontSize: '2.5rem', fontFamily: FONT, margin: 0, lineHeight: 1 }}>
+              <p style={{ color: RED, fontWeight: 900, fontSize: '2.5rem', fontFamily: FONT, margin: 0, lineHeight: 1 }}>
                 {pct}%
               </p>
               <p className="ob-heading" style={{ marginTop: '0.3rem', fontSize: '1.1rem' }}>{msg}</p>
@@ -931,7 +932,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               CREATE ACCOUNT &amp; SAVE PROGRESS
             </button>
             {selectedPlan === 'plus' && (
-              <p style={{ color: BLACK, fontFamily: FONT, fontSize: '0.74em', textAlign: 'center', margin: 0, opacity: 0.72 }}>
+              <p style={{ color: '#fff', fontFamily: FONT, fontSize: '0.74em', textAlign: 'center', margin: 0, opacity: 0.8 }}>
                 You'll be set up with AfroPlus after signing up
               </p>
             )}
