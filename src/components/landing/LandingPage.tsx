@@ -1009,7 +1009,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
         {/* Our Mission — merged with Giving Back, centred */}
         <div className="lp-mission-block lp-reveal">
-          <span className="lp-reveal" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 900, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', letterSpacing: '0.04em', textAlign: 'center', display: 'block', color: '#b00020' }}>
+          <span className="lp-reveal" style={{ fontFamily: "'Roboto Condensed', sans-serif", fontWeight: 700, fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', textAlign: 'center', display: 'block', color: '#b00020', marginBottom: 4 }}>
             Our Mission
           </span>
           <p className="lp-reveal lp-mission-body">
