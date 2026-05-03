@@ -467,7 +467,8 @@ const GREEN = '#4CAF50';
 const RED   = '#b00020';
 const BLACK = '#000000';
 const DARK  = '#0d0d0d';
-const FONT  = "'Plus Jakarta Sans', sans-serif";
+const FONT   = "'Plus Jakarta Sans', sans-serif";
+const TRENCH = "'Trench Slab', sans-serif";
 
 const TOTAL_Q = 11;
 
@@ -661,7 +662,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
             <img src="/Afroslang.png" alt="Afroslang" className="ob-mascot"
               style={{ width: 100, height: 100, animation: 'ob-bounce 2.4s ease-in-out infinite' }} />
             <div style={{ textAlign: 'center' }}>
-              <p style={{ color: '#fff', fontFamily: FONT, fontWeight: 900, fontSize: '2rem', margin: '0 0 0.3rem', letterSpacing: 1 }}>
+              <p style={{ color: '#fff', fontFamily: TRENCH, fontWeight: 700, fontSize: '2.4rem', margin: '0 0 0.3rem', letterSpacing: 2 }}>
                 Afro<span style={{ color: RED }}>slang</span>
               </p>
               <p style={{ color: 'rgba(255,255,255,0.45)', fontFamily: FONT, fontSize: '0.85rem', margin: 0, letterSpacing: 0.5 }}>
@@ -1018,7 +1019,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               }}>
                 {t('recommended')}
               </div>
-              <p style={{ color: GREEN, fontWeight: 900, fontSize: '1.1rem', margin: '0.5rem 0 0.2rem', fontFamily: FONT }}>
+              <p style={{ color: GREEN, fontWeight: 700, fontSize: '1.2rem', margin: '0.5rem 0 0.2rem', fontFamily: TRENCH, letterSpacing: 1 }}>
                 AfroPlus ⚡
               </p>
               <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8em', margin: '0 0 0.9rem', fontFamily: FONT }}>
