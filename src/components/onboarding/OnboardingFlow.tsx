@@ -467,7 +467,7 @@ const GREEN = '#4CAF50';
 const RED   = '#b00020';
 const BLACK = '#000000';
 const DARK  = '#0d0d0d';
-const FONT   = "'Plus Jakarta Sans', sans-serif";
+const FONT   = "'Roboto Condensed', sans-serif";
 const TRENCH = "'Trench Slab', sans-serif";
 
 const TOTAL_Q = 11;

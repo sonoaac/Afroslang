@@ -164,7 +164,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
   };
 
   return (
-    <div style={{ minHeight: '100dvh', background: '#0d0d0d', color: '#f0e6d3', fontFamily: "'Plus Jakarta Sans', sans-serif", position: 'relative', zIndex: 5 }}>
+    <div style={{ minHeight: '100dvh', background: '#0d0d0d', color: '#f0e6d3', fontFamily: "'Roboto Condensed', sans-serif", position: 'relative', zIndex: 5 }}>
       <style>{`
         @keyframes shop-fadein {
           from { opacity: 0; transform: translateY(6px); }
