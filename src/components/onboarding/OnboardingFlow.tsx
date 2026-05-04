@@ -470,6 +470,19 @@ const DARK  = '#0d0d0d';
 const FONT   = "'Roboto Condensed', sans-serif";
 const TRENCH = "'Trench Slab', sans-serif";
 
+const OB_BGS = [
+  '/onboardingbg/onboarding1.png',
+  '/onboardingbg/onboarding1A.png',
+  '/onboardingbg/onboarding1C.png',
+  '/onboardingbg/onboarding1E.png',
+];
+const cardBg = (s: number): React.CSSProperties => ({
+  backgroundImage: `linear-gradient(rgba(0,0,0,0.62),rgba(0,0,0,0.62)), url(${OB_BGS[s % OB_BGS.length]})`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center top',
+  backgroundColor: DARK,
+});
+
 const TOTAL_Q = 11;
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -571,6 +584,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       height:100dvh; max-height:900px;
       display:flex; flex-direction:column;
       background:${DARK}; position:relative; overflow:hidden;
+      background-size:cover; background-position:center top;
     }
     .ob-progress { height:3px; background:rgba(255,255,255,0.08); flex-shrink:0; }
     .ob-progress-fill { height:100%; background:${RED}; transition:width 0.4s ease; }
@@ -656,7 +670,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   if (step === 0) {
     return (
       <Overlay>
-        <div className="ob-card" style={{ position: 'relative' }}>
+        <div className="ob-card" style={{ position: 'relative', ...cardBg(step) }}>
           <button className="ob-lang-toggle" onClick={toggleIface}>{t('langToggle')}</button>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1.2rem', padding: '2rem 1.5rem' }} className="ob-anim">
             <img src="/Afroslang.png" alt="Afroslang" className="ob-mascot"
@@ -692,7 +706,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   if (step === 1) {
     return (
       <Overlay>
-        <div className="ob-card" key={animKey}>
+        <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <div className="ob-content ob-anim">
             <img src="/Afroslang.png" alt="Afro" className="ob-mascot"
@@ -715,7 +729,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   if (step === 2) {
     return (
       <Overlay>
-        <div className="ob-card" key={animKey}>
+        <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <div className="ob-content ob-anim" style={{ alignItems: 'flex-start', justifyContent: 'center', gap: '1.6rem', padding: '2rem 1.4rem' }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem' }}>
@@ -757,7 +771,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   if (step === 3) {
     return (
       <Overlay>
-        <div className="ob-card" key={animKey}>
+        <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <div className="ob-content-top ob-anim" style={{ paddingTop: '1.25rem' }}>
             <p className="ob-heading" style={{ width: '100%', marginBottom: '0.4rem' }}>{t('whatLearn')}</p>
@@ -791,7 +805,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   if (step === 4) {
     return (
       <Overlay>
-        <div className="ob-card" key={animKey}>
+        <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <div className="ob-content ob-anim" style={{ gap: '1.6rem' }}>
             <img src="/Afroslang.png" alt="Building" className="ob-mascot"
@@ -819,7 +833,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   if (step === 5) {
     return (
       <Overlay>
-        <div className="ob-card" key={animKey}>
+        <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <div className="ob-content-top ob-anim" style={{ paddingTop: '1.25rem' }}>
             <p className="ob-heading" style={{ width: '100%', marginBottom: '0.35rem' }}>{t('howHeard')}</p>
@@ -852,7 +866,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   if (step === 6) {
     return (
       <Overlay>
-        <div className="ob-card" key={animKey}>
+        <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <div className="ob-content ob-anim" style={{ justifyContent: 'flex-start', paddingTop: '1.5rem', gap: '0.9rem' }}>
             <p className="ob-heading" style={{ width: '100%' }}>{t('howMuchSlang')}</p>
@@ -883,7 +897,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   if (step === 7) {
     return (
       <Overlay>
-        <div className="ob-card" key={animKey}>
+        <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <div className="ob-content ob-anim" style={{ gap: '1.5rem' }}>
             <img src="/Afroslang.png" alt="Excited" className="ob-mascot"
@@ -908,7 +922,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   if (step === 8) {
     return (
       <Overlay>
-        <div className="ob-card" key={animKey}>
+        <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <div className="ob-content-top ob-anim" style={{ paddingTop: '1.1rem' }}>
             <p className="ob-heading" style={{ width: '100%' }}>{t('whyLearning')}</p>
@@ -942,7 +956,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   if (step === 9) {
     return (
       <Overlay>
-        <div className="ob-card" key={animKey}>
+        <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <div className="ob-content ob-anim" style={{ gap: '1.4rem' }}>
             <div style={{ fontSize: '3.4em', animation: 'ob-bounce 1.7s ease-in-out infinite' }}>⏰</div>
@@ -962,7 +976,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   if (step === 10) {
     return (
       <Overlay>
-        <div className="ob-card" key={animKey}>
+        <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <div className="ob-content ob-anim" style={{ justifyContent: 'flex-start', paddingTop: '1.5rem', gap: '0.9rem' }}>
             <p className="ob-heading" style={{ width: '100%' }}>{t('dailyGoalQ')}</p>
@@ -1001,7 +1015,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
     };
     return (
       <Overlay>
-        <div className="ob-card" key={animKey}>
+        <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <div className="ob-content ob-anim" style={{ gap: '1.2rem' }}>
             <p className="ob-heading" style={{ fontSize: '1.2rem' }}>{t('howStart')}</p>
@@ -1060,7 +1074,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
 
     return (
       <Overlay>
-        <div className="ob-card" key={animKey}>
+        <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <div className="ob-content-top ob-anim" style={{ paddingTop: '1.3rem', gap: '1rem' }}>
             <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1111,7 +1125,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
 
     return (
       <Overlay>
-        <div className="ob-card" key={animKey}>
+        <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <div className="ob-content ob-anim" style={{ gap: '1.3rem' }}>
             <img src="/Afroslang.png" alt="Mascot" className="ob-mascot"
