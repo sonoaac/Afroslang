@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 const UI = {
   en: {
     langToggle: '🇫🇷 Je parle français',
-    tagline: 'The living dictionary of African street slang',
+    tagline: 'Relive and share memories',
     newUser: 'New to Afroslang?',
     getStarted: 'GET STARTED',
     signIn: 'Already have an account? SIGN IN',
@@ -53,7 +53,7 @@ const UI = {
   },
   fr: {
     langToggle: '🇬🇧 I speak English',
-    tagline: 'Le dictionnaire vivant du slang africain',
+    tagline: 'Revivre et partager des souvenirs',
     newUser: 'Nouveau sur Afroslang ?',
     getStarted: 'COMMENCER',
     signIn: 'Déjà un compte ? SE CONNECTER',
