@@ -563,6 +563,38 @@ function TypingGreeting({ hiThere, mascotName, guide }: { hiThere: string; masco
   );
 }
 
+// ── Step content loader: dots → assembled content ────────────────────────────
+
+function StepContent({ top = false, style, children, stepKey }: {
+  top?: boolean;
+  style?: React.CSSProperties;
+  children: React.ReactNode;
+  stepKey: number;
+}) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    setVisible(false);
+    const t = setTimeout(() => setVisible(true), 660);
+    return () => clearTimeout(t);
+  }, [stepKey]);
+
+  const cls = top ? 'ob-content-top' : 'ob-content';
+
+  if (!visible) {
+    return (
+      <div className={cls} style={{ justifyContent: 'center', ...style }}>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <span className="ob-dot-1" style={{ width: 12, height: 12, borderRadius: '50%', background: 'rgba(255,255,255,0.85)', display: 'inline-block' }} />
+          <span className="ob-dot-2" style={{ width: 12, height: 12, borderRadius: '50%', background: 'rgba(255,255,255,0.85)', display: 'inline-block' }} />
+          <span className="ob-dot-3" style={{ width: 12, height: 12, borderRadius: '50%', background: 'rgba(255,255,255,0.85)', display: 'inline-block' }} />
+        </div>
+      </div>
+    );
+  }
+
+  return <div className={cls} style={style}>{children}</div>;
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 interface OnboardingFlowProps {
@@ -624,15 +656,28 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   // ── Shared CSS ──────────────────────────────────────────────────────────────
 
   const css = `
-    @keyframes ob-fadein  { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes ob-bounce  { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
-    @keyframes ob-pulse   { 0%,100% { opacity:1; } 50% { opacity:0.45; } }
-    @keyframes ob-barfill { from { width:0; } to { width:72%; } }
-    @keyframes ob-dot     { 0%,60%,100% { transform:translateY(0); opacity:0.4; } 30% { transform:translateY(-5px); opacity:1; } }
-    .ob-anim { animation: ob-fadein 0.32s ease both; }
-    .ob-dot-1 { animation: ob-dot 1.1s ease-in-out infinite; }
-    .ob-dot-2 { animation: ob-dot 1.1s ease-in-out 0.18s infinite; }
-    .ob-dot-3 { animation: ob-dot 1.1s ease-in-out 0.36s infinite; }
+    @keyframes ob-fadein    { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes ob-bounce    { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
+    @keyframes ob-pulse     { 0%,100% { opacity:1; } 50% { opacity:0.45; } }
+    @keyframes ob-barfill   { from { width:0; } to { width:72%; } }
+    @keyframes ob-dot       { 0%,60%,100% { transform:translateY(0); opacity:0.4; } 30% { transform:translateY(-5px); opacity:1; } }
+    @keyframes ob-assemble  {
+      0%   { opacity:0; transform:translateY(-28px) scale(0.72) rotate(-6deg); filter:blur(5px); }
+      55%  { filter:blur(0); }
+      100% { opacity:1; transform:translateY(0) scale(1) rotate(0deg); }
+    }
+    @keyframes ob-assemble2 {
+      0%   { opacity:0; transform:translateX(22px) scale(0.8) rotate(4deg); filter:blur(4px); }
+      55%  { filter:blur(0); }
+      100% { opacity:1; transform:translateX(0) scale(1) rotate(0deg); }
+    }
+    .ob-anim   { animation: ob-fadein 0.32s ease both; }
+    .ob-dot-1  { animation: ob-dot 1.1s ease-in-out infinite; }
+    .ob-dot-2  { animation: ob-dot 1.1s ease-in-out 0.18s infinite; }
+    .ob-dot-3  { animation: ob-dot 1.1s ease-in-out 0.36s infinite; }
+    .ob-text-h { animation: ob-assemble  0.55s cubic-bezier(0.22,1,0.36,1) both; }
+    .ob-text-s { animation: ob-assemble2 0.5s  cubic-bezier(0.22,1,0.36,1) 0.12s both; }
+    .ob-text-l { animation: ob-assemble  0.45s cubic-bezier(0.22,1,0.36,1) 0.22s both; }
     .ob-card {
       width:100%; max-width:390px;
       height:100dvh;
@@ -666,36 +711,36 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       cursor:pointer; width:100%; letter-spacing:0.5px;
     }
     .ob-row-btn {
-      background:#1a1a1a; border:1.5px solid #252525; border-radius:13px;
+      background:rgba(0,0,0,0.32); backdrop-filter:blur(8px);
+      border:1.5px solid rgba(255,255,255,0.18); border-radius:13px;
       padding:0.75rem 0.9rem; display:flex; align-items:center; gap:0.7rem;
       cursor:pointer; width:100%; font-family:${FONT}; font-weight:700;
       transition:border-color 0.15s, background 0.15s; text-align:left;
     }
-    .ob-row-btn:hover { border-color:${GREEN}; background:rgba(76,175,80,0.08); }
-    .ob-row-btn.sel  { border-color:${GREEN}; background:rgba(76,175,80,0.12); }
-    .ob-row-btn-plain { border-color:#1e1e1e !important; background:#161616 !important; cursor:pointer; }
-    .ob-row-btn-plain:active { background:rgba(176,0,32,0.12) !important; border-color:${RED} !important; }
-    .ob-check { width:20px; height:20px; border-radius:6px; border:2px solid #333; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.15s, border-color 0.15s; }
+    .ob-row-btn:hover { border-color:rgba(255,255,255,0.42); background:rgba(0,0,0,0.48); }
+    .ob-row-btn.sel   { border-color:${GREEN}; background:rgba(76,175,80,0.18); }
+    .ob-row-btn-plain { border-color:rgba(255,255,255,0.12) !important; background:rgba(0,0,0,0.28) !important; }
+    .ob-row-btn-plain:active { background:rgba(176,0,32,0.18) !important; border-color:${RED} !important; }
+    .ob-check { width:20px; height:20px; border-radius:6px; border:2px solid rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.15s, border-color 0.15s; }
     .ob-check.on { background:${GREEN}; border-color:${GREEN}; }
-    .ob-bubble {
-      background:#1c1c1c; border:1.5px solid rgba(176,0,32,0.45);
-      border-radius:18px 18px 18px 4px; padding:0.75rem 1rem;
-      display:flex; align-items:center; gap:6px;
-    }
+    .ob-bubble { display:flex; align-items:center; gap:6px; padding:0.5rem 0; }
     .ob-bubble-speech {
-      background:#1c1c1c; border:1.5px solid rgba(176,0,32,0.45);
-      border-radius:18px; padding:1rem 1.2rem; color:#fff;
-      font-family:${FONT}; font-size:1rem; font-weight:600;
-      text-align:center; max-width:270px; position:relative; line-height:1.45;
-    }
-    .ob-bubble-speech::before {
-      content:''; position:absolute; top:-10px; left:50%; transform:translateX(-50%);
-      width:0; height:0; border-left:9px solid transparent;
-      border-right:9px solid transparent; border-bottom:10px solid rgba(176,0,32,0.45);
+      background:none; border:none; padding:0.25rem 0;
+      color:#fff; font-family:${FONT}; font-size:1.05rem; font-weight:900;
+      text-align:center; max-width:270px; line-height:1.45;
+      text-shadow: 0 1px 0 rgba(0,0,0,0.95), 0 2px 5px rgba(0,0,0,0.8), 0 5px 14px rgba(0,0,0,0.6), 0 0 30px rgba(0,0,0,0.3);
     }
     .ob-mascot { width:90px; height:90px; object-fit:contain; filter:drop-shadow(0 4px 18px rgba(176,0,32,0.45)); }
-    .ob-heading { color:#fff; font-family:${FONT}; font-weight:800; font-size:1.25rem; text-align:center; line-height:1.2; margin:0; }
-    .ob-sub { color:rgba(255,255,255,0.5); font-family:${FONT}; font-size:0.85rem; text-align:center; line-height:1.5; margin:0; }
+    .ob-heading {
+      color:#fff; font-family:${FONT}; font-weight:800; font-size:1.25rem;
+      text-align:center; line-height:1.2; margin:0;
+      text-shadow: 0 1px 0 rgba(0,0,0,0.95), 0 2px 6px rgba(0,0,0,0.8), 0 5px 16px rgba(0,0,0,0.55), 0 0 32px rgba(0,0,0,0.3);
+    }
+    .ob-sub {
+      color:rgba(255,255,255,0.75); font-family:${FONT}; font-size:0.85rem;
+      text-align:center; line-height:1.5; margin:0;
+      text-shadow: 0 1px 0 rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.65), 0 4px 14px rgba(0,0,0,0.4);
+    }
     .ob-lang-toggle {
       position:absolute; top:12px; right:12px; z-index:10;
       background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
@@ -726,23 +771,23 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       <Overlay>
         <div className="ob-card" style={{ position: 'relative', ...cardBg(step) }}>
           <button className="ob-lang-toggle" onClick={toggleIface}>{t('langToggle')}</button>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1.2rem', padding: '2rem 1.5rem' }} className="ob-anim">
+          <StepContent stepKey={0} style={{ gap: '1.2rem', padding: '2rem 1.5rem' }}>
             <img src="/Afroslang.png" alt="Afroslang" className="ob-mascot"
               style={{ width: 100, height: 100, animation: 'ob-bounce 2.4s ease-in-out infinite' }} />
             <div style={{ textAlign: 'center' }}>
-              <p style={{ color: '#fff', fontFamily: TRENCH, fontWeight: 700, fontSize: '2.4rem', margin: '0 0 0.3rem', letterSpacing: 2 }}>
+              <p className="ob-text-h" style={{ color: '#fff', fontFamily: TRENCH, fontWeight: 700, fontSize: '2.4rem', margin: '0 0 0.3rem', letterSpacing: 2, textShadow: '0 1px 0 rgba(0,0,0,0.95), 0 3px 8px rgba(0,0,0,0.7), 0 6px 20px rgba(0,0,0,0.4)' }}>
                 Afro<span style={{ color: RED }}>slang</span>
               </p>
-              <p style={{ color: 'rgba(255,255,255,0.45)', fontFamily: FONT, fontSize: '0.85rem', margin: 0, letterSpacing: 0.5 }}>
+              <p className="ob-text-s ob-sub" style={{ margin: 0, letterSpacing: 0.5 }}>
                 {t('tagline')}
               </p>
             </div>
-            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+            <div className="ob-text-l" style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
               {['🇳🇬','🇰🇪','🇿🇦','🇪🇹','🌍'].map((f, i) => (
                 <span key={i} style={{ fontSize: '1.3em', opacity: 0.7 + i * 0.06 }}>{f}</span>
               ))}
             </div>
-          </div>
+          </StepContent>
           <Wave />
           <div style={{ background: RED, padding: '1.4rem 1.25rem 2.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
             <p style={{ color: '#fff', fontFamily: FONT, fontWeight: 700, fontSize: '0.8rem', textAlign: 'center', margin: 0, letterSpacing: 1, textTransform: 'uppercase', opacity: 0.75 }}>
@@ -792,33 +837,28 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          <div className="ob-content ob-anim" style={{ alignItems: 'flex-start', justifyContent: 'center', gap: '1.6rem', padding: '2rem 1.4rem' }}>
+          <StepContent stepKey={animKey} style={{ alignItems: 'flex-start', justifyContent: 'center', gap: '1.6rem', padding: '2rem 1.4rem' }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem' }}>
               <img src="/Afroslang.png" alt="Afro" style={{
                 width: 44, height: 44, borderRadius: '50%', objectFit: 'contain',
                 border: '2px solid rgba(176,0,32,0.5)', flexShrink: 0,
                 filter: 'drop-shadow(0 2px 8px rgba(176,0,32,0.35))',
               }} />
-              <div className="ob-bubble">
-                <div className="ob-dot-1" style={{ width: 9, height: 9, borderRadius: '50%', background: RED }} />
-                <div className="ob-dot-2" style={{ width: 9, height: 9, borderRadius: '50%', background: RED }} />
-                <div className="ob-dot-3" style={{ width: 9, height: 9, borderRadius: '50%', background: RED }} />
-              </div>
             </div>
             <div>
-              <p className="ob-heading" style={{ textAlign: 'left', fontSize: '1.5rem', lineHeight: 1.2 }}>
+              <p className="ob-heading ob-text-h" style={{ textAlign: 'left', fontSize: '1.5rem', lineHeight: 1.2 }}>
                 {t('questionsHeading')}
               </p>
-              <p className="ob-sub" style={{ textAlign: 'left', marginTop: '0.55rem' }}>
+              <p className="ob-sub ob-text-s" style={{ textAlign: 'left', marginTop: '0.55rem' }}>
                 {t('questionsSub')}
               </p>
             </div>
-            <div style={{ display: 'flex', gap: '0.45em' }}>
+            <div className="ob-text-l" style={{ display: 'flex', gap: '0.45em' }}>
               {[...Array(7)].map((_, i) => (
                 <div key={i} style={{ width: 30, height: 7, borderRadius: 4, background: 'rgba(176,0,32,0.2)', border: '1px solid rgba(176,0,32,0.4)' }} />
               ))}
             </div>
-          </div>
+          </StepContent>
           <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" onClick={next}>{t('letsGo')}</button>
@@ -834,8 +874,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          <div className="ob-content-top ob-anim" style={{ paddingTop: '1.25rem' }}>
-            <p className="ob-heading" style={{ width: '100%', marginBottom: '0.4rem' }}>{t('whatLearn')}</p>
+          <StepContent top stepKey={animKey} style={{ paddingTop: '1.25rem' }}>
+            <p className="ob-heading ob-text-h" style={{ width: '100%', marginBottom: '0.4rem' }}>{t('whatLearn')}</p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {LANGUAGES.map(lang => (
                 <button key={lang.id}
@@ -852,7 +892,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                 </button>
               ))}
             </div>
-          </div>
+          </StepContent>
           <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" disabled={!selectedLang} onClick={next}>{t('continue')}</button>
@@ -868,17 +908,17 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          <div className="ob-content ob-anim" style={{ gap: '1.6rem' }}>
+          <StepContent stepKey={animKey} style={{ gap: '1.6rem' }}>
             <img src="/Afroslang.png" alt="Building" className="ob-mascot"
               style={{ animation: 'ob-bounce 0.75s ease-in-out infinite' }} />
             <div style={{ textAlign: 'center' }}>
-              <p className="ob-heading" style={{ fontSize: '1.15rem', marginBottom: '0.35rem' }}>{t('courseBuilding')}</p>
-              <p className="ob-sub">{t('joinFriends')}</p>
+              <p className="ob-heading ob-text-h" style={{ fontSize: '1.15rem', marginBottom: '0.35rem' }}>{t('courseBuilding')}</p>
+              <p className="ob-sub ob-text-s">{t('joinFriends')}</p>
             </div>
-            <div style={{ width: '100%', background: 'rgba(255,255,255,0.07)', borderRadius: 8, height: 8, overflow: 'hidden' }}>
+            <div className="ob-text-l" style={{ width: '100%', background: 'rgba(255,255,255,0.07)', borderRadius: 8, height: 8, overflow: 'hidden' }}>
               <div style={{ height: '100%', background: RED, borderRadius: 8, animation: 'ob-barfill 2.5s ease-out both' }} />
             </div>
-          </div>
+          </StepContent>
           <Wave />
           <div style={{ background: RED, padding: '1.1rem 1.2rem 1.9rem' }}>
             <p style={{ color: '#fff', fontWeight: 700, textAlign: 'center', fontFamily: FONT, margin: 0, fontSize: '0.88rem', animation: 'ob-pulse 1.1s ease-in-out infinite' }}>
@@ -896,8 +936,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          <div className="ob-content-top ob-anim" style={{ paddingTop: '1.25rem' }}>
-            <p className="ob-heading" style={{ width: '100%', marginBottom: '0.35rem' }}>{t('howHeard')}</p>
+          <StepContent top stepKey={animKey} style={{ paddingTop: '1.25rem' }}>
+            <p className="ob-heading ob-text-h" style={{ width: '100%', marginBottom: '0.35rem' }}>{t('howHeard')}</p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {SOURCES.map(src => (
                 <button key={src.id}
@@ -913,7 +953,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                 </button>
               ))}
             </div>
-          </div>
+          </StepContent>
           <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" disabled={!discovery} onClick={next}>{t('continue')}</button>
@@ -929,8 +969,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          <div className="ob-content ob-anim" style={{ justifyContent: 'flex-start', paddingTop: '1.5rem', gap: '0.9rem' }}>
-            <p className="ob-heading" style={{ width: '100%' }}>{t('howMuchSlang')}</p>
+          <StepContent stepKey={animKey} style={{ justifyContent: 'flex-start', paddingTop: '1.5rem', gap: '0.9rem' }}>
+            <p className="ob-heading ob-text-h" style={{ width: '100%' }}>{t('howMuchSlang')}</p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
               {LEVELS.map(lvl => (
                 <button key={lvl.id}
@@ -944,7 +984,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                 </button>
               ))}
             </div>
-          </div>
+          </StepContent>
           <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" disabled={!level} onClick={next}>{t('continue')}</button>
@@ -960,16 +1000,16 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          <div className="ob-content ob-anim" style={{ gap: '1.5rem' }}>
+          <StepContent stepKey={animKey} style={{ gap: '1.5rem' }}>
             <img src="/Afroslang.png" alt="Excited" className="ob-mascot"
               style={{ width: 110, height: 110, animation: 'ob-bounce 0.65s ease-in-out infinite' }} />
-            <div className="ob-bubble-speech" style={{ fontSize: '1.05rem' }}>
+            <p className="ob-bubble-speech ob-text-h" style={{ fontSize: '1.05rem' }}>
               {t('affirm')}
-            </div>
-            <p className="ob-sub" style={{ animation: 'ob-pulse 1.4s ease-in-out infinite' }}>
+            </p>
+            <p className="ob-sub ob-text-s" style={{ animation: 'ob-pulse 1.4s ease-in-out infinite' }}>
               {t('settingUp')}
             </p>
-          </div>
+          </StepContent>
           <Wave />
           <div style={{ background: RED, padding: '1.1rem 1.2rem 1.9rem' }}>
             <button className="ob-btn-primary" onClick={next}>{t('continue')}</button>
@@ -985,9 +1025,9 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          <div className="ob-content-top ob-anim" style={{ paddingTop: '1.1rem' }}>
-            <p className="ob-heading" style={{ width: '100%' }}>{t('whyLearning')}</p>
-            <p className="ob-sub" style={{ width: '100%', textAlign: 'left', marginBottom: '0.1rem' }}>{t('selectAll')}</p>
+          <StepContent top stepKey={animKey} style={{ paddingTop: '1.1rem' }}>
+            <p className="ob-heading ob-text-h" style={{ width: '100%' }}>{t('whyLearning')}</p>
+            <p className="ob-sub ob-text-s" style={{ width: '100%', textAlign: 'left', marginBottom: '0.1rem' }}>{t('selectAll')}</p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.48rem' }}>
               {GOALS.map(g => (
                 <button key={g.id}
@@ -1003,7 +1043,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                 </button>
               ))}
             </div>
-          </div>
+          </StepContent>
           <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" disabled={goals.length === 0} onClick={next}>{t('continue')}</button>
@@ -1019,11 +1059,11 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          <div className="ob-content ob-anim" style={{ gap: '1.4rem' }}>
+          <StepContent stepKey={animKey} style={{ gap: '1.4rem' }}>
             <div style={{ fontSize: '3.4em', animation: 'ob-bounce 1.7s ease-in-out infinite' }}>⏰</div>
-            <p className="ob-heading">{t('routineTitle')}</p>
-            <p className="ob-sub" style={{ maxWidth: 275 }}>{t('routineSub')}</p>
-          </div>
+            <p className="ob-heading ob-text-h">{t('routineTitle')}</p>
+            <p className="ob-sub ob-text-s" style={{ maxWidth: 275 }}>{t('routineSub')}</p>
+          </StepContent>
           <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" onClick={next}>{t('soundsGood')}</button>
@@ -1039,8 +1079,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          <div className="ob-content ob-anim" style={{ justifyContent: 'flex-start', paddingTop: '1.5rem', gap: '0.9rem' }}>
-            <p className="ob-heading" style={{ width: '100%' }}>{t('dailyGoalQ')}</p>
+          <StepContent stepKey={animKey} style={{ justifyContent: 'flex-start', paddingTop: '1.5rem', gap: '0.9rem' }}>
+            <p className="ob-heading ob-text-h" style={{ width: '100%' }}>{t('dailyGoalQ')}</p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
               {DAILY.map(d => (
                 <button key={d.id}
@@ -1056,7 +1096,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                 </button>
               ))}
             </div>
-          </div>
+          </StepContent>
           <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" disabled={!dailyGoal} onClick={next}>{t('lockedIn')}</button>
@@ -1078,8 +1118,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          <div className="ob-content ob-anim" style={{ gap: '1.2rem' }}>
-            <p className="ob-heading" style={{ fontSize: '1.2rem' }}>{t('howStart')}</p>
+          <StepContent stepKey={animKey} style={{ gap: '1.2rem' }}>
+            <p className="ob-heading ob-text-h" style={{ fontSize: '1.2rem' }}>{t('howStart')}</p>
 
             <div style={{
               width: '100%', background: 'linear-gradient(145deg,#071407,#0d200d)',
@@ -1119,7 +1159,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                 {t('continueFree')}
               </button>
             </div>
-          </div>
+          </StepContent>
           <div style={{ height: '1.5rem', background: DARK, flexShrink: 0 }} />
         </div>
       </Overlay>
@@ -1137,7 +1177,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          <div className="ob-content-top ob-anim" style={{ paddingTop: '1.3rem', gap: '1rem' }}>
+          <StepContent top stepKey={animKey} style={{ paddingTop: '1.3rem', gap: '1rem' }}>
             <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <p style={{ color: 'rgba(255,255,255,0.45)', fontFamily: FONT, fontSize: '0.78rem', margin: 0 }}>
                 {t('placementLabel')}
@@ -1151,7 +1191,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
             </div>
 
             <div key={`pq-${placementQ}`} className="ob-anim" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
-              <p className="ob-heading" style={{ textAlign: 'left', fontSize: '1.05rem', lineHeight: 1.35 }}>
+              <p className="ob-heading ob-text-h" style={{ textAlign: 'left', fontSize: '1.05rem', lineHeight: 1.35 }}>
                 {iface === 'fr' ? currentQ.qFr : currentQ.q}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -1165,7 +1205,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                 ))}
               </div>
             </div>
-          </div>
+          </StepContent>
           <div style={{ height: '1rem', flexShrink: 0 }} />
         </div>
       </Overlay>
@@ -1188,21 +1228,21 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          <div className="ob-content ob-anim" style={{ gap: '1.3rem' }}>
+          <StepContent stepKey={animKey} style={{ gap: '1.3rem' }}>
             <img src="/Afroslang.png" alt="Mascot" className="ob-mascot"
               style={{ width: 100, height: 100, animation: 'ob-bounce 1.8s ease-in-out infinite' }} />
             <div style={{ textAlign: 'center' }}>
-              <p style={{ color: RED, fontWeight: 900, fontSize: '2.5rem', fontFamily: FONT, margin: 0, lineHeight: 1 }}>
+              <p style={{ color: RED, fontWeight: 900, fontSize: '2.5rem', fontFamily: FONT, margin: 0, lineHeight: 1 }} className="ob-text-h">
                 {pct}%
               </p>
-              <p className="ob-heading" style={{ marginTop: '0.3rem', fontSize: '1.1rem' }}>{msg}</p>
-              <p className="ob-sub" style={{ marginTop: '0.35rem' }}>
+              <p className="ob-heading ob-text-h" style={{ marginTop: '0.3rem', fontSize: '1.1rem' }}>{msg}</p>
+              <p className="ob-sub ob-text-s" style={{ marginTop: '0.35rem' }}>
                 {t('startAt')}{' '}<strong style={{ color: '#fff' }}>
                   {iface === 'fr' ? `Étape ${startStage}` : `Stage ${startStage}`}
                 </strong>{' — '}<span style={{ opacity: 0.75 }}>{stageLabel}</span>
               </p>
             </div>
-            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 230 }}>
+            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 230 }} className="ob-text-l">
               {questions.map((q, i) => (
                 <div key={i} style={{
                   width: 13, height: 13, borderRadius: '50%',
@@ -1211,8 +1251,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                 }} />
               ))}
             </div>
-            <p className="ob-sub" style={{ fontSize: '0.8em', maxWidth: 260 }}>{t('saveProg')}</p>
-          </div>
+            <p className="ob-sub ob-text-s" style={{ fontSize: '0.8em', maxWidth: 260 }}>{t('saveProg')}</p>
+          </StepContent>
           <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" onClick={() => onComplete(selectedLang, selectedPlan, scoreFrac)}>
