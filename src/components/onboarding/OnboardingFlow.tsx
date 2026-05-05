@@ -698,7 +698,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       align-items:center; justify-content:flex-start;
       padding:1.1rem 1.2rem 0; overflow-y:auto; gap:0.7rem;
     }
-    .ob-bottom { background:transparent; padding:1.2rem 1.2rem env(safe-area-inset-bottom, 2.2rem); display:flex; flex-direction:column; gap:0.7rem; flex-shrink:0; }
+    .ob-bottom { background:transparent; padding:1.2rem 1.2rem 2.4rem; display:flex; flex-direction:column; gap:0.7rem; flex-shrink:0; }
     .ob-lang-card {
       flex:1; background:rgba(0,0,0,0.36); backdrop-filter:blur(10px);
       border:1.5px solid rgba(255,255,255,0.18); border-radius:18px;
@@ -881,53 +881,52 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
     const topLang = LANGUAGES[langIndex % LANGUAGES.length];
     const botLang = LANGUAGES[(langIndex + 1) % LANGUAGES.length];
 
-    const advanceLang = () => {
-      setLangIndex(i => (i + 2) % LANGUAGES.length);
-      setLangAnim(k => k + 1);
-    };
-    const prevLang = () => {
-      setLangIndex(i => (i - 2 + LANGUAGES.length) % LANGUAGES.length);
-      setLangAnim(k => k + 1);
-    };
-
-    const LangTile = ({ lang, arrow, onArrow }: { lang: typeof LANGUAGES[0]; arrow: '›' | '‹'; onArrow: () => void }) => (
-      <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-        {arrow === '‹' && (
-          <button className="ob-arrow-btn" onClick={onArrow} aria-label="Previous">{arrow}</button>
-        )}
-        <button
-          className={`ob-lang-card${selectedLang === lang.id ? ' sel' : ''}`}
-          onClick={() => setSelectedLang(lang.id)}
-        >
-          <span style={{ fontSize: '2.2em', lineHeight: 1, flexShrink: 0 }}>{lang.flag}</span>
-          <div style={{ flex: 1 }}>
-            <p style={{ color: '#fff', fontWeight: 800, margin: 0, fontSize: '1.05em', fontFamily: FONT }}>{lang.label}</p>
-            <p style={{ color: 'rgba(255,255,255,0.45)', margin: '0.1rem 0 0', fontSize: '0.75em', fontFamily: FONT }}>
-              {iface === 'fr' ? lang.regionFr : lang.region}
-            </p>
-          </div>
-          {selectedLang === lang.id && (
-            <span style={{ color: GREEN, fontSize: '1.2em', fontWeight: 900, flexShrink: 0 }}>✓</span>
-          )}
-        </button>
-        {arrow === '›' && (
-          <button className="ob-arrow-btn" onClick={onArrow} aria-label="Next">{arrow}</button>
-        )}
-      </div>
-    );
+    const advanceLang = () => { setLangIndex(i => (i + 2) % LANGUAGES.length); setLangAnim(k => k + 1); };
+    const prevLang   = () => { setLangIndex(i => (i - 2 + LANGUAGES.length) % LANGUAGES.length); setLangAnim(k => k + 1); };
 
     return (
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '1.4rem 1.2rem 0' }}>
-            <p className="ob-heading ob-text-h" style={{ width: '100%', marginBottom: '0.8rem' }}>{t('whatLearn')}</p>
-            <div key={`t-${langAnim}`} className="ob-anim" style={{ width: '100%' }}>
-              <LangTile lang={topLang} arrow="›" onArrow={advanceLang} />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '1.4rem 1.2rem 0' }}>
+            <p className="ob-heading ob-text-h" style={{ width: '100%', marginBottom: '1rem' }}>{t('whatLearn')}</p>
+
+            {/* Top tile — › advances */}
+            <div key={`t-${langAnim}`} className="ob-anim" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <button
+                className={`ob-lang-card${selectedLang === topLang.id ? ' sel' : ''}`}
+                onClick={() => setSelectedLang(topLang.id)}
+              >
+                <span style={{ fontSize: '2.2em', lineHeight: 1, flexShrink: 0 }}>{topLang.flag}</span>
+                <div style={{ flex: 1 }}>
+                  <p style={{ color: '#fff', fontWeight: 800, margin: 0, fontSize: '1.05em', fontFamily: FONT }}>{topLang.label}</p>
+                  <p style={{ color: 'rgba(255,255,255,0.45)', margin: '0.1rem 0 0', fontSize: '0.75em', fontFamily: FONT }}>
+                    {iface === 'fr' ? topLang.regionFr : topLang.region}
+                  </p>
+                </div>
+                {selectedLang === topLang.id && <span style={{ color: GREEN, fontSize: '1.2em', fontWeight: 900, flexShrink: 0 }}>✓</span>}
+              </button>
+              <button className="ob-arrow-btn" onClick={advanceLang} aria-label="Next">›</button>
             </div>
+
             <div style={{ flex: 1 }} />
-            <div key={`b-${langAnim}`} className="ob-anim" style={{ width: '100%', marginBottom: '0.5rem' }}>
-              <LangTile lang={botLang} arrow="‹" onArrow={prevLang} />
+
+            {/* Bottom tile — ‹ goes back */}
+            <div key={`b-${langAnim}`} className="ob-anim" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
+              <button className="ob-arrow-btn" onClick={prevLang} aria-label="Previous">‹</button>
+              <button
+                className={`ob-lang-card${selectedLang === botLang.id ? ' sel' : ''}`}
+                onClick={() => setSelectedLang(botLang.id)}
+              >
+                <span style={{ fontSize: '2.2em', lineHeight: 1, flexShrink: 0 }}>{botLang.flag}</span>
+                <div style={{ flex: 1 }}>
+                  <p style={{ color: '#fff', fontWeight: 800, margin: 0, fontSize: '1.05em', fontFamily: FONT }}>{botLang.label}</p>
+                  <p style={{ color: 'rgba(255,255,255,0.45)', margin: '0.1rem 0 0', fontSize: '0.75em', fontFamily: FONT }}>
+                    {iface === 'fr' ? botLang.regionFr : botLang.region}
+                  </p>
+                </div>
+                {selectedLang === botLang.id && <span style={{ color: GREEN, fontSize: '1.2em', fontWeight: 900, flexShrink: 0 }}>‍✓</span>}
+              </button>
             </div>
           </div>
           <div className="ob-bottom">
