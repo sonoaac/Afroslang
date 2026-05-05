@@ -9,11 +9,11 @@ const UI = {
     newUser: 'New to Afroslang?',
     getStarted: 'GET STARTED',
     signIn: 'Already have an account? SIGN IN',
-    hiThere: "👋 Hi there! I'm ",
+    hiThere: "Hi there! I'm ",
     mascotName: 'Afro!',
     guide: 'Your African slang guide',
     continue: 'CONTINUE',
-    questionsHeading: 'Just answer a few questions for me',
+    questionsHeading: "Let's get you started",
     questionsSub: "I'll use your answers to build your perfect Afroslang course",
     letsGo: "LET'S GO 🔥",
     whatLearn: 'What would you like to learn?',
@@ -57,11 +57,11 @@ const UI = {
     newUser: 'Nouveau sur Afroslang ?',
     getStarted: 'COMMENCER',
     signIn: 'Déjà un compte ? SE CONNECTER',
-    hiThere: '👋 Salut ! Je suis ',
+    hiThere: 'Salut ! Je suis ',
     mascotName: 'Afro !',
     guide: 'Ton guide du slang africain',
     continue: 'CONTINUER',
-    questionsHeading: 'Réponds juste à quelques questions',
+    questionsHeading: 'Commençons !',
     questionsSub: "J'utiliserai tes réponses pour créer ton cours Afroslang parfait",
     letsGo: "C'EST PARTI 🔥",
     whatLearn: "Qu'est-ce que tu voudrais apprendre ?",
@@ -104,13 +104,21 @@ const UI = {
 // ── Static data ───────────────────────────────────────────────────────────────
 
 const LANGUAGES = [
-  { id: 'swahili',  label: 'Swahili',  flag: '🇰🇪', region: 'East Africa',  regionFr: "Afrique de l'Est" },
-  { id: 'yoruba',   label: 'Yoruba',   flag: '🇳🇬', region: 'West Africa',  regionFr: "Afrique de l'Ouest" },
-  { id: 'hausa',    label: 'Hausa',    flag: '🇳🇬', region: 'West Africa',  regionFr: "Afrique de l'Ouest" },
-  { id: 'igbo',     label: 'Igbo',     flag: '🇳🇬', region: 'Nigeria',      regionFr: 'Nigeria' },
-  { id: 'zulu',     label: 'Zulu',     flag: '🇿🇦', region: 'South Africa', regionFr: 'Afrique du Sud' },
-  { id: 'amharic',  label: 'Amharic',  flag: '🇪🇹', region: 'East Africa',  regionFr: "Afrique de l'Est" },
-  { id: 'arabic',   label: 'Arabic',   flag: '🇪🇬', region: 'North Africa', regionFr: 'Afrique du Nord' },
+  { id: 'swahili',  label: 'Swahili',  flag: '🇰🇪', region: 'East Africa',     regionFr: "Afrique de l'Est" },
+  { id: 'yoruba',   label: 'Yoruba',   flag: '🇳🇬', region: 'West Africa',     regionFr: "Afrique de l'Ouest" },
+  { id: 'hausa',    label: 'Hausa',    flag: '🇳🇬', region: 'West Africa',     regionFr: "Afrique de l'Ouest" },
+  { id: 'igbo',     label: 'Igbo',     flag: '🇳🇬', region: 'Nigeria',         regionFr: 'Nigeria' },
+  { id: 'zulu',     label: 'Zulu',     flag: '🇿🇦', region: 'South Africa',    regionFr: 'Afrique du Sud' },
+  { id: 'amharic',  label: 'Amharic',  flag: '🇪🇹', region: 'East Africa',     regionFr: "Afrique de l'Est" },
+  { id: 'arabic',   label: 'Arabic',   flag: '🇪🇬', region: 'North Africa',    regionFr: 'Afrique du Nord' },
+  { id: 'somali',   label: 'Somali',   flag: '🇸🇴', region: 'East Africa',     regionFr: "Afrique de l'Est" },
+  { id: 'shona',    label: 'Shona',    flag: '🇿🇼', region: 'Southern Africa', regionFr: 'Afrique australe' },
+  { id: 'lingala',  label: 'Lingala',  flag: '🇨🇩', region: 'Central Africa',  regionFr: 'Afrique centrale' },
+  { id: 'twi',      label: 'Twi',      flag: '🇬🇭', region: 'West Africa',     regionFr: "Afrique de l'Ouest" },
+  { id: 'moore',    label: 'Moore',    flag: '🇧🇫', region: 'West Africa',     regionFr: "Afrique de l'Ouest" },
+  { id: 'chichewa', label: 'Chichewa', flag: '🇲🇼', region: 'Southern Africa', regionFr: 'Afrique australe' },
+  { id: 'wolof',    label: 'Wolof',    flag: '🇸🇳', region: 'West Africa',     regionFr: "Afrique de l'Ouest" },
+  { id: 'berber',   label: 'Berber',   flag: '🇲🇦', region: 'North Africa',    regionFr: 'Afrique du Nord' },
 ];
 
 const SOURCES = [
@@ -487,15 +495,6 @@ const TOTAL_Q = 11;
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function Wave() {
-  return (
-    <svg viewBox="0 0 390 28" xmlns="http://www.w3.org/2000/svg"
-      style={{ display: 'block', width: '100%', flexShrink: 0, marginBottom: -1 }}>
-      <path d="M0,14 Q65,0 130,14 Q195,28 260,14 Q325,0 390,14 L390,28 L0,28 Z" fill={RED} />
-    </svg>
-  );
-}
-
 function SignalBars({ count }: { count: number }) {
   return (
     <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 22, flexShrink: 0 }}>
@@ -614,6 +613,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   const [selectedPlan, setSelectedPlan]         = useState<'plus' | 'free'>('free');
   const [placementQ, setPlacementQ]             = useState(0);
   const [placementAnswers, setPlacementAnswers] = useState<string[]>([]);
+  const [langIndex, setLangIndex]               = useState(0);
+  const [langAnim, setLangAnim]                 = useState(0);
 
   const t = (key: keyof typeof UI['en']) => UI[iface][key];
 
@@ -697,7 +698,24 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       align-items:center; justify-content:flex-start;
       padding:1.1rem 1.2rem 0; overflow-y:auto; gap:0.7rem;
     }
-    .ob-bottom { background:${RED}; padding:1.2rem 1.2rem 2.2rem; display:flex; flex-direction:column; gap:0.7rem; flex-shrink:0; }
+    .ob-bottom { background:transparent; padding:1.2rem 1.2rem env(safe-area-inset-bottom, 2.2rem); display:flex; flex-direction:column; gap:0.7rem; flex-shrink:0; }
+    .ob-lang-card {
+      flex:1; background:rgba(0,0,0,0.36); backdrop-filter:blur(10px);
+      border:1.5px solid rgba(255,255,255,0.18); border-radius:18px;
+      padding:1.1rem 1rem; display:flex; align-items:center; gap:0.7rem;
+      cursor:pointer; font-family:${FONT}; text-align:left;
+      transition:border-color 0.18s, background 0.18s; width:100%;
+    }
+    .ob-lang-card.sel { border-color:${GREEN}; background:rgba(76,175,80,0.20); }
+    .ob-lang-card:active { opacity:0.85; }
+    .ob-arrow-btn {
+      width:44px; height:44px; border-radius:50%; flex-shrink:0;
+      background:rgba(255,255,255,0.10); border:1.5px solid rgba(255,255,255,0.22);
+      color:#fff; font-size:1.5rem; line-height:1; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      transition:background 0.15s; font-family:${FONT};
+    }
+    .ob-arrow-btn:active { background:rgba(255,255,255,0.22); }
     .ob-btn-primary {
       background:${BLACK}; color:#fff; border:none; border-radius:30px;
       padding:1rem; font-size:0.97rem; font-weight:800; font-family:${FONT};
@@ -788,9 +806,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               ))}
             </div>
           </StepContent>
-          <Wave />
-          <div style={{ background: RED, padding: '1.4rem 1.25rem 2.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-            <p style={{ color: '#fff', fontFamily: FONT, fontWeight: 700, fontSize: '0.8rem', textAlign: 'center', margin: 0, letterSpacing: 1, textTransform: 'uppercase', opacity: 0.75 }}>
+          <div className="ob-bottom">
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontFamily: FONT, fontWeight: 700, fontSize: '0.8rem', textAlign: 'center', margin: 0, letterSpacing: 1, textTransform: 'uppercase' }}>
               {t('newUser')}
             </p>
             <button className="ob-btn-primary" onClick={() => go(1)}>{t('getStarted')}</button>
@@ -822,7 +839,6 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
           </div>
           {/* Spacer so background fills the middle */}
           <div style={{ flex: 1 }} />
-          <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" onClick={next}>{t('continue')}</button>
           </div>
@@ -839,10 +855,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
           <ProgressBar />
           <StepContent stepKey={animKey} style={{ alignItems: 'flex-start', justifyContent: 'center', gap: '1.6rem', padding: '2rem 1.4rem' }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem' }}>
-              <img src="/Afroslang.png" alt="Afro" style={{
-                width: 44, height: 44, borderRadius: '50%', objectFit: 'contain',
-                border: '2px solid rgba(176,0,32,0.5)', flexShrink: 0,
-                filter: 'drop-shadow(0 2px 8px rgba(176,0,32,0.35))',
+              <img src="/Afroplus.png" alt="Afroplus" style={{
+                width: 54, height: 54, objectFit: 'contain', flexShrink: 0,
               }} />
             </div>
             <div>
@@ -853,13 +867,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                 {t('questionsSub')}
               </p>
             </div>
-            <div className="ob-text-l" style={{ display: 'flex', gap: '0.45em' }}>
-              {[...Array(7)].map((_, i) => (
-                <div key={i} style={{ width: 30, height: 7, borderRadius: 4, background: 'rgba(176,0,32,0.2)', border: '1px solid rgba(176,0,32,0.4)' }} />
-              ))}
-            </div>
           </StepContent>
-          <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" onClick={next}>{t('letsGo')}</button>
           </div>
@@ -870,30 +878,58 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
 
   // ── STEP 3: Language select ─────────────────────────────────────────────────
   if (step === 3) {
+    const topLang = LANGUAGES[langIndex % LANGUAGES.length];
+    const botLang = LANGUAGES[(langIndex + 1) % LANGUAGES.length];
+
+    const advanceLang = () => {
+      setLangIndex(i => (i + 2) % LANGUAGES.length);
+      setLangAnim(k => k + 1);
+    };
+    const prevLang = () => {
+      setLangIndex(i => (i - 2 + LANGUAGES.length) % LANGUAGES.length);
+      setLangAnim(k => k + 1);
+    };
+
+    const LangTile = ({ lang, arrow, onArrow }: { lang: typeof LANGUAGES[0]; arrow: '›' | '‹'; onArrow: () => void }) => (
+      <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+        {arrow === '‹' && (
+          <button className="ob-arrow-btn" onClick={onArrow} aria-label="Previous">{arrow}</button>
+        )}
+        <button
+          className={`ob-lang-card${selectedLang === lang.id ? ' sel' : ''}`}
+          onClick={() => setSelectedLang(lang.id)}
+        >
+          <span style={{ fontSize: '2.2em', lineHeight: 1, flexShrink: 0 }}>{lang.flag}</span>
+          <div style={{ flex: 1 }}>
+            <p style={{ color: '#fff', fontWeight: 800, margin: 0, fontSize: '1.05em', fontFamily: FONT }}>{lang.label}</p>
+            <p style={{ color: 'rgba(255,255,255,0.45)', margin: '0.1rem 0 0', fontSize: '0.75em', fontFamily: FONT }}>
+              {iface === 'fr' ? lang.regionFr : lang.region}
+            </p>
+          </div>
+          {selectedLang === lang.id && (
+            <span style={{ color: GREEN, fontSize: '1.2em', fontWeight: 900, flexShrink: 0 }}>✓</span>
+          )}
+        </button>
+        {arrow === '›' && (
+          <button className="ob-arrow-btn" onClick={onArrow} aria-label="Next">{arrow}</button>
+        )}
+      </div>
+    );
+
     return (
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          <StepContent top stepKey={animKey} style={{ paddingTop: '1.25rem' }}>
-            <p className="ob-heading ob-text-h" style={{ width: '100%', marginBottom: '0.4rem' }}>{t('whatLearn')}</p>
-            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {LANGUAGES.map(lang => (
-                <button key={lang.id}
-                  className={`ob-row-btn${selectedLang === lang.id ? ' sel' : ''}`}
-                  onClick={() => setSelectedLang(lang.id)}>
-                  <span style={{ fontSize: '1.55em', minWidth: 28, textAlign: 'center' }}>{lang.flag}</span>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ color: '#fff', fontWeight: 700, margin: 0, fontSize: '0.94em' }}>{lang.label}</p>
-                    <p style={{ color: 'rgba(255,255,255,0.38)', margin: 0, fontSize: '0.73em' }}>
-                      {iface === 'fr' ? lang.regionFr : lang.region}
-                    </p>
-                  </div>
-                  {selectedLang === lang.id && <span style={{ color: GREEN, fontSize: '1em', fontWeight: 900 }}>✓</span>}
-                </button>
-              ))}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '1.4rem 1.2rem 0' }}>
+            <p className="ob-heading ob-text-h" style={{ width: '100%', marginBottom: '0.8rem' }}>{t('whatLearn')}</p>
+            <div key={`t-${langAnim}`} className="ob-anim" style={{ width: '100%' }}>
+              <LangTile lang={topLang} arrow="›" onArrow={advanceLang} />
             </div>
-          </StepContent>
-          <Wave />
+            <div style={{ flex: 1 }} />
+            <div key={`b-${langAnim}`} className="ob-anim" style={{ width: '100%', marginBottom: '0.5rem' }}>
+              <LangTile lang={botLang} arrow="‹" onArrow={prevLang} />
+            </div>
+          </div>
           <div className="ob-bottom">
             <button className="ob-btn-primary" disabled={!selectedLang} onClick={next}>{t('continue')}</button>
           </div>
@@ -919,9 +955,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               <div style={{ height: '100%', background: RED, borderRadius: 8, animation: 'ob-barfill 2.5s ease-out both' }} />
             </div>
           </StepContent>
-          <Wave />
-          <div style={{ background: RED, padding: '1.1rem 1.2rem 1.9rem' }}>
-            <p style={{ color: '#fff', fontWeight: 700, textAlign: 'center', fontFamily: FONT, margin: 0, fontSize: '0.88rem', animation: 'ob-pulse 1.1s ease-in-out infinite' }}>
+          <div className="ob-bottom">
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 700, textAlign: 'center', fontFamily: FONT, margin: 0, fontSize: '0.88rem', animation: 'ob-pulse 1.1s ease-in-out infinite' }}>
               {t('personalizing')}
             </p>
           </div>
@@ -954,7 +989,6 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               ))}
             </div>
           </StepContent>
-          <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" disabled={!discovery} onClick={next}>{t('continue')}</button>
           </div>
@@ -985,7 +1019,6 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               ))}
             </div>
           </StepContent>
-          <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" disabled={!level} onClick={next}>{t('continue')}</button>
           </div>
@@ -1010,8 +1043,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               {t('settingUp')}
             </p>
           </StepContent>
-          <Wave />
-          <div style={{ background: RED, padding: '1.1rem 1.2rem 1.9rem' }}>
+          <div className="ob-bottom">
             <button className="ob-btn-primary" onClick={next}>{t('continue')}</button>
           </div>
         </div>
@@ -1044,7 +1076,6 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               ))}
             </div>
           </StepContent>
-          <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" disabled={goals.length === 0} onClick={next}>{t('continue')}</button>
           </div>
@@ -1064,7 +1095,6 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
             <p className="ob-heading ob-text-h">{t('routineTitle')}</p>
             <p className="ob-sub ob-text-s" style={{ maxWidth: 275 }}>{t('routineSub')}</p>
           </StepContent>
-          <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" onClick={next}>{t('soundsGood')}</button>
           </div>
@@ -1097,7 +1127,6 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               ))}
             </div>
           </StepContent>
-          <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" disabled={!dailyGoal} onClick={next}>{t('lockedIn')}</button>
           </div>
@@ -1253,7 +1282,6 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
             </div>
             <p className="ob-sub ob-text-s" style={{ fontSize: '0.8em', maxWidth: 260 }}>{t('saveProg')}</p>
           </StepContent>
-          <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" onClick={() => onComplete(selectedLang, selectedPlan, scoreFrac)}>
               {t('createAccount')}
