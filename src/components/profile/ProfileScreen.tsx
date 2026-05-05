@@ -30,7 +30,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [equipping, setEquipping] = useState<string | null>(null);
 
   const isEn = interfaceLanguage === 'en';
-  const username   = userData?.username || user?.displayName || (isGuest ? (isEn ? 'Guest' : 'Invité') : 'User');
+  const username   = userData?.username || (user?.user_metadata?.full_name as string | undefined) || (isGuest ? (isEn ? 'Guest' : 'Invité') : 'User');
   const email      = userData?.email    || user?.email    || '';
   const initials   = username.slice(0, 2).toUpperCase();
   const isPremium  = userData?.subscription?.active ?? false;

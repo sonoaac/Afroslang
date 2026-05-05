@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../../firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { supabase } from '../../lib/supabase';
 
 interface SignUpProps {
   onSuccess: () => void;
@@ -22,19 +20,13 @@ export const SignUp: React.FC<SignUpProps> = ({ onSuccess, onSwitchToLogin }) =>
     setError('');
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      await setDoc(doc(db, "users", user.uid), {
-        username,
-        email,
-        hearts: 5,
-        xp: 0,
-        subscription: { active: false, plan: null },
-        createdAt: new Date().toISOString(),
-        languages: {}
+      const { data: { user }, error } = await supabase.auth.signUp({ email, password });
+      if (error || !user) throw error ?? new Error('Signup failed');
+      await supabase.from('profiles').insert({
+        id: user.id, username, email, hearts: 5, xp: 0,
+        sandbits: 0, diamonds: 0, subscription_active: false,
+        subscription_plan: null, created_at: new Date().toISOString(),
       });
-
       onSuccess();
     } catch (error: any) {
       

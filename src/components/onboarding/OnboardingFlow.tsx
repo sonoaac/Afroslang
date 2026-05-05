@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 // ── Bilingual UI strings ──────────────────────────────────────────────────────
 
@@ -509,6 +509,60 @@ function SignalBars({ count }: { count: number }) {
   );
 }
 
+// ── Typing greeting component (Step 1) ───────────────────────────────────────
+
+function TypingGreeting({ hiThere, mascotName, guide }: { hiThere: string; mascotName: string; guide: string }) {
+  const fullText = hiThere + mascotName;
+  const [phase, setPhase] = useState<'dots' | 'typing' | 'done'>('dots');
+  const [displayed, setDisplayed] = useState('');
+  const ivRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    const t1 = setTimeout(() => {
+      setPhase('typing');
+      let idx = 0;
+      ivRef.current = setInterval(() => {
+        idx++;
+        setDisplayed(fullText.slice(0, idx));
+        if (idx >= fullText.length) {
+          clearInterval(ivRef.current!);
+          setPhase('done');
+        }
+      }, 48);
+    }, 1300);
+    return () => {
+      clearTimeout(t1);
+      if (ivRef.current) clearInterval(ivRef.current);
+    };
+  }, [fullText]);
+
+  if (phase === 'dots') {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7, paddingTop: '0.8rem', minHeight: '2.2rem' }}>
+        <div className="ob-dot-1" style={{ width: 10, height: 10, borderRadius: '50%', background: '#fff' }} />
+        <div className="ob-dot-2" style={{ width: 10, height: 10, borderRadius: '50%', background: '#fff' }} />
+        <div className="ob-dot-3" style={{ width: 10, height: 10, borderRadius: '50%', background: '#fff' }} />
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', paddingTop: '0.5rem' }}>
+      <p style={{ color: '#fff', fontFamily: FONT, fontWeight: 900, fontSize: '1.3rem', margin: 0, lineHeight: 1.3 }}>
+        {displayed}
+        {phase === 'typing' && (
+          <span style={{ color: RED, display: 'inline-block', animation: 'ob-pulse 0.6s ease-in-out infinite', marginLeft: 1 }}>|</span>
+        )}
+      </p>
+      {phase === 'done' && (
+        <p style={{ color: 'rgba(255,255,255,0.55)', fontFamily: FONT, fontSize: '0.85rem', margin: 0, animation: 'ob-fadein 0.4s ease both' }}>
+          {guide}
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 interface OnboardingFlowProps {
@@ -581,7 +635,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
     .ob-dot-3 { animation: ob-dot 1.1s ease-in-out 0.36s infinite; }
     .ob-card {
       width:100%; max-width:390px;
-      height:100dvh; max-height:900px;
+      height:100dvh;
       display:flex; flex-direction:column;
       background:${DARK}; position:relative; overflow:hidden;
       background-size:cover; background-position:center top;
@@ -614,8 +668,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
     .ob-row-btn {
       background:#1a1a1a; border:1.5px solid #252525; border-radius:13px;
       padding:0.75rem 0.9rem; display:flex; align-items:center; gap:0.7rem;
-      cursor:pointer; width:100%; font-family:${FONT}; transition:border-color 0.15s, background 0.15s;
-      text-align:left;
+      cursor:pointer; width:100%; font-family:${FONT}; font-weight:700;
+      transition:border-color 0.15s, background 0.15s; text-align:left;
     }
     .ob-row-btn:hover { border-color:${GREEN}; background:rgba(76,175,80,0.08); }
     .ob-row-btn.sel  { border-color:${GREEN}; background:rgba(76,175,80,0.12); }
@@ -708,14 +762,21 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          <div className="ob-content ob-anim">
-            <img src="/Afroslang.png" alt="Afro" className="ob-mascot"
-              style={{ animation: 'ob-bounce 1.8s ease-in-out infinite' }} />
-            <div className="ob-bubble-speech">
-              {t('hiThere')}<strong>{t('mascotName')}</strong>
-              <br /><span style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.82em' }}>{t('guide')}</span>
-            </div>
+          {/* Top-left mascot + typing greeting */}
+          <div style={{ padding: '1.5rem 1.4rem 0', display: 'flex', alignItems: 'flex-start', gap: '0.85rem' }} className="ob-anim">
+            <img
+              src="/Afroslang.png"
+              alt="Afro"
+              style={{
+                width: 68, height: 68, objectFit: 'contain', flexShrink: 0,
+                animation: 'ob-bounce 1.8s ease-in-out infinite',
+                filter: 'drop-shadow(0 4px 18px rgba(176,0,32,0.45))',
+              }}
+            />
+            <TypingGreeting hiThere={t('hiThere')} mascotName={t('mascotName')} guide={t('guide')} />
           </div>
+          {/* Spacer so background fills the middle */}
+          <div style={{ flex: 1 }} />
           <Wave />
           <div className="ob-bottom">
             <button className="ob-btn-primary" onClick={next}>{t('continue')}</button>

@@ -89,7 +89,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
       }
       // 'cancelled' — user dismissed the store sheet, do nothing
     } else {
-      buyDiamondPack(pack, user.uid, user.email ?? '');
+      buyDiamondPack(pack, user.id, user.email ?? '');
     }
   };
 
@@ -113,7 +113,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
         if (!STRIPE_ORIGINS.has(dest.origin)) return;
       } catch { return; }
       const returnUrl = `${window.location.origin}?payment_success=1`;
-      const url = `${plan.paymentLink}?client_reference_id=${encodeURIComponent(user.uid)}&prefilled_email=${encodeURIComponent(user.email ?? '')}&redirect_url=${encodeURIComponent(returnUrl)}`;
+      const url = `${plan.paymentLink}?client_reference_id=${encodeURIComponent(user.id)}&prefilled_email=${encodeURIComponent(user.email ?? '')}&redirect_url=${encodeURIComponent(returnUrl)}`;
       window.location.href = url;
     }
   };
@@ -134,7 +134,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
     if (purchasing === item.id) return;
     setPurchasing(item.id);
     try {
-      const result = await purchaseCosmetic(user.uid, userData, item, type);
+      const result = await purchaseCosmetic(user.id, userData, item, type);
       if (result) {
         setUserData({ ...userData, ...result });
         showToast(isEn ? `✓ ${item.name} purchased!` : `✓ ${item.name} acheté!`);
@@ -153,7 +153,7 @@ export function ShopScreen({ interfaceLanguage, onBack }: ShopScreenProps) {
     if (purchasing === item.id) return;
     setPurchasing(item.id);
     try {
-      const result = await equipCosmetic(user.uid, item.id, type);
+      const result = await equipCosmetic(user.id, item.id, type);
       if (userData) setUserData({ ...userData, ...result });
       showToast(isEn ? `✓ ${item.name} equipped!` : `✓ ${item.name} équipé!`);
     } catch {

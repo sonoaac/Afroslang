@@ -35,7 +35,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
 
   const handleDeactivateDemo = async () => {
     if (user && userData?.subscription?.demo) {
-      await deactivateDemoSubscription(user.uid);
+      await deactivateDemoSubscription(user.id);
       window.location.reload();
     }
     setIsOpen(false);

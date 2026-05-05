@@ -34,37 +34,45 @@ Node 22.x is required.
 
 ## Architecture
 
-### Screen Navigation (`src/App.tsx`)
+### Screen Navigation (`src/App.tsx`, `src/main.tsx`)
 
-App is a single-page app with no router. Navigation is a `currentScreen` state string that switches between rendered screen components:
+The app uses **react-router-dom v7** with `BrowserRouter`. Route structure:
 
 ```
-AfroslangIntro (logo animation, once per session)
-  → LandingPage (unauthenticated)
-  → interface-select → path → lesson → complete
-                            ↘ leaderboard / shop / latest-news / subscription / payment-success / feedback
+/                        → LandingPage (login/signup overlay, Africa map, language picker)
+/:country/:lang          → LearnView (LearningPath → LessonScreen → LessonComplete sub-screens)
+/shop                    → ShopScreen
+/leaderboard             → LeaderboardScreen
+/profile                 → ProfileScreen
+/news                    → LatestNews
+/subscription            → SubscriptionPage
+/payment-success         → SuccessPage
+/feedback                → FeedbackPage
+/learn/:lang             → (legacy) redirects to /:country/:lang
+/:lang                   → (legacy) redirects to /:country/:lang
+*                        → redirects to /
 ```
 
-`SplashScreen` (`src/components/splash/SplashScreen.tsx`) exists as a file but is **not currently used** in `App.tsx` — it was removed from the navigation flow. Do not re-add it without intent.
+Language URLs use a `/:country/:lang` pattern (e.g. `/nigeria/hausa`, `/ethiopia/amharic`). The `LANG_COUNTRY` constant in `App.tsx` maps each `AfricanLanguage` to its primary country slug. `langUrl(lang)` constructs the canonical URL.
 
-Returning authenticated users skip `LandingPage` and go straight to `interface-select`. The `currentLanguage` is intentionally **not** restored on load — users always choose their language fresh each session.
+Unauthenticated users see `LandingPage` at `/`. After auth, the app navigates to `/:country/:lang` for the user's selected language (or the pre-selected language captured from the URL on first visit). Routes other than `/` redirect to `/` if unauthenticated.
 
-`userProgressMap` (keyed by `AfricanLanguage`) is the primary client-side state. It persists to `localStorage` (keys: `afroslang_progress`, `afroslang_interface`, `afroslang_current_language`). XP/streaks only count for authenticated (non-guest) users.
-
-`sessionStorage` keys: `afro_intro_seen` (logo intro shown).
+`userProgressMap` (keyed by `AfricanLanguage`) is the primary client-side state. It persists to `localStorage` (keys: `afroslang_progress`, `afroslang_interface`). XP/streaks only count for authenticated (non-guest) users.
 
 ### Authentication (`src/contexts/AuthContext.tsx`)
 
-Firebase Auth via `useAuth()` hook. Three modes:
-- **Authenticated user** — full Firebase Firestore sync
+**Supabase Auth** via `useAuth()` hook (`src/lib/supabase.ts` — requires `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` env vars). Three modes:
+- **Authenticated user** — full Supabase sync (profiles + progress tables)
 - **Guest** — progress stored in `localStorage` via `loadGuestProgress`/`saveGuestProgress`
 - **Unauthenticated** — shows `<LandingPage />`
 
-On every auth state change, `AuthContext` calls `getCurrentHeartsStatus()` from `src/utils/heartsTimer.ts` to recalculate heart regeneration before setting `userData`.
+On every auth state change, `AuthContext` calls `getCurrentHeartsStatus()` from `src/utils/heartsTimer.ts` to recalculate heart regeneration before setting `userData`. Also initializes RevenueCat via `initRevenueCat()` from `src/utils/revenueCatUtils.ts` (native in-app purchases).
 
-**`UserData` vs `UserProgress`** — these are two distinct types:
-- `UserData` (`src/utils/userData.ts`) — the Firestore document: subscription status, gems, total XP, `heartsData` with server-side regeneration timestamps.
+**`UserData` vs `UserProgress`** — two distinct types:
+- `UserData` (`src/utils/userData.ts`) — the Supabase `profiles` row: subscription status, gems, sandbits, diamonds, equipped cosmetics, `heartsData` with server-side regeneration timestamps.
 - `UserProgress` (`src/types/index.ts`) — client-side per-language state in `userProgressMap`: XP, level, streak, `completedLessons[]`. Persisted to `localStorage`.
+
+> **Firebase note:** `src/firebase.ts`, `src/firebase.js`, `src/utils/demoSubscription.ts`, and `src/components/debug/Firebase*.tsx` are legacy artifacts — Firebase is no longer used for auth or data storage. Do not add new Firebase dependencies.
 
 ### Lesson Data Pipeline (`src/data/lessons/index.ts`)
 
@@ -93,42 +101,72 @@ Enriched exercises carry `isEnriched: true` on the runtime `EnrichedExercise` ty
 
 ### Conversation Scripts (`src/features/lessons/conversationScripts.ts`)
 
-Topic-aware dialogue scripts exist for all 15 languages. `getConversationScript(languageId, topic)` returns a `ConversationTurn[]` array with native text, English gloss, French gloss, answer choices, and `wrongExplanation` fields. `detectTopic(lessonTitle)` infers topic from lesson title keywords (greetings, numbers, family, food, colors, etc.). All conversation turns include bilingual fields (`text`, `textTranslation`, `textTranslationFr`, `wrongExplanation`, `wrongExplanationFr`).
+Topic-aware dialogue scripts exist for all 15 languages. `getConversationScript(languageId, topic)` returns a `ConversationTurn[]` array with native text, English gloss, French gloss, answer choices, and `wrongExplanation` fields. `detectTopic(lessonTitle)` infers topic from lesson title keywords. All conversation turns include bilingual fields (`textTranslation`, `textTranslationFr`, `wrongExplanation`, `wrongExplanationFr`).
 
 ### Tone Training (`src/features/lessons/lessonUtils.ts`)
 
-Tonal languages get `tone-trainer` exercises automatically. `TONAL_LANGUAGES` set: `igbo, yoruba, hausa, twi, ewe, moore, lingala`. The `TONE_DATA` object maps each language to an array of `ToneEntry` objects containing the diacritic mark, English/French name, a native example word, its meaning, and pitch direction (`high | low | mid | rising | falling`).
+Tonal languages get `tone-trainer` exercises automatically. `TONAL_LANGUAGES` set: `igbo, yoruba, hausa, twi, ewe, moore, lingala`. The `TONE_DATA` object maps each language to an array of `ToneEntry` objects with the diacritic mark, English/French name, a native example word, its meaning, and pitch direction (`high | low | mid | rising | falling`).
 
 ### Key Data Types (`src/types/index.ts`)
 
 - `UserProgress` — per-language client state (xp, level, hearts, streak, completedLessons[])
 - `Stage` → `Lesson` → `Exercise` — the content hierarchy
-- `ConversationTurn` — one turn in a scripted dialogue (speaker, native text, translation, options, wrongExplanation)
+- `ConversationTurn` — one turn in a scripted dialogue
 - `StoryWord` — a tappable word in a story exercise (word, meaning, meaningFr)
 - `ToneEntry` — one tone in a tone-trainer slide (mark, name, example, pitch)
-- Hearts: max 5, regenerate at **1 heart per 5 hours** (incremental, not a bulk reset). Managed server-side via `src/utils/heartsTimer.ts` for authenticated users, via `localStorage` key `afroslang_guest_hearts` for guests. Subscribers get 999 (unlimited).
+- Hearts: max 5, regenerate at **1 heart per 5 hours** (incremental). Managed server-side via `src/utils/heartsTimer.ts` for authenticated users, via `localStorage` key `afroslang_guest_hearts` for guests. Plus subscribers get 999 (unlimited).
 - Guest lesson cap: 3 completions before `GuestLimitModal` prompts sign-up; XP/streaks do not persist for guests
 
 ### Design System
 
 Dark luxury theme defined in `src/styles/globals.css`:
 - **Brand colors:** `--brand-black: #000000`, `--brand-red: #b00020`, `--brand-green: #35b729`
-- **Background:** `--app-bg` is a radial gradient (dark black + subtle red glow)
+- **Background:** `--app-bg` is a radial gradient (dark black + subtle red glow); overridden by user's equipped background
 - **Fonts:** Plus Jakarta Sans (primary UI font) and Playfair Display (serif/editorial) — loaded via Google Fonts in `globals.css`
 - **Component library:** shadcn/ui in `src/components/ui/` — **do not modify these files directly**
 
-### Firebase / Backend (`src/firebase.ts`, `src/utils/`, `functions/`)
+### Animated Backgrounds
 
-- **Firestore collections:** `users/{uid}` for profile/progress, `leaderboard` for weekly XP
+The app shell wraps all authenticated routes in a canvas background that respects `userData.equippedBackground`:
+
+| Background ID | Canvas Component | CSS gradient applied |
+|---|---|---|
+| `bg_default` | `GlCanvas` | Dark warm radial gradient |
+| `bg_savanna` | `SavannaCanvas` | Warm orange-red linear |
+| `bg_cloudy` | `CloudyCanvas` | Blue storm linear |
+| `bg_night` | `NightSkyCanvas` | Purple/cyan starfield |
+| `bg_forest` | `DeepForestCanvas` | Dark teal HSL |
+| `bg_ocean` | `OceanCanvas` | Ocean blue linear |
+
+`getBackgroundStyle(bgId)` in `currencyUtils.ts` returns the CSS for the `style` attribute; the matching canvas component renders on top.
+
+### Supabase / Backend (`src/lib/supabase.ts`, `src/utils/`)
+
+- **Supabase tables:** `profiles` (user data, cosmetics, subscription), `progress` (per-language lesson completion/XP), `leaderboard` (weekly XP)
+- **Env vars required:** `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
 - **Leaderboard leagues** (7 tiers): Copper → Bronze → Silver → Gold → Platinum → Diamond → Stars
-- Firebase config has hardcoded fallback values in `src/firebase.ts`; `.env` vars (`VITE_FIREBASE_*`) take precedence
-- Firebase emulators can be enabled via `VITE_USE_FIREBASE_EMULATOR=true`
-- **Stripe webhook:** The live handler is a Firebase Cloud Function at `functions/src/index.ts` — NOT `src/api/stripe-webhook.ts` (that file is reference-only). Webhook URL: `https://us-central1-ahamefuna-legacy.cloudfunctions.net/stripeWebhook`. Secrets are set via `firebase functions:secrets:set STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`.
-- **Subscription flow:** `SubscriptionPage` redirects to a Stripe Payment Link with `client_reference_id=uid`. On return (`?payment_success=1`), `SuccessPage` polls Firestore every 2 s (up to 30 s) waiting for the webhook to flip `users/{uid}.subscription.active = true`. Use `src/utils/demoSubscription.ts` to activate/deactivate subscriptions locally for testing.
+- **Stripe webhook:** The live handler is a Firebase Cloud Function at `functions/src/index.ts`. Webhook URL: `https://us-central1-ahamefuna-legacy.cloudfunctions.net/stripeWebhook`. Secrets are set via `firebase functions:secrets:set STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`.
+- **Subscription flow:** `SubscriptionPage` redirects to a Stripe Payment Link with `client_reference_id=uid`. On return (`?payment_success=1`), `SuccessPage` polls Supabase every 2 s (up to 30 s) waiting for the webhook to flip `profiles.subscription_active = true`.
+- **RevenueCat:** Native in-app purchases (mobile) via `@revenuecat/purchases-capacitor`. Initialized in `AuthContext` on login; reset on logout.
 
-### Gems & Currency (`src/utils/currencyUtils.ts`)
+### Gems, Sandbits & Diamonds (`src/utils/currencyUtils.ts`)
 
-Two in-app currencies: **Gems** (earned by completing lessons) and **Sandbits** (purchasable; used for XP boosts). Shop actions: hearts refill (100 gems), XP boost (150 sandbits → 2× XP for 1 hour), Sandbits pack purchase. XP boost expiry is stored on `userData.xpBoostExpiry` (timestamp). Plus subscribers bypass the hearts system entirely (hearts set to 999).
+Three in-app currencies:
+- **Gems** — earned by completing lessons (not yet wired; reserved for shop)
+- **Sandbits** — earned via leaderboard rewards; used to purchase cosmetics in the shop
+- **Diamonds** — purchased with real money via Stripe Payment Links (`DIAMOND_PACKS`); convert to Sandbits at 1 diamond = 50 SB
+
+Shop actions: cosmetic avatar purchase (Sandbits), background purchase (Sandbits), diamond → Sandbits conversion. Plus subscribers get 2× XP automatically (`isXpBoostActive()` checks subscription status — there is no separate purchasable XP boost).
+
+Diamond purchase return uses `?diamonds_success=1` URL param; `App.tsx` polls Supabase for up to 20 s waiting for the webhook to credit the diamonds.
+
+### Cosmetics System (`src/utils/currencyUtils.ts`)
+
+`AVATARS` and `BACKGROUNDS` arrays define the cosmetic catalogue (`CosmeticItem` type). Items with `plusOnly: true` are automatically owned by Plus subscribers. `purchaseCosmetic()` deducts Sandbits and updates `profiles.owned_avatars` / `profiles.owned_backgrounds`. `equipCosmetic()` updates `profiles.equipped_avatar` / `profiles.equipped_background`.
+
+### Placement Test
+
+`handleSetPlacementScore(languageId, scoreFrac)` in `App.tsx` pre-unlocks stages based on a quiz result: 70%+ skips 1–4 stages (1 per 10% above 70%, max 4 at 100%). Unlocking marks all lessons in skipped stages as completed in `userProgressMap`.
 
 ### Path Aliases
 
@@ -136,58 +174,49 @@ TypeScript path alias `@/*` maps to `./src/*` (configured in `tsconfig.json`). U
 
 ### TypeScript Strictness
 
-`tsconfig.json` enables `strict`, `noUnusedLocals`, and `noUnusedParameters`. `npm run typecheck` (or `tsc --noEmit`) will fail on unused variables — remove them rather than prefixing with `_`.
+`tsconfig.json` enables `strict`, `noUnusedLocals`, and `noUnusedParameters`. `npm run typecheck` will fail on unused variables — remove them rather than prefixing with `_`.
 
 ### UI Components & Screen Modules
 
 - `src/components/ui/` — shadcn/ui component library (do not modify these files)
-- `src/features/language-select/` — `LanguageSelectionScreen`, `InterfaceLanguageSelector`, `FlagIcon`, `SelectMotionOverlay` (visual overlay during language pick transition)
-- `src/features/lessons/` — `LearningPath` (stage/lesson map), `LessonScreen` (quiz runner), `LessonComplete`, `ExerciseTypes` (base exercise renderers), `AdvancedExercises` (type-answer, word-order variants), `EnrichedExercises` (flashcard, audio-match, cultural-card renderers), `IntroPhases` (teaches content before quiz phase begins)
-- `src/features/store/` — `ShopScreen` (gems/sandbits shop)
-- `src/hooks/` — empty; hook logic lives in components or `src/utils/`
-- `src/api/` — `create-checkout-session.ts` and `stripe-webhook.ts` (reference-only; live webhook is in `functions/`)
-- `src/components/intro/` — `AfroslangIntro` (animated logo reveal, plays once per session)
-- `src/components/splash/` — `SplashScreen` (3D shattering text animation, unused in App.tsx)
-- `src/components/landing/` — Full landing page suite:
-  - `LandingPage` — scrolling marketing page with hero, interactive Africa map explorer, feature blocks, footer, and glassmorphic auth overlay (login/signup). Manages a `pendingLanguage` flow: when an unauthenticated user picks a language from the map and hits "Start Learning", the language is stored in `pendingLanguage` and applied after signup/login completes.
-  - `AfricaMap` — D3 v7 choropleth of Africa (loaded dynamically from CDN at `https://d3js.org/d3.v7.min.js`). Accepts `onCountrySelect(iso2)`, `highlightedCodes` (search results), and `unlockedCodes` (countries lit up when the user has completed ≥1 lesson in any of that country's languages). Country–language mapping lives in `LANGUAGE_COUNTRIES` in `LandingPage.tsx`.
-  - `GlCanvas` — WebGL animated canvas used as the hero background (also imported in `App.tsx`).
-  - `StaticPage` — wrapper that renders in-app static content (About, Our Story, Terms, Privacy, etc.) — navigated to by setting `activePage` state in `LandingPage`.
-  - `DescrambleText` — letter-by-letter drop-in/scramble animation used for the hero heading and auth modal titles.
-  - Auth overlay: glassmorphic card with Login / Sign Up tabs. Client-side rate limiting stored in `localStorage` key `afro_login_rl` (5 attempts → 15-minute lockout). Password validation enforces 7 chars + uppercase + lowercase + digit + special character before submission.
-- `src/components/rain/` — `RainCanvas` (animated rain background) and `MascotFactCard` (cultural facts carousel shown on `LearningPath` for languages in `RAIN_LANGUAGES`)
-- `src/components/` — shared components: auth, layout, leaderboard, subscription, streak, mascot, debug
+- `src/features/language-select/` — `LanguageSelectionScreen`, `InterfaceLanguageSelector`, `FlagIcon`, `SelectMotionOverlay`
+- `src/features/lessons/` — `LearningPath`, `LessonScreen`, `LessonComplete`, `ExerciseTypes`, `AdvancedExercises`, `EnrichedExercises`, `IntroPhases`
+- `src/features/store/` — `ShopScreen` (cosmetics/currency shop)
+- `src/components/landing/` — `LandingPage`, `AfricaMap` (D3 v7 choropleth), `GlCanvas`, `SavannaCanvas`, `CloudyCanvas`, `NightSkyCanvas`, `DeepForestCanvas`, `OceanCanvas`, `StaticPage`, `DescrambleText`
+- `src/components/profile/` — `ProfileScreen` (user stats, equipped cosmetics, language progress overview, settings)
+- `src/components/rain/` — `RainCanvas` and `MascotFactCard` (shown on `LearningPath` for `RAIN_LANGUAGES`)
+- `src/components/auth/` — `Login`, `SignUp`, `AuthModal`, `AuthScreen`
+- `src/components/intro/` — `AfroslangIntro` (animated logo reveal — present in the codebase but not used in any route)
+- `src/components/splash/` — `SplashScreen` (unused in routing — do not re-add without intent)
+- `src/utils/logger.ts` — wrapper for console logging (use instead of bare `console.log`)
 
 ### Cultural Facts & Rain Background
 
-`src/data/culturalFacts.ts` exports:
-- `culturalFacts` — per-language arrays of `CulturalFact` objects (each with `text`, `textFr`, `emoji`)
-- `RAIN_LANGUAGES` — a `Set` of language IDs that display the rain canvas + mascot fact card on the `LearningPath` screen (tropical/high-rainfall region languages)
-
-When adding a new language, add cultural facts here and decide whether it belongs in `RAIN_LANGUAGES`.
+`src/data/culturalFacts.ts` exports `culturalFacts` (per-language `CulturalFact[]`) and `RAIN_LANGUAGES` (Set of language IDs that show rain canvas + mascot fact card on `LearningPath`).
 
 ### Duplicate / Legacy Files
 
-- `src/data/` root contains legacy copies of some lesson files (e.g. `src/data/swahili.ts`, `hausa.ts`, `yoruba.ts`, `zulu.ts`). The canonical source is `src/data/lessons/<language>.ts`. **Do not add new content to files in `src/data/` root.**
-- `src/data/all-languages.ts` and `src/data/lessons/all-languages.ts` are aggregate files — do not add new lessons here; add to individual language files instead.
-- `src/data/swahili-structured.ts` mirrors `src/data/lessons/swahili-structured.ts` — the `lessons/` version is canonical.
-- `src/firebase.js` and `src/firebase.ts` both exist — use only `src/firebase.ts`. The `.js` file is a legacy artifact.
+- `src/data/` root contains legacy copies of some lesson files. Canonical source is `src/data/lessons/<language>.ts`. **Do not add content to files in `src/data/` root.**
+- `src/data/all-languages.ts` and `src/data/lessons/all-languages.ts` are aggregate files — do not add lessons here; use individual language files.
+- `src/firebase.js` — legacy artifact; use only `src/firebase.ts` if Firebase debug tools are needed.
+- `src/utils/demoSubscription.ts` — legacy Firebase-based subscription toggle; no longer functional against Supabase.
 - `src/main.tsx.backup` — ignore it.
-- `src/lib/` and `src/pages/` directories exist but are empty placeholders.
-- Root-level `components/` directory at the repo root (not `src/components/`) is a legacy artifact — do not add anything there.
+- `src/lib/` contains only `supabase.ts`; `src/pages/` and `src/hooks/` are empty placeholders.
+- Root-level `components/` and `project/` directories are legacy artifacts — do not add anything there.
 
 ### Adding a New Language
 
-1. Create `src/data/lessons/<language>.ts` exporting `<language>Lessons` (array of lesson objects with `exercises`)
+1. Create `src/data/lessons/<language>.ts` exporting `<language>Lessons`
 2. Add the language ID to `AfricanLanguage` type in `src/types/index.ts`
 3. Add it to `rawLessonsForLanguage()` switch in `src/data/lessons/index.ts`
 4. Add metadata to `src/data/languages.ts`
 5. Add cultural facts to `src/data/culturalFacts.ts`; decide whether it belongs in `RAIN_LANGUAGES`
 6. If tonal, add it to `TONAL_LANGUAGES` and provide `TONE_DATA` entries in `src/features/lessons/lessonUtils.ts`
 7. Add topic-aware conversation scripts to `src/features/lessons/conversationScripts.ts`
-8. Add to `LANGUAGE_COUNTRIES` in `LandingPage.tsx` (maps language ID → ISO-2 country codes) so the Africa map lights up correctly
-9. Add the relevant countries to `EXPLORE_COUNTRIES` in `LandingPage.tsx` if not already present (each entry has `code`, `name`, `fact`, `languages[]`)
-10. Run `npm run validate:lessons` to check data integrity
+8. Add to `LANG_COUNTRY` in `App.tsx` (language ID → country slug for URL)
+9. Add to `LANGUAGE_COUNTRIES` in `LandingPage.tsx` (language ID → ISO-2 country codes for Africa map)
+10. Add the relevant countries to `EXPLORE_COUNTRIES` in `LandingPage.tsx` if not already present
+11. Run `npm run validate:lessons` to check data integrity
 
 ### Lesson Data Validation
 
@@ -209,10 +238,10 @@ Every user-facing string in lesson/exercise data must have English + French vari
 
 ### Hearts Regeneration (`src/utils/heartsTimer.ts`)
 
-Hearts refill at **1 heart per 5 hours** (up to max 5). The `HeartsData` object (`currentHearts`, `lastResetTime`, `maxHearts`) is stored in `users/{uid}.heartsData` in Firestore for authenticated users and in `localStorage` key `afroslang_guest_hearts` for guests. `AuthContext` calls `getCurrentHeartsStatus()` on login to apply any hearts that regenerated while the user was away and writes the update back to Firestore.
+Hearts refill at **1 heart per 5 hours** (up to max 5). `HeartsData` (`currentHearts`, `lastResetTime`, `maxHearts`) is stored in `profiles.hearts_*` columns in Supabase for authenticated users and in `localStorage` key `afroslang_guest_hearts` for guests. `AuthContext` calls `getCurrentHeartsStatus()` on login to apply regenerated hearts and writes back to Supabase.
 
 ### Deployment
 
-- **Vercel** is the target host (`vercel.json` in root). No special build config needed — Vite output in `dist/` is served directly.
-- Firebase config is read from `VITE_FIREBASE_*` env vars, with hardcoded fallbacks in `src/firebase.ts` for development without `.env`.
-- Stripe API keys go in `VITE_STRIPE_*` env vars; the live webhook handler is `functions/src/index.ts`, not `src/api/stripe-webhook.ts` (that file is reference-only).
+- **Vercel** is the target host (`vercel.json` in root). Vite output in `dist/` is served directly.
+- Supabase config is read from `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` env vars.
+- Stripe API keys go in `VITE_STRIPE_*` env vars; the live webhook handler is `functions/src/index.ts` (Firebase Cloud Function).

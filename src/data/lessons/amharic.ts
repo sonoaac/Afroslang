@@ -189,7 +189,7 @@ export const amharicLessons: Lesson[] = [
       }
     ]
   },
-  // Stage 1, Mission 2: Common Phrases
+  // Stage 1, Lesson 2: Common Phrases
   {
     id: 'am-vocab-1-2',
     stageId: 'amharic-stage-1',

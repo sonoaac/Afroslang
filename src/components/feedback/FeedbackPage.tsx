@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { supabase } from '../../lib/supabase';
 import { logger } from '../../utils/logger';
 import { BarChart3, TrendingUp, Target, Lightbulb, ChevronLeft, Award, Zap, BookOpen } from 'lucide-react';
 
@@ -48,12 +47,21 @@ export const FeedbackPage: React.FC<FeedbackPageProps> = ({ onBack }) => {
   const loadUserProgress = async () => {
     try {
       setLoading(true);
-      const userRef = doc(db, 'users', user!.uid);
-      const userSnap = await getDoc(userRef);
-      
-      if (userSnap.exists()) {
-        const data = userSnap.data();
-        const progress = data.userProgressMap || {};
+      const { data: profileData } = await supabase
+        .from('language_progress')
+        .select('language_id,xp,hearts,completed_lessons')
+        .eq('user_id', user!.id);
+
+      if (profileData) {
+        const progress: UserProgress = {};
+        for (const row of profileData) {
+          progress[row.language_id] = {
+            xp: row.xp, level: 1, hearts: row.hearts,
+            completedLessons: row.completed_lessons,
+            mistakeCount: 0, wordsLearned: 0,
+            lessonsCompleted: row.completed_lessons.length,
+          };
+        }
         setUserProgress(progress);
         
         // Calculate totals

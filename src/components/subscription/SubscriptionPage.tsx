@@ -34,7 +34,7 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({ onBack }) =>
         // Web — redirect to Stripe Payment Link
         const plan = SUBSCRIPTION_PLANS[planType];
         const returnUrl = `${window.location.origin}?payment_success=1`;
-        const paymentUrl = `${plan.paymentLink}?client_reference_id=${encodeURIComponent(user.uid)}&prefilled_email=${encodeURIComponent(user.email ?? '')}&prefilled_name=${encodeURIComponent(userData?.username ?? '')}&redirect_url=${encodeURIComponent(returnUrl)}`;
+        const paymentUrl = `${plan.paymentLink}?client_reference_id=${encodeURIComponent(user.id)}&prefilled_email=${encodeURIComponent(user.email ?? '')}&prefilled_name=${encodeURIComponent(userData?.username ?? '')}&redirect_url=${encodeURIComponent(returnUrl)}`;
         window.location.href = paymentUrl;
       }
     } catch (error) {

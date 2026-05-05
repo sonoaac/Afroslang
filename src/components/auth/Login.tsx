@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase";
+import { supabase } from '../../lib/supabase';
 
 interface LoginProps {
   onSuccess: () => void;
@@ -20,7 +19,8 @@ export const Login: React.FC<LoginProps> = ({ onSuccess, onSwitchToSignUp, onGue
     setError('');
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+      if (authError) throw authError;
       onSuccess();
     } catch (error: any) {
       setError(error.message);

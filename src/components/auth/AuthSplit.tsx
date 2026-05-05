@@ -1,7 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../../firebase';
+import { supabase } from '../../lib/supabase';
 import './AuthSplit.css';
 import { AfroslangSignature } from './AfroslangSignature';
 
@@ -66,7 +64,8 @@ export const AuthSplit: React.FC<AuthSplitProps> = ({
     setLoginSuccess('');
 
     try {
-      await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
+      const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password: loginPassword });
+      if (error) throw error;
       onSuccess?.();
     } catch (error: any) {
       setLoginError(error?.message || 'Login failed.');
@@ -83,7 +82,8 @@ export const AuthSplit: React.FC<AuthSplitProps> = ({
       return;
     }
     try {
-      await sendPasswordResetEmail(auth, loginEmail);
+      const { error } = await supabase.auth.resetPasswordForEmail(loginEmail);
+      if (error) throw error;
       setLoginSuccess('Password reset email sent.');
     } catch (error: any) {
       setLoginError(error?.message || 'Could not send reset email.');
@@ -96,32 +96,17 @@ export const AuthSplit: React.FC<AuthSplitProps> = ({
     setSignupError('');
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, signupEmail, signupPassword);
-      const user = userCredential.user;
-
-      await setDoc(doc(db, 'users', user.uid), {
-        username: fullName,
-        email: signupEmail,
-        hearts: 5,
-        xp: 0,
-        subscription: { active: false, plan: null },
-        createdAt: new Date().toISOString(),
-        languages: {},
+      const { data: { user }, error } = await supabase.auth.signUp({ email: signupEmail, password: signupPassword });
+      if (error || !user) throw error ?? new Error('Signup failed');
+      await supabase.from('profiles').insert({
+        id: user.id, username: fullName, email: signupEmail,
+        hearts: 5, xp: 0, sandbits: 0, diamonds: 0,
+        subscription_active: false, subscription_plan: null,
+        created_at: new Date().toISOString(),
       });
-
       onSuccess?.();
     } catch (error: any) {
-      if (error?.code === 'auth/configuration-not-found') {
-        setSignupError('Firebase configuration not found. Please check your Firebase project settings.');
-      } else if (error?.code === 'auth/email-already-in-use') {
-        setSignupError('This email is already registered. Please try logging in instead.');
-      } else if (error?.code === 'auth/weak-password') {
-        setSignupError('Password should be at least 6 characters long.');
-      } else if (error?.code === 'auth/invalid-email') {
-        setSignupError('Please enter a valid email address.');
-      } else {
-        setSignupError(error?.message || 'An error occurred during signup. Please try again.');
-      }
+      setSignupError(error?.message || 'An error occurred during signup. Please try again.');
     } finally {
       setSignupLoading(false);
     }

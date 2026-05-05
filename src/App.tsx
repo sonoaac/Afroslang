@@ -117,12 +117,12 @@ function LearnView({
     setLastCompletedXP(xpEarned);
 
     if (user && !isGuest) {
-      await saveUserProgress(user.uid, language, activeLesson.id, xpEarned, heartsLost);
+      await saveUserProgress(user.id, language, activeLesson.id, xpEarned, heartsLost);
       try {
         const weekId = await getCurrentWeekIdFromDB();
-        const userLeague = await getUserLeague(user.uid, weekId);
+        const userLeague = await getUserLeague(user.id, weekId);
         await addWeeklyXP(
-          user.uid, userLeague || 'Copper',
+          user.id, userLeague || 'Copper',
           userData?.username || 'User', xpEarned,
           userData?.subscription?.active || false, weekId
         );
@@ -201,8 +201,8 @@ function LearnView({
         heartsData={userData?.heartsData}
         isSubscribed={userData?.subscription?.active || false}
         xpBoostActive={isXpBoostActive(userData)}
-        userId={user?.uid}
-        userName={userData?.name || user?.displayName || undefined}
+        userId={user?.id}
+        userName={userData?.name || (user?.user_metadata?.full_name as string | undefined) || undefined}
         isGuest={isGuest}
         onComplete={handleLessonComplete}
         onExit={() => setSubScreen('path')}

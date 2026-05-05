@@ -1,9 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { getApp } from 'firebase/app';
-import { getFunctions, httpsCallable } from 'firebase/functions';
-import { auth, db } from '../../firebase';
+import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { DescrambleText } from '../ui/DescrambleText';
 import { StaticPage } from './StaticPage';
@@ -388,19 +384,25 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
   };
 
   // ── Friendly Firebase error map ────────────────────────────────────────────
-  const friendlyAuthError = (code: string): string => {
-    const map: Record<string, string> = {
-      'auth/user-not-found':        'No account found with that email.',
-      'auth/wrong-password':        'Incorrect password. Please try again.',
-      'auth/invalid-email':         'Please enter a valid email address.',
-      'auth/email-already-in-use':  'An account with that email already exists. Try logging in.',
-      'auth/weak-password':         'Password does not meet the requirements.',
-      'auth/too-many-requests':     'Too many attempts. Please wait before trying again.',
-      'auth/network-request-failed':'Network error. Check your connection and try again.',
-      'auth/invalid-credential':    'Incorrect email or password.',
-      'auth/user-disabled':         'This account has been disabled. Contact support.',
-    };
-    return map[code] || 'Something went wrong. Please try again.';
+  const friendlyAuthError = (msg: string): string => {
+    const m = msg.toLowerCase();
+    if (m.includes('invalid login') || m.includes('invalid credential') || m.includes('wrong password'))
+      return 'Incorrect email or password.';
+    if (m.includes('user not found') || m.includes('no user'))
+      return 'No account found with that email.';
+    if (m.includes('already registered') || m.includes('already in use') || m.includes('already exists'))
+      return 'An account with that email already exists. Try logging in.';
+    if (m.includes('weak password') || m.includes('password should'))
+      return 'Password does not meet the requirements.';
+    if (m.includes('too many') || m.includes('rate limit'))
+      return 'Too many attempts. Please wait before trying again.';
+    if (m.includes('network') || m.includes('fetch'))
+      return 'Network error. Check your connection and try again.';
+    if (m.includes('disabled'))
+      return 'This account has been disabled. Contact support.';
+    if (m.includes('email') && m.includes('valid'))
+      return 'Please enter a valid email address.';
+    return msg || 'Something went wrong. Please try again.';
   };
 
   const closeSheet = () => {
@@ -412,11 +414,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     setShowSignupPwd(false);
   };
 
-  // ── Email hashing (privacy — never send raw email to rate-limit fn) ─────────
-  const hashEmail = async (email: string): Promise<string> => {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(email));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -435,44 +432,17 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
     setLoginLoading(true);
     try {
-      // Server-side rate limit check (authoritative)
-      try {
-        const functions = getFunctions(getApp(), 'us-central1');
-        const checkRateLimit = httpsCallable(functions, 'checkLoginRateLimit');
-        const emailHash = await hashEmail(email);
-        const result = await checkRateLimit({ emailHash }) as { data: { allowed: boolean; until?: number; attemptsLeft: number } };
-        if (!result.data.allowed) {
-          const until = result.data.until ?? Date.now() + LOCKOUT_MS;
-          const mins  = Math.ceil((until - Date.now()) / 60000);
-          setRl({ count: MAX_ATTEMPTS, until });
-          setLoginError(`Too many failed attempts. Try again in ${mins} minute${mins !== 1 ? 's' : ''}.`);
-          setLoginLoading(false);
-          return;
-        }
-      } catch {
-        // Function unavailable — fall through to localStorage fallback
-      }
-
-      await signInWithEmailAndPassword(auth, email, loginPassword);
+      const { error } = await supabase.auth.signInWithPassword({ email, password: loginPassword });
+      if (error) throw error;
       clearRl();
       closeSheet();
     } catch (err: any) {
-      // Record failure server-side (best-effort)
-      try {
-        const functions = getFunctions(getApp(), 'us-central1');
-        const recordFailure = httpsCallable(functions, 'recordLoginFailure');
-        const emailHash = await hashEmail(email);
-        await recordFailure({ emailHash });
-      } catch {
-        // Ignore — localStorage fallback below is the safety net
-      }
-
       const remaining = recordFailedLogin();
-      const base = friendlyAuthError(err?.code ?? '');
+      const base = friendlyAuthError(err?.message ?? err?.code ?? '');
       if (remaining > 0 && remaining <= 3) {
         setLoginError(`${base} (${remaining} attempt${remaining !== 1 ? 's' : ''} remaining before lockout)`);
       } else if (remaining <= 0) {
-        setLoginError(`Account locked for 15 minutes due to too many failed attempts.`);
+        setLoginError('Account locked for 15 minutes due to too many failed attempts.');
       } else {
         setLoginError(base);
       }
@@ -487,10 +457,11 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     if (!email) { setLoginError('Enter your email address above first.'); return; }
     if (!validateEmail(email)) { setLoginError('Please enter a valid email address.'); return; }
     try {
-      await sendPasswordResetEmail(auth, email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      if (error) throw error;
       setLoginSuccess('Password reset email sent. Check your inbox.');
     } catch (err: any) {
-      setLoginError(friendlyAuthError(err?.code ?? ''));
+      setLoginError(friendlyAuthError(err?.message ?? err?.code ?? ''));
     }
   };
 
@@ -523,22 +494,23 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
 
     setSignupLoading(true);
     try {
-      const { user } = await createUserWithEmailAndPassword(auth, email, password);
-      // Write Firestore profile in background — don't block on it.
-      // onAuthStateChanged fires immediately after Auth succeeds, and waiting
-      // on setDoc causes the spinner to hang if Firestore is slow.
-      setDoc(doc(db, 'users', user.uid), {
+      const { data: { user }, error } = await supabase.auth.signUp({ email, password });
+      if (error || !user) throw error ?? new Error('Signup failed');
+
+      // Insert profile row in background — onAuthStateChange fires immediately
+      await supabase.from('profiles').insert({
+        id: user.id,
         username,
         email,
-        ...(phone ? { phone } : {}),
         hearts: 5,
         xp: 0,
-        gems: 0,
         sandbits: 0,
-        subscription: { active: false, plan: null },
-        createdAt: new Date().toISOString(),
-        languages: {},
-      }).catch(() => {});
+        diamonds: 0,
+        subscription_active: false,
+        subscription_plan: null,
+        created_at: new Date().toISOString(),
+      });
+
       if (pendingScoreRef.current > 0 && pendingLangRef.current) {
         onSetPlacementScore?.(pendingLangRef.current, pendingScoreRef.current);
       }
@@ -550,7 +522,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
       pendingScoreRef.current = 0;
       pendingLangRef.current  = '';
     } catch (err: any) {
-      setSignupError(friendlyAuthError(err?.code ?? ''));
+      setSignupError(friendlyAuthError(err?.message ?? err?.code ?? ''));
     } finally {
       setSignupLoading(false);
     }

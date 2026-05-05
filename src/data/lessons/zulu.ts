@@ -1,6 +1,8 @@
 import { Lesson } from '../../types';
 
-export const zuluLessons: Lesson[] = [
+type RawLesson = Omit<Lesson, 'stageId' | 'lessonNumber'> & { level?: number };
+
+export const zuluLessons: RawLesson[] = [
   // STAGE 1 - MISSION 1: GREETINGS (20 questions, 10 will be randomly selected)
   {
     id: 'zu-vocab-1',
@@ -1163,500 +1165,1208 @@ export const zuluLessons: Lesson[] = [
     ]
   },
 
-  // STAGE 2 - MISSION 8: USEFUL EXPRESSIONS (20 questions, 10 will be randomly selected)
+  // ── STAGE 2: POLITE & FORMAL SPEECH ─────────────────────────────────────
+
+  // Unit 1 — Please & Thank You
   {
-    id: 'zu-vocab-8',
+    id: 'zu-s2-1',
     type: 'vocabulary',
-    title: 'Useful Expressions',
-    titleFr: 'Expressions utiles',
+    title: 'Please & Thank You',
+    titleFr: 'S\'il vous plaît et Merci',
     level: 2,
     xpReward: 15,
     exercises: [
       {
-        id: 'zu-v141',
+        id: 'zu-s2-1-1',
         type: 'multiple-choice',
-        question: 'How do you say "I don\'t understand" in Zulu?',
-        questionFr: 'Comment dit-on "Je ne comprends pas" en Zulu?',
-        correctAnswer: 'Angiqondi',
-        options: ['Angiqondi', 'Angazi', 'Angifuni', 'Angiyi']
+        question: 'How do you say "please" in Zulu?',
+        questionFr: 'Comment dit-on "s\'il vous plaît" en Zulu?',
+        correctAnswer: 'Ngiyacela',
+        options: ['Ngiyacela', 'Ngiyabonga', 'Kulungile', 'Sawubona']
       },
       {
-        id: 'zu-v142',
+        id: 'zu-s2-1-2',
         type: 'multiple-choice',
-        question: 'What does "Angiqondi" mean?',
-        questionFr: 'Que signifie "Angiqondi"?',
-        correctAnswer: 'I don\'t understand',
-        options: ['I don\'t understand', 'I don\'t know', 'I don\'t want', 'I won\'t go']
+        question: 'What does "Ngiyabonga" mean?',
+        questionFr: 'Que signifie "Ngiyabonga"?',
+        correctAnswer: 'Thank you',
+        options: ['Thank you', 'Please', 'Sorry', 'Welcome']
       },
       {
-        id: 'zu-v143',
+        id: 'zu-s2-1-3',
+        type: 'multiple-choice',
+        question: 'How do you say "thank you very much" in Zulu?',
+        questionFr: 'Comment dit-on "merci beaucoup" en Zulu?',
+        correctAnswer: 'Ngiyabonga kakhulu',
+        options: ['Ngiyabonga kakhulu', 'Ngiyabonga', 'Ngiyacela', 'Kulungile']
+      },
+      {
+        id: 'zu-s2-1-4',
+        type: 'multiple-choice',
+        question: 'What does "Kulungile" mean?',
+        questionFr: 'Que signifie "Kulungile"?',
+        correctAnswer: 'It\'s okay / You\'re welcome',
+        options: ['It\'s okay / You\'re welcome', 'Thank you', 'Please', 'Sorry']
+      },
+      {
+        id: 'zu-s2-1-5',
+        type: 'multiple-choice',
+        question: 'How do you say "well done" in Zulu?',
+        questionFr: 'Comment dit-on "bien fait" en Zulu?',
+        correctAnswer: 'Wenze kahle',
+        options: ['Wenze kahle', 'Ngiyabonga', 'Kulungile', 'Ngiyacela']
+      },
+      {
+        id: 'zu-s2-1-6',
+        type: 'fill-blank',
+        question: 'Complete: "Ngiya___" = please',
+        questionFr: 'Complétez: "Ngiya___" = s\'il vous plaît',
+        correctAnswer: 'cela',
+        hint: 'The verb for requesting politely',
+        hintFr: 'Le verbe pour demander poliment'
+      },
+      {
+        id: 'zu-s2-1-7',
+        type: 'multiple-choice',
+        question: 'What does "Ngiyabonga kakhulu" mean?',
+        questionFr: 'Que signifie "Ngiyabonga kakhulu"?',
+        correctAnswer: 'Thank you very much',
+        options: ['Thank you very much', 'Thank you', 'You\'re welcome', 'Well done']
+      },
+      {
+        id: 'zu-s2-1-8',
+        type: 'multiple-choice',
+        question: 'In "Ngiyabonga kakhulu", what does "kakhulu" mean?',
+        questionFr: 'Dans "Ngiyabonga kakhulu", que signifie "kakhulu"?',
+        correctAnswer: 'Very much',
+        options: ['Very much', 'A little', 'Again', 'Always']
+      },
+      {
+        id: 'zu-s2-1-9',
+        type: 'multiple-choice',
+        question: 'How do you respond when someone thanks you?',
+        questionFr: 'Comment répondre quand quelqu\'un vous remercie?',
+        correctAnswer: 'Kulungile',
+        options: ['Kulungile', 'Ngiyabonga', 'Ngiyacela', 'Wenze kahle']
+      },
+      {
+        id: 'zu-s2-1-10',
+        type: 'multiple-choice',
+        question: 'How do you formally say "I am grateful" in Zulu?',
+        questionFr: 'Comment dire formellement "je suis reconnaissant" en Zulu?',
+        correctAnswer: 'Ngibonga kakhulu',
+        options: ['Ngibonga kakhulu', 'Ngiyacela', 'Kulungile', 'Wenze kahle']
+      },
+      {
+        id: 'zu-s2-1-11',
         type: 'type-answer',
-        question: 'Type "I don\'t know" in Zulu',
-        questionFr: 'Tapez "Je ne sais pas" en Zulu',
-        correctAnswer: 'Angazi'
+        question: 'Type "thank you" in Zulu',
+        questionFr: 'Tapez "merci" en Zulu',
+        correctAnswer: 'Ngiyabonga'
       },
       {
-        id: 'zu-v144',
+        id: 'zu-s2-1-12',
         type: 'multiple-choice',
-        question: 'How do you say "I don\'t want" in Zulu?',
-        questionFr: 'Comment dit-on "Je ne veux pas" en Zulu?',
-        correctAnswer: 'Angifuni',
-        options: ['Angifuni', 'Angiqondi', 'Angazi', 'Angiyi']
+        question: 'What does "Wenze kahle" literally mean?',
+        questionFr: 'Que signifie littéralement "Wenze kahle"?',
+        correctAnswer: 'You did well',
+        options: ['You did well', 'You are here', 'You are welcome', 'You are kind']
       },
       {
-        id: 'zu-v145',
+        id: 'zu-s2-1-13',
         type: 'multiple-choice',
-        question: '"Angifuni" means:',
-        questionFr: '"Angifuni" signifie:',
-        correctAnswer: 'I don\'t want',
-        options: ['I don\'t want', 'I don\'t understand', 'I don\'t know', 'I won\'t go']
+        question: 'How do you say "please give me" in Zulu?',
+        questionFr: 'Comment dit-on "donnez-moi s\'il vous plaît" en Zulu?',
+        correctAnswer: 'Ngicela unginike',
+        options: ['Ngicela unginike', 'Ngiyabonga', 'Kulungile', 'Wenze kahle']
       },
       {
-        id: 'zu-v146',
+        id: 'zu-s2-1-14',
+        type: 'multiple-choice',
+        question: 'What does "Ngiyacela" mean?',
+        questionFr: 'Que signifie "Ngiyacela"?',
+        correctAnswer: 'Please / I request',
+        options: ['Please / I request', 'Thank you', 'I agree', 'I am sorry']
+      },
+      {
+        id: 'zu-s2-1-15',
+        type: 'fill-blank',
+        question: 'Complete: "Ngiyabonga ___" = thank you very much',
+        questionFr: 'Complétez: "Ngiyabonga ___" = merci beaucoup',
+        correctAnswer: 'kakhulu',
+        hint: 'The Zulu word for "very much"',
+        hintFr: 'Le mot zulu pour "beaucoup"'
+      },
+      {
+        id: 'zu-s2-1-16',
+        type: 'multiple-choice',
+        question: 'Which Zulu phrase acknowledges good work?',
+        questionFr: 'Quelle phrase zulu reconnaît un bon travail?',
+        correctAnswer: 'Wenze kahle',
+        options: ['Wenze kahle', 'Ngiyabonga', 'Ngiyacela', 'Kulungile']
+      },
+      {
+        id: 'zu-s2-1-17',
+        type: 'multiple-choice',
+        question: 'How do you say "please sit down" in Zulu?',
+        questionFr: 'Comment dit-on "veuillez vous asseoir" en Zulu?',
+        correctAnswer: 'Ngicela uhlale',
+        options: ['Ngicela uhlale', 'Ngiyabonga', 'Wenze kahle', 'Kulungile']
+      },
+      {
+        id: 'zu-s2-1-18',
+        type: 'multiple-choice',
+        question: 'What is the difference between "Ngiyabonga" and "Ngiyabonga kakhulu"?',
+        questionFr: 'Quelle est la différence entre "Ngiyabonga" et "Ngiyabonga kakhulu"?',
+        correctAnswer: '"Ngiyabonga kakhulu" is more emphatic',
+        options: ['"Ngiyabonga kakhulu" is more emphatic', '"Ngiyabonga" is more formal', 'They mean the same thing', '"Ngiyabonga kakhulu" is for elders only']
+      },
+      {
+        id: 'zu-s2-1-19',
+        type: 'multiple-choice',
+        question: 'In Zulu, "Kulungile" can also mean:',
+        questionFr: 'En Zulu, "Kulungile" peut aussi signifier:',
+        correctAnswer: 'It\'s fine / No problem',
+        options: ['It\'s fine / No problem', 'You\'re right', 'Go ahead', 'I agree']
+      },
+      {
+        id: 'zu-s2-1-20',
         type: 'type-answer',
-        question: 'Type "I can\'t" in Zulu',
-        questionFr: 'Tapez "Je ne peux pas" en Zulu',
-        correctAnswer: 'Angikwazi'
-      },
-      {
-        id: 'zu-v147',
-        type: 'multiple-choice',
-        question: 'How do you say "I can" in Zulu?',
-        questionFr: 'Comment dit-on "Je peux" en Zulu?',
-        correctAnswer: 'Ngiyakwazi',
-        options: ['Ngiyakwazi', 'Angikwazi', 'Angifuni', 'Angiqondi']
-      },
-      {
-        id: 'zu-v148',
-        type: 'multiple-choice',
-        question: 'What does "Ngiyakwazi" mean?',
-        questionFr: 'Que signifie "Ngiyakwazi"?',
-        correctAnswer: 'I can',
-        options: ['I can', 'I can\'t', 'I don\'t want', 'I don\'t understand']
-      },
-      {
-        id: 'zu-v149',
-        type: 'type-answer',
-        question: 'Type "I will" in Zulu',
-        questionFr: 'Tapez "Je vais" en Zulu',
-        correctAnswer: 'Ngiyayi'
-      },
-      {
-        id: 'zu-v150',
-        type: 'multiple-choice',
-        question: 'How do you say "I won\'t" in Zulu?',
-        questionFr: 'Comment dit-on "Je ne vais pas" en Zulu?',
-        correctAnswer: 'Angiyi',
-        options: ['Angiyi', 'Ngiyayi', 'Ngiyakwazi', 'Angikwazi']
-      },
-      {
-        id: 'zu-v151',
-        type: 'multiple-choice',
-        question: '"Angiyi" means:',
-        questionFr: '"Angiyi" signifie:',
-        correctAnswer: 'I won\'t',
-        options: ['I won\'t', 'I will', 'I can', 'I can\'t']
-      },
-      {
-        id: 'zu-v152',
-        type: 'type-answer',
-        question: 'Type "I have" in Zulu',
-        questionFr: 'Tapez "J\'ai" en Zulu',
-        correctAnswer: 'Nginakho'
-      },
-      {
-        id: 'zu-v153',
-        type: 'multiple-choice',
-        question: 'How do you say "I don\'t have" in Zulu?',
-        questionFr: 'Comment dit-on "Je n\'ai pas" en Zulu?',
-        correctAnswer: 'Anginakho',
-        options: ['Anginakho', 'Nginakho', 'Angifuni', 'Angiqondi']
-      },
-      {
-        id: 'zu-v154',
-        type: 'multiple-choice',
-        question: 'What does "Anginakho" mean?',
-        questionFr: 'Que signifie "Anginakho"?',
-        correctAnswer: 'I don\'t have',
-        options: ['I don\'t have', 'I have', 'I don\'t want', 'I don\'t understand']
-      },
-      {
-        id: 'zu-v155',
-        type: 'type-answer',
-        question: 'Type "I like" in Zulu',
-        questionFr: 'Tapez "J\'aime" en Zulu',
-        correctAnswer: 'Ngiyathanda'
-      },
-      {
-        id: 'zu-v156',
-        type: 'multiple-choice',
-        question: 'How do you say "I don\'t like" in Zulu?',
-        questionFr: 'Comment dit-on "Je n\'aime pas" en Zulu?',
-        correctAnswer: 'Angithandi',
-        options: ['Angithandi', 'Ngiyathanda', 'Anginakho', 'Nginakho']
-      },
-      {
-        id: 'zu-v157',
-        type: 'multiple-choice',
-        question: 'What does "Angithandi" mean?',
-        questionFr: 'Que signifie "Angithandi"?',
-        correctAnswer: 'I don\'t like',
-        options: ['I don\'t like', 'I like', 'I don\'t have', 'I have']
-      },
-      {
-        id: 'zu-v158',
-        type: 'type-answer',
-        question: 'Type "I love" in Zulu',
-        questionFr: 'Tapez "J\'aime beaucoup" en Zulu',
-        correctAnswer: 'Ngiyathanda kakhulu'
-      },
-      {
-        id: 'zu-v159',
-        type: 'multiple-choice',
-        question: 'How do you say "I hate" in Zulu?',
-        questionFr: 'Comment dit-on "Je déteste" en Zulu?',
-        correctAnswer: 'Ngiyazonda',
-        options: ['Ngiyazonda', 'Ngiyathanda kakhulu', 'Angithandi', 'Ngiyathanda']
-      },
-      {
-        id: 'zu-v160',
-        type: 'multiple-choice',
-        question: 'What does "Ngiyazonda" mean?',
-        questionFr: 'Que signifie "Ngiyazonda"?',
-        correctAnswer: 'I hate',
-        options: ['I hate', 'I love', 'I don\'t like', 'I like']
+        question: 'Type "you\'re welcome" in Zulu',
+        questionFr: 'Tapez "de rien" en Zulu',
+        correctAnswer: 'Kulungile'
       }
     ]
   },
 
-  // STAGE 2 - MISSION 9: BUILDING SENTENCES (20 questions, 10 will be randomly selected)
+  // Unit 2 — Apologies & Forgiveness
   {
-    id: 'zu-vocab-9',
+    id: 'zu-s2-2',
     type: 'vocabulary',
-    title: 'Building Sentences',
-    titleFr: 'Construction de phrases',
+    title: 'Apologies & Forgiveness',
+    titleFr: 'Excuses et Pardon',
     level: 2,
     xpReward: 15,
     exercises: [
       {
-        id: 'zu-v161',
+        id: 'zu-s2-2-1',
         type: 'multiple-choice',
-        question: 'Complete: "Ngi___ ukudla" (I am eating food)',
-        questionFr: 'Compléter: "Ngi___ ukudla" (Je mange de la nourriture)',
-        correctAnswer: 'dla',
-        options: ['dla', 'pheka', 'ya', 'funda']
+        question: 'How do you say "sorry" in Zulu?',
+        questionFr: 'Comment dit-on "désolé" en Zulu?',
+        correctAnswer: 'Uxolo',
+        options: ['Uxolo', 'Ngixolele', 'Kulungile', 'Ngiyacela']
       },
       {
-        id: 'zu-v162',
+        id: 'zu-s2-2-2',
         type: 'multiple-choice',
-        question: 'Complete: "Ngi___ amanzi" (I am drinking water)',
-        questionFr: 'Compléter: "Ngi___ amanzi" (Je bois de l\'eau)',
-        correctAnswer: 'phuza',
-        options: ['phuza', 'dla', 'pheka', 'ya']
+        question: 'What does "Ngixolele" mean?',
+        questionFr: 'Que signifie "Ngixolele"?',
+        correctAnswer: 'Forgive me',
+        options: ['Forgive me', 'Sorry', 'No problem', 'I\'m okay']
       },
       {
-        id: 'zu-v163',
+        id: 'zu-s2-2-3',
+        type: 'multiple-choice',
+        question: 'How do you say "no problem" in Zulu?',
+        questionFr: 'Comment dit-on "pas de problème" en Zulu?',
+        correctAnswer: 'Akukho ndaba',
+        options: ['Akukho ndaba', 'Uxolo', 'Ngixolele', 'Kulungile']
+      },
+      {
+        id: 'zu-s2-2-4',
+        type: 'multiple-choice',
+        question: 'What does "Uxolo" mean?',
+        questionFr: 'Que signifie "Uxolo"?',
+        correctAnswer: 'Sorry / Peace',
+        options: ['Sorry / Peace', 'Forgive me', 'No problem', 'It\'s okay']
+      },
+      {
+        id: 'zu-s2-2-5',
+        type: 'multiple-choice',
+        question: 'How do you say "it\'s okay" in Zulu?',
+        questionFr: 'Comment dit-on "c\'est bon" en Zulu?',
+        correctAnswer: 'Kulungile',
+        options: ['Kulungile', 'Uxolo', 'Ngixolele', 'Akukho ndaba']
+      },
+      {
+        id: 'zu-s2-2-6',
+        type: 'fill-blank',
+        question: 'Complete: "Ngi___" = forgive me',
+        questionFr: 'Complétez: "Ngi___" = pardonnez-moi',
+        correctAnswer: 'xolele',
+        hint: 'The verb for forgiveness',
+        hintFr: 'Le verbe pour le pardon'
+      },
+      {
+        id: 'zu-s2-2-7',
+        type: 'multiple-choice',
+        question: 'What does "Ngiyaxolisa" mean?',
+        questionFr: 'Que signifie "Ngiyaxolisa"?',
+        correctAnswer: 'I apologize',
+        options: ['I apologize', 'I forgive', 'I agree', 'I understand']
+      },
+      {
+        id: 'zu-s2-2-8',
+        type: 'multiple-choice',
+        question: 'In Zulu, "Uxolo" is also the word for:',
+        questionFr: 'En Zulu, "Uxolo" est aussi le mot pour:',
+        correctAnswer: 'Peace',
+        options: ['Peace', 'Love', 'Joy', 'Hope']
+      },
+      {
+        id: 'zu-s2-2-9',
+        type: 'multiple-choice',
+        question: 'How do you accept an apology in Zulu?',
+        questionFr: 'Comment accepter une excuse en Zulu?',
+        correctAnswer: 'Kulungile',
+        options: ['Kulungile', 'Uxolo', 'Ngixolele', 'Ngiyacela']
+      },
+      {
+        id: 'zu-s2-2-10',
+        type: 'multiple-choice',
+        question: 'What does "Akukho ndaba" mean?',
+        questionFr: 'Que signifie "Akukho ndaba"?',
+        correctAnswer: 'No problem / Never mind',
+        options: ['No problem / Never mind', 'I am sorry', 'Forgive me', 'It is fine']
+      },
+      {
+        id: 'zu-s2-2-11',
         type: 'type-answer',
-        question: 'Complete: "Ngi___ emsebenzini" (I am going to work)',
-        questionFr: 'Compléter: "Ngi___ emsebenzini" (Je vais au travail)',
-        correctAnswer: 'ya'
+        question: 'Type "forgive me" in Zulu',
+        questionFr: 'Tapez "pardonnez-moi" en Zulu',
+        correctAnswer: 'Ngixolele'
       },
       {
-        id: 'zu-v164',
+        id: 'zu-s2-2-12',
         type: 'multiple-choice',
-        question: 'Complete: "Ngi___ isiZulu" (I am learning Zulu)',
-        questionFr: 'Compléter: "Ngi___ isiZulu" (J\'apprends le Zulu)',
-        correctAnswer: 'funda',
-        options: ['funda', 'ya', 'dla', 'pheka']
+        question: 'What does "Ngiyaxolisa" achieve?',
+        questionFr: 'Qu\'exprime "Ngiyaxolisa"?',
+        correctAnswer: 'It formally expresses an apology',
+        options: ['It formally expresses an apology', 'It requests forgiveness', 'It accepts an apology', 'It greets someone']
       },
       {
-        id: 'zu-v165',
+        id: 'zu-s2-2-13',
         type: 'multiple-choice',
-        question: 'Complete: "Ngi___ ukudla" (I am cooking food)',
-        questionFr: 'Compléter: "Ngi___ ukudla" (Je cuisine de la nourriture)',
-        correctAnswer: 'pheka',
-        options: ['pheka', 'funda', 'ya', 'dla']
+        question: 'How do you say "I\'m deeply sorry" in Zulu?',
+        questionFr: 'Comment dire "je suis profondément désolé" en Zulu?',
+        correctAnswer: 'Ngiyaxolisa kakhulu',
+        options: ['Ngiyaxolisa kakhulu', 'Uxolo kakhulu', 'Ngixolele kakhulu', 'Kulungile kakhulu']
       },
       {
-        id: 'zu-v166',
+        id: 'zu-s2-2-14',
+        type: 'multiple-choice',
+        question: 'What does "Xola" mean on its own?',
+        questionFr: 'Que signifie "Xola" seul?',
+        correctAnswer: 'Be calm / Forgive (informal)',
+        options: ['Be calm / Forgive (informal)', 'Come here', 'Sit down', 'Thank you']
+      },
+      {
+        id: 'zu-s2-2-15',
+        type: 'fill-blank',
+        question: 'Complete: "U___" = sorry (informal)',
+        questionFr: 'Complétez: "U___" = désolé (informel)',
+        correctAnswer: 'xolo',
+        hint: 'A single-word apology',
+        hintFr: 'Une excuse en un seul mot'
+      },
+      {
+        id: 'zu-s2-2-16',
+        type: 'multiple-choice',
+        question: 'In Zulu culture, apologizing starts with:',
+        questionFr: 'Dans la culture zulu, les excuses commencent par:',
+        correctAnswer: 'Uxolo',
+        options: ['Uxolo', 'Ngiyabonga', 'Sawubona', 'Kulungile']
+      },
+      {
+        id: 'zu-s2-2-17',
+        type: 'multiple-choice',
+        question: 'What does "Ngikhuluma ngokukhulu ukuzisola" mean?',
+        questionFr: 'Que signifie "Ngikhuluma ngokukhulu ukuzisola"?',
+        correctAnswer: 'I speak with great regret',
+        options: ['I speak with great regret', 'I speak slowly', 'I speak clearly', 'I speak honestly']
+      },
+      {
+        id: 'zu-s2-2-18',
+        type: 'multiple-choice',
+        question: 'How do you reassure someone after an accident?',
+        questionFr: 'Comment rassurer quelqu\'un après un accident?',
+        correctAnswer: 'Kulungile, akukho ndaba',
+        options: ['Kulungile, akukho ndaba', 'Uxolo, ngixolele', 'Ngiyabonga, wenze kahle', 'Sawubona, ngiyacela']
+      },
+      {
+        id: 'zu-s2-2-19',
+        type: 'multiple-choice',
+        question: 'What does "Ukuxolela" mean?',
+        questionFr: 'Que signifie "Ukuxolela"?',
+        correctAnswer: 'Forgiveness',
+        options: ['Forgiveness', 'Apology', 'Peace', 'Kindness']
+      },
+      {
+        id: 'zu-s2-2-20',
         type: 'type-answer',
-        question: 'Complete: "Ngi___ incwadi" (I am reading a book)',
-        questionFr: 'Compléter: "Ngi___ incwadi" (Je lis un livre)',
-        correctAnswer: 'funda'
-      },
-      {
-        id: 'zu-v167',
-        type: 'multiple-choice',
-        question: 'Complete: "Ngi___ okuthile" (I am writing something)',
-        questionFr: 'Compléter: "Ngi___ okuthile" (J\'écris quelque chose)',
-        correctAnswer: 'bhala',
-        options: ['bhala', 'funda', 'pheka', 'dla']
-      },
-      {
-        id: 'zu-v168',
-        type: 'multiple-choice',
-        question: 'Complete: "Ngi___ umculo" (I am playing music)',
-        questionFr: 'Compléter: "Ngi___ umculo" (Je joue de la musique)',
-        correctAnswer: 'dlala',
-        options: ['dlala', 'bhala', 'funda', 'pheka']
-      },
-      {
-        id: 'zu-v169',
-        type: 'type-answer',
-        question: 'Complete: "Ngi___ indlu" (I am cleaning the house)',
-        questionFr: 'Compléter: "Ngi___ indlu" (Je nettoie la maison)',
-        correctAnswer: 'hlanza'
-      },
-      {
-        id: 'zu-v170',
-        type: 'multiple-choice',
-        question: 'Complete: "Ngi___ izingubo" (I am washing clothes)',
-        questionFr: 'Compléter: "Ngi___ izingubo" (Je lave les vêtements)',
-        correctAnswer: 'geza',
-        options: ['geza', 'hlanza', 'dlala', 'bhala']
-      },
-      {
-        id: 'zu-v171',
-        type: 'multiple-choice',
-        question: 'Complete: "Ngi___ endlini" (I am at home)',
-        questionFr: 'Compléter: "Ngi___ endlini" (Je suis à la maison)',
-        correctAnswer: 'khona',
-        options: ['khona', 'ya', 'za', 'phuma']
-      },
-      {
-        id: 'zu-v172',
-        type: 'type-answer',
-        question: 'Complete: "Ngi___ endlini" (I am coming home)',
-        questionFr: 'Compléter: "Ngi___ endlini" (Je rentre à la maison)',
-        correctAnswer: 'za'
-      },
-      {
-        id: 'zu-v173',
-        type: 'multiple-choice',
-        question: 'Complete: "Ngi___ endlini" (I am leaving home)',
-        questionFr: 'Compléter: "Ngi___ endlini" (Je quitte la maison)',
-        correctAnswer: 'phuma',
-        options: ['phuma', 'za', 'khona', 'ya']
-      },
-      {
-        id: 'zu-v174',
-        type: 'multiple-choice',
-        question: 'Complete: "Ngi___ emsebenzini" (I am at work)',
-        questionFr: 'Compléter: "Ngi___ emsebenzini" (Je suis au travail)',
-        correctAnswer: 'khona',
-        options: ['khona', 'ya', 'za', 'phuma']
-      },
-      {
-        id: 'zu-v175',
-        type: 'type-answer',
-        question: 'Complete: "Ngi___ esikoleni" (I am at school)',
-        questionFr: 'Compléter: "Ngi___ esikoleni" (Je suis à l\'école)',
-        correctAnswer: 'khona'
-      },
-      {
-        id: 'zu-v176',
-        type: 'multiple-choice',
-        question: 'Complete: "Ngi___ emakethe" (I am at the market)',
-        questionFr: 'Compléter: "Ngi___ emakethe" (Je suis au marché)',
-        correctAnswer: 'khona',
-        options: ['khona', 'ya', 'za', 'phuma']
-      },
-      {
-        id: 'zu-v177',
-        type: 'multiple-choice',
-        question: 'Complete: "Ngi___ esibhedlela" (I am at the hospital)',
-        questionFr: 'Compléter: "Ngi___ esibhedlela" (Je suis à l\'hôpital)',
-        correctAnswer: 'khona',
-        options: ['khona', 'ya', 'za', 'phuma']
-      },
-      {
-        id: 'zu-v178',
-        type: 'type-answer',
-        question: 'Complete: "Ngi___ esontweni" (I am at church)',
-        questionFr: 'Compléter: "Ngi___ esontweni" (Je suis à l\'église)',
-        correctAnswer: 'khona'
-      },
-      {
-        id: 'zu-v179',
-        type: 'multiple-choice',
-        question: 'Complete: "Ngi___ ehhovisini" (I am at the office)',
-        questionFr: 'Compléter: "Ngi___ ehhovisini" (Je suis au bureau)',
-        correctAnswer: 'khona',
-        options: ['khona', 'ya', 'za', 'phuma']
-      },
-      {
-        id: 'zu-v180',
-        type: 'multiple-choice',
-        question: 'Complete: "Ngi___ endlini" (I am at home)',
-        questionFr: 'Compléter: "Ngi___ endlini" (Je suis à la maison)',
-        correctAnswer: 'khona',
-        options: ['khona', 'ya', 'za', 'phuma']
+        question: 'Type "sorry" in Zulu',
+        questionFr: 'Tapez "désolé" en Zulu',
+        correctAnswer: 'Uxolo'
       }
     ]
   },
 
-  // STAGE 2 - MISSION 10: STAGE 2 REVIEW (20 questions, 10 will be randomly selected)
+  // Unit 3 — Yes, No & Agreement
   {
-    id: 'zu-vocab-10',
+    id: 'zu-s2-3',
     type: 'vocabulary',
-    title: 'Stage 2 Review',
-    titleFr: 'Révision étape 2',
+    title: 'Yes, No & Agreement',
+    titleFr: 'Oui, Non et Accord',
+    level: 2,
+    xpReward: 15,
+    exercises: [
+      {
+        id: 'zu-s2-3-1',
+        type: 'multiple-choice',
+        question: 'How do you say "yes" in Zulu?',
+        questionFr: 'Comment dit-on "oui" en Zulu?',
+        correctAnswer: 'Yebo',
+        options: ['Yebo', 'Cha', 'Mhlawumbe', 'Kulungile']
+      },
+      {
+        id: 'zu-s2-3-2',
+        type: 'multiple-choice',
+        question: 'How do you say "no" in Zulu?',
+        questionFr: 'Comment dit-on "non" en Zulu?',
+        correctAnswer: 'Cha',
+        options: ['Cha', 'Yebo', 'Mhlawumbe', 'Ngiyavuma']
+      },
+      {
+        id: 'zu-s2-3-3',
+        type: 'multiple-choice',
+        question: 'What does "Yebo ngempela" mean?',
+        questionFr: 'Que signifie "Yebo ngempela"?',
+        correctAnswer: 'Yes indeed / Absolutely',
+        options: ['Yes indeed / Absolutely', 'Yes please', 'Yes of course', 'Yes maybe']
+      },
+      {
+        id: 'zu-s2-3-4',
+        type: 'multiple-choice',
+        question: 'How do you say "maybe" in Zulu?',
+        questionFr: 'Comment dit-on "peut-être" en Zulu?',
+        correctAnswer: 'Mhlawumbe',
+        options: ['Mhlawumbe', 'Yebo', 'Cha', 'Ngiyavuma']
+      },
+      {
+        id: 'zu-s2-3-5',
+        type: 'multiple-choice',
+        question: 'What does "Ngiyavuma" mean?',
+        questionFr: 'Que signifie "Ngiyavuma"?',
+        correctAnswer: 'I agree',
+        options: ['I agree', 'I disagree', 'I understand', 'I know']
+      },
+      {
+        id: 'zu-s2-3-6',
+        type: 'multiple-choice',
+        question: 'How do you say "of course" in Zulu?',
+        questionFr: 'Comment dit-on "bien sûr" en Zulu?',
+        correctAnswer: 'Ngempela',
+        options: ['Ngempela', 'Mhlawumbe', 'Cha', 'Yebo']
+      },
+      {
+        id: 'zu-s2-3-7',
+        type: 'fill-blank',
+        question: 'Complete: "Yebo ___" = yes indeed',
+        questionFr: 'Complétez: "Yebo ___" = oui vraiment',
+        correctAnswer: 'ngempela',
+        hint: 'The word meaning "truly/indeed"',
+        hintFr: 'Le mot signifiant "vraiment"'
+      },
+      {
+        id: 'zu-s2-3-8',
+        type: 'multiple-choice',
+        question: 'What does "Angivumi" mean?',
+        questionFr: 'Que signifie "Angivumi"?',
+        correctAnswer: 'I don\'t agree',
+        options: ['I don\'t agree', 'I agree', 'I don\'t know', 'I don\'t want']
+      },
+      {
+        id: 'zu-s2-3-9',
+        type: 'multiple-choice',
+        question: 'How do you say "that is correct" in Zulu?',
+        questionFr: 'Comment dit-on "c\'est correct" en Zulu?',
+        correctAnswer: 'Kulungile / Kunjalo',
+        options: ['Kulungile / Kunjalo', 'Yebo yebo', 'Ngempela', 'Mhlawumbe']
+      },
+      {
+        id: 'zu-s2-3-10',
+        type: 'multiple-choice',
+        question: 'What does "Nami" mean?',
+        questionFr: 'Que signifie "Nami"?',
+        correctAnswer: 'Me too',
+        options: ['Me too', 'You too', 'Us too', 'Them too']
+      },
+      {
+        id: 'zu-s2-3-11',
+        type: 'type-answer',
+        question: 'Type "yes" in Zulu',
+        questionFr: 'Tapez "oui" en Zulu',
+        correctAnswer: 'Yebo'
+      },
+      {
+        id: 'zu-s2-3-12',
+        type: 'multiple-choice',
+        question: 'How do you express "me too" in Zulu?',
+        questionFr: 'Comment dire "moi aussi" en Zulu?',
+        correctAnswer: 'Nami',
+        options: ['Nami', 'Nabo', 'Nawe', 'Naye']
+      },
+      {
+        id: 'zu-s2-3-13',
+        type: 'multiple-choice',
+        question: 'What does "Kunjalo" mean?',
+        questionFr: 'Que signifie "Kunjalo"?',
+        correctAnswer: 'That\'s right / Indeed',
+        options: ['That\'s right / Indeed', 'That\'s wrong', 'That\'s good', 'That\'s enough']
+      },
+      {
+        id: 'zu-s2-3-14',
+        type: 'multiple-choice',
+        question: 'What does "Cha" mean?',
+        questionFr: 'Que signifie "Cha"?',
+        correctAnswer: 'No',
+        options: ['No', 'Yes', 'Maybe', 'Never']
+      },
+      {
+        id: 'zu-s2-3-15',
+        type: 'fill-blank',
+        question: 'Complete: "Ngiya___" = I agree',
+        questionFr: 'Complétez: "Ngiya___" = je suis d\'accord',
+        correctAnswer: 'vuma',
+        hint: 'The verb for agreeing/accepting',
+        hintFr: 'Le verbe pour accepter/être d\'accord'
+      },
+      {
+        id: 'zu-s2-3-16',
+        type: 'multiple-choice',
+        question: 'How do you say "I think so" in Zulu?',
+        questionFr: 'Comment dit-on "je pense que oui" en Zulu?',
+        correctAnswer: 'Ngicabanga ukuthi kunjalo',
+        options: ['Ngicabanga ukuthi kunjalo', 'Mhlawumbe kunjalo', 'Yebo ngempela', 'Ngiyavuma']
+      },
+      {
+        id: 'zu-s2-3-17',
+        type: 'multiple-choice',
+        question: 'Which phrase shows the strongest agreement?',
+        questionFr: 'Quelle phrase montre l\'accord le plus fort?',
+        correctAnswer: 'Yebo ngempela',
+        options: ['Yebo ngempela', 'Mhlawumbe', 'Ngiyavuma', 'Kunjalo']
+      },
+      {
+        id: 'zu-s2-3-18',
+        type: 'multiple-choice',
+        question: 'How do you say "maybe" in Zulu?',
+        questionFr: 'Comment dit-on "peut-être" en Zulu?',
+        correctAnswer: 'Mhlawumbe',
+        options: ['Mhlawumbe', 'Yebo', 'Cha', 'Kunjalo']
+      },
+      {
+        id: 'zu-s2-3-19',
+        type: 'multiple-choice',
+        question: 'What does "Angivumi" signal?',
+        questionFr: 'Qu\'indique "Angivumi"?',
+        correctAnswer: 'Disagreement or refusal',
+        options: ['Disagreement or refusal', 'Agreement', 'Confusion', 'Surprise']
+      },
+      {
+        id: 'zu-s2-3-20',
+        type: 'type-answer',
+        question: 'Type "of course" in Zulu',
+        questionFr: 'Tapez "bien sûr" en Zulu',
+        correctAnswer: 'Ngempela'
+      }
+    ]
+  },
+
+  // Unit 4 — Welcome & Hospitality
+  {
+    id: 'zu-s2-4',
+    type: 'vocabulary',
+    title: 'Welcome & Hospitality',
+    titleFr: 'Bienvenue et Hospitalité',
+    level: 2,
+    xpReward: 15,
+    exercises: [
+      {
+        id: 'zu-s2-4-1',
+        type: 'multiple-choice',
+        question: 'How do you say "welcome" in Zulu?',
+        questionFr: 'Comment dit-on "bienvenue" en Zulu?',
+        correctAnswer: 'Wamukelekile',
+        options: ['Wamukelekile', 'Ngena', 'Hlala', 'Ngiyabonga']
+      },
+      {
+        id: 'zu-s2-4-2',
+        type: 'multiple-choice',
+        question: 'What does "Ngena" mean?',
+        questionFr: 'Que signifie "Ngena"?',
+        correctAnswer: 'Come in',
+        options: ['Come in', 'Sit down', 'Welcome', 'Eat']
+      },
+      {
+        id: 'zu-s2-4-3',
+        type: 'multiple-choice',
+        question: 'How do you say "sit down" in Zulu?',
+        questionFr: 'Comment dit-on "asseyez-vous" en Zulu?',
+        correctAnswer: 'Hlala',
+        options: ['Hlala', 'Ngena', 'Wamukelekile', 'Dlula']
+      },
+      {
+        id: 'zu-s2-4-4',
+        type: 'multiple-choice',
+        question: 'What does "Yidla" mean?',
+        questionFr: 'Que signifie "Yidla"?',
+        correctAnswer: 'Please eat',
+        options: ['Please eat', 'Please sit', 'Come in', 'Welcome']
+      },
+      {
+        id: 'zu-s2-4-5',
+        type: 'multiple-choice',
+        question: 'How do you say "let me help you" in Zulu?',
+        questionFr: 'Comment dit-on "laissez-moi vous aider" en Zulu?',
+        correctAnswer: 'Ake ngikusize',
+        options: ['Ake ngikusize', 'Ngiyabonga', 'Wamukelekile', 'Ngiyacela']
+      },
+      {
+        id: 'zu-s2-4-6',
+        type: 'fill-blank',
+        question: 'Complete: "Wamukel___" = welcome',
+        questionFr: 'Complétez: "Wamukel___" = bienvenue',
+        correctAnswer: 'ekile',
+        hint: 'The Zulu word for welcome is a past-tense form',
+        hintFr: 'Le mot zulu pour bienvenue est une forme passée'
+      },
+      {
+        id: 'zu-s2-4-7',
+        type: 'multiple-choice',
+        question: 'What does "Izindlu zethu ziyindlu yakho" mean?',
+        questionFr: 'Que signifie "Izindlu zethu ziyindlu yakho"?',
+        correctAnswer: 'Our home is your home',
+        options: ['Our home is your home', 'Welcome to our home', 'Please come inside', 'Sit and eat']
+      },
+      {
+        id: 'zu-s2-4-8',
+        type: 'multiple-choice',
+        question: 'How do you offer food to a guest in Zulu?',
+        questionFr: 'Comment offrir de la nourriture à un invité en Zulu?',
+        correctAnswer: 'Yidla',
+        options: ['Yidla', 'Hlala', 'Ngena', 'Wamukelekile']
+      },
+      {
+        id: 'zu-s2-4-9',
+        type: 'multiple-choice',
+        question: 'What does "Hlala" mean?',
+        questionFr: 'Que signifie "Hlala"?',
+        correctAnswer: 'Sit / Stay',
+        options: ['Sit / Stay', 'Come in', 'Welcome', 'Eat']
+      },
+      {
+        id: 'zu-s2-4-10',
+        type: 'multiple-choice',
+        question: 'When a visitor arrives, you say:',
+        questionFr: 'Quand un visiteur arrive, vous dites:',
+        correctAnswer: 'Wamukelekile',
+        options: ['Wamukelekile', 'Sala kahle', 'Ngiyabonga', 'Kulungile']
+      },
+      {
+        id: 'zu-s2-4-11',
+        type: 'type-answer',
+        question: 'Type "welcome" in Zulu',
+        questionFr: 'Tapez "bienvenue" en Zulu',
+        correctAnswer: 'Wamukelekile'
+      },
+      {
+        id: 'zu-s2-4-12',
+        type: 'multiple-choice',
+        question: 'What does "Ngena" literally mean?',
+        questionFr: 'Que signifie littéralement "Ngena"?',
+        correctAnswer: 'Enter',
+        options: ['Enter', 'Stay', 'Go', 'Eat']
+      },
+      {
+        id: 'zu-s2-4-13',
+        type: 'multiple-choice',
+        question: 'How do you say "please come in and sit"?',
+        questionFr: 'Comment dit-on "veuillez entrer et vous asseoir"?',
+        correctAnswer: 'Ngena, uhlale',
+        options: ['Ngena, uhlale', 'Wamukelekile, yidla', 'Hlala, ngena', 'Yidla, ngena']
+      },
+      {
+        id: 'zu-s2-4-14',
+        type: 'multiple-choice',
+        question: 'What does "Thatha" mean when offering something?',
+        questionFr: 'Que signifie "Thatha" quand on offre quelque chose?',
+        correctAnswer: 'Take this',
+        options: ['Take this', 'Give this', 'Eat this', 'Drink this']
+      },
+      {
+        id: 'zu-s2-4-15',
+        type: 'fill-blank',
+        question: 'Complete: "Ake ngiku___" = let me help you',
+        questionFr: 'Complétez: "Ake ngiku___" = laissez-moi vous aider',
+        correctAnswer: 'size',
+        hint: 'The verb for helping',
+        hintFr: 'Le verbe pour aider'
+      },
+      {
+        id: 'zu-s2-4-16',
+        type: 'multiple-choice',
+        question: 'Which phrase expresses Zulu hospitality?',
+        questionFr: 'Quelle phrase exprime l\'hospitalité zulu?',
+        correctAnswer: 'Izindlu zethu ziyindlu yakho',
+        options: ['Izindlu zethu ziyindlu yakho', 'Wamukelekile', 'Ngena', 'Hlala']
+      },
+      {
+        id: 'zu-s2-4-17',
+        type: 'multiple-choice',
+        question: 'What does "Wamukelwa" mean?',
+        questionFr: 'Que signifie "Wamukelwa"?',
+        correctAnswer: 'You are received / You are welcomed',
+        options: ['You are received / You are welcomed', 'You are eating', 'You are sitting', 'You are coming']
+      },
+      {
+        id: 'zu-s2-4-18',
+        type: 'multiple-choice',
+        question: 'How do you say "please drink" in Zulu?',
+        questionFr: 'Comment dit-on "veuillez boire" en Zulu?',
+        correctAnswer: 'Phuza',
+        options: ['Phuza', 'Yidla', 'Hlala', 'Ngena']
+      },
+      {
+        id: 'zu-s2-4-19',
+        type: 'multiple-choice',
+        question: 'Which word is used to invite someone inside?',
+        questionFr: 'Quel mot est utilisé pour inviter quelqu\'un à entrer?',
+        correctAnswer: 'Ngena',
+        options: ['Ngena', 'Hlala', 'Wamukelekile', 'Yidla']
+      },
+      {
+        id: 'zu-s2-4-20',
+        type: 'type-answer',
+        question: 'Type "come in" in Zulu',
+        questionFr: 'Tapez "entrez" en Zulu',
+        correctAnswer: 'Ngena'
+      }
+    ]
+  },
+
+  // Unit 5 — Making Polite Requests
+  {
+    id: 'zu-s2-5',
+    type: 'vocabulary',
+    title: 'Making Polite Requests',
+    titleFr: 'Formuler des Demandes Polies',
+    level: 2,
+    xpReward: 15,
+    exercises: [
+      {
+        id: 'zu-s2-5-1',
+        type: 'multiple-choice',
+        question: 'How do you say "I want" in Zulu?',
+        questionFr: 'Comment dit-on "je veux" en Zulu?',
+        correctAnswer: 'Ngifuna',
+        options: ['Ngifuna', 'Ngidinga', 'Ngicela', 'Ngiyacela']
+      },
+      {
+        id: 'zu-s2-5-2',
+        type: 'multiple-choice',
+        question: 'What does "Ngidinga" mean?',
+        questionFr: 'Que signifie "Ngidinga"?',
+        correctAnswer: 'I need',
+        options: ['I need', 'I want', 'I have', 'I go']
+      },
+      {
+        id: 'zu-s2-5-3',
+        type: 'multiple-choice',
+        question: 'How do you ask "can you help me?" in Zulu?',
+        questionFr: 'Comment demander "pouvez-vous m\'aider?" en Zulu?',
+        correctAnswer: 'Ungangisiza?',
+        options: ['Ungangisiza?', 'Ngifuna usizo', 'Ngicela ukusiza', 'Ngiyacela']
+      },
+      {
+        id: 'zu-s2-5-4',
+        type: 'multiple-choice',
+        question: 'What does "Ngicela usizo" mean?',
+        questionFr: 'Que signifie "Ngicela usizo"?',
+        correctAnswer: 'Please help me / I request help',
+        options: ['Please help me / I request help', 'Please come here', 'Please wait', 'Please sit']
+      },
+      {
+        id: 'zu-s2-5-5',
+        type: 'multiple-choice',
+        question: 'How do you say "I am looking for" in Zulu?',
+        questionFr: 'Comment dit-on "je cherche" en Zulu?',
+        correctAnswer: 'Ngifuna / Ngidinga',
+        options: ['Ngifuna / Ngidinga', 'Ngihamba', 'Ngiya', 'Ngifike']
+      },
+      {
+        id: 'zu-s2-5-6',
+        type: 'fill-blank',
+        question: 'Complete: "Ngi___" = I want',
+        questionFr: 'Complétez: "Ngi___" = je veux',
+        correctAnswer: 'funa',
+        hint: 'The verb for wanting',
+        hintFr: 'Le verbe pour vouloir'
+      },
+      {
+        id: 'zu-s2-5-7',
+        type: 'multiple-choice',
+        question: 'What does "Ungangisiza?" mean?',
+        questionFr: 'Que signifie "Ungangisiza?"?',
+        correctAnswer: 'Can you help me?',
+        options: ['Can you help me?', 'Do you need help?', 'Can I help you?', 'Are you helping me?']
+      },
+      {
+        id: 'zu-s2-5-8',
+        type: 'multiple-choice',
+        question: 'How do you say "I need water" in Zulu?',
+        questionFr: 'Comment dit-on "j\'ai besoin d\'eau" en Zulu?',
+        correctAnswer: 'Ngidinga amanzi',
+        options: ['Ngidinga amanzi', 'Ngifuna amanzi', 'Ngicela amanzi', 'Ngiphuza amanzi']
+      },
+      {
+        id: 'zu-s2-5-9',
+        type: 'multiple-choice',
+        question: 'What does "Ngifuna" mean?',
+        questionFr: 'Que signifie "Ngifuna"?',
+        correctAnswer: 'I want',
+        options: ['I want', 'I need', 'I have', 'I see']
+      },
+      {
+        id: 'zu-s2-5-10',
+        type: 'multiple-choice',
+        question: 'How do you politely say "please give me" in Zulu?',
+        questionFr: 'Comment dire poliment "donnez-moi s\'il vous plaît" en Zulu?',
+        correctAnswer: 'Ngicela unginike',
+        options: ['Ngicela unginike', 'Ngifuna okunika', 'Ngidinga unike', 'Ngiyacela unike']
+      },
+      {
+        id: 'zu-s2-5-11',
+        type: 'type-answer',
+        question: 'Type "I need" in Zulu',
+        questionFr: 'Tapez "j\'ai besoin" en Zulu',
+        correctAnswer: 'Ngidinga'
+      },
+      {
+        id: 'zu-s2-5-12',
+        type: 'multiple-choice',
+        question: 'What is the difference between "Ngifuna" and "Ngidinga"?',
+        questionFr: 'Quelle est la différence entre "Ngifuna" et "Ngidinga"?',
+        correctAnswer: '"Ngifuna" = want, "Ngidinga" = need',
+        options: ['"Ngifuna" = want, "Ngidinga" = need', '"Ngifuna" = need, "Ngidinga" = want', 'They mean the same thing', '"Ngidinga" is more polite']
+      },
+      {
+        id: 'zu-s2-5-13',
+        type: 'multiple-choice',
+        question: 'How do you say "please help me" in Zulu?',
+        questionFr: 'Comment dit-on "aidez-moi s\'il vous plaît" en Zulu?',
+        correctAnswer: 'Ngicela usizo',
+        options: ['Ngicela usizo', 'Ngifuna ukusiza', 'Ungangisiza', 'Ngidinga wena']
+      },
+      {
+        id: 'zu-s2-5-14',
+        type: 'multiple-choice',
+        question: 'What does "Ngicela" mean at the start of a request?',
+        questionFr: 'Que signifie "Ngicela" au début d\'une demande?',
+        correctAnswer: 'Please / I request',
+        options: ['Please / I request', 'I want', 'I need', 'Thank you']
+      },
+      {
+        id: 'zu-s2-5-15',
+        type: 'fill-blank',
+        question: 'Complete: "Ngi___" = I need',
+        questionFr: 'Complétez: "Ngi___" = j\'ai besoin',
+        correctAnswer: 'dinga',
+        hint: 'The Zulu verb for needing',
+        hintFr: 'Le verbe zulu pour avoir besoin'
+      },
+      {
+        id: 'zu-s2-5-16',
+        type: 'multiple-choice',
+        question: 'How do you say "can you please?" in Zulu?',
+        questionFr: 'Comment dit-on "pouvez-vous s\'il vous plaît?" en Zulu?',
+        correctAnswer: 'Ungacela?',
+        options: ['Ungacela?', 'Ungafuna?', 'Unganika?', 'Ungadinga?']
+      },
+      {
+        id: 'zu-s2-5-17',
+        type: 'multiple-choice',
+        question: 'What does "Usizo" mean?',
+        questionFr: 'Que signifie "Usizo"?',
+        correctAnswer: 'Help / Assistance',
+        options: ['Help / Assistance', 'Water', 'Food', 'Place']
+      },
+      {
+        id: 'zu-s2-5-18',
+        type: 'multiple-choice',
+        question: 'How do you say "I want to go" in Zulu?',
+        questionFr: 'Comment dit-on "je veux partir" en Zulu?',
+        correctAnswer: 'Ngifuna ukuhamba',
+        options: ['Ngifuna ukuhamba', 'Ngidinga ukuhamba', 'Ngicela ukuhamba', 'Ngiyahamba']
+      },
+      {
+        id: 'zu-s2-5-19',
+        type: 'multiple-choice',
+        question: 'Which phrase is used to begin a polite request?',
+        questionFr: 'Quelle phrase est utilisée pour commencer une demande polie?',
+        correctAnswer: 'Ngicela',
+        options: ['Ngicela', 'Ngifuna', 'Ngidinga', 'Ngiyabonga']
+      },
+      {
+        id: 'zu-s2-5-20',
+        type: 'type-answer',
+        question: 'Type "please help me" in Zulu',
+        questionFr: 'Tapez "aidez-moi s\'il vous plaît" en Zulu',
+        correctAnswer: 'Ngicela usizo'
+      }
+    ]
+  },
+
+  // Unit 6 — Compliments & Encouragement
+  {
+    id: 'zu-s2-6',
+    type: 'vocabulary',
+    title: 'Compliments & Encouragement',
+    titleFr: 'Compliments et Encouragement',
+    level: 2,
+    xpReward: 15,
+    exercises: [
+      {
+        id: 'zu-s2-6-1',
+        type: 'multiple-choice',
+        question: 'How do you say "well done" in Zulu?',
+        questionFr: 'Comment dit-on "bien fait" en Zulu?',
+        correctAnswer: 'Wenze kahle',
+        options: ['Wenze kahle', 'Muhle', 'Ngiyajabula', 'Kulungile']
+      },
+      {
+        id: 'zu-s2-6-2',
+        type: 'multiple-choice',
+        question: 'What does "Muhle" mean?',
+        questionFr: 'Que signifie "Muhle"?',
+        correctAnswer: 'Beautiful / Good-looking',
+        options: ['Beautiful / Good-looking', 'Smart', 'Strong', 'Kind']
+      },
+      {
+        id: 'zu-s2-6-3',
+        type: 'multiple-choice',
+        question: 'How do you say "you are smart" in Zulu?',
+        questionFr: 'Comment dit-on "tu es intelligent" en Zulu?',
+        correctAnswer: 'Uhlakanipha',
+        options: ['Uhlakanipha', 'Umuhle', 'Unamandla', 'Unomusa']
+      },
+      {
+        id: 'zu-s2-6-4',
+        type: 'multiple-choice',
+        question: 'What does "Ngiyajabula" mean?',
+        questionFr: 'Que signifie "Ngiyajabula"?',
+        correctAnswer: 'I am happy',
+        options: ['I am happy', 'I am sad', 'I am tired', 'I am ready']
+      },
+      {
+        id: 'zu-s2-6-5',
+        type: 'multiple-choice',
+        question: 'How do you say "very good" in Zulu?',
+        questionFr: 'Comment dit-on "très bien" en Zulu?',
+        correctAnswer: 'Kulungile kakhulu',
+        options: ['Kulungile kakhulu', 'Wenze kahle kakhulu', 'Muhle kakhulu', 'Yebo kakhulu']
+      },
+      {
+        id: 'zu-s2-6-6',
+        type: 'fill-blank',
+        question: 'Complete: "Wenze ___" = well done',
+        questionFr: 'Complétez: "Wenze ___" = bien fait',
+        correctAnswer: 'kahle',
+        hint: 'The word meaning "well/nicely"',
+        hintFr: 'Le mot signifiant "bien"'
+      },
+      {
+        id: 'zu-s2-6-7',
+        type: 'multiple-choice',
+        question: 'How do you say "you are beautiful" in Zulu?',
+        questionFr: 'Comment dit-on "tu es beau/belle" en Zulu?',
+        correctAnswer: 'Umuhle',
+        options: ['Umuhle', 'Uhlakanipha', 'Unamandla', 'Unomusa']
+      },
+      {
+        id: 'zu-s2-6-8',
+        type: 'multiple-choice',
+        question: 'What does "Unamandla" mean?',
+        questionFr: 'Que signifie "Unamandla"?',
+        correctAnswer: 'You are strong',
+        options: ['You are strong', 'You are smart', 'You are beautiful', 'You are kind']
+      },
+      {
+        id: 'zu-s2-6-9',
+        type: 'multiple-choice',
+        question: 'How do you encourage someone in Zulu?',
+        questionFr: 'Comment encourager quelqu\'un en Zulu?',
+        correctAnswer: 'Qhubeka, wenza kahle',
+        options: ['Qhubeka, wenza kahle', 'Yebo, kulungile', 'Ngiyabonga, muhle', 'Uxolo, ngena']
+      },
+      {
+        id: 'zu-s2-6-10',
+        type: 'multiple-choice',
+        question: 'What does "Ngiyakuthanda" mean?',
+        questionFr: 'Que signifie "Ngiyakuthanda"?',
+        correctAnswer: 'I love you / I like you',
+        options: ['I love you / I like you', 'I see you', 'I need you', 'I thank you']
+      },
+      {
+        id: 'zu-s2-6-11',
+        type: 'type-answer',
+        question: 'Type "beautiful" in Zulu',
+        questionFr: 'Tapez "beau/belle" en Zulu',
+        correctAnswer: 'Muhle'
+      },
+      {
+        id: 'zu-s2-6-12',
+        type: 'multiple-choice',
+        question: 'What does "Unomusa" mean?',
+        questionFr: 'Que signifie "Unomusa"?',
+        correctAnswer: 'You are kind',
+        options: ['You are kind', 'You are smart', 'You are strong', 'You are beautiful']
+      },
+      {
+        id: 'zu-s2-6-13',
+        type: 'multiple-choice',
+        question: 'How do you say "I am proud of you" in Zulu?',
+        questionFr: 'Comment dit-on "je suis fier de toi" en Zulu?',
+        correctAnswer: 'Ngiyaniqhenya ngawe',
+        options: ['Ngiyaniqhenya ngawe', 'Ngiyakuthanda', 'Wenze kahle', 'Ngiyajabula']
+      },
+      {
+        id: 'zu-s2-6-14',
+        type: 'multiple-choice',
+        question: 'What does "Wenze kahle" literally mean?',
+        questionFr: 'Que signifie littéralement "Wenze kahle"?',
+        correctAnswer: 'You did well',
+        options: ['You did well', 'You are good', 'You are beautiful', 'You are kind']
+      },
+      {
+        id: 'zu-s2-6-15',
+        type: 'fill-blank',
+        question: 'Complete: "U___" = you are beautiful',
+        questionFr: 'Complétez: "U___" = tu es beau/belle',
+        correctAnswer: 'muhle',
+        hint: 'The Zulu word for beautiful',
+        hintFr: 'Le mot zulu pour beau/belle'
+      },
+      {
+        id: 'zu-s2-6-16',
+        type: 'multiple-choice',
+        question: 'How do you say "keep going" in Zulu?',
+        questionFr: 'Comment dit-on "continue" en Zulu?',
+        correctAnswer: 'Qhubeka',
+        options: ['Qhubeka', 'Hlala', 'Ngena', 'Yidla']
+      },
+      {
+        id: 'zu-s2-6-17',
+        type: 'multiple-choice',
+        question: 'What does "Uhlakanipha" mean?',
+        questionFr: 'Que signifie "Uhlakanipha"?',
+        correctAnswer: 'You are smart / intelligent',
+        options: ['You are smart / intelligent', 'You are beautiful', 'You are strong', 'You are kind']
+      },
+      {
+        id: 'zu-s2-6-18',
+        type: 'multiple-choice',
+        question: 'How do you express joy in Zulu?',
+        questionFr: 'Comment exprimer la joie en Zulu?',
+        correctAnswer: 'Ngiyajabula',
+        options: ['Ngiyajabula', 'Ngiyadabuka', 'Ngiyacela', 'Ngidinga']
+      },
+      {
+        id: 'zu-s2-6-19',
+        type: 'multiple-choice',
+        question: 'What does "Kahle" mean on its own?',
+        questionFr: 'Que signifie "Kahle" seul?',
+        correctAnswer: 'Well / Nicely / Slowly',
+        options: ['Well / Nicely / Slowly', 'Good', 'Beautiful', 'Smart']
+      },
+      {
+        id: 'zu-s2-6-20',
+        type: 'type-answer',
+        question: 'Type "well done" in Zulu',
+        questionFr: 'Tapez "bien fait" en Zulu',
+        correctAnswer: 'Wenze kahle'
+      }
+    ]
+  },
+
+  // Unit 7 — Polite Speech Review
+  {
+    id: 'zu-s2-7',
+    type: 'vocabulary',
+    title: 'Polite Speech Review',
+    titleFr: 'Révision du Discours Poli',
     level: 2,
     xpReward: 20,
     exercises: [
       {
-        id: 'zu-v181',
+        id: 'zu-s2-7-1',
         type: 'multiple-choice',
-        question: 'What does "Ngivuka" mean?',
-        questionFr: 'Que signifie "Ngivuka"?',
-        correctAnswer: 'I wake up',
-        options: ['I wake up', 'I sleep', 'I eat', 'I go to work']
+        question: 'How do you say "please" in Zulu?',
+        questionFr: 'Comment dit-on "s\'il vous plaît" en Zulu?',
+        correctAnswer: 'Ngiyacela',
+        options: ['Ngiyacela', 'Ngiyabonga', 'Kulungile', 'Wamukelekile']
       },
       {
-        id: 'zu-v182',
+        id: 'zu-s2-7-2',
         type: 'multiple-choice',
-        question: 'How do you say "I am hungry" in Zulu?',
-        questionFr: 'Comment dit-on "J\'ai faim" en Zulu?',
-        correctAnswer: 'Ngilambile',
-        options: ['Ngilambile', 'Ngomile', 'Ngikhathele', 'Ngishisa']
+        question: 'What does "Ngiyabonga" mean?',
+        questionFr: 'Que signifie "Ngiyabonga"?',
+        correctAnswer: 'Thank you',
+        options: ['Thank you', 'Please', 'Sorry', 'You\'re welcome']
       },
       {
-        id: 'zu-v183',
+        id: 'zu-s2-7-3',
+        type: 'multiple-choice',
+        question: 'How do you say "sorry" in Zulu?',
+        questionFr: 'Comment dit-on "désolé" en Zulu?',
+        correctAnswer: 'Uxolo',
+        options: ['Uxolo', 'Ngixolele', 'Kulungile', 'Ngiyacela']
+      },
+      {
+        id: 'zu-s2-7-4',
+        type: 'multiple-choice',
+        question: 'What does "Yebo" mean?',
+        questionFr: 'Que signifie "Yebo"?',
+        correctAnswer: 'Yes',
+        options: ['Yes', 'No', 'Maybe', 'Of course']
+      },
+      {
+        id: 'zu-s2-7-5',
+        type: 'multiple-choice',
+        question: 'How do you say "welcome" in Zulu?',
+        questionFr: 'Comment dit-on "bienvenue" en Zulu?',
+        correctAnswer: 'Wamukelekile',
+        options: ['Wamukelekile', 'Ngena', 'Hlala', 'Ngiyabonga']
+      },
+      {
+        id: 'zu-s2-7-6',
+        type: 'multiple-choice',
+        question: 'What does "Ngifuna" mean?',
+        questionFr: 'Que signifie "Ngifuna"?',
+        correctAnswer: 'I want',
+        options: ['I want', 'I need', 'I have', 'I go']
+      },
+      {
+        id: 'zu-s2-7-7',
+        type: 'multiple-choice',
+        question: 'How do you say "well done" in Zulu?',
+        questionFr: 'Comment dit-on "bien fait" en Zulu?',
+        correctAnswer: 'Wenze kahle',
+        options: ['Wenze kahle', 'Muhle', 'Ngiyajabula', 'Kulungile']
+      },
+      {
+        id: 'zu-s2-7-8',
+        type: 'fill-blank',
+        question: 'Complete: "Ngiyabonga ___" = thank you very much',
+        questionFr: 'Complétez: "Ngiyabonga ___" = merci beaucoup',
+        correctAnswer: 'kakhulu',
+        hint: 'The word meaning "very much"',
+        hintFr: 'Le mot signifiant "beaucoup"'
+      },
+      {
+        id: 'zu-s2-7-9',
+        type: 'multiple-choice',
+        question: 'What does "Ngixolele" mean?',
+        questionFr: 'Que signifie "Ngixolele"?',
+        correctAnswer: 'Forgive me',
+        options: ['Forgive me', 'Help me', 'Greet me', 'Thank me']
+      },
+      {
+        id: 'zu-s2-7-10',
+        type: 'multiple-choice',
+        question: 'How do you say "I agree" in Zulu?',
+        questionFr: 'Comment dit-on "je suis d\'accord" en Zulu?',
+        correctAnswer: 'Ngiyavuma',
+        options: ['Ngiyavuma', 'Angivumi', 'Yebo', 'Kulungile']
+      },
+      {
+        id: 'zu-s2-7-11',
+        type: 'multiple-choice',
+        question: 'What does "Ngena" mean?',
+        questionFr: 'Que signifie "Ngena"?',
+        correctAnswer: 'Come in',
+        options: ['Come in', 'Sit down', 'Welcome', 'Please eat']
+      },
+      {
+        id: 'zu-s2-7-12',
+        type: 'multiple-choice',
+        question: 'How do you say "I need" in Zulu?',
+        questionFr: 'Comment dit-on "j\'ai besoin" en Zulu?',
+        correctAnswer: 'Ngidinga',
+        options: ['Ngidinga', 'Ngifuna', 'Ngicela', 'Ngihamba']
+      },
+      {
+        id: 'zu-s2-7-13',
         type: 'type-answer',
-        question: 'Type "I don\'t understand" in Zulu',
-        questionFr: 'Tapez "Je ne comprends pas" en Zulu',
-        correctAnswer: 'Angiqondi'
+        question: 'Type "thank you very much" in Zulu',
+        questionFr: 'Tapez "merci beaucoup" en Zulu',
+        correctAnswer: 'Ngiyabonga kakhulu'
       },
       {
-        id: 'zu-v184',
+        id: 'zu-s2-7-14',
         type: 'multiple-choice',
-        question: 'What does "Ngiyakwazi" mean?',
-        questionFr: 'Que signifie "Ngiyakwazi"?',
-        correctAnswer: 'I can',
-        options: ['I can', 'I can\'t', 'I don\'t want', 'I don\'t understand']
+        question: 'What does "Mhlawumbe" mean?',
+        questionFr: 'Que signifie "Mhlawumbe"?',
+        correctAnswer: 'Maybe',
+        options: ['Maybe', 'Never', 'Always', 'Of course']
       },
       {
-        id: 'zu-v185',
+        id: 'zu-s2-7-15',
         type: 'multiple-choice',
-        question: 'How do you say "I like" in Zulu?',
-        questionFr: 'Comment dit-on "J\'aime" en Zulu?',
-        correctAnswer: 'Ngiyathanda',
-        options: ['Ngiyathanda', 'Angithandi', 'Nginakho', 'Anginakho']
+        question: 'How do you say "I am happy" in Zulu?',
+        questionFr: 'Comment dit-on "je suis heureux" en Zulu?',
+        correctAnswer: 'Ngiyajabula',
+        options: ['Ngiyajabula', 'Ngiyadabuka', 'Ngiyacela', 'Ngidinga']
       },
       {
-        id: 'zu-v186',
+        id: 'zu-s2-7-16',
+        type: 'fill-blank',
+        question: 'Complete: "H___" = sit down',
+        questionFr: 'Complétez: "H___" = asseyez-vous',
+        correctAnswer: 'lala',
+        hint: 'Also means "stay"',
+        hintFr: 'Signifie aussi "rester"'
+      },
+      {
+        id: 'zu-s2-7-17',
+        type: 'multiple-choice',
+        question: 'What does "Kulungile" mean?',
+        questionFr: 'Que signifie "Kulungile"?',
+        correctAnswer: 'It\'s okay / You\'re welcome',
+        options: ['It\'s okay / You\'re welcome', 'I am sorry', 'I am grateful', 'I am happy']
+      },
+      {
+        id: 'zu-s2-7-18',
+        type: 'multiple-choice',
+        question: 'How do you say "no" in Zulu?',
+        questionFr: 'Comment dit-on "non" en Zulu?',
+        correctAnswer: 'Cha',
+        options: ['Cha', 'Yebo', 'Mhlawumbe', 'Kulungile']
+      },
+      {
+        id: 'zu-s2-7-19',
+        type: 'multiple-choice',
+        question: 'What does "Muhle" mean?',
+        questionFr: 'Que signifie "Muhle"?',
+        correctAnswer: 'Beautiful',
+        options: ['Beautiful', 'Good', 'Smart', 'Happy']
+      },
+      {
+        id: 'zu-s2-7-20',
         type: 'type-answer',
-        question: 'Type "I am cooking food" in Zulu',
-        questionFr: 'Tapez "Je cuisine de la nourriture" en Zulu',
-        correctAnswer: 'Ngipheka ukudla'
-      },
-      {
-        id: 'zu-v187',
-        type: 'multiple-choice',
-        question: 'What does "Ngifunda incwadi" mean?',
-        questionFr: 'Que signifie "Ngifunda incwadi"?',
-        correctAnswer: 'I am reading a book',
-        options: ['I am reading a book', 'I am writing something', 'I am playing music', 'I am cleaning the house']
-      },
-      {
-        id: 'zu-v188',
-        type: 'multiple-choice',
-        question: 'How do you say "I am at home" in Zulu?',
-        questionFr: 'Comment dit-on "Je suis à la maison" en Zulu?',
-        correctAnswer: 'Ngikhona endlini',
-        options: ['Ngikhona endlini', 'Ngiya endlini', 'Ngiza endlini', 'Ngiphuma endlini']
-      },
-      {
-        id: 'zu-v189',
-        type: 'type-answer',
-        question: 'Type "I am happy" in Zulu',
-        questionFr: 'Tapez "Je suis heureux" en Zulu',
-        correctAnswer: 'Ngiyajabula'
-      },
-      {
-        id: 'zu-v190',
-        type: 'multiple-choice',
-        question: 'What does "Ngimatasa" mean?',
-        questionFr: 'Que signifie "Ngimatasa"?',
-        correctAnswer: 'I am busy',
-        options: ['I am busy', 'I am well', 'I am sick', 'I am angry']
-      },
-      {
-        id: 'zu-v191',
-        type: 'multiple-choice',
-        question: 'How do you say "I don\'t have" in Zulu?',
-        questionFr: 'Comment dit-on "Je n\'ai pas" en Zulu?',
-        correctAnswer: 'Anginakho',
-        options: ['Anginakho', 'Nginakho', 'Angifuni', 'Angiqondi']
-      },
-      {
-        id: 'zu-v192',
-        type: 'type-answer',
-        question: 'Type "I am washing clothes" in Zulu',
-        questionFr: 'Tapez "Je lave les vêtements" en Zulu',
-        correctAnswer: 'Ngigeza izingubo'
-      },
-      {
-        id: 'zu-v193',
-        type: 'multiple-choice',
-        question: 'What does "Angithandi" mean?',
-        questionFr: 'Que signifie "Angithandi"?',
-        correctAnswer: 'I don\'t like',
-        options: ['I don\'t like', 'I like', 'I don\'t have', 'I have']
-      },
-      {
-        id: 'zu-v194',
-        type: 'multiple-choice',
-        question: 'How do you say "I am tired" in Zulu?',
-        questionFr: 'Comment dit-on "Je suis fatigué" en Zulu?',
-        correctAnswer: 'Ngikhathele',
-        options: ['Ngikhathele', 'Ngilambile', 'Ngomile', 'Ngishisa']
-      },
-      {
-        id: 'zu-v195',
-        type: 'type-answer',
-        question: 'Type "I am coming home" in Zulu',
-        questionFr: 'Tapez "Je rentre à la maison" en Zulu',
-        correctAnswer: 'Ngiza endlini'
-      },
-      {
-        id: 'zu-v196',
-        type: 'multiple-choice',
-        question: 'What does "Ngibhala okuthile" mean?',
-        questionFr: 'Que signifie "Ngibhala okuthile"?',
-        correctAnswer: 'I am writing something',
-        options: ['I am writing something', 'I am reading a book', 'I am playing music', 'I am cleaning the house']
-      },
-      {
-        id: 'zu-v197',
-        type: 'multiple-choice',
-        question: 'How do you say "I am ready" in Zulu?',
-        questionFr: 'Comment dit-on "Je suis prêt" en Zulu?',
-        correctAnswer: 'Ngilungile',
-        options: ['Ngilungile', 'Anginamsebenzi', 'Ngimatasa', 'Ngiphilile']
-      },
-      {
-        id: 'zu-v198',
-        type: 'type-answer',
-        question: 'Type "I am at school" in Zulu',
-        questionFr: 'Tapez "Je suis à l\'école" en Zulu',
-        correctAnswer: 'Ngikhona esikoleni'
-      },
-      {
-        id: 'zu-v199',
-        type: 'multiple-choice',
-        question: 'What does "Ngiyathanda kakhulu" mean?',
-        questionFr: 'Que signifie "Ngiyathanda kakhulu"?',
-        correctAnswer: 'I love',
-        options: ['I love', 'I hate', 'I don\'t like', 'I like']
-      },
-      {
-        id: 'zu-v200',
-        type: 'multiple-choice',
-        question: 'How do you say "I am at the market" in Zulu?',
-        questionFr: 'Comment dit-on "Je suis au marché" en Zulu?',
-        correctAnswer: 'Ngikhona emakethe',
-        options: ['Ngikhona emakethe', 'Ngiya emakethe', 'Ngiza emakethe', 'Ngiphuma emakethe']
+        question: 'Type "forgive me" in Zulu',
+        questionFr: 'Tapez "pardonnez-moi" en Zulu',
+        correctAnswer: 'Ngixolele'
       }
     ]
   }

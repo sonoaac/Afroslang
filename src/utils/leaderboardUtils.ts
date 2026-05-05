@@ -1,68 +1,35 @@
-import { doc, setDoc, updateDoc, increment, getDoc, collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
-import { logger } from "./logger";
+import { supabase } from '../lib/supabase';
+import { logger } from './logger';
 
-// League system with 7 tiers
-export const LEAGUES = ["Copper", "Bronze", "Silver", "Gold", "Platinum", "Diamond", "Stars"] as const;
+export const LEAGUES = ['Copper', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Stars'] as const;
 export type League = typeof LEAGUES[number];
 
-// League colors and icons
 export const LEAGUE_CONFIG: Record<League, { color: string; icon: string; gradient: string }> = {
-  Copper: { 
-    color: "#CD7F32", 
-    icon: "🥉", 
-    gradient: "from-amber-600 to-orange-500" 
-  },
-  Bronze: { 
-    color: "#CD7F32", 
-    icon: "🥉", 
-    gradient: "from-amber-500 to-yellow-600" 
-  },
-  Silver: { 
-    color: "#C0C0C0", 
-    icon: "🥈", 
-    gradient: "from-gray-300 to-gray-400" 
-  },
-  Gold: { 
-    color: "#FFD700", 
-    icon: "🥇", 
-    gradient: "from-yellow-400 to-yellow-500" 
-  },
-  Platinum: { 
-    color: "#E5E4E2", 
-    icon: "💎", 
-    gradient: "from-gray-200 to-gray-300" 
-  },
-  Diamond: { 
-    color: "#B9F2FF", 
-    icon: "💎", 
-    gradient: "from-blue-300 to-cyan-400" 
-  },
-  Stars: { 
-    color: "#FFD700", 
-    icon: "⭐", 
-    gradient: "from-yellow-300 to-yellow-400" 
-  }
+  Copper:   { color: '#CD7F32', icon: '🥉', gradient: 'from-amber-600 to-orange-500' },
+  Bronze:   { color: '#CD7F32', icon: '🥉', gradient: 'from-amber-500 to-yellow-600' },
+  Silver:   { color: '#C0C0C0', icon: '🥈', gradient: 'from-gray-300 to-gray-400' },
+  Gold:     { color: '#FFD700', icon: '🥇', gradient: 'from-yellow-400 to-yellow-500' },
+  Platinum: { color: '#E5E4E2', icon: '💎', gradient: 'from-gray-200 to-gray-300' },
+  Diamond:  { color: '#B9F2FF', icon: '💎', gradient: 'from-blue-300 to-cyan-400' },
+  Stars:    { color: '#FFD700', icon: '⭐', gradient: 'from-yellow-300 to-yellow-400' },
 };
 
-// Week ID generation
 export function getCurrentWeekId(): string {
   const now = new Date();
   const startOfYear = new Date(now.getFullYear(), 0, 1);
   const days = Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
-  const weekNumber = Math.ceil((days + startOfYear.getDay() + 1) / 7);
-  return `${now.getFullYear()}-W${weekNumber}`;
+  const week = Math.ceil((days + startOfYear.getDay() + 1) / 7);
+  return `${now.getFullYear()}-W${week}`;
 }
 
 export function getNextWeekId(): string {
   const now = new Date();
   const startOfYear = new Date(now.getFullYear(), 0, 1);
   const days = Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
-  const weekNumber = Math.ceil((days + startOfYear.getDay() + 1) / 7) + 1;
-  return `${now.getFullYear()}-W${weekNumber}`;
+  const week = Math.ceil((days + startOfYear.getDay() + 1) / 7) + 1;
+  return `${now.getFullYear()}-W${week}`;
 }
 
-// Leaderboard entry interface
 export interface LeaderboardEntry {
   userId: string;
   username: string;
@@ -74,158 +41,148 @@ export interface LeaderboardEntry {
   updatedAt: Date;
 }
 
-// Add XP to leaderboard
 export async function addWeeklyXP(
   userId: string,
   league: League,
   username: string,
   gainedXP: number,
   isSubscribed: boolean,
-  weekId: string
+  weekId: string,
 ): Promise<void> {
   try {
     const multiplier = isSubscribed ? 1.42 : 1;
     const totalXP = Math.floor(gainedXP * multiplier);
 
-    const ref = doc(db, "leaderboards", weekId, league, userId);
+    // Upsert: insert or increment XP
+    const { data: existing } = await supabase
+      .from('leaderboard')
+      .select('xp')
+      .eq('user_id', userId)
+      .eq('week_id', weekId)
+      .single();
 
-    await setDoc(
-      ref,
-      {
-        userId,
-        username,
-        xp: increment(totalXP),
-        league,
-        subscribed: isSubscribed,
-        multiplier,
-        updatedAt: new Date(),
-      },
-      { merge: true }
-    );
+    const newXP = (existing?.xp ?? 0) + totalXP;
+
+    await supabase.from('leaderboard').upsert({
+      user_id: userId,
+      username,
+      xp: newXP,
+      league,
+      subscribed: isSubscribed,
+      multiplier,
+      week_id: weekId,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id,week_id' });
   } catch (error) {
-    logger.error("Error adding weekly XP:", error);
+    logger.error('Error adding weekly XP:', error);
     throw error;
   }
 }
 
-// Get current week ID from Firestore
+// Kept for API compatibility — week ID is computed locally now
 export async function getCurrentWeekIdFromDB(): Promise<string> {
-  try {
-    const weekRef = doc(db, "leaderboards", "currentWeek");
-    const weekSnap = await getDoc(weekRef);
-    
-    if (weekSnap.exists()) {
-      return weekSnap.data().weekId;
-    } else {
-      // Initialize current week if it doesn't exist
-      const currentWeek = getCurrentWeekId();
-      await setDoc(weekRef, { weekId: currentWeek });
-      return currentWeek;
-    }
-  } catch (error) {
-    console.error("Error getting current week ID:", error);
-    return getCurrentWeekId();
-  }
+  return getCurrentWeekId();
 }
 
-// Get leaderboard for a specific league and week
 export async function getLeaderboard(league: League, weekId: string): Promise<LeaderboardEntry[]> {
   try {
-    const q = query(
-      collection(db, "leaderboards", weekId, league),
-      orderBy("xp", "desc")
-    );
-    const snapshot = await getDocs(q);
-    const data = snapshot.docs.map((doc, index) => ({
-      ...doc.data(),
-      rank: index + 1
-    })) as LeaderboardEntry[];
-    
-    return data;
+    const { data, error } = await supabase
+      .from('leaderboard')
+      .select('user_id,username,xp,league,subscribed,multiplier,updated_at')
+      .eq('league', league)
+      .eq('week_id', weekId)
+      .order('xp', { ascending: false });
+
+    if (error || !data) return [];
+    return data.map((row, i) => ({
+      userId: row.user_id,
+      username: row.username,
+      xp: row.xp,
+      league: row.league as League,
+      subscribed: row.subscribed,
+      multiplier: row.multiplier,
+      rank: i + 1,
+      updatedAt: new Date(row.updated_at),
+    }));
   } catch (error) {
-    console.error("Error getting leaderboard:", error);
+    logger.error('Error getting leaderboard:', error);
     return [];
   }
 }
 
-// Get user's current league
 export async function getUserLeague(userId: string, weekId: string): Promise<League | null> {
   try {
-    for (const league of LEAGUES) {
-      const userRef = doc(db, "leaderboards", weekId, league, userId);
-      const userSnap = await getDoc(userRef);
-      
-      if (userSnap.exists()) {
-        return league;
-      }
-    }
-    return null;
-  } catch (error) {
-    console.error("Error getting user league:", error);
+    const { data } = await supabase
+      .from('leaderboard')
+      .select('league')
+      .eq('user_id', userId)
+      .eq('week_id', weekId)
+      .single();
+    return (data?.league as League) ?? null;
+  } catch {
     return null;
   }
 }
 
-// Get user's leaderboard entry
 export async function getUserLeaderboardEntry(userId: string, weekId: string): Promise<LeaderboardEntry | null> {
   try {
-    for (const league of LEAGUES) {
-      const userRef = doc(db, "leaderboards", weekId, league, userId);
-      const userSnap = await getDoc(userRef);
-      
-      if (userSnap.exists()) {
-        const data = userSnap.data() as LeaderboardEntry;
-        return data;
-      }
-    }
-    return null;
-  } catch (error) {
-    console.error("Error getting user leaderboard entry:", error);
+    const { data } = await supabase
+      .from('leaderboard')
+      .select('user_id,username,xp,league,subscribed,multiplier,updated_at')
+      .eq('user_id', userId)
+      .eq('week_id', weekId)
+      .single();
+    if (!data) return null;
+    return {
+      userId: data.user_id,
+      username: data.username,
+      xp: data.xp,
+      league: data.league as League,
+      subscribed: data.subscribed,
+      multiplier: data.multiplier,
+      updatedAt: new Date(data.updated_at),
+    };
+  } catch {
     return null;
   }
 }
 
-// Weekly reset function (for admin use)
 export async function resetWeeklyLeaderboard(): Promise<void> {
   try {
-    const leagues = LEAGUES;
-    const currentWeek = await getCurrentWeekIdFromDB();
-    const nextWeek = getNextWeekId();
+    const currentWeek = getCurrentWeekId();
+    const nextWeek    = getNextWeekId();
+    const { data: allEntries } = await supabase
+      .from('leaderboard')
+      .select('*')
+      .eq('week_id', currentWeek)
+      .order('xp', { ascending: false });
 
-    for (const league of leagues) {
-      const snapshot = await getDocs(collection(db, "leaderboards", currentWeek, league));
-      const users = snapshot.docs.map((d) => ({ id: d.id, league: league as string, ...d.data() }));
-      const total = users.length;
-      const top = 7;
-      const bottom = Math.floor(total * 0.1);
+    if (!allEntries) return;
 
-      for (let i = 0; i < users.length; i++) {
-        const u = users[i];
-        let newLeague = u.league;
-        
-        // Promotion/demotion logic
-        if (i < top && league !== "Stars") {
-          const currentIndex = leagues.indexOf(league);
-          newLeague = leagues[currentIndex + 1];
-        } else if (i >= total - bottom && league !== "Copper") {
-          const currentIndex = leagues.indexOf(league);
-          newLeague = leagues[currentIndex - 1];
-        }
-
-        // Reset XP for new week
-        await setDoc(doc(db, "leaderboards", nextWeek, newLeague, u.id), {
-          ...u,
-          xp: 0,
-          league: newLeague,
-          updatedAt: new Date(),
-        });
-      }
+    // Group by league, apply promotion/demotion
+    const byLeague: Record<string, typeof allEntries> = {};
+    for (const e of allEntries) {
+      (byLeague[e.league] ??= []).push(e);
     }
 
-    // Update currentWeek document
-    await setDoc(doc(db, "leaderboards", "currentWeek"), { weekId: nextWeek });
+    for (const [leagueName, entries] of Object.entries(byLeague)) {
+      const idx   = LEAGUES.indexOf(leagueName as League);
+      const total = entries.length;
+      for (let i = 0; i < total; i++) {
+        const e = entries[i];
+        let newLeague: string = leagueName;
+        if (i < 7 && idx < LEAGUES.length - 1)            newLeague = LEAGUES[idx + 1];
+        else if (i >= total - Math.floor(total * 0.1) && idx > 0) newLeague = LEAGUES[idx - 1];
+        await supabase.from('leaderboard').upsert({
+          user_id: e.user_id, username: e.username,
+          xp: 0, league: newLeague,
+          subscribed: e.subscribed, multiplier: e.multiplier,
+          week_id: nextWeek, updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id,week_id' });
+      }
+    }
   } catch (error) {
-    console.error("Error resetting weekly leaderboard:", error);
+    logger.error('Error resetting weekly leaderboard:', error);
     throw error;
   }
 }

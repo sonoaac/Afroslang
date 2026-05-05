@@ -1,5 +1,4 @@
-import { doc, updateDoc, increment, runTransaction } from 'firebase/firestore';
-import { db } from '../firebase';
+import { supabase } from '../lib/supabase';
 import { UserData } from './userData';
 
 // ── Leaderboard weekly Sandbit rewards ────────────────────────────────────
@@ -100,9 +99,10 @@ export async function equipCosmetic(
   itemId: string,
   type: 'avatar' | 'background',
 ): Promise<Partial<UserData>> {
-  const equippedKey = type === 'avatar' ? 'equippedAvatar' : 'equippedBackground';
-  await updateDoc(doc(db, 'users', userId), { [equippedKey]: itemId });
-  return { [equippedKey]: itemId };
+  const col = type === 'avatar' ? 'equipped_avatar' : 'equipped_background';
+  const key = type === 'avatar' ? 'equippedAvatar'  : 'equippedBackground';
+  await supabase.from('profiles').update({ [col]: itemId }).eq('id', userId);
+  return { [key]: itemId };
 }
 
 // ── 2× XP — Plus perk only (not a purchasable item) ───────────────────────
@@ -116,7 +116,8 @@ export function isXpBoostActive(userData: UserData | null): boolean {
 /** Award Sandbit leaderboard reward to a user. */
 export async function awardLeaderboardSandbits(userId: string, rank: 1 | 2 | 3): Promise<void> {
   const amount = LEADERBOARD_REWARDS[rank];
-  await updateDoc(doc(db, 'users', userId), { sandbits: increment(amount) });
+  const { data } = await supabase.from('profiles').select('sandbits').eq('id', userId).single();
+  await supabase.from('profiles').update({ sandbits: (data?.sandbits ?? 0) + amount }).eq('id', userId);
 }
 
 /** Convert diamonds → sandbits (1 diamond = 50 SB). */
@@ -126,22 +127,15 @@ export async function convertDiamondsToSandbits(
   diamondsToSpend: number,
 ): Promise<Partial<UserData> | null> {
   if (diamondsToSpend < 1) return null;
-
-  // Transaction: read current balance from Firestore before deducting (prevents TOCTOU)
-  return runTransaction(db, async (tx) => {
-    const userRef = doc(db, 'users', userId);
-    const snap = await tx.get(userRef);
-    if (!snap.exists()) return null;
-
-    const current = snap.data();
-    const currentDiamonds = current.diamonds ?? 0;
-    if (currentDiamonds < diamondsToSpend) return null;
-
-    const newDiamonds = currentDiamonds - diamondsToSpend;
-    const newSandbits = (current.sandbits ?? 0) + diamondsToSpend * SANDBITS_PER_DIAMOND;
-    tx.update(userRef, { diamonds: newDiamonds, sandbits: newSandbits });
-    return { diamonds: newDiamonds, sandbits: newSandbits };
-  });
+  const { data } = await supabase.from('profiles').select('diamonds,sandbits').eq('id', userId).single();
+  if (!data) return null;
+  const currentDiamonds = data.diamonds ?? 0;
+  if (currentDiamonds < diamondsToSpend) return null;
+  const newDiamonds = currentDiamonds - diamondsToSpend;
+  const newSandbits = (data.sandbits ?? 0) + diamondsToSpend * SANDBITS_PER_DIAMOND;
+  const { error } = await supabase.from('profiles').update({ diamonds: newDiamonds, sandbits: newSandbits }).eq('id', userId);
+  if (error) return null;
+  return { diamonds: newDiamonds, sandbits: newSandbits };
 }
 
 /** Purchase a cosmetic (avatar or background) with sandbits. */
@@ -151,32 +145,36 @@ export async function purchaseCosmetic(
   item: CosmeticItem,
   type: 'avatar' | 'background',
 ): Promise<Partial<UserData> | null> {
-  const ownedKey    = type === 'avatar' ? 'ownedAvatars'      : 'ownedBackgrounds';
+  const ownedCol    = type === 'avatar' ? 'owned_avatars'      : 'owned_backgrounds';
+  const equippedCol = type === 'avatar' ? 'equipped_avatar'    : 'equipped_background';
+  const ownedKey    = type === 'avatar' ? 'ownedAvatars'       : 'ownedBackgrounds';
   const equippedKey = type === 'avatar' ? 'equippedAvatar'     : 'equippedBackground';
-  const userRef     = doc(db, 'users', userId);
 
-  // Transaction: read authoritative balance from Firestore before deducting
-  return runTransaction(db, async (tx) => {
-    const snap = await tx.get(userRef);
-    if (!snap.exists()) return null;
+  const { data } = await supabase
+    .from('profiles')
+    .select('sandbits,owned_avatars,owned_backgrounds,equipped_avatar,equipped_background')
+    .eq('id', userId)
+    .single();
+  if (!data) return null;
 
-    const current     = snap.data();
-    const currentOwned: string[] = current[ownedKey] ?? [];
+  const currentOwned: string[] = data[ownedCol] ?? [];
+  if (currentOwned.includes(item.id)) {
+    await supabase.from('profiles').update({ [equippedCol]: item.id }).eq('id', userId);
+    return { [equippedKey]: item.id };
+  }
 
-    if (currentOwned.includes(item.id)) {
-      // Already owned — just equip (free)
-      tx.update(userRef, { [equippedKey]: item.id });
-      return { [equippedKey]: item.id };
-    }
+  const currentSandbits = data.sandbits ?? 0;
+  if (currentSandbits < item.price) return null;
 
-    const currentSandbits = current.sandbits ?? 0;
-    if (currentSandbits < item.price) return null;
-
-    const newSandbits = currentSandbits - item.price;
-    const newOwned    = [...currentOwned, item.id];
-    tx.update(userRef, { sandbits: newSandbits, [ownedKey]: newOwned, [equippedKey]: item.id });
-    return { sandbits: newSandbits, [ownedKey]: newOwned, [equippedKey]: item.id };
-  });
+  const newSandbits = currentSandbits - item.price;
+  const newOwned    = [...currentOwned, item.id];
+  const { error } = await supabase.from('profiles').update({
+    sandbits: newSandbits,
+    [ownedCol]: newOwned,
+    [equippedCol]: item.id,
+  }).eq('id', userId);
+  if (error) return null;
+  return { sandbits: newSandbits, [ownedKey]: newOwned, [equippedKey]: item.id };
 }
 
 // Only redirect to known Stripe payment origins

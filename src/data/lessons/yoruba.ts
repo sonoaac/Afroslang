@@ -1,6 +1,8 @@
 import { Lesson } from '../../types';
 
-export const yorubaLessons: Lesson[] = [
+type RawLesson = Omit<Lesson, 'stageId' | 'lessonNumber'> & { level?: number };
+
+export const yorubaLessons: RawLesson[] = [
   // STAGE 1 - MISSION 1: GREETINGS (20 questions, 10 will be randomly selected)
   {
     id: 'yo-vocab-1',
@@ -1163,500 +1165,1208 @@ export const yorubaLessons: Lesson[] = [
     ]
   },
 
-  // STAGE 2 - MISSION 8: USEFUL EXPRESSIONS (20 questions, 10 will be randomly selected)
+  // ── STAGE 2: POLITE & FORMAL SPEECH ─────────────────────────────────────
+
+  // Unit 1 — Please & Thank You
   {
-    id: 'yo-vocab-8',
+    id: 'yo-s2-1',
     type: 'vocabulary',
-    title: 'Useful Expressions',
-    titleFr: 'Expressions utiles',
+    title: 'Please & Thank You',
+    titleFr: 'S\'il vous plaît et Merci',
     level: 2,
     xpReward: 15,
     exercises: [
       {
-        id: 'yo-v141',
+        id: 'yo-s2-1-1',
         type: 'multiple-choice',
-        question: 'How do you say "I don\'t understand" in Yoruba?',
-        questionFr: 'Comment dit-on "Je ne comprends pas" en Yoruba?',
-        correctAnswer: 'Ko ye mi',
-        options: ['Ko ye mi', 'Ko mo', 'Ko fe mi', 'Ko lọ']
+        question: 'How do you say "please" in Yoruba?',
+        questionFr: 'Comment dit-on "s\'il vous plaît" en Yoruba?',
+        correctAnswer: 'E jọwọ',
+        options: ['E jọwọ', 'E se', 'Ko si ohun', 'Bawo ni']
       },
       {
-        id: 'yo-v142',
+        id: 'yo-s2-1-2',
         type: 'multiple-choice',
-        question: 'What does "Ko ye mi" mean?',
-        questionFr: 'Que signifie "Ko ye mi"?',
-        correctAnswer: 'I don\'t understand',
-        options: ['I don\'t understand', 'I don\'t know', 'I don\'t want', 'I won\'t go']
+        question: 'What does "E se" mean?',
+        questionFr: 'Que signifie "E se"?',
+        correctAnswer: 'Thank you',
+        options: ['Thank you', 'Please', 'Sorry', 'Welcome']
       },
       {
-        id: 'yo-v143',
+        id: 'yo-s2-1-3',
+        type: 'multiple-choice',
+        question: 'How do you say "thank you very much" in Yoruba?',
+        questionFr: 'Comment dit-on "merci beaucoup" en Yoruba?',
+        correctAnswer: 'E se pupọ',
+        options: ['E se pupọ', 'E se', 'E jọwọ', 'Mo dupẹ']
+      },
+      {
+        id: 'yo-s2-1-4',
+        type: 'multiple-choice',
+        question: 'What does "Ko si ohun" mean?',
+        questionFr: 'Que signifie "Ko si ohun"?',
+        correctAnswer: 'You\'re welcome',
+        options: ['You\'re welcome', 'Thank you', 'Please', 'No problem']
+      },
+      {
+        id: 'yo-s2-1-5',
+        type: 'multiple-choice',
+        question: 'How do you say "I am grateful" in Yoruba?',
+        questionFr: 'Comment dit-on "Je suis reconnaissant" en Yoruba?',
+        correctAnswer: 'Mo dupẹ',
+        options: ['Mo dupẹ', 'E se', 'Ko si ohun', 'E jọwọ']
+      },
+      {
+        id: 'yo-s2-1-6',
+        type: 'fill-blank',
+        question: 'Complete: "E ___" = please',
+        questionFr: 'Complétez: "E ___" = s\'il vous plaît',
+        correctAnswer: 'jọwọ',
+        hint: 'Used before requests',
+        hintFr: 'Utilisé avant les demandes'
+      },
+      {
+        id: 'yo-s2-1-7',
+        type: 'multiple-choice',
+        question: 'What does "Mo dupe lọwọ rẹ" mean?',
+        questionFr: 'Que signifie "Mo dupe lọwọ rẹ"?',
+        correctAnswer: 'I thank you (formal)',
+        options: ['I thank you (formal)', 'I greet you', 'I welcome you', 'I need you']
+      },
+      {
+        id: 'yo-s2-1-8',
+        type: 'multiple-choice',
+        question: 'How do you say "well done" in Yoruba?',
+        questionFr: 'Comment dit-on "bien fait" en Yoruba?',
+        correctAnswer: 'O ṣe daadaa',
+        options: ['O ṣe daadaa', 'E se', 'Mo dupẹ', 'O dara']
+      },
+      {
+        id: 'yo-s2-1-9',
+        type: 'multiple-choice',
+        question: 'In "E se pupọ", what does "pupọ" mean?',
+        questionFr: 'Dans "E se pupọ", que signifie "pupọ"?',
+        correctAnswer: 'Very much',
+        options: ['Very much', 'A little', 'Again', 'Always']
+      },
+      {
+        id: 'yo-s2-1-10',
+        type: 'multiple-choice',
+        question: 'Which phrase is used to formally thank someone?',
+        questionFr: 'Quelle expression est utilisée pour remercier formellement?',
+        correctAnswer: 'Mo dupe lọwọ rẹ',
+        options: ['Mo dupe lọwọ rẹ', 'E jọwọ', 'Ko si ohun', 'E se pupọ']
+      },
+      {
+        id: 'yo-s2-1-11',
         type: 'type-answer',
-        question: 'Type "I don\'t know" in Yoruba',
-        questionFr: 'Tapez "Je ne sais pas" en Yoruba',
-        correctAnswer: 'Ko mo'
+        question: 'Type "thank you" in Yoruba',
+        questionFr: 'Tapez "merci" en Yoruba',
+        correctAnswer: 'E se'
       },
       {
-        id: 'yo-v144',
+        id: 'yo-s2-1-12',
         type: 'multiple-choice',
-        question: 'How do you say "I don\'t want" in Yoruba?',
-        questionFr: 'Comment dit-on "Je ne veux pas" en Yoruba?',
-        correctAnswer: 'Ko fe mi',
-        options: ['Ko fe mi', 'Ko ye mi', 'Ko mo', 'Ko lọ']
+        question: 'How do you reply when someone thanks you?',
+        questionFr: 'Comment répondre quand quelqu\'un vous remercie?',
+        correctAnswer: 'Ko si ohun',
+        options: ['Ko si ohun', 'E se', 'E jọwọ', 'Bẹẹni']
       },
       {
-        id: 'yo-v145',
+        id: 'yo-s2-1-13',
         type: 'multiple-choice',
-        question: '"Ko fe mi" means:',
-        questionFr: '"Ko fe mi" signifie:',
-        correctAnswer: 'I don\'t want',
-        options: ['I don\'t want', 'I don\'t understand', 'I don\'t know', 'I won\'t go']
+        question: 'How do you say "please come" in Yoruba?',
+        questionFr: 'Comment dit-on "veuillez venir" en Yoruba?',
+        correctAnswer: 'E jọwọ wọle',
+        options: ['E jọwọ wọle', 'E se wọle', 'Mo dupẹ wọle', 'Ko si wọle']
       },
       {
-        id: 'yo-v146',
+        id: 'yo-s2-1-14',
+        type: 'multiple-choice',
+        question: 'What does "Mo dupẹ" mean?',
+        questionFr: 'Que signifie "Mo dupẹ"?',
+        correctAnswer: 'I am grateful',
+        options: ['I am grateful', 'I am sorry', 'I am here', 'I am well']
+      },
+      {
+        id: 'yo-s2-1-15',
+        type: 'fill-blank',
+        question: 'Complete: "Ko si ___" = you\'re welcome',
+        questionFr: 'Complétez: "Ko si ___" = de rien',
+        correctAnswer: 'ohun',
+        hint: 'Literally "there is nothing"',
+        hintFr: 'Littéralement "il n\'y a rien"'
+      },
+      {
+        id: 'yo-s2-1-16',
+        type: 'multiple-choice',
+        question: 'In "O ṣe daadaa", what does "daadaa" mean?',
+        questionFr: 'Dans "O ṣe daadaa", que signifie "daadaa"?',
+        correctAnswer: 'Well / Nicely',
+        options: ['Well / Nicely', 'Quickly', 'Slowly', 'Often']
+      },
+      {
+        id: 'yo-s2-1-17',
+        type: 'multiple-choice',
+        question: 'How do you say "please sit down"?',
+        questionFr: 'Comment dit-on "veuillez vous asseoir"?',
+        correctAnswer: 'E jọwọ joko',
+        options: ['E jọwọ joko', 'E se joko', 'Mo dupẹ joko', 'Ko si joko']
+      },
+      {
+        id: 'yo-s2-1-18',
+        type: 'multiple-choice',
+        question: 'Which Yoruba phrase means "thank you very much"?',
+        questionFr: 'Quelle phrase yoruba signifie "merci beaucoup"?',
+        correctAnswer: 'E se pupọ',
+        options: ['E se pupọ', 'E se daadaa', 'Ko si ohun', 'Mo dupe']
+      },
+      {
+        id: 'yo-s2-1-19',
+        type: 'multiple-choice',
+        question: 'What is the difference between "E se" and "E se pupọ"?',
+        questionFr: 'Quelle est la différence entre "E se" et "E se pupọ"?',
+        correctAnswer: '"E se pupọ" means thank you very much',
+        options: ['"E se pupọ" means thank you very much', '"E se" is more formal', '"E se pupọ" is a greeting', 'They mean the same thing']
+      },
+      {
+        id: 'yo-s2-1-20',
         type: 'type-answer',
-        question: 'Type "I can\'t" in Yoruba',
-        questionFr: 'Tapez "Je ne peux pas" en Yoruba',
-        correctAnswer: 'Ko le mi'
-      },
-      {
-        id: 'yo-v147',
-        type: 'multiple-choice',
-        question: 'How do you say "I can" in Yoruba?',
-        questionFr: 'Comment dit-on "Je peux" en Yoruba?',
-        correctAnswer: 'Mo le',
-        options: ['Mo le', 'Ko le mi', 'Ko fe mi', 'Ko ye mi']
-      },
-      {
-        id: 'yo-v148',
-        type: 'multiple-choice',
-        question: 'What does "Mo le" mean?',
-        questionFr: 'Que signifie "Mo le"?',
-        correctAnswer: 'I can',
-        options: ['I can', 'I can\'t', 'I don\'t want', 'I don\'t understand']
-      },
-      {
-        id: 'yo-v149',
-        type: 'type-answer',
-        question: 'Type "I will" in Yoruba',
-        questionFr: 'Tapez "Je vais" en Yoruba',
-        correctAnswer: 'Mo lọ'
-      },
-      {
-        id: 'yo-v150',
-        type: 'multiple-choice',
-        question: 'How do you say "I won\'t" in Yoruba?',
-        questionFr: 'Comment dit-on "Je ne vais pas" en Yoruba?',
-        correctAnswer: 'Ko lọ',
-        options: ['Ko lọ', 'Mo lọ', 'Mo le', 'Ko le mi']
-      },
-      {
-        id: 'yo-v151',
-        type: 'multiple-choice',
-        question: '"Ko lọ" means:',
-        questionFr: '"Ko lọ" signifie:',
-        correctAnswer: 'I won\'t',
-        options: ['I won\'t', 'I will', 'I can', 'I can\'t']
-      },
-      {
-        id: 'yo-v152',
-        type: 'type-answer',
-        question: 'Type "I have" in Yoruba',
-        questionFr: 'Tapez "J\'ai" en Yoruba',
-        correctAnswer: 'Mo ni'
-      },
-      {
-        id: 'yo-v153',
-        type: 'multiple-choice',
-        question: 'How do you say "I don\'t have" in Yoruba?',
-        questionFr: 'Comment dit-on "Je n\'ai pas" en Yoruba?',
-        correctAnswer: 'Ko si fun mi',
-        options: ['Ko si fun mi', 'Mo ni', 'Ko fe mi', 'Ko ye mi']
-      },
-      {
-        id: 'yo-v154',
-        type: 'multiple-choice',
-        question: 'What does "Ko si fun mi" mean?',
-        questionFr: 'Que signifie "Ko si fun mi"?',
-        correctAnswer: 'I don\'t have',
-        options: ['I don\'t have', 'I have', 'I don\'t want', 'I don\'t understand']
-      },
-      {
-        id: 'yo-v155',
-        type: 'type-answer',
-        question: 'Type "I like" in Yoruba',
-        questionFr: 'Tapez "J\'aime" en Yoruba',
-        correctAnswer: 'Mo feran'
-      },
-      {
-        id: 'yo-v156',
-        type: 'multiple-choice',
-        question: 'How do you say "I don\'t like" in Yoruba?',
-        questionFr: 'Comment dit-on "Je n\'aime pas" en Yoruba?',
-        correctAnswer: 'Ko feran mi',
-        options: ['Ko feran mi', 'Mo feran', 'Ko si fun mi', 'Mo ni']
-      },
-      {
-        id: 'yo-v157',
-        type: 'multiple-choice',
-        question: 'What does "Ko feran mi" mean?',
-        questionFr: 'Que signifie "Ko feran mi"?',
-        correctAnswer: 'I don\'t like',
-        options: ['I don\'t like', 'I like', 'I don\'t have', 'I have']
-      },
-      {
-        id: 'yo-v158',
-        type: 'type-answer',
-        question: 'Type "I love" in Yoruba',
-        questionFr: 'Tapez "J\'aime beaucoup" en Yoruba',
-        correctAnswer: 'Mo nifẹ'
-      },
-      {
-        id: 'yo-v159',
-        type: 'multiple-choice',
-        question: 'How do you say "I hate" in Yoruba?',
-        questionFr: 'Comment dit-on "Je déteste" en Yoruba?',
-        correctAnswer: 'Mo korira',
-        options: ['Mo korira', 'Mo nifẹ', 'Ko feran mi', 'Mo feran']
-      },
-      {
-        id: 'yo-v160',
-        type: 'multiple-choice',
-        question: 'What does "Mo korira" mean?',
-        questionFr: 'Que signifie "Mo korira"?',
-        correctAnswer: 'I hate',
-        options: ['I hate', 'I love', 'I don\'t like', 'I like']
+        question: 'Type "you\'re welcome" in Yoruba',
+        questionFr: 'Tapez "de rien" en Yoruba',
+        correctAnswer: 'Ko si ohun'
       }
     ]
   },
 
-  // STAGE 2 - MISSION 9: BUILDING SENTENCES (20 questions, 10 will be randomly selected)
+  // Unit 2 — Apologies & Forgiveness
   {
-    id: 'yo-vocab-9',
+    id: 'yo-s2-2',
     type: 'vocabulary',
-    title: 'Building Sentences',
-    titleFr: 'Construction de phrases',
+    title: 'Apologies & Forgiveness',
+    titleFr: 'Excuses et Pardon',
     level: 2,
     xpReward: 15,
     exercises: [
       {
-        id: 'yo-v161',
+        id: 'yo-s2-2-1',
         type: 'multiple-choice',
-        question: 'Complete: "Mo ___ ounjẹ" (I am eating food)',
-        questionFr: 'Compléter: "Mo ___ ounjẹ" (Je mange de la nourriture)',
-        correctAnswer: 'jeun',
-        options: ['jeun', 'se', 'lọ', 'kọ']
+        question: 'How do you say "sorry" in Yoruba?',
+        questionFr: 'Comment dit-on "désolé" en Yoruba?',
+        correctAnswer: 'E ma binu',
+        options: ['E ma binu', 'E dariji mi', 'Mo banujẹ', 'Ko si ohun']
       },
       {
-        id: 'yo-v162',
+        id: 'yo-s2-2-2',
         type: 'multiple-choice',
-        question: 'Complete: "Mo ___ omi" (I am drinking water)',
-        questionFr: 'Compléter: "Mo ___ omi" (Je bois de l\'eau)',
-        correctAnswer: 'mu',
-        options: ['mu', 'jeun', 'se', 'lọ']
+        question: 'What does "E ma binu" literally mean?',
+        questionFr: 'Que signifie littéralement "E ma binu"?',
+        correctAnswer: 'Don\'t be angry',
+        options: ['Don\'t be angry', 'Forgive me', 'I am sorry', 'No problem']
       },
       {
-        id: 'yo-v163',
+        id: 'yo-s2-2-3',
+        type: 'multiple-choice',
+        question: 'How do you say "forgive me" in Yoruba?',
+        questionFr: 'Comment dit-on "pardonnez-moi" en Yoruba?',
+        correctAnswer: 'E dariji mi',
+        options: ['E dariji mi', 'E ma binu', 'Ko si ohun', 'Mo banujẹ']
+      },
+      {
+        id: 'yo-s2-2-4',
+        type: 'multiple-choice',
+        question: 'What does "Mo banujẹ" mean?',
+        questionFr: 'Que signifie "Mo banujẹ"?',
+        correctAnswer: 'I am sorry',
+        options: ['I am sorry', 'I am well', 'I am happy', 'I am angry']
+      },
+      {
+        id: 'yo-s2-2-5',
+        type: 'multiple-choice',
+        question: 'How do you say "no problem" in Yoruba?',
+        questionFr: 'Comment dit-on "pas de problème" en Yoruba?',
+        correctAnswer: 'Ko si ohun',
+        options: ['Ko si ohun', 'E ma binu', 'E dariji mi', 'Bẹẹni']
+      },
+      {
+        id: 'yo-s2-2-6',
+        type: 'fill-blank',
+        question: 'Complete: "E dariji ___" = forgive me',
+        questionFr: 'Complétez: "E dariji ___" = pardonnez-moi',
+        correctAnswer: 'mi',
+        hint: 'The word for "me"',
+        hintFr: 'Le mot pour "moi"'
+      },
+      {
+        id: 'yo-s2-2-7',
+        type: 'multiple-choice',
+        question: 'What does "O ti dara" mean?',
+        questionFr: 'Que signifie "O ti dara"?',
+        correctAnswer: 'It\'s okay / It\'s fine now',
+        options: ['It\'s okay / It\'s fine now', 'It\'s bad', 'It\'s over', 'It\'s done']
+      },
+      {
+        id: 'yo-s2-2-8',
+        type: 'multiple-choice',
+        question: 'How do you formally apologize in Yoruba?',
+        questionFr: 'Comment s\'excuser formellement en Yoruba?',
+        correctAnswer: 'Mo tọrọ gafara',
+        options: ['Mo tọrọ gafara', 'E ma binu', 'Ko si ohun', 'Mo banujẹ']
+      },
+      {
+        id: 'yo-s2-2-9',
+        type: 'multiple-choice',
+        question: 'Which phrase do you use to comfort someone after an accident?',
+        questionFr: 'Quelle phrase utilisez-vous pour réconforter quelqu\'un après un accident?',
+        correctAnswer: 'E ma binu',
+        options: ['E ma binu', 'Bẹẹni', 'E se', 'O dara']
+      },
+      {
+        id: 'yo-s2-2-10',
+        type: 'multiple-choice',
+        question: 'How do you respond to an apology in Yoruba?',
+        questionFr: 'Comment répondre à une excuse en Yoruba?',
+        correctAnswer: 'Ko si ohun',
+        options: ['Ko si ohun', 'E ma binu', 'Mo banujẹ', 'E dariji']
+      },
+      {
+        id: 'yo-s2-2-11',
         type: 'type-answer',
-        question: 'Complete: "Mo ___ si iṣẹ" (I am going to work)',
-        questionFr: 'Compléter: "Mo ___ si iṣẹ" (Je vais au travail)',
-        correctAnswer: 'lọ'
+        question: 'Type "forgive me" in Yoruba',
+        questionFr: 'Tapez "pardonnez-moi" en Yoruba',
+        correctAnswer: 'E dariji mi'
       },
       {
-        id: 'yo-v164',
+        id: 'yo-s2-2-12',
         type: 'multiple-choice',
-        question: 'Complete: "Mo ___ Yoruba" (I am learning Yoruba)',
-        questionFr: 'Compléter: "Mo ___ Yoruba" (J\'apprends le Yoruba)',
-        correctAnswer: 'kọ',
-        options: ['kọ', 'lọ', 'jeun', 'se']
+        question: 'In "Mo banujẹ", which word means sad/sorry?',
+        questionFr: 'Dans "Mo banujẹ", quel mot signifie triste/désolé?',
+        correctAnswer: 'banujẹ',
+        options: ['banujẹ', 'Mo', 'banu', 'jẹ']
       },
       {
-        id: 'yo-v165',
+        id: 'yo-s2-2-13',
         type: 'multiple-choice',
-        question: 'Complete: "Mo ___ ounjẹ" (I am cooking food)',
-        questionFr: 'Compléter: "Mo ___ ounjẹ" (Je cuisine de la nourriture)',
-        correctAnswer: 'se',
-        options: ['se', 'kọ', 'lọ', 'jeun']
+        question: 'How do you say "it\'s okay" in Yoruba?',
+        questionFr: 'Comment dit-on "c\'est bon" en Yoruba?',
+        correctAnswer: 'O ti dara',
+        options: ['O ti dara', 'Ko si ohun', 'E ma binu', 'O dara pupọ']
       },
       {
-        id: 'yo-v166',
+        id: 'yo-s2-2-14',
+        type: 'multiple-choice',
+        question: 'What does "Idariji" mean?',
+        questionFr: 'Que signifie "Idariji"?',
+        correctAnswer: 'Forgiveness',
+        options: ['Forgiveness', 'Apology', 'Sorrow', 'Anger']
+      },
+      {
+        id: 'yo-s2-2-15',
+        type: 'fill-blank',
+        question: 'Complete: "Mo ___" = I am sorry',
+        questionFr: 'Complétez: "Mo ___" = je suis désolé',
+        correctAnswer: 'banujẹ',
+        hint: 'Expresses sadness or remorse',
+        hintFr: 'Exprime la tristesse ou le remords'
+      },
+      {
+        id: 'yo-s2-2-16',
+        type: 'multiple-choice',
+        question: 'What does "Ẹ jẹ ki a gbagbe" mean?',
+        questionFr: 'Que signifie "Ẹ jẹ ki a gbagbe"?',
+        correctAnswer: 'Let\'s forget it',
+        options: ['Let\'s forget it', 'Let\'s go', 'Let\'s eat', 'Let\'s talk']
+      },
+      {
+        id: 'yo-s2-2-17',
+        type: 'multiple-choice',
+        question: 'How do you say "don\'t worry" in Yoruba?',
+        questionFr: 'Comment dit-on "ne t\'inquiète pas" en Yoruba?',
+        correctAnswer: 'Maṣe yọ ara rẹ lẹnu',
+        options: ['Maṣe yọ ara rẹ lẹnu', 'E ma binu', 'Ko si ohun', 'Mo banujẹ']
+      },
+      {
+        id: 'yo-s2-2-18',
+        type: 'multiple-choice',
+        question: 'Which phrase shows deep forgiveness?',
+        questionFr: 'Quelle phrase montre un pardon profond?',
+        correctAnswer: 'Mo ti dariji rẹ',
+        options: ['Mo ti dariji rẹ', 'Ko si ohun', 'O ti dara', 'E ma binu']
+      },
+      {
+        id: 'yo-s2-2-19',
+        type: 'multiple-choice',
+        question: 'What does "E ma binu" achieve in Yoruba culture?',
+        questionFr: 'Que réalise "E ma binu" dans la culture yoruba?',
+        correctAnswer: 'It calms anger and shows empathy',
+        options: ['It calms anger and shows empathy', 'It requests help', 'It greets someone', 'It ends a conversation']
+      },
+      {
+        id: 'yo-s2-2-20',
         type: 'type-answer',
-        question: 'Complete: "Mo ___ iwe" (I am reading a book)',
-        questionFr: 'Compléter: "Mo ___ iwe" (Je lis un livre)',
-        correctAnswer: 'ka'
-      },
-      {
-        id: 'yo-v167',
-        type: 'multiple-choice',
-        question: 'Complete: "Mo ___ nkan kan" (I am writing something)',
-        questionFr: 'Compléter: "Mo ___ nkan kan" (J\'écris quelque chose)',
-        correctAnswer: 'kọwe',
-        options: ['kọwe', 'ka', 'se', 'kọ']
-      },
-      {
-        id: 'yo-v168',
-        type: 'multiple-choice',
-        question: 'Complete: "Mo ___ orin" (I am playing music)',
-        questionFr: 'Compléter: "Mo ___ orin" (Je joue de la musique)',
-        correctAnswer: 'ṣere',
-        options: ['ṣere', 'kọwe', 'ka', 'se']
-      },
-      {
-        id: 'yo-v169',
-        type: 'type-answer',
-        question: 'Complete: "Mo ___ ile" (I am cleaning the house)',
-        questionFr: 'Compléter: "Mo ___ ile" (Je nettoie la maison)',
-        correctAnswer: 'ṣe'
-      },
-      {
-        id: 'yo-v170',
-        type: 'multiple-choice',
-        question: 'Complete: "Mo ___ aṣo" (I am washing clothes)',
-        questionFr: 'Compléter: "Mo ___ aṣo" (Je lave les vêtements)',
-        correctAnswer: 'fọ',
-        options: ['fọ', 'ṣe', 'ṣere', 'kọwe']
-      },
-      {
-        id: 'yo-v171',
-        type: 'multiple-choice',
-        question: 'Complete: "Mo ___ ile" (I am at home)',
-        questionFr: 'Compléter: "Mo ___ ile" (Je suis à la maison)',
-        correctAnswer: 'wa',
-        options: ['wa', 'lọ', 'wọ', 'jade']
-      },
-      {
-        id: 'yo-v172',
-        type: 'type-answer',
-        question: 'Complete: "Mo ___ ile" (I am coming home)',
-        questionFr: 'Compléter: "Mo ___ ile" (Je rentre à la maison)',
-        correctAnswer: 'wọ'
-      },
-      {
-        id: 'yo-v173',
-        type: 'multiple-choice',
-        question: 'Complete: "Mo ___ ile" (I am leaving home)',
-        questionFr: 'Compléter: "Mo ___ ile" (Je quitte la maison)',
-        correctAnswer: 'jade',
-        options: ['jade', 'wọ', 'wa', 'lọ']
-      },
-      {
-        id: 'yo-v174',
-        type: 'multiple-choice',
-        question: 'Complete: "Mo ___ iṣẹ" (I am at work)',
-        questionFr: 'Compléter: "Mo ___ iṣẹ" (Je suis au travail)',
-        correctAnswer: 'wa',
-        options: ['wa', 'lọ', 'wọ', 'jade']
-      },
-      {
-        id: 'yo-v175',
-        type: 'type-answer',
-        question: 'Complete: "Mo ___ ile-ẹkọ" (I am at school)',
-        questionFr: 'Compléter: "Mo ___ ile-ẹkọ" (Je suis à l\'école)',
-        correctAnswer: 'wa'
-      },
-      {
-        id: 'yo-v176',
-        type: 'multiple-choice',
-        question: 'Complete: "Mo ___ oja" (I am at the market)',
-        questionFr: 'Compléter: "Mo ___ oja" (Je suis au marché)',
-        correctAnswer: 'wa',
-        options: ['wa', 'lọ', 'wọ', 'jade']
-      },
-      {
-        id: 'yo-v177',
-        type: 'multiple-choice',
-        question: 'Complete: "Mo ___ ile-iwosan" (I am at the hospital)',
-        questionFr: 'Compléter: "Mo ___ ile-iwosan" (Je suis à l\'hôpital)',
-        correctAnswer: 'wa',
-        options: ['wa', 'lọ', 'wọ', 'jade']
-      },
-      {
-        id: 'yo-v178',
-        type: 'type-answer',
-        question: 'Complete: "Mo ___ ile-ẹsin" (I am at church)',
-        questionFr: 'Compléter: "Mo ___ ile-ẹsin" (Je suis à l\'église)',
-        correctAnswer: 'wa'
-      },
-      {
-        id: 'yo-v179',
-        type: 'multiple-choice',
-        question: 'Complete: "Mo ___ ile-iṣẹ" (I am at the office)',
-        questionFr: 'Compléter: "Mo ___ ile-iṣẹ" (Je suis au bureau)',
-        correctAnswer: 'wa',
-        options: ['wa', 'lọ', 'wọ', 'jade']
-      },
-      {
-        id: 'yo-v180',
-        type: 'multiple-choice',
-        question: 'Complete: "Mo ___ ile" (I am at home)',
-        questionFr: 'Compléter: "Mo ___ ile" (Je suis à la maison)',
-        correctAnswer: 'wa',
-        options: ['wa', 'lọ', 'wọ', 'jade']
+        question: 'Type "sorry" in Yoruba',
+        questionFr: 'Tapez "désolé" en Yoruba',
+        correctAnswer: 'E ma binu'
       }
     ]
   },
 
-  // STAGE 2 - MISSION 10: STAGE 2 REVIEW (20 questions, 10 will be randomly selected)
+  // Unit 3 — Yes, No & Agreement
   {
-    id: 'yo-vocab-10',
+    id: 'yo-s2-3',
     type: 'vocabulary',
-    title: 'Stage 2 Review',
-    titleFr: 'Révision étape 2',
+    title: 'Yes, No & Agreement',
+    titleFr: 'Oui, Non et Accord',
+    level: 2,
+    xpReward: 15,
+    exercises: [
+      {
+        id: 'yo-s2-3-1',
+        type: 'multiple-choice',
+        question: 'How do you say "yes" in Yoruba?',
+        questionFr: 'Comment dit-on "oui" en Yoruba?',
+        correctAnswer: 'Bẹẹni',
+        options: ['Bẹẹni', 'Rara', 'Boya', 'O tọ']
+      },
+      {
+        id: 'yo-s2-3-2',
+        type: 'multiple-choice',
+        question: 'How do you say "no" in Yoruba?',
+        questionFr: 'Comment dit-on "non" en Yoruba?',
+        correctAnswer: 'Rara',
+        options: ['Rara', 'Bẹẹni', 'Boya', 'Dajudaju']
+      },
+      {
+        id: 'yo-s2-3-3',
+        type: 'multiple-choice',
+        question: 'What does "O tọ" mean?',
+        questionFr: 'Que signifie "O tọ"?',
+        correctAnswer: 'Correct / Right',
+        options: ['Correct / Right', 'Wrong', 'Maybe', 'I agree']
+      },
+      {
+        id: 'yo-s2-3-4',
+        type: 'multiple-choice',
+        question: 'How do you say "of course" in Yoruba?',
+        questionFr: 'Comment dit-on "bien sûr" en Yoruba?',
+        correctAnswer: 'Dajudaju',
+        options: ['Dajudaju', 'Boya', 'O tọ', 'Nitootọ']
+      },
+      {
+        id: 'yo-s2-3-5',
+        type: 'multiple-choice',
+        question: 'What does "Boya" mean?',
+        questionFr: 'Que signifie "Boya"?',
+        correctAnswer: 'Maybe',
+        options: ['Maybe', 'Yes', 'No', 'Of course']
+      },
+      {
+        id: 'yo-s2-3-6',
+        type: 'multiple-choice',
+        question: 'How do you say "I agree" in Yoruba?',
+        questionFr: 'Comment dit-on "je suis d\'accord" en Yoruba?',
+        correctAnswer: 'Mo gba',
+        options: ['Mo gba', 'Mi o gba', 'Emi naa', 'O tọ']
+      },
+      {
+        id: 'yo-s2-3-7',
+        type: 'fill-blank',
+        question: 'Complete: "Bẹẹ___" = yes',
+        questionFr: 'Complétez: "Bẹẹ___" = oui',
+        correctAnswer: 'ni',
+        hint: 'A short suffix',
+        hintFr: 'Un court suffixe'
+      },
+      {
+        id: 'yo-s2-3-8',
+        type: 'multiple-choice',
+        question: 'What does "Emi naa" mean?',
+        questionFr: 'Que signifie "Emi naa"?',
+        correctAnswer: 'Me too',
+        options: ['Me too', 'You too', 'I agree', 'I know']
+      },
+      {
+        id: 'yo-s2-3-9',
+        type: 'multiple-choice',
+        question: 'How do you say "I don\'t agree" in Yoruba?',
+        questionFr: 'Comment dit-on "je ne suis pas d\'accord" en Yoruba?',
+        correctAnswer: 'Mi o gba',
+        options: ['Mi o gba', 'Mo gba', 'Rara', 'Boya']
+      },
+      {
+        id: 'yo-s2-3-10',
+        type: 'multiple-choice',
+        question: 'What does "Nitootọ" mean?',
+        questionFr: 'Que signifie "Nitootọ"?',
+        correctAnswer: 'Truly / Really',
+        options: ['Truly / Really', 'Maybe', 'Of course', 'Not at all']
+      },
+      {
+        id: 'yo-s2-3-11',
+        type: 'type-answer',
+        question: 'Type "yes" in Yoruba',
+        questionFr: 'Tapez "oui" en Yoruba',
+        correctAnswer: 'Bẹẹni'
+      },
+      {
+        id: 'yo-s2-3-12',
+        type: 'multiple-choice',
+        question: 'How do you confirm something is correct?',
+        questionFr: 'Comment confirmer que quelque chose est correct?',
+        correctAnswer: 'O tọ',
+        options: ['O tọ', 'Rara', 'Boya', 'Mi o gba']
+      },
+      {
+        id: 'yo-s2-3-13',
+        type: 'multiple-choice',
+        question: 'What does "Dajudaju" express?',
+        questionFr: 'Qu\'exprime "Dajudaju"?',
+        correctAnswer: 'Strong certainty / Of course',
+        options: ['Strong certainty / Of course', 'Doubt', 'Refusal', 'Surprise']
+      },
+      {
+        id: 'yo-s2-3-14',
+        type: 'multiple-choice',
+        question: 'What does "Rara" mean?',
+        questionFr: 'Que signifie "Rara"?',
+        correctAnswer: 'No',
+        options: ['No', 'Yes', 'Maybe', 'Never mind']
+      },
+      {
+        id: 'yo-s2-3-15',
+        type: 'fill-blank',
+        question: 'Complete: "Mo ___" = I agree',
+        questionFr: 'Complétez: "Mo ___" = je suis d\'accord',
+        correctAnswer: 'gba',
+        hint: 'Short verb meaning to accept/agree',
+        hintFr: 'Verbe court signifiant accepter/être d\'accord'
+      },
+      {
+        id: 'yo-s2-3-16',
+        type: 'multiple-choice',
+        question: 'How do you say "that is true" in Yoruba?',
+        questionFr: 'Comment dit-on "c\'est vrai" en Yoruba?',
+        correctAnswer: 'Nitootọ',
+        options: ['Nitootọ', 'O tọ', 'Dajudaju', 'Bẹẹni']
+      },
+      {
+        id: 'yo-s2-3-17',
+        type: 'multiple-choice',
+        question: 'Which phrase shows the strongest agreement?',
+        questionFr: 'Quelle phrase montre l\'accord le plus fort?',
+        correctAnswer: 'Dajudaju',
+        options: ['Dajudaju', 'Boya', 'O tọ', 'Emi naa']
+      },
+      {
+        id: 'yo-s2-3-18',
+        type: 'multiple-choice',
+        question: 'How do you say "maybe" in Yoruba?',
+        questionFr: 'Comment dit-on "peut-être" en Yoruba?',
+        correctAnswer: 'Boya',
+        options: ['Boya', 'Bẹẹni', 'Rara', 'O tọ']
+      },
+      {
+        id: 'yo-s2-3-19',
+        type: 'multiple-choice',
+        question: 'What does "Mo ko gba" mean?',
+        questionFr: 'Que signifie "Mo ko gba"?',
+        correctAnswer: 'I don\'t agree',
+        options: ['I don\'t agree', 'I agree', 'I don\'t know', 'I refuse']
+      },
+      {
+        id: 'yo-s2-3-20',
+        type: 'type-answer',
+        question: 'Type "of course" in Yoruba',
+        questionFr: 'Tapez "bien sûr" en Yoruba',
+        correctAnswer: 'Dajudaju'
+      }
+    ]
+  },
+
+  // Unit 4 — Welcome & Hospitality
+  {
+    id: 'yo-s2-4',
+    type: 'vocabulary',
+    title: 'Welcome & Hospitality',
+    titleFr: 'Bienvenue et Hospitalité',
+    level: 2,
+    xpReward: 15,
+    exercises: [
+      {
+        id: 'yo-s2-4-1',
+        type: 'multiple-choice',
+        question: 'How do you say "welcome" in Yoruba?',
+        questionFr: 'Comment dit-on "bienvenue" en Yoruba?',
+        correctAnswer: 'E kaabo',
+        options: ['E kaabo', 'E wọle', 'E joko', 'E jẹun']
+      },
+      {
+        id: 'yo-s2-4-2',
+        type: 'multiple-choice',
+        question: 'What does "E wọle" mean?',
+        questionFr: 'Que signifie "E wọle"?',
+        correctAnswer: 'Come in',
+        options: ['Come in', 'Sit down', 'Welcome', 'Please eat']
+      },
+      {
+        id: 'yo-s2-4-3',
+        type: 'multiple-choice',
+        question: 'How do you say "sit down" in Yoruba?',
+        questionFr: 'Comment dit-on "asseyez-vous" en Yoruba?',
+        correctAnswer: 'E joko',
+        options: ['E joko', 'E wọle', 'E kaabo', 'E jẹun']
+      },
+      {
+        id: 'yo-s2-4-4',
+        type: 'multiple-choice',
+        question: 'What does "E jẹun" mean?',
+        questionFr: 'Que signifie "E jẹun"?',
+        correctAnswer: 'Please eat',
+        options: ['Please eat', 'Please sit', 'Come in', 'Welcome']
+      },
+      {
+        id: 'yo-s2-4-5',
+        type: 'multiple-choice',
+        question: 'How do you say "let me help you" in Yoruba?',
+        questionFr: 'Comment dit-on "laissez-moi vous aider" en Yoruba?',
+        correctAnswer: 'Jẹ ki n ran ọ lọwọ',
+        options: ['Jẹ ki n ran ọ lọwọ', 'E jọwọ', 'Mo dupẹ', 'E kaabo']
+      },
+      {
+        id: 'yo-s2-4-6',
+        type: 'fill-blank',
+        question: 'Complete: "E ___" = come in',
+        questionFr: 'Complétez: "E ___" = entrez',
+        correctAnswer: 'wọle',
+        hint: 'Invitation to enter a home',
+        hintFr: 'Invitation à entrer dans une maison'
+      },
+      {
+        id: 'yo-s2-4-7',
+        type: 'multiple-choice',
+        question: 'What does "Ile wa ni ile yin" mean?',
+        questionFr: 'Que signifie "Ile wa ni ile yin"?',
+        correctAnswer: 'Our home is your home',
+        options: ['Our home is your home', 'Welcome to our home', 'Please come in', 'Sit and eat']
+      },
+      {
+        id: 'yo-s2-4-8',
+        type: 'multiple-choice',
+        question: 'How do you offer something to a guest?',
+        questionFr: 'Comment offrir quelque chose à un invité?',
+        correctAnswer: 'E mu',
+        options: ['E mu', 'E joko', 'E kaabo', 'E se']
+      },
+      {
+        id: 'yo-s2-4-9',
+        type: 'multiple-choice',
+        question: 'What does "E joko" mean?',
+        questionFr: 'Que signifie "E joko"?',
+        correctAnswer: 'Sit down',
+        options: ['Sit down', 'Come in', 'Welcome', 'Please eat']
+      },
+      {
+        id: 'yo-s2-4-10',
+        type: 'multiple-choice',
+        question: 'When a visitor arrives, you say:',
+        questionFr: 'Quand un visiteur arrive, vous dites:',
+        correctAnswer: 'E kaabo',
+        options: ['E kaabo', 'O dabo', 'E se', 'Ko si ohun']
+      },
+      {
+        id: 'yo-s2-4-11',
+        type: 'type-answer',
+        question: 'Type "welcome" in Yoruba',
+        questionFr: 'Tapez "bienvenue" en Yoruba',
+        correctAnswer: 'E kaabo'
+      },
+      {
+        id: 'yo-s2-4-12',
+        type: 'multiple-choice',
+        question: 'In "E jẹun", what does "jẹun" mean?',
+        questionFr: 'Dans "E jẹun", que signifie "jẹun"?',
+        correctAnswer: 'Eat',
+        options: ['Eat', 'Sit', 'Come', 'Stay']
+      },
+      {
+        id: 'yo-s2-4-13',
+        type: 'multiple-choice',
+        question: 'How do you say "please come in and sit"?',
+        questionFr: 'Comment dit-on "veuillez entrer et vous asseoir"?',
+        correctAnswer: 'E wọle, e joko',
+        options: ['E wọle, e joko', 'E kaabo, e jẹun', 'E se, e kaabo', 'E joko, e wọle']
+      },
+      {
+        id: 'yo-s2-4-14',
+        type: 'multiple-choice',
+        question: 'What does "E mu" mean?',
+        questionFr: 'Que signifie "E mu"?',
+        correctAnswer: 'Have this / Take this',
+        options: ['Have this / Take this', 'Eat this', 'Sit here', 'Come here']
+      },
+      {
+        id: 'yo-s2-4-15',
+        type: 'fill-blank',
+        question: 'Complete: "E ___" = sit down',
+        questionFr: 'Complétez: "E ___" = asseyez-vous',
+        correctAnswer: 'joko',
+        hint: 'Used when offering a seat',
+        hintFr: 'Utilisé pour offrir une place'
+      },
+      {
+        id: 'yo-s2-4-16',
+        type: 'multiple-choice',
+        question: 'What phrase makes a guest feel at home?',
+        questionFr: 'Quelle phrase met un invité à l\'aise?',
+        correctAnswer: 'Ile wa ni ile yin',
+        options: ['Ile wa ni ile yin', 'E kaabo', 'E wọle', 'E jẹun']
+      },
+      {
+        id: 'yo-s2-4-17',
+        type: 'multiple-choice',
+        question: 'What does "Kaabo" alone mean?',
+        questionFr: 'Que signifie "Kaabo" seul?',
+        correctAnswer: 'Welcome',
+        options: ['Welcome', 'Goodbye', 'Thank you', 'Please']
+      },
+      {
+        id: 'yo-s2-4-18',
+        type: 'multiple-choice',
+        question: 'How do you say "I will help you"?',
+        questionFr: 'Comment dit-on "je vais vous aider"?',
+        correctAnswer: 'Emi yio ran ọ lọwọ',
+        options: ['Emi yio ran ọ lọwọ', 'Jẹ ki n ran ọ lọwọ', 'Mo dupẹ', 'E se']
+      },
+      {
+        id: 'yo-s2-4-19',
+        type: 'multiple-choice',
+        question: 'Which phrase invites someone to eat?',
+        questionFr: 'Quelle phrase invite quelqu\'un à manger?',
+        correctAnswer: 'E jẹun',
+        options: ['E jẹun', 'E wọle', 'E joko', 'E kaabo']
+      },
+      {
+        id: 'yo-s2-4-20',
+        type: 'type-answer',
+        question: 'Type "come in" in Yoruba',
+        questionFr: 'Tapez "entrez" en Yoruba',
+        correctAnswer: 'E wọle'
+      }
+    ]
+  },
+
+  // Unit 5 — Making Polite Requests
+  {
+    id: 'yo-s2-5',
+    type: 'vocabulary',
+    title: 'Making Polite Requests',
+    titleFr: 'Formuler des Demandes Polies',
+    level: 2,
+    xpReward: 15,
+    exercises: [
+      {
+        id: 'yo-s2-5-1',
+        type: 'multiple-choice',
+        question: 'How do you say "I want" in Yoruba?',
+        questionFr: 'Comment dit-on "je veux" en Yoruba?',
+        correctAnswer: 'Mo fẹ',
+        options: ['Mo fẹ', 'Mo nilo', 'Mo n wa', 'Jọwọ']
+      },
+      {
+        id: 'yo-s2-5-2',
+        type: 'multiple-choice',
+        question: 'What does "Mo nilo" mean?',
+        questionFr: 'Que signifie "Mo nilo"?',
+        correctAnswer: 'I need',
+        options: ['I need', 'I want', 'I have', 'I go']
+      },
+      {
+        id: 'yo-s2-5-3',
+        type: 'multiple-choice',
+        question: 'How do you ask "can you help me?" in Yoruba?',
+        questionFr: 'Comment demander "pouvez-vous m\'aider?" en Yoruba?',
+        correctAnswer: 'Ṣe o le ran mi lọwọ?',
+        options: ['Ṣe o le ran mi lọwọ?', 'Mo fẹ iranlọwọ', 'Jọwọ joko', 'E kaabo']
+      },
+      {
+        id: 'yo-s2-5-4',
+        type: 'multiple-choice',
+        question: 'What does "Jọwọ ran mi lọwọ" mean?',
+        questionFr: 'Que signifie "Jọwọ ran mi lọwọ"?',
+        correctAnswer: 'Please help me',
+        options: ['Please help me', 'Please come here', 'Please wait', 'Please sit']
+      },
+      {
+        id: 'yo-s2-5-5',
+        type: 'multiple-choice',
+        question: 'How do you say "I am looking for" in Yoruba?',
+        questionFr: 'Comment dit-on "je cherche" en Yoruba?',
+        correctAnswer: 'Mo n wa',
+        options: ['Mo n wa', 'Mo fẹ', 'Mo nilo', 'Mo lọ']
+      },
+      {
+        id: 'yo-s2-5-6',
+        type: 'fill-blank',
+        question: 'Complete: "Mo ___" = I want',
+        questionFr: 'Complétez: "Mo ___" = je veux',
+        correctAnswer: 'fẹ',
+        hint: 'The verb for wanting/wishing',
+        hintFr: 'Le verbe pour vouloir/souhaiter'
+      },
+      {
+        id: 'yo-s2-5-7',
+        type: 'multiple-choice',
+        question: 'What does "Ṣe o le?" mean?',
+        questionFr: 'Que signifie "Ṣe o le?"?',
+        correctAnswer: 'Can you?',
+        options: ['Can you?', 'Do you want?', 'Are you?', 'Will you?']
+      },
+      {
+        id: 'yo-s2-5-8',
+        type: 'multiple-choice',
+        question: 'How do you say "I need water" in Yoruba?',
+        questionFr: 'Comment dit-on "j\'ai besoin d\'eau" en Yoruba?',
+        correctAnswer: 'Mo nilo omi',
+        options: ['Mo nilo omi', 'Mo fẹ omi', 'Mo n wa omi', 'E mu omi']
+      },
+      {
+        id: 'yo-s2-5-9',
+        type: 'multiple-choice',
+        question: 'What does "Mo fẹ" mean?',
+        questionFr: 'Que signifie "Mo fẹ"?',
+        correctAnswer: 'I want',
+        options: ['I want', 'I need', 'I have', 'I see']
+      },
+      {
+        id: 'yo-s2-5-10',
+        type: 'multiple-choice',
+        question: 'How do you politely say "give me please"?',
+        questionFr: 'Comment dire poliment "donnez-moi s\'il vous plaît"?',
+        correctAnswer: 'Jọwọ fun mi',
+        options: ['Jọwọ fun mi', 'E jọwọ', 'Mo fẹ', 'E mu']
+      },
+      {
+        id: 'yo-s2-5-11',
+        type: 'type-answer',
+        question: 'Type "I need" in Yoruba',
+        questionFr: 'Tapez "j\'ai besoin" en Yoruba',
+        correctAnswer: 'Mo nilo'
+      },
+      {
+        id: 'yo-s2-5-12',
+        type: 'multiple-choice',
+        question: 'In "Mo n wa", what does "wa" mean?',
+        questionFr: 'Dans "Mo n wa", que signifie "wa"?',
+        correctAnswer: 'Looking for / Searching',
+        options: ['Looking for / Searching', 'Going', 'Coming', 'Staying']
+      },
+      {
+        id: 'yo-s2-5-13',
+        type: 'multiple-choice',
+        question: 'How do you say "please give me" in Yoruba?',
+        questionFr: 'Comment dit-on "donnez-moi s\'il vous plaît" en Yoruba?',
+        correctAnswer: 'Jọwọ fun mi',
+        options: ['Jọwọ fun mi', 'E jọwọ fun', 'Mo nilo fun', 'Ko si fun mi']
+      },
+      {
+        id: 'yo-s2-5-14',
+        type: 'multiple-choice',
+        question: 'What does "Ṣe o le ran mi lọwọ" mean?',
+        questionFr: 'Que signifie "Ṣe o le ran mi lọwọ"?',
+        correctAnswer: 'Can you help me?',
+        options: ['Can you help me?', 'Do you need help?', 'Can I help you?', 'Are you helping me?']
+      },
+      {
+        id: 'yo-s2-5-15',
+        type: 'fill-blank',
+        question: 'Complete: "Mo n ___" = I am looking for',
+        questionFr: 'Complétez: "Mo n ___" = je cherche',
+        correctAnswer: 'wa',
+        hint: 'The verb meaning to search',
+        hintFr: 'Le verbe signifiant chercher'
+      },
+      {
+        id: 'yo-s2-5-16',
+        type: 'multiple-choice',
+        question: 'How do you start a polite request in Yoruba?',
+        questionFr: 'Comment commencer une demande polie en Yoruba?',
+        correctAnswer: 'Jọwọ',
+        options: ['Jọwọ', 'Rara', 'Bẹẹni', 'Nitootọ']
+      },
+      {
+        id: 'yo-s2-5-17',
+        type: 'multiple-choice',
+        question: 'What does "Jọwọ" mean?',
+        questionFr: 'Que signifie "Jọwọ"?',
+        correctAnswer: 'Please',
+        options: ['Please', 'Thank you', 'Sorry', 'Welcome']
+      },
+      {
+        id: 'yo-s2-5-18',
+        type: 'multiple-choice',
+        question: 'How do you say "I want to go" in Yoruba?',
+        questionFr: 'Comment dit-on "je veux partir" en Yoruba?',
+        correctAnswer: 'Mo fẹ lọ',
+        options: ['Mo fẹ lọ', 'Mo nilo lọ', 'Mo n wa lọ', 'Jọwọ lọ']
+      },
+      {
+        id: 'yo-s2-5-19',
+        type: 'multiple-choice',
+        question: 'What is the difference between "Mo fẹ" and "Mo nilo"?',
+        questionFr: 'Quelle est la différence entre "Mo fẹ" et "Mo nilo"?',
+        correctAnswer: '"Mo fẹ" = want, "Mo nilo" = need',
+        options: ['"Mo fẹ" = want, "Mo nilo" = need', '"Mo fẹ" = need, "Mo nilo" = want', 'They mean the same thing', '"Mo nilo" is more polite']
+      },
+      {
+        id: 'yo-s2-5-20',
+        type: 'type-answer',
+        question: 'Type "please help me" in Yoruba',
+        questionFr: 'Tapez "aidez-moi s\'il vous plaît" en Yoruba',
+        correctAnswer: 'Jọwọ ran mi lọwọ'
+      }
+    ]
+  },
+
+  // Unit 6 — Compliments & Encouragement
+  {
+    id: 'yo-s2-6',
+    type: 'vocabulary',
+    title: 'Compliments & Encouragement',
+    titleFr: 'Compliments et Encouragement',
+    level: 2,
+    xpReward: 15,
+    exercises: [
+      {
+        id: 'yo-s2-6-1',
+        type: 'multiple-choice',
+        question: 'How do you say "well done" in Yoruba?',
+        questionFr: 'Comment dit-on "bien fait" en Yoruba?',
+        correctAnswer: 'O ṣe daadaa',
+        options: ['O ṣe daadaa', 'O dara', 'Ẹwà', 'Mo yọ']
+      },
+      {
+        id: 'yo-s2-6-2',
+        type: 'multiple-choice',
+        question: 'What does "O dara" mean?',
+        questionFr: 'Que signifie "O dara"?',
+        correctAnswer: 'It\'s good / Good',
+        options: ['It\'s good / Good', 'It\'s bad', 'It\'s beautiful', 'Well done']
+      },
+      {
+        id: 'yo-s2-6-3',
+        type: 'multiple-choice',
+        question: 'How do you say "beautiful" in Yoruba?',
+        questionFr: 'Comment dit-on "beau/belle" en Yoruba?',
+        correctAnswer: 'Ẹwà',
+        options: ['Ẹwà', 'O dara', 'Mo yọ', 'O ṣe daadaa']
+      },
+      {
+        id: 'yo-s2-6-4',
+        type: 'multiple-choice',
+        question: 'What does "Iwọ jẹ ọlọgbọn" mean?',
+        questionFr: 'Que signifie "Iwọ jẹ ọlọgbọn"?',
+        correctAnswer: 'You are smart',
+        options: ['You are smart', 'You are beautiful', 'You are strong', 'You are kind']
+      },
+      {
+        id: 'yo-s2-6-5',
+        type: 'multiple-choice',
+        question: 'How do you say "I am happy" in Yoruba?',
+        questionFr: 'Comment dit-on "je suis heureux" en Yoruba?',
+        correctAnswer: 'Mo yọ',
+        options: ['Mo yọ', 'Mo banujẹ', 'Mo dupẹ', 'Mo fẹ']
+      },
+      {
+        id: 'yo-s2-6-6',
+        type: 'fill-blank',
+        question: 'Complete: "O dara ___" = very good',
+        questionFr: 'Complétez: "O dara ___" = très bien',
+        correctAnswer: 'pupọ',
+        hint: 'The word for "very/much"',
+        hintFr: 'Le mot pour "très/beaucoup"'
+      },
+      {
+        id: 'yo-s2-6-7',
+        type: 'multiple-choice',
+        question: 'What does "Ẹ kú irẹlẹ" mean?',
+        questionFr: 'Que signifie "Ẹ kú irẹlẹ"?',
+        correctAnswer: 'Well done (for humility/effort)',
+        options: ['Well done (for humility/effort)', 'You are beautiful', 'Thank you', 'Good morning']
+      },
+      {
+        id: 'yo-s2-6-8',
+        type: 'multiple-choice',
+        question: 'How do you compliment someone\'s work in Yoruba?',
+        questionFr: 'Comment complimenter le travail de quelqu\'un en Yoruba?',
+        correctAnswer: 'O ṣe daadaa',
+        options: ['O ṣe daadaa', 'E se', 'Mo yọ', 'O dara']
+      },
+      {
+        id: 'yo-s2-6-9',
+        type: 'multiple-choice',
+        question: 'What does "Mo yọ" mean?',
+        questionFr: 'Que signifie "Mo yọ"?',
+        correctAnswer: 'I am happy',
+        options: ['I am happy', 'I am sad', 'I am tired', 'I am ready']
+      },
+      {
+        id: 'yo-s2-6-10',
+        type: 'multiple-choice',
+        question: 'How do you say "very good" in Yoruba?',
+        questionFr: 'Comment dit-on "très bien" en Yoruba?',
+        correctAnswer: 'O dara pupọ',
+        options: ['O dara pupọ', 'O ṣe daadaa', 'Ẹwà pupọ', 'Mo yọ pupọ']
+      },
+      {
+        id: 'yo-s2-6-11',
+        type: 'type-answer',
+        question: 'Type "beautiful" in Yoruba',
+        questionFr: 'Tapez "beau/belle" en Yoruba',
+        correctAnswer: 'Ẹwà'
+      },
+      {
+        id: 'yo-s2-6-12',
+        type: 'multiple-choice',
+        question: 'What does "Ọjọ rere" mean?',
+        questionFr: 'Que signifie "Ọjọ rere"?',
+        correctAnswer: 'Good day',
+        options: ['Good day', 'Good work', 'Good luck', 'Good morning']
+      },
+      {
+        id: 'yo-s2-6-13',
+        type: 'multiple-choice',
+        question: 'How do you encourage someone to keep going?',
+        questionFr: 'Comment encourager quelqu\'un à continuer?',
+        correctAnswer: 'O ṣe daadaa, ma tẹsiwaju',
+        options: ['O ṣe daadaa, ma tẹsiwaju', 'E se, o dara', 'Mo yọ, e kaabo', 'Ẹwà, dajudaju']
+      },
+      {
+        id: 'yo-s2-6-14',
+        type: 'multiple-choice',
+        question: 'What does "O ṣe daadaa" mean?',
+        questionFr: 'Que signifie "O ṣe daadaa"?',
+        correctAnswer: 'Well done / You did well',
+        options: ['Well done / You did well', 'It is good', 'You are beautiful', 'I am happy']
+      },
+      {
+        id: 'yo-s2-6-15',
+        type: 'fill-blank',
+        question: 'Complete: "Iwọ jẹ ___" = you are smart',
+        questionFr: 'Complétez: "Iwọ jẹ ___" = tu es intelligent',
+        correctAnswer: 'ọlọgbọn',
+        hint: 'The Yoruba word for smart/intelligent',
+        hintFr: 'Le mot yoruba pour intelligent'
+      },
+      {
+        id: 'yo-s2-6-16',
+        type: 'multiple-choice',
+        question: 'How do you say "you are beautiful" in Yoruba?',
+        questionFr: 'Comment dit-on "tu es beau/belle" en Yoruba?',
+        correctAnswer: 'Iwọ jẹ ẹwà',
+        options: ['Iwọ jẹ ẹwà', 'Iwọ jẹ daadaa', 'O dara pupọ', 'Ẹwà daadaa']
+      },
+      {
+        id: 'yo-s2-6-17',
+        type: 'multiple-choice',
+        question: 'What does "Ẹ kú" mean in Yoruba greetings?',
+        questionFr: 'Que signifie "Ẹ kú" dans les salutations yoruba?',
+        correctAnswer: 'Well done / Acknowledgment of effort',
+        options: ['Well done / Acknowledgment of effort', 'Thank you', 'Goodbye', 'Welcome']
+      },
+      {
+        id: 'yo-s2-6-18',
+        type: 'multiple-choice',
+        question: 'How do you express joy in Yoruba?',
+        questionFr: 'Comment exprimer la joie en Yoruba?',
+        correctAnswer: 'Mo yọ',
+        options: ['Mo yọ', 'Mo banujẹ', 'E ma binu', 'Mo nilo']
+      },
+      {
+        id: 'yo-s2-6-19',
+        type: 'multiple-choice',
+        question: 'Which word means "smart/intelligent" in Yoruba?',
+        questionFr: 'Quel mot signifie "intelligent" en Yoruba?',
+        correctAnswer: 'ọlọgbọn',
+        options: ['ọlọgbọn', 'ẹwà', 'daadaa', 'pupọ']
+      },
+      {
+        id: 'yo-s2-6-20',
+        type: 'type-answer',
+        question: 'Type "well done" in Yoruba',
+        questionFr: 'Tapez "bien fait" en Yoruba',
+        correctAnswer: 'O ṣe daadaa'
+      }
+    ]
+  },
+
+  // Unit 7 — Polite Speech Review
+  {
+    id: 'yo-s2-7',
+    type: 'vocabulary',
+    title: 'Polite Speech Review',
+    titleFr: 'Révision du Discours Poli',
     level: 2,
     xpReward: 20,
     exercises: [
       {
-        id: 'yo-v181',
+        id: 'yo-s2-7-1',
         type: 'multiple-choice',
-        question: 'What does "Mo ji" mean?',
-        questionFr: 'Que signifie "Mo ji"?',
-        correctAnswer: 'I wake up',
-        options: ['I wake up', 'I sleep', 'I eat', 'I go to work']
+        question: 'How do you say "please" in Yoruba?',
+        questionFr: 'Comment dit-on "s\'il vous plaît" en Yoruba?',
+        correctAnswer: 'E jọwọ',
+        options: ['E jọwọ', 'E se', 'Ko si ohun', 'E kaabo']
       },
       {
-        id: 'yo-v182',
+        id: 'yo-s2-7-2',
         type: 'multiple-choice',
-        question: 'How do you say "I am hungry" in Yoruba?',
-        questionFr: 'Comment dit-on "J\'ai faim" en Yoruba?',
-        correctAnswer: 'Ebi npa mi',
-        options: ['Ebi npa mi', 'Omi npa mi', 'Ororo npa mi', 'Gbona npa mi']
+        question: 'What does "E se" mean?',
+        questionFr: 'Que signifie "E se"?',
+        correctAnswer: 'Thank you',
+        options: ['Thank you', 'Please', 'Sorry', 'You\'re welcome']
       },
       {
-        id: 'yo-v183',
+        id: 'yo-s2-7-3',
+        type: 'multiple-choice',
+        question: 'How do you say "sorry" in Yoruba?',
+        questionFr: 'Comment dit-on "désolé" en Yoruba?',
+        correctAnswer: 'E ma binu',
+        options: ['E ma binu', 'E dariji mi', 'Mo banujẹ', 'Ko si ohun']
+      },
+      {
+        id: 'yo-s2-7-4',
+        type: 'multiple-choice',
+        question: 'What does "Bẹẹni" mean?',
+        questionFr: 'Que signifie "Bẹẹni"?',
+        correctAnswer: 'Yes',
+        options: ['Yes', 'No', 'Maybe', 'Of course']
+      },
+      {
+        id: 'yo-s2-7-5',
+        type: 'multiple-choice',
+        question: 'How do you say "welcome" in Yoruba?',
+        questionFr: 'Comment dit-on "bienvenue" en Yoruba?',
+        correctAnswer: 'E kaabo',
+        options: ['E kaabo', 'E wọle', 'E joko', 'E se']
+      },
+      {
+        id: 'yo-s2-7-6',
+        type: 'multiple-choice',
+        question: 'What does "Mo fẹ" mean?',
+        questionFr: 'Que signifie "Mo fẹ"?',
+        correctAnswer: 'I want',
+        options: ['I want', 'I need', 'I have', 'I go']
+      },
+      {
+        id: 'yo-s2-7-7',
+        type: 'multiple-choice',
+        question: 'How do you say "well done" in Yoruba?',
+        questionFr: 'Comment dit-on "bien fait" en Yoruba?',
+        correctAnswer: 'O ṣe daadaa',
+        options: ['O ṣe daadaa', 'O dara', 'Mo yọ', 'E se']
+      },
+      {
+        id: 'yo-s2-7-8',
+        type: 'fill-blank',
+        question: 'Complete: "Ko si ___" = you\'re welcome',
+        questionFr: 'Complétez: "Ko si ___" = de rien',
+        correctAnswer: 'ohun',
+        hint: 'Literally "there is nothing"',
+        hintFr: 'Littéralement "il n\'y a rien"'
+      },
+      {
+        id: 'yo-s2-7-9',
+        type: 'multiple-choice',
+        question: 'What does "E dariji mi" mean?',
+        questionFr: 'Que signifie "E dariji mi"?',
+        correctAnswer: 'Forgive me',
+        options: ['Forgive me', 'Help me', 'Greet me', 'Thank me']
+      },
+      {
+        id: 'yo-s2-7-10',
+        type: 'multiple-choice',
+        question: 'How do you say "I agree" in Yoruba?',
+        questionFr: 'Comment dit-on "je suis d\'accord" en Yoruba?',
+        correctAnswer: 'Mo gba',
+        options: ['Mo gba', 'Mi o gba', 'Bẹẹni', 'O tọ']
+      },
+      {
+        id: 'yo-s2-7-11',
+        type: 'multiple-choice',
+        question: 'What does "E wọle" mean?',
+        questionFr: 'Que signifie "E wọle"?',
+        correctAnswer: 'Come in',
+        options: ['Come in', 'Sit down', 'Welcome', 'Please eat']
+      },
+      {
+        id: 'yo-s2-7-12',
+        type: 'multiple-choice',
+        question: 'How do you say "I need" in Yoruba?',
+        questionFr: 'Comment dit-on "j\'ai besoin" en Yoruba?',
+        correctAnswer: 'Mo nilo',
+        options: ['Mo nilo', 'Mo fẹ', 'Mo n wa', 'Mo lọ']
+      },
+      {
+        id: 'yo-s2-7-13',
         type: 'type-answer',
-        question: 'Type "I don\'t understand" in Yoruba',
-        questionFr: 'Tapez "Je ne comprends pas" en Yoruba',
-        correctAnswer: 'Ko ye mi'
+        question: 'Type "thank you very much" in Yoruba',
+        questionFr: 'Tapez "merci beaucoup" en Yoruba',
+        correctAnswer: 'E se pupọ'
       },
       {
-        id: 'yo-v184',
+        id: 'yo-s2-7-14',
         type: 'multiple-choice',
-        question: 'What does "Mo le" mean?',
-        questionFr: 'Que signifie "Mo le"?',
-        correctAnswer: 'I can',
-        options: ['I can', 'I can\'t', 'I don\'t want', 'I don\'t understand']
+        question: 'What does "Dajudaju" mean?',
+        questionFr: 'Que signifie "Dajudaju"?',
+        correctAnswer: 'Of course',
+        options: ['Of course', 'Maybe', 'Never', 'Always']
       },
       {
-        id: 'yo-v185',
+        id: 'yo-s2-7-15',
         type: 'multiple-choice',
-        question: 'How do you say "I like" in Yoruba?',
-        questionFr: 'Comment dit-on "J\'aime" en Yoruba?',
-        correctAnswer: 'Mo feran',
-        options: ['Mo feran', 'Ko feran mi', 'Mo ni', 'Ko si fun mi']
+        question: 'How do you say "I am happy" in Yoruba?',
+        questionFr: 'Comment dit-on "je suis heureux" en Yoruba?',
+        correctAnswer: 'Mo yọ',
+        options: ['Mo yọ', 'Mo banujẹ', 'Mo fẹ', 'Mo dupẹ']
       },
       {
-        id: 'yo-v186',
+        id: 'yo-s2-7-16',
+        type: 'fill-blank',
+        question: 'Complete: "E ___" = sit down',
+        questionFr: 'Complétez: "E ___" = asseyez-vous',
+        correctAnswer: 'joko',
+        hint: 'Invitation to take a seat',
+        hintFr: 'Invitation à s\'asseoir'
+      },
+      {
+        id: 'yo-s2-7-17',
+        type: 'multiple-choice',
+        question: 'What does "Mo banujẹ" mean?',
+        questionFr: 'Que signifie "Mo banujẹ"?',
+        correctAnswer: 'I am sorry',
+        options: ['I am sorry', 'I am well', 'I am grateful', 'I am happy']
+      },
+      {
+        id: 'yo-s2-7-18',
+        type: 'multiple-choice',
+        question: 'How do you say "maybe" in Yoruba?',
+        questionFr: 'Comment dit-on "peut-être" en Yoruba?',
+        correctAnswer: 'Boya',
+        options: ['Boya', 'Bẹẹni', 'Rara', 'O tọ']
+      },
+      {
+        id: 'yo-s2-7-19',
+        type: 'multiple-choice',
+        question: 'What does "Ẹwà" mean?',
+        questionFr: 'Que signifie "Ẹwà"?',
+        correctAnswer: 'Beautiful',
+        options: ['Beautiful', 'Good', 'Smart', 'Happy']
+      },
+      {
+        id: 'yo-s2-7-20',
         type: 'type-answer',
-        question: 'Type "I am cooking food" in Yoruba',
-        questionFr: 'Tapez "Je cuisine de la nourriture" en Yoruba',
-        correctAnswer: 'Mo nse ounjẹ'
-      },
-      {
-        id: 'yo-v187',
-        type: 'multiple-choice',
-        question: 'What does "Mo nka iwe" mean?',
-        questionFr: 'Que signifie "Mo nka iwe"?',
-        correctAnswer: 'I am reading a book',
-        options: ['I am reading a book', 'I am writing something', 'I am playing music', 'I am cleaning the house']
-      },
-      {
-        id: 'yo-v188',
-        type: 'multiple-choice',
-        question: 'How do you say "I am at home" in Yoruba?',
-        questionFr: 'Comment dit-on "Je suis à la maison" en Yoruba?',
-        correctAnswer: 'Mo wa ile',
-        options: ['Mo wa ile', 'Mo lọ ile', 'Mo wọ ile', 'Mo jade ile']
-      },
-      {
-        id: 'yo-v189',
-        type: 'type-answer',
-        question: 'Type "I am happy" in Yoruba',
-        questionFr: 'Tapez "Je suis heureux" en Yoruba',
-        correctAnswer: 'Mo dun'
-      },
-      {
-        id: 'yo-v190',
-        type: 'multiple-choice',
-        question: 'What does "Mo nṣe iṣẹ" mean?',
-        questionFr: 'Que signifie "Mo nṣe iṣẹ"?',
-        correctAnswer: 'I am busy',
-        options: ['I am busy', 'I am well', 'I am sick', 'I am angry']
-      },
-      {
-        id: 'yo-v191',
-        type: 'multiple-choice',
-        question: 'How do you say "I don\'t have" in Yoruba?',
-        questionFr: 'Comment dit-on "Je n\'ai pas" en Yoruba?',
-        correctAnswer: 'Ko si fun mi',
-        options: ['Ko si fun mi', 'Mo ni', 'Ko fe mi', 'Ko ye mi']
-      },
-      {
-        id: 'yo-v192',
-        type: 'type-answer',
-        question: 'Type "I am washing clothes" in Yoruba',
-        questionFr: 'Tapez "Je lave les vêtements" en Yoruba',
-        correctAnswer: 'Mo nfọ aṣo'
-      },
-      {
-        id: 'yo-v193',
-        type: 'multiple-choice',
-        question: 'What does "Ko feran mi" mean?',
-        questionFr: 'Que signifie "Ko feran mi"?',
-        correctAnswer: 'I don\'t like',
-        options: ['I don\'t like', 'I like', 'I don\'t have', 'I have']
-      },
-      {
-        id: 'yo-v194',
-        type: 'multiple-choice',
-        question: 'How do you say "I am tired" in Yoruba?',
-        questionFr: 'Comment dit-on "Je suis fatigué" en Yoruba?',
-        correctAnswer: 'Ororo npa mi',
-        options: ['Ororo npa mi', 'Ebi npa mi', 'Omi npa mi', 'Gbona npa mi']
-      },
-      {
-        id: 'yo-v195',
-        type: 'type-answer',
-        question: 'Type "I am coming home" in Yoruba',
-        questionFr: 'Tapez "Je rentre à la maison" en Yoruba',
-        correctAnswer: 'Mo wọ ile'
-      },
-      {
-        id: 'yo-v196',
-        type: 'multiple-choice',
-        question: 'What does "Mo nkọwe nkan kan" mean?',
-        questionFr: 'Que signifie "Mo nkọwe nkan kan"?',
-        correctAnswer: 'I am writing something',
-        options: ['I am writing something', 'I am reading a book', 'I am playing music', 'I am cleaning the house']
-      },
-      {
-        id: 'yo-v197',
-        type: 'multiple-choice',
-        question: 'How do you say "I am ready" in Yoruba?',
-        questionFr: 'Comment dit-on "Je suis prêt" en Yoruba?',
-        correctAnswer: 'Mo setan',
-        options: ['Mo setan', 'Ko si iṣẹ fun mi', 'Mo nṣe iṣẹ', 'Mo wa daadaa']
-      },
-      {
-        id: 'yo-v198',
-        type: 'type-answer',
-        question: 'Type "I am at school" in Yoruba',
-        questionFr: 'Tapez "Je suis à l\'école" en Yoruba',
-        correctAnswer: 'Mo wa ile-ẹkọ'
-      },
-      {
-        id: 'yo-v199',
-        type: 'multiple-choice',
-        question: 'What does "Mo nifẹ" mean?',
-        questionFr: 'Que signifie "Mo nifẹ"?',
-        correctAnswer: 'I love',
-        options: ['I love', 'I hate', 'I don\'t like', 'I like']
-      },
-      {
-        id: 'yo-v200',
-        type: 'multiple-choice',
-        question: 'How do you say "I am at the market" in Yoruba?',
-        questionFr: 'Comment dit-on "Je suis au marché" en Yoruba?',
-        correctAnswer: 'Mo wa oja',
-        options: ['Mo wa oja', 'Mo lọ oja', 'Mo wọ oja', 'Mo jade oja']
+        question: 'Type "forgive me" in Yoruba',
+        questionFr: 'Tapez "pardonnez-moi" en Yoruba',
+        correctAnswer: 'E dariji mi'
       }
     ]
   }
