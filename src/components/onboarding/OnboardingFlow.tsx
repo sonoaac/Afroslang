@@ -508,57 +508,63 @@ function SignalBars({ count }: { count: number }) {
   );
 }
 
-// ── Typing greeting component (Step 1) ───────────────────────────────────────
+// ── Typewriter cycle component ────────────────────────────────────────────────
 
-function TypingGreeting({ hiThere, mascotName, guide }: { hiThere: string; mascotName: string; guide: string }) {
-  const fullText = hiThere + mascotName;
-  const [phase, setPhase] = useState<'dots' | 'typing' | 'done'>('dots');
-  const [displayed, setDisplayed] = useState('');
-  const ivRef = useRef<ReturnType<typeof setInterval> | null>(null);
+function TypewriterCycle({ words, colors }: { words: string[]; colors?: string[] }) {
+  const cols       = colors ?? ['#fff'];
+  const wordsRef   = useRef([...words]);
+  const colorsRef  = useRef([...cols]);
+  const lcRef      = useRef(1);
+  const xRef       = useRef(1);
+  const waitRef    = useRef(false);
+  const doneRef    = useRef(false);
+  const [text, setText]     = useState('');
+  const [color, setColor]   = useState(cols[0]);
+  const [cursor, setCursor] = useState(true);
+  const [done, setDone]     = useState(false);
 
   useEffect(() => {
-    const t1 = setTimeout(() => {
-      setPhase('typing');
-      let idx = 0;
-      ivRef.current = setInterval(() => {
-        idx++;
-        setDisplayed(fullText.slice(0, idx));
-        if (idx >= fullText.length) {
-          clearInterval(ivRef.current!);
-          setPhase('done');
-        }
-      }, 48);
-    }, 1300);
-    return () => {
-      clearTimeout(t1);
-      if (ivRef.current) clearInterval(ivRef.current);
-    };
-  }, [fullText]);
-
-  if (phase === 'dots') {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7, paddingTop: '0.8rem', minHeight: '2.2rem' }}>
-        <div className="ob-dot-1" style={{ width: 10, height: 10, borderRadius: '50%', background: '#fff' }} />
-        <div className="ob-dot-2" style={{ width: 10, height: 10, borderRadius: '50%', background: '#fff' }} />
-        <div className="ob-dot-3" style={{ width: 10, height: 10, borderRadius: '50%', background: '#fff' }} />
-      </div>
-    );
-  }
+    const single = wordsRef.current.length === 1;
+    const tick = setInterval(() => {
+      if (doneRef.current) return;
+      const lc   = lcRef.current;
+      const x    = xRef.current;
+      const wait = waitRef.current;
+      const w    = wordsRef.current;
+      const c    = colorsRef.current;
+      if (lc === 0 && !wait) {
+        waitRef.current = true;
+        setText('');
+        setTimeout(() => {
+          const uc = c.shift()!; c.push(uc);
+          const uw = w.shift()!; w.push(uw);
+          xRef.current  = 1;
+          setColor(c[0]);
+          lcRef.current = 1;
+          waitRef.current = false;
+        }, 1000);
+      } else if (lc === w[0].length + 1 && !wait) {
+        if (single) { doneRef.current = true; setDone(true); return; }
+        waitRef.current = true;
+        setTimeout(() => {
+          xRef.current  = -1;
+          lcRef.current += xRef.current;
+          waitRef.current = false;
+        }, 1000);
+      } else if (!wait) {
+        setText(w[0].substring(0, lc));
+        lcRef.current += x;
+      }
+    }, 120);
+    const blink = setInterval(() => setCursor(v => !v), 400);
+    return () => { clearInterval(tick); clearInterval(blink); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', paddingTop: '0.5rem' }}>
-      <p style={{ color: '#fff', fontFamily: FONT, fontWeight: 900, fontSize: '1.3rem', margin: 0, lineHeight: 1.3 }}>
-        {displayed}
-        {phase === 'typing' && (
-          <span style={{ color: RED, display: 'inline-block', animation: 'ob-pulse 0.6s ease-in-out infinite', marginLeft: 1 }}>|</span>
-        )}
-      </p>
-      {phase === 'done' && (
-        <p style={{ color: 'rgba(255,255,255,0.55)', fontFamily: FONT, fontSize: '0.85rem', margin: 0, animation: 'ob-fadein 0.4s ease both' }}>
-          {guide}
-        </p>
-      )}
-    </div>
+    <>
+      <span style={{ color }}>{text}</span>
+      {!done && <span style={{ color, opacity: cursor ? 1 : 0, marginLeft: 1 }}>_</span>}
+    </>
   );
 }
 
@@ -824,7 +830,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          {/* Top-left mascot + typing greeting */}
+          {/* Top-left mascot + typewriter greeting */}
           <div style={{ padding: '1.5rem 1.4rem 0', display: 'flex', alignItems: 'flex-start', gap: '0.85rem' }} className="ob-anim">
             <img
               src="/Afroslang.png"
@@ -835,7 +841,14 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                 filter: 'drop-shadow(0 4px 18px rgba(176,0,32,0.45))',
               }}
             />
-            <TypingGreeting hiThere={t('hiThere')} mascotName={t('mascotName')} guide={t('guide')} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', paddingTop: '0.5rem' }}>
+              <p style={{ color: '#fff', fontFamily: FONT, fontWeight: 900, fontSize: '1.3rem', margin: 0, lineHeight: 1.3 }}>
+                <TypewriterCycle
+                  words={[t('hiThere') + t('mascotName'), t('guide')]}
+                  colors={['#fff', 'rgba(255,255,255,0.55)']}
+                />
+              </p>
+            </div>
           </div>
           {/* Spacer so background fills the middle */}
           <div style={{ flex: 1 }} />
@@ -860,8 +873,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               }} />
             </div>
             <div>
-              <p className="ob-heading ob-text-h" style={{ textAlign: 'left', fontSize: '1.5rem', lineHeight: 1.2 }}>
-                {t('questionsHeading')}
+              <p className="ob-heading" style={{ textAlign: 'left', fontSize: '1.5rem', lineHeight: 1.2 }}>
+                <TypewriterCycle words={[t('questionsHeading')]} />
               </p>
               <p className="ob-sub ob-text-s" style={{ textAlign: 'left', marginTop: '0.55rem' }}>
                 {t('questionsSub')}
@@ -889,7 +902,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '1.4rem 1.2rem 0' }}>
-            <p className="ob-heading ob-text-h" style={{ width: '100%', marginBottom: '1rem' }}>{t('whatLearn')}</p>
+            <p className="ob-heading" style={{ width: '100%', marginBottom: '1rem' }}><TypewriterCycle words={[t('whatLearn')]} /></p>
 
             {/* Top tile — › advances */}
             <div key={`t-${langAnim}`} className="ob-anim" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
@@ -947,7 +960,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
             <img src="/Afroslang.png" alt="Building" className="ob-mascot"
               style={{ animation: 'ob-bounce 0.75s ease-in-out infinite' }} />
             <div style={{ textAlign: 'center' }}>
-              <p className="ob-heading ob-text-h" style={{ fontSize: '1.15rem', marginBottom: '0.35rem' }}>{t('courseBuilding')}</p>
+              <p className="ob-heading" style={{ fontSize: '1.15rem', marginBottom: '0.35rem' }}><TypewriterCycle words={[t('courseBuilding')]} /></p>
               <p className="ob-sub ob-text-s">{t('joinFriends')}</p>
             </div>
             <div className="ob-text-l" style={{ width: '100%', background: 'rgba(255,255,255,0.07)', borderRadius: 8, height: 8, overflow: 'hidden' }}>
@@ -971,7 +984,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <StepContent top stepKey={animKey} style={{ paddingTop: '1.25rem' }}>
-            <p className="ob-heading ob-text-h" style={{ width: '100%', marginBottom: '0.35rem' }}>{t('howHeard')}</p>
+            <p className="ob-heading" style={{ width: '100%', marginBottom: '0.35rem' }}><TypewriterCycle words={[t('howHeard')]} /></p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {SOURCES.map(src => (
                 <button key={src.id}
@@ -1003,7 +1016,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <StepContent stepKey={animKey} style={{ justifyContent: 'flex-start', paddingTop: '1.5rem', gap: '0.9rem' }}>
-            <p className="ob-heading ob-text-h" style={{ width: '100%' }}>{t('howMuchSlang')}</p>
+            <p className="ob-heading" style={{ width: '100%' }}><TypewriterCycle words={[t('howMuchSlang')]} /></p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
               {LEVELS.map(lvl => (
                 <button key={lvl.id}
@@ -1035,8 +1048,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
           <StepContent stepKey={animKey} style={{ gap: '1.5rem' }}>
             <img src="/Afroslang.png" alt="Excited" className="ob-mascot"
               style={{ width: 110, height: 110, animation: 'ob-bounce 0.65s ease-in-out infinite' }} />
-            <p className="ob-bubble-speech ob-text-h" style={{ fontSize: '1.05rem' }}>
-              {t('affirm')}
+            <p className="ob-bubble-speech" style={{ fontSize: '1.05rem' }}>
+              <TypewriterCycle words={[t('affirm')]} />
             </p>
             <p className="ob-sub ob-text-s" style={{ animation: 'ob-pulse 1.4s ease-in-out infinite' }}>
               {t('settingUp')}
@@ -1057,7 +1070,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <StepContent top stepKey={animKey} style={{ paddingTop: '1.1rem' }}>
-            <p className="ob-heading ob-text-h" style={{ width: '100%' }}>{t('whyLearning')}</p>
+            <p className="ob-heading" style={{ width: '100%' }}><TypewriterCycle words={[t('whyLearning')]} /></p>
             <p className="ob-sub ob-text-s" style={{ width: '100%', textAlign: 'left', marginBottom: '0.1rem' }}>{t('selectAll')}</p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.48rem' }}>
               {GOALS.map(g => (
@@ -1091,7 +1104,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
           <ProgressBar />
           <StepContent stepKey={animKey} style={{ gap: '1.4rem' }}>
             <div style={{ fontSize: '3.4em', animation: 'ob-bounce 1.7s ease-in-out infinite' }}>⏰</div>
-            <p className="ob-heading ob-text-h">{t('routineTitle')}</p>
+            <p className="ob-heading"><TypewriterCycle words={[t('routineTitle')]} /></p>
             <p className="ob-sub ob-text-s" style={{ maxWidth: 275 }}>{t('routineSub')}</p>
           </StepContent>
           <div className="ob-bottom">
@@ -1109,7 +1122,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <StepContent stepKey={animKey} style={{ justifyContent: 'flex-start', paddingTop: '1.5rem', gap: '0.9rem' }}>
-            <p className="ob-heading ob-text-h" style={{ width: '100%' }}>{t('dailyGoalQ')}</p>
+            <p className="ob-heading" style={{ width: '100%' }}><TypewriterCycle words={[t('dailyGoalQ')]} /></p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
               {DAILY.map(d => (
                 <button key={d.id}
@@ -1147,7 +1160,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <StepContent stepKey={animKey} style={{ gap: '1.2rem' }}>
-            <p className="ob-heading ob-text-h" style={{ fontSize: '1.2rem' }}>{t('howStart')}</p>
+            <p className="ob-heading" style={{ fontSize: '1.2rem' }}><TypewriterCycle words={[t('howStart')]} /></p>
 
             <div style={{
               width: '100%', background: 'linear-gradient(145deg,#071407,#0d200d)',
@@ -1219,8 +1232,8 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
             </div>
 
             <div key={`pq-${placementQ}`} className="ob-anim" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
-              <p className="ob-heading ob-text-h" style={{ textAlign: 'left', fontSize: '1.05rem', lineHeight: 1.35 }}>
-                {iface === 'fr' ? currentQ.qFr : currentQ.q}
+              <p className="ob-heading" style={{ textAlign: 'left', fontSize: '1.05rem', lineHeight: 1.35 }}>
+                <TypewriterCycle words={[iface === 'fr' ? currentQ.qFr : currentQ.q]} />
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {currentQ.opts.map(opt => (
@@ -1263,7 +1276,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               <p style={{ color: RED, fontWeight: 900, fontSize: '2.5rem', fontFamily: FONT, margin: 0, lineHeight: 1 }} className="ob-text-h">
                 {pct}%
               </p>
-              <p className="ob-heading ob-text-h" style={{ marginTop: '0.3rem', fontSize: '1.1rem' }}>{msg}</p>
+              <p className="ob-heading" style={{ marginTop: '0.3rem', fontSize: '1.1rem' }}><TypewriterCycle words={[msg]} /></p>
               <p className="ob-sub ob-text-s" style={{ marginTop: '0.35rem' }}>
                 {t('startAt')}{' '}<strong style={{ color: '#fff' }}>
                   {iface === 'fr' ? `Étape ${startStage}` : `Stage ${startStage}`}
