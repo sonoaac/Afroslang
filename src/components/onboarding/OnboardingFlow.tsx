@@ -337,114 +337,6 @@ const PLACEMENT_QUESTIONS: Record<string, PlacementQ[]> = {
   ],
 };
 
-// ── Social media SVG icons ────────────────────────────────────────────────────
-
-function IconTikTok() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
-      <rect width="48" height="48" rx="10" fill="#000"/>
-      <path d="M34.1 14.5a8.7 8.7 0 01-5.4-5.5h-4.5v20.6a4.1 4.1 0 01-4.1 3.7 4.1 4.1 0 01-4.1-4.1 4.1 4.1 0 014.1-4.1c.4 0 .8.06 1.1.15V20.7a8.7 8.7 0 00-1.1-.07 8.7 8.7 0 00-8.7 8.7 8.7 8.7 0 008.7 8.7 8.7 8.7 0 008.7-8.7V19.6a13.4 13.4 0 007.8 2.5v-4.5a8.7 8.7 0 01-2.5-.6z" fill="#69C9D0"/>
-      <path d="M34.1 14.5a8.7 8.7 0 01-5.4-5.5h-4.5v20.6a4.1 4.1 0 01-4.1 3.7 4.1 4.1 0 01-4.1-4.1 4.1 4.1 0 014.1-4.1c.4 0 .8.06 1.1.15V20.7a8.7 8.7 0 00-1.1-.07 8.7 8.7 0 00-8.7 8.7 8.7 8.7 0 008.7 8.7 8.7 8.7 0 008.7-8.7V19.6a13.4 13.4 0 007.8 2.5v-4.5a8.7 8.7 0 01-2.5-.6z" fill="white" opacity="0.55"/>
-    </svg>
-  );
-}
-
-function IconInstagram() {
-  return (
-    <img src="/instagrampng.jpg" width={28} height={28}
-      style={{ borderRadius: 8, objectFit: 'cover', display: 'block', flexShrink: 0 }}
-      alt="Instagram" />
-  );
-}
-
-function IconFacebook() {
-  return (
-    <img src="/facebookimg.jpg" width={28} height={28}
-      style={{ borderRadius: '50%', objectFit: 'cover', display: 'block', flexShrink: 0 }}
-      alt="Facebook" />
-  );
-}
-
-function IconFriend() {
-  return (
-    <div style={{ width: 28, height: 28, background: '#2a2a2a', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
-      <img src="/familyiconsimg.jpg" width={22} height={22}
-        style={{ objectFit: 'contain', display: 'block', filter: 'invert(1)' }}
-        alt="A Friend" />
-    </div>
-  );
-}
-
-function IconTwitterX() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
-      <rect width="48" height="48" rx="10" fill="#000"/>
-      <path d="M28.4 21.5L38.3 10h-2.4L27.4 20l-7.2-10H11l10.4 14.5L11 38h2.4l9.1-10.1 7.3 10.1H39L28.4 21.5zm-3.2 3.6l-1-1.5L14.3 12h3.6l6.9 9.5 1 1.5 9 12.5h-3.6l-5.9-8.4z" fill="white"/>
-    </svg>
-  );
-}
-
-function IconAppStore() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
-      <defs>
-        <linearGradient id="asg" x1="24" y1="4" x2="24" y2="44" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#22CCFF"/>
-          <stop offset="1" stopColor="#0066FF"/>
-        </linearGradient>
-      </defs>
-      <rect width="48" height="48" rx="11" fill="url(#asg)"/>
-      <line x1="24" y1="10" x2="11"  y2="37" stroke="white" strokeWidth="4" strokeLinecap="round"/>
-      <line x1="24" y1="10" x2="37"  y2="37" stroke="white" strokeWidth="4" strokeLinecap="round"/>
-      <line x1="15.5" y1="28" x2="32.5" y2="28" stroke="white" strokeWidth="4" strokeLinecap="round"/>
-    </svg>
-  );
-}
-
-function IconOther() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
-      <rect width="48" height="48" rx="10" fill="#444"/>
-      <circle cx="15" cy="24" r="3.5" fill="white"/>
-      <circle cx="24" cy="24" r="3.5" fill="white"/>
-      <circle cx="33" cy="24" r="3.5" fill="white"/>
-    </svg>
-  );
-}
-
-function IconYouTube() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
-      <rect width="48" height="48" rx="10" fill="#FF0000"/>
-      <rect x="8" y="14" width="32" height="20" rx="5" fill="#FF0000" stroke="white" strokeWidth="2"/>
-      <path d="M21 19l12 5-12 5V19z" fill="white"/>
-    </svg>
-  );
-}
-
-function IconGoogle() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
-      <rect width="48" height="48" rx="10" fill="white"/>
-      <path d="M43.6 24.5c0-1.4-.12-2.8-.35-4.1H24v7.8h11c-.5 2.5-1.9 4.6-4 6v5h6.5c3.8-3.5 6.1-8.7 6.1-14.7z" fill="#4285F4"/>
-      <path d="M24 44c5.4 0 10-1.8 13.3-4.8l-6.5-5c-1.8 1.2-4.1 1.9-6.8 1.9-5.2 0-9.7-3.5-11.3-8.3H5v5.2C8.3 39.4 15.6 44 24 44z" fill="#34A853"/>
-      <path d="M12.7 27.8a12 12 0 010-7.6V15H5A19.8 19.8 0 005 33l7.7-5.2z" fill="#FBBC05"/>
-      <path d="M24 12.1c2.9 0 5.5 1 7.5 2.9l5.6-5.6C33.9 6.3 29.3 4.2 24 4.2c-8.4 0-15.7 4.6-19 11.4l7.7 5.2C14.3 15.6 18.8 12.1 24 12.1z" fill="#EA4335"/>
-    </svg>
-  );
-}
-
-const SOURCE_ICONS: Record<string, () => React.ReactElement> = {
-  tiktok:    IconTikTok,
-  instagram: IconInstagram,
-  facebook:  IconFacebook,
-  twitter:   IconTwitterX,
-  friend:    IconFriend,
-  appstore:  IconAppStore,
-  youtube:   IconYouTube,
-  google:    IconGoogle,
-  other:     IconOther,
-};
 
 const LEVELS = [
   { id: 'zero',   label: "I'm brand new",          labelFr: 'Je suis débutant(e)',              bars: 0 },
@@ -465,10 +357,10 @@ const GOALS = [
 ];
 
 const DAILY = [
-  { id: '5',  label: '5 min',   subtitle: 'Chill',   subtitleFr: 'Tranquille' },
-  { id: '10', label: '10 min',  subtitle: 'Regular', subtitleFr: 'Régulier'   },
-  { id: '15', label: '15 min',  subtitle: 'Serious', subtitleFr: 'Sérieux'    },
-  { id: '20', label: '20+ min', subtitle: 'Extreme', subtitleFr: 'Extrême'    },
+  { id: '5',  subtitle: 'Warm up',   subtitleFr: 'Échauffement' },
+  { id: '15', subtitle: 'Focused',   subtitleFr: 'Concentré'    },
+  { id: '30', subtitle: 'Deep dive', subtitleFr: 'Immersion'    },
+  { id: '60', subtitle: 'Marathon',  subtitleFr: 'Marathon'     },
 ];
 
 const GREEN = '#4CAF50';
@@ -619,6 +511,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   const [selectedPlan, setSelectedPlan]         = useState<'plus' | 'free'>('free');
   const [placementQ, setPlacementQ]             = useState(0);
   const [placementAnswers, setPlacementAnswers] = useState<string[]>([]);
+  const [placementFeedback, setPlacementFeedback] = useState<{ chosen: string; correct: string } | null>(null);
   const [langIndex, setLangIndex]               = useState(0);
   const [langAnim, setLangAnim]                 = useState(0);
 
@@ -648,14 +541,20 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
     setGoals(prev => prev.includes(id) ? prev.filter(g => g !== id) : [...prev, id]);
 
   const handlePlacementAnswer = (opt: string) => {
+    if (placementFeedback) return;
     const questions = PLACEMENT_QUESTIONS[selectedLang] ?? [];
-    const newAnswers = [...placementAnswers, opt];
-    setPlacementAnswers(newAnswers);
-    if (placementQ + 1 >= questions.length) {
-      go(13);
-    } else {
-      setPlacementQ(q => q + 1);
-    }
+    const correct = questions[placementQ]?.ans ?? '';
+    setPlacementFeedback({ chosen: opt, correct });
+    setTimeout(() => {
+      const newAnswers = [...placementAnswers, opt];
+      setPlacementAnswers(newAnswers);
+      setPlacementFeedback(null);
+      if (placementQ + 1 >= questions.length) {
+        go(13);
+      } else {
+        setPlacementQ(q => q + 1);
+      }
+    }, 1100);
   };
 
   const optDisplay = (opt: string) => iface === 'fr' ? (OPTION_FR[opt] ?? opt) : opt;
@@ -745,6 +644,9 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
     .ob-row-btn.sel   { border-color:${GREEN}; background:rgba(76,175,80,0.18); }
     .ob-row-btn-plain { border-color:rgba(255,255,255,0.12) !important; background:rgba(0,0,0,0.28) !important; }
     .ob-row-btn-plain:active { background:rgba(176,0,32,0.18) !important; border-color:${RED} !important; }
+    .ob-row-btn-ghost { background:rgba(255,255,255,0.03) !important; border-color:rgba(255,255,255,0.07) !important; }
+    .ob-row-btn-ghost:hover { background:rgba(255,255,255,0.07) !important; border-color:rgba(255,255,255,0.15) !important; }
+    .ob-row-btn-ghost.sel { border-color:${GREEN} !important; background:rgba(76,175,80,0.10) !important; }
     .ob-check { width:20px; height:20px; border-radius:6px; border:2px solid rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.15s, border-color 0.15s; }
     .ob-check.on { background:${GREEN}; border-color:${GREEN}; }
     .ob-bubble { display:flex; align-items:center; gap:6px; padding:0.5rem 0; }
@@ -988,15 +890,12 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {SOURCES.map(src => (
                 <button key={src.id}
-                  className={`ob-row-btn${discovery === src.id ? ' sel' : ''}`}
+                  className={`ob-row-btn ob-row-btn-ghost${discovery === src.id ? ' sel' : ''}`}
                   onClick={() => setDiscovery(src.id)}>
-                  <span style={{ minWidth: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {SOURCE_ICONS[src.id]?.()}
-                  </span>
-                  <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.92em' }}>
+                  <span style={{ color: discovery === src.id ? '#fff' : 'rgba(255,255,255,0.55)', fontWeight: 600, fontSize: '0.92em', flex: 1 }}>
                     {iface === 'fr' ? src.labelFr : src.label}
                   </span>
-                  {discovery === src.id && <span style={{ color: GREEN, marginLeft: 'auto', fontWeight: 900 }}>✓</span>}
+                  {discovery === src.id && <span style={{ color: GREEN, fontWeight: 900 }}>✓</span>}
                 </button>
               ))}
             </div>
@@ -1121,22 +1020,36 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
       <Overlay>
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
-          <StepContent stepKey={animKey} style={{ justifyContent: 'flex-start', paddingTop: '1.5rem', gap: '0.9rem' }}>
-            <p className="ob-heading" style={{ width: '100%' }}><TypewriterCycle words={[t('dailyGoalQ')]} /></p>
-            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
-              {DAILY.map(d => (
-                <button key={d.id}
-                  className={`ob-row-btn${dailyGoal === d.id ? ' sel' : ''}`}
-                  onClick={() => setDailyGoal(d.id)}>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ color: '#fff', fontWeight: 700, margin: 0, fontSize: '0.94em' }}>{d.label}</p>
-                    <p style={{ color: 'rgba(255,255,255,0.38)', margin: 0, fontSize: '0.73em' }}>
+          <StepContent stepKey={animKey} style={{ justifyContent: 'center', gap: '1.2rem' }}>
+            <p className="ob-heading" style={{ width: '100%', textAlign: 'center' }}><TypewriterCycle words={[t('dailyGoalQ')]} /></p>
+            <div style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.7rem' }}>
+              {DAILY.map(d => {
+                const sel = dailyGoal === d.id;
+                return (
+                  <button key={d.id}
+                    onClick={() => setDailyGoal(d.id)}
+                    style={{
+                      background: sel ? 'rgba(76,175,80,0.14)' : 'rgba(255,255,255,0.04)',
+                      border: `2px solid ${sel ? GREEN : 'rgba(255,255,255,0.10)'}`,
+                      borderRadius: 18,
+                      padding: '1.6rem 0.5rem 1.3rem',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.1rem',
+                      cursor: 'pointer', fontFamily: FONT,
+                      transition: 'border-color 0.18s, background 0.18s',
+                      backdropFilter: 'blur(6px)',
+                    }}>
+                    <p style={{ color: sel ? GREEN : '#fff', fontWeight: 900, fontSize: '2.6rem', margin: 0, lineHeight: 1 }}>
+                      {d.id}
+                    </p>
+                    <p style={{ color: sel ? GREEN : 'rgba(255,255,255,0.45)', fontWeight: 700, fontSize: '0.7rem', margin: 0, textTransform: 'uppercase', letterSpacing: 1 }}>
+                      min
+                    </p>
+                    <p style={{ color: 'rgba(255,255,255,0.28)', fontWeight: 600, fontSize: '0.68rem', margin: '0.6rem 0 0', textTransform: 'uppercase', letterSpacing: 0.6 }}>
                       {iface === 'fr' ? d.subtitleFr : d.subtitle}
                     </p>
-                  </div>
-                  {dailyGoal === d.id && <span style={{ color: GREEN, fontWeight: 900 }}>✓</span>}
-                </button>
-              ))}
+                  </button>
+                );
+              })}
             </div>
           </StepContent>
           <div className="ob-bottom">
@@ -1236,14 +1149,37 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
                 <TypewriterCycle words={[iface === 'fr' ? currentQ.qFr : currentQ.q]} />
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {currentQ.opts.map(opt => (
-                  <button key={opt}
-                    className="ob-row-btn ob-row-btn-plain"
-                    onClick={() => handlePlacementAnswer(opt)}
-                    style={{ padding: '0.85rem 1rem' }}>
-                    <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.9em' }}>{optDisplay(opt)}</span>
-                  </button>
-                ))}
+                {currentQ.opts.map(opt => {
+                  const fb = placementFeedback;
+                  const isChosen  = fb?.chosen  === opt;
+                  const isCorrect = fb?.correct  === opt;
+                  const wasWrong  = isChosen && fb?.chosen !== fb?.correct;
+                  const showRight = !isChosen && isCorrect && fb !== null;
+                  const bg = wasWrong  ? 'rgba(176,0,32,0.28)'
+                           : (isChosen && !wasWrong) || showRight ? 'rgba(76,175,80,0.22)'
+                           : 'rgba(0,0,0,0.28)';
+                  const border = wasWrong  ? '#b00020'
+                               : (isChosen && !wasWrong) || showRight ? GREEN
+                               : 'rgba(255,255,255,0.12)';
+                  return (
+                    <button key={opt}
+                      className="ob-row-btn"
+                      onClick={() => handlePlacementAnswer(opt)}
+                      disabled={!!fb}
+                      style={{
+                        padding: '0.85rem 1rem',
+                        background: bg,
+                        borderColor: border,
+                        opacity: fb && !isChosen && !showRight ? 0.38 : 1,
+                        transition: 'background 0.15s, border-color 0.15s',
+                      }}>
+                      <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.9em', flex: 1 }}>{optDisplay(opt)}</span>
+                      {(isChosen && !wasWrong) && <span style={{ color: GREEN, fontWeight: 900, fontSize: '1.1em' }}>✓</span>}
+                      {wasWrong   && <span style={{ color: '#ff5252', fontWeight: 900, fontSize: '1em' }}>✗</span>}
+                      {showRight  && <span style={{ color: GREEN, fontWeight: 900, fontSize: '1.1em' }}>✓</span>}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </StepContent>
