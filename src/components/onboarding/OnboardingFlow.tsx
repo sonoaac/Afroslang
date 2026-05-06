@@ -402,7 +402,7 @@ function SignalBars({ count }: { count: number }) {
 
 // ── Typewriter cycle component ────────────────────────────────────────────────
 
-function TypewriterCycle({ words, colors }: { words: string[]; colors?: string[] }) {
+function TypewriterCycle({ words, colors, onDone }: { words: string[]; colors?: string[]; onDone?: () => void }) {
   const cols       = colors ?? ['#fff'];
   const wordsRef   = useRef([...words]);
   const colorsRef  = useRef([...cols]);
@@ -410,6 +410,8 @@ function TypewriterCycle({ words, colors }: { words: string[]; colors?: string[]
   const xRef       = useRef(1);
   const waitRef    = useRef(false);
   const doneRef    = useRef(false);
+  const onDoneRef  = useRef(onDone);
+  onDoneRef.current = onDone;
   const [text, setText]     = useState('');
   const [color, setColor]   = useState(cols[0]);
   const [cursor, setCursor] = useState(true);
@@ -436,7 +438,7 @@ function TypewriterCycle({ words, colors }: { words: string[]; colors?: string[]
           waitRef.current = false;
         }, 1000);
       } else if (lc === w[0].length + 1 && !wait) {
-        if (single) { doneRef.current = true; setDone(true); return; }
+        if (single) { doneRef.current = true; setDone(true); onDoneRef.current?.(); return; }
         waitRef.current = true;
         setTimeout(() => {
           xRef.current  = -1;
@@ -514,6 +516,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
   const [placementFeedback, setPlacementFeedback] = useState<{ chosen: string; correct: string } | null>(null);
   const [langIndex, setLangIndex]               = useState(0);
   const [langAnim, setLangAnim]                 = useState(0);
+  const [btnReady, setBtnReady]                 = useState(false);
 
   const t = (key: keyof typeof UI['en']) => UI[iface][key];
 
@@ -534,6 +537,13 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
     if (step === 4) { const t2 = setTimeout(() => go(5), 2800); return () => clearTimeout(t2); }
     if (step === 7) { const t2 = setTimeout(() => go(8), 2200); return () => clearTimeout(t2); }
   }, [step, go]);
+
+  useEffect(() => {
+    setBtnReady(step === 0);
+    if (step === 0) return;
+    const timer = setTimeout(() => setBtnReady(true), 3000);
+    return () => clearTimeout(timer);
+  }, [step]);
 
   const progress = step < 1 ? 0 : Math.min(100, Math.round((step / TOTAL_Q) * 100));
 
@@ -754,7 +764,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
           </div>
           {/* Spacer so background fills the middle */}
           <div style={{ flex: 1 }} />
-          <div className="ob-bottom">
+          <div className="ob-bottom" style={{ opacity: btnReady ? 1 : 0, transition: 'opacity 0.35s ease', pointerEvents: btnReady ? 'auto' : 'none' }}>
             <button className="ob-btn-primary" onClick={next}>{t('continue')}</button>
           </div>
         </div>
@@ -776,14 +786,14 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
             </div>
             <div>
               <p className="ob-heading" style={{ textAlign: 'left', fontSize: '1.5rem', lineHeight: 1.2 }}>
-                <TypewriterCycle words={[t('questionsHeading')]} />
+                <TypewriterCycle words={[t('questionsHeading')]} onDone={() => setBtnReady(true)} />
               </p>
               <p className="ob-sub ob-text-s" style={{ textAlign: 'left', marginTop: '0.55rem' }}>
                 {t('questionsSub')}
               </p>
             </div>
           </StepContent>
-          <div className="ob-bottom">
+          <div className="ob-bottom" style={{ opacity: btnReady ? 1 : 0, transition: 'opacity 0.35s ease', pointerEvents: btnReady ? 'auto' : 'none' }}>
             <button className="ob-btn-primary" onClick={next}>{t('letsGo')}</button>
           </div>
         </div>
@@ -804,7 +814,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '1.4rem 1.2rem 0' }}>
-            <p className="ob-heading" style={{ width: '100%', marginBottom: '1rem' }}><TypewriterCycle words={[t('whatLearn')]} /></p>
+            <p className="ob-heading" style={{ width: '100%', marginBottom: '1rem' }}><TypewriterCycle words={[t('whatLearn')]} onDone={() => setBtnReady(true)} /></p>
 
             {/* Top tile — › advances */}
             <div key={`t-${langAnim}`} className="ob-anim" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
@@ -844,7 +854,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               </button>
             </div>
           </div>
-          <div className="ob-bottom">
+          <div className="ob-bottom" style={{ opacity: btnReady ? 1 : 0, transition: 'opacity 0.35s ease', pointerEvents: btnReady ? 'auto' : 'none' }}>
             <button className="ob-btn-primary" disabled={!selectedLang} onClick={next}>{t('continue')}</button>
           </div>
         </div>
@@ -886,7 +896,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <StepContent top stepKey={animKey} style={{ paddingTop: '1.25rem' }}>
-            <p className="ob-heading" style={{ width: '100%', marginBottom: '0.35rem' }}><TypewriterCycle words={[t('howHeard')]} /></p>
+            <p className="ob-heading" style={{ width: '100%', marginBottom: '0.35rem' }}><TypewriterCycle words={[t('howHeard')]} onDone={() => setBtnReady(true)} /></p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {SOURCES.map(src => (
                 <button key={src.id}
@@ -900,7 +910,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               ))}
             </div>
           </StepContent>
-          <div className="ob-bottom">
+          <div className="ob-bottom" style={{ opacity: btnReady ? 1 : 0, transition: 'opacity 0.35s ease', pointerEvents: btnReady ? 'auto' : 'none' }}>
             <button className="ob-btn-primary" disabled={!discovery} onClick={next}>{t('continue')}</button>
           </div>
         </div>
@@ -915,7 +925,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <StepContent stepKey={animKey} style={{ justifyContent: 'flex-start', paddingTop: '1.5rem', gap: '0.9rem' }}>
-            <p className="ob-heading" style={{ width: '100%' }}><TypewriterCycle words={[t('howMuchSlang')]} /></p>
+            <p className="ob-heading" style={{ width: '100%' }}><TypewriterCycle words={[t('howMuchSlang')]} onDone={() => setBtnReady(true)} /></p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
               {LEVELS.map(lvl => (
                 <button key={lvl.id}
@@ -930,7 +940,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               ))}
             </div>
           </StepContent>
-          <div className="ob-bottom">
+          <div className="ob-bottom" style={{ opacity: btnReady ? 1 : 0, transition: 'opacity 0.35s ease', pointerEvents: btnReady ? 'auto' : 'none' }}>
             <button className="ob-btn-primary" disabled={!level} onClick={next}>{t('continue')}</button>
           </div>
         </div>
@@ -948,13 +958,13 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
             <img src="/Afroslang.png" alt="Excited" className="ob-mascot"
               style={{ width: 110, height: 110, animation: 'ob-bounce 0.65s ease-in-out infinite' }} />
             <p className="ob-bubble-speech" style={{ fontSize: '1.05rem' }}>
-              <TypewriterCycle words={[t('affirm')]} />
+              <TypewriterCycle words={[t('affirm')]} onDone={() => setBtnReady(true)} />
             </p>
             <p className="ob-sub ob-text-s" style={{ animation: 'ob-pulse 1.4s ease-in-out infinite' }}>
               {t('settingUp')}
             </p>
           </StepContent>
-          <div className="ob-bottom">
+          <div className="ob-bottom" style={{ opacity: btnReady ? 1 : 0, transition: 'opacity 0.35s ease', pointerEvents: btnReady ? 'auto' : 'none' }}>
             <button className="ob-btn-primary" onClick={next}>{t('continue')}</button>
           </div>
         </div>
@@ -969,7 +979,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <StepContent top stepKey={animKey} style={{ paddingTop: '1.1rem' }}>
-            <p className="ob-heading" style={{ width: '100%' }}><TypewriterCycle words={[t('whyLearning')]} /></p>
+            <p className="ob-heading" style={{ width: '100%' }}><TypewriterCycle words={[t('whyLearning')]} onDone={() => setBtnReady(true)} /></p>
             <p className="ob-sub ob-text-s" style={{ width: '100%', textAlign: 'left', marginBottom: '0.1rem' }}>{t('selectAll')}</p>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.48rem' }}>
               {GOALS.map(g => (
@@ -987,7 +997,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               ))}
             </div>
           </StepContent>
-          <div className="ob-bottom">
+          <div className="ob-bottom" style={{ opacity: btnReady ? 1 : 0, transition: 'opacity 0.35s ease', pointerEvents: btnReady ? 'auto' : 'none' }}>
             <button className="ob-btn-primary" disabled={goals.length === 0} onClick={next}>{t('continue')}</button>
           </div>
         </div>
@@ -1003,10 +1013,10 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
           <ProgressBar />
           <StepContent stepKey={animKey} style={{ gap: '1.4rem' }}>
             <div style={{ fontSize: '3.4em', animation: 'ob-bounce 1.7s ease-in-out infinite' }}>⏰</div>
-            <p className="ob-heading"><TypewriterCycle words={[t('routineTitle')]} /></p>
+            <p className="ob-heading"><TypewriterCycle words={[t('routineTitle')]} onDone={() => setBtnReady(true)} /></p>
             <p className="ob-sub ob-text-s" style={{ maxWidth: 275 }}>{t('routineSub')}</p>
           </StepContent>
-          <div className="ob-bottom">
+          <div className="ob-bottom" style={{ opacity: btnReady ? 1 : 0, transition: 'opacity 0.35s ease', pointerEvents: btnReady ? 'auto' : 'none' }}>
             <button className="ob-btn-primary" onClick={next}>{t('soundsGood')}</button>
           </div>
         </div>
@@ -1021,7 +1031,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <StepContent stepKey={animKey} style={{ justifyContent: 'center', gap: '1.2rem' }}>
-            <p className="ob-heading" style={{ width: '100%', textAlign: 'center' }}><TypewriterCycle words={[t('dailyGoalQ')]} /></p>
+            <p className="ob-heading" style={{ width: '100%', textAlign: 'center' }}><TypewriterCycle words={[t('dailyGoalQ')]} onDone={() => setBtnReady(true)} /></p>
             <div style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.7rem' }}>
               {DAILY.map(d => {
                 const sel = dailyGoal === d.id;
@@ -1052,7 +1062,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               })}
             </div>
           </StepContent>
-          <div className="ob-bottom">
+          <div className="ob-bottom" style={{ opacity: btnReady ? 1 : 0, transition: 'opacity 0.35s ease', pointerEvents: btnReady ? 'auto' : 'none' }}>
             <button className="ob-btn-primary" disabled={!dailyGoal} onClick={next}>{t('lockedIn')}</button>
           </div>
         </div>
@@ -1073,45 +1083,47 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
         <div className="ob-card" key={animKey} style={cardBg(step)}>
           <ProgressBar />
           <StepContent stepKey={animKey} style={{ gap: '1.2rem' }}>
-            <p className="ob-heading" style={{ fontSize: '1.2rem' }}><TypewriterCycle words={[t('howStart')]} /></p>
+            <p className="ob-heading" style={{ fontSize: '1.2rem' }}><TypewriterCycle words={[t('howStart')]} onDone={() => setBtnReady(true)} /></p>
 
-            <div style={{
-              width: '100%', background: 'linear-gradient(145deg,#071407,#0d200d)',
-              border: `2px solid ${GREEN}`, borderRadius: 18, padding: '1.25rem',
-              position: 'relative', cursor: 'pointer',
-            }} onClick={() => startPlan('plus')}>
+            <div style={{ opacity: btnReady ? 1 : 0, transition: 'opacity 0.35s ease', pointerEvents: btnReady ? 'auto' : 'none', width: '100%', display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
               <div style={{
-                position: 'absolute', top: -13, left: '50%', transform: 'translateX(-50%)',
-                background: GREEN, color: BLACK, fontWeight: 900, fontSize: '0.68em',
-                padding: '0.28em 0.9em', borderRadius: 20, letterSpacing: 1,
-                fontFamily: FONT, whiteSpace: 'nowrap', textTransform: 'uppercase',
-              }}>
-                {t('recommended')}
+                width: '100%', background: 'linear-gradient(145deg,#071407,#0d200d)',
+                border: `2px solid ${GREEN}`, borderRadius: 18, padding: '1.25rem',
+                position: 'relative', cursor: 'pointer',
+              }} onClick={() => startPlan('plus')}>
+                <div style={{
+                  position: 'absolute', top: -13, left: '50%', transform: 'translateX(-50%)',
+                  background: GREEN, color: BLACK, fontWeight: 900, fontSize: '0.68em',
+                  padding: '0.28em 0.9em', borderRadius: 20, letterSpacing: 1,
+                  fontFamily: FONT, whiteSpace: 'nowrap', textTransform: 'uppercase',
+                }}>
+                  {t('recommended')}
+                </div>
+                <p style={{ color: GREEN, fontWeight: 700, fontSize: '1.2rem', margin: '0.5rem 0 0.2rem', fontFamily: TRENCH, letterSpacing: 1 }}>
+                  AfroPlus ⚡
+                </p>
+                <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8em', margin: '0 0 0.9rem', fontFamily: FONT }}>
+                  {t('plusTagline')}
+                </p>
+                <button className="ob-btn-primary" style={{ background: GREEN, color: BLACK, padding: '0.8em' }}>
+                  {t('startPlus')}
+                </button>
               </div>
-              <p style={{ color: GREEN, fontWeight: 700, fontSize: '1.2rem', margin: '0.5rem 0 0.2rem', fontFamily: TRENCH, letterSpacing: 1 }}>
-                AfroPlus ⚡
-              </p>
-              <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8em', margin: '0 0 0.9rem', fontFamily: FONT }}>
-                {t('plusTagline')}
-              </p>
-              <button className="ob-btn-primary" style={{ background: GREEN, color: BLACK, padding: '0.8em' }}>
-                {t('startPlus')}
-              </button>
-            </div>
 
-            <div style={{
-              width: '100%', background: '#181818', border: '1.5px solid #2a2a2a',
-              borderRadius: 18, padding: '1.1rem', cursor: 'pointer',
-            }} onClick={() => startPlan('free')}>
-              <p style={{ color: '#fff', fontWeight: 800, fontSize: '0.97rem', margin: '0 0 0.2rem', fontFamily: FONT }}>
-                {t('learnFree')}
-              </p>
-              <p style={{ color: 'rgba(255,255,255,0.38)', fontSize: '0.78em', margin: '0 0 0.8rem', fontFamily: FONT }}>
-                {t('freeTagline')}
-              </p>
-              <button className="ob-btn-outline" style={{ borderColor: '#333', color: 'rgba(255,255,255,0.55)', padding: '0.65em' }}>
-                {t('continueFree')}
-              </button>
+              <div style={{
+                width: '100%', background: '#181818', border: '1.5px solid #2a2a2a',
+                borderRadius: 18, padding: '1.1rem', cursor: 'pointer',
+              }} onClick={() => startPlan('free')}>
+                <p style={{ color: '#fff', fontWeight: 800, fontSize: '0.97rem', margin: '0 0 0.2rem', fontFamily: FONT }}>
+                  {t('learnFree')}
+                </p>
+                <p style={{ color: 'rgba(255,255,255,0.38)', fontSize: '0.78em', margin: '0 0 0.8rem', fontFamily: FONT }}>
+                  {t('freeTagline')}
+                </p>
+                <button className="ob-btn-outline" style={{ borderColor: '#333', color: 'rgba(255,255,255,0.55)', padding: '0.65em' }}>
+                  {t('continueFree')}
+                </button>
+              </div>
             </div>
           </StepContent>
           <div style={{ height: '1.5rem', background: DARK, flexShrink: 0 }} />
@@ -1212,7 +1224,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
               <p style={{ color: RED, fontWeight: 900, fontSize: '2.5rem', fontFamily: FONT, margin: 0, lineHeight: 1 }} className="ob-text-h">
                 {pct}%
               </p>
-              <p className="ob-heading" style={{ marginTop: '0.3rem', fontSize: '1.1rem' }}><TypewriterCycle words={[msg]} /></p>
+              <p className="ob-heading" style={{ marginTop: '0.3rem', fontSize: '1.1rem' }}><TypewriterCycle words={[msg]} onDone={() => setBtnReady(true)} /></p>
               <p className="ob-sub ob-text-s" style={{ marginTop: '0.35rem' }}>
                 {t('startAt')}{' '}<strong style={{ color: '#fff' }}>
                   {iface === 'fr' ? `Étape ${startStage}` : `Stage ${startStage}`}
@@ -1230,7 +1242,7 @@ export function OnboardingFlow({ onSignIn, onComplete }: OnboardingFlowProps) {
             </div>
             <p className="ob-sub ob-text-s" style={{ fontSize: '0.8em', maxWidth: 260 }}>{t('saveProg')}</p>
           </StepContent>
-          <div className="ob-bottom">
+          <div className="ob-bottom" style={{ opacity: btnReady ? 1 : 0, transition: 'opacity 0.35s ease', pointerEvents: btnReady ? 'auto' : 'none' }}>
             <button className="ob-btn-primary" onClick={() => onComplete(selectedLang, selectedPlan, scoreFrac)}>
               {t('createAccount')}
             </button>

@@ -55,7 +55,7 @@ The app uses **react-router-dom v7** with `BrowserRouter`. Route structure:
 
 Language URLs use a `/:country/:lang` pattern (e.g. `/nigeria/hausa`, `/ethiopia/amharic`). The `LANG_COUNTRY` constant in `App.tsx` maps each `AfricanLanguage` to its primary country slug. `langUrl(lang)` constructs the canonical URL.
 
-Unauthenticated users see `LandingPage` at `/`. After auth, the app navigates to `/:country/:lang` for the user's selected language (or the pre-selected language captured from the URL on first visit). Routes other than `/` redirect to `/` if unauthenticated.
+Unauthenticated users see `LandingPage` at `/`, which renders `OnboardingFlow` as a full-screen overlay for new sign-ups. After auth, the app navigates to `/:country/:lang` for the user's selected language (or the pre-selected language captured from the URL on first visit). Routes other than `/` redirect to `/` if unauthenticated.
 
 `userProgressMap` (keyed by `AfricanLanguage`) is the primary client-side state. It persists to `localStorage` (keys: `afroslang_progress`, `afroslang_interface`). XP/streaks only count for authenticated (non-guest) users.
 
@@ -164,9 +164,31 @@ Diamond purchase return uses `?diamonds_success=1` URL param; `App.tsx` polls Su
 
 `AVATARS` and `BACKGROUNDS` arrays define the cosmetic catalogue (`CosmeticItem` type). Items with `plusOnly: true` are automatically owned by Plus subscribers. `purchaseCosmetic()` deducts Sandbits and updates `profiles.owned_avatars` / `profiles.owned_backgrounds`. `equipCosmetic()` updates `profiles.equipped_avatar` / `profiles.equipped_background`.
 
+### Onboarding Flow (`src/components/onboarding/OnboardingFlow.tsx`)
+
+A 14-step wizard rendered as a fixed overlay (z-index 9999) on `LandingPage` for unauthenticated users. Called with `onSignIn` and `onComplete(selectedLanguage, plan, placementScore)` callbacks.
+
+**Steps in order:**
+0. Welcome screen — language toggle (EN/FR), mascot animation, CTA buttons
+1. Mascot intro with typewriter greeting
+2. Chat-style questions intro (Afroplus mascot)
+3. Language selection carousel — arrow-navigated 2-column picker
+4. Course building — auto-advances after 2.8 s, animated progress bar
+5. Discovery source — how the user heard about Afroslang (TikTok, Instagram, Facebook, Twitter/X, Friend, App Store, YouTube, Google, Other)
+6. Level check — self-assessed fluency with signal-bar visualization (5 options from "brand new" to "basically native")
+7. Affirmation screen — auto-advances after 2.2 s
+8. Learning goals — multi-select (roots, culture, fun, travel, career, family, other)
+9. Routine setup intro — emoji animation
+10. Daily goal — 5 / 15 / 30 / 60 min
+11. Plan selection — AfroPlus vs Free
+12. Placement test — 10 language-specific questions per language (defined for Swahili, Yoruba, Hausa, Igbo, Zulu, Amharic, Arabic) with immediate feedback
+13. Results — score %, starting stage, visual answer grid, then account creation
+
+All 14 steps are fully bilingual (EN/FR). Keyframe animations are injected as a style string into the DOM; background images come from `/onboardingbg/onboarding*.png`.
+
 ### Placement Test
 
-`handleSetPlacementScore(languageId, scoreFrac)` in `App.tsx` pre-unlocks stages based on a quiz result: 70%+ skips 1–4 stages (1 per 10% above 70%, max 4 at 100%). Unlocking marks all lessons in skipped stages as completed in `userProgressMap`.
+The placement test lives inside `OnboardingFlow` (step 12) and also integrates with `App.tsx`. `handleSetPlacementScore(languageId, scoreFrac)` pre-unlocks stages: 70%+ skips 1–4 stages (1 per 10% above 70%, max 4 at 100%). Unlocking marks all lessons in skipped stages as completed in `userProgressMap`.
 
 ### Path Aliases
 
@@ -185,7 +207,11 @@ TypeScript path alias `@/*` maps to `./src/*` (configured in `tsconfig.json`). U
 - `src/components/landing/` — `LandingPage`, `AfricaMap` (D3 v7 choropleth), `GlCanvas`, `SavannaCanvas`, `CloudyCanvas`, `NightSkyCanvas`, `DeepForestCanvas`, `OceanCanvas`, `StaticPage`, `DescrambleText`
 - `src/components/profile/` — `ProfileScreen` (user stats, equipped cosmetics, language progress overview, settings)
 - `src/components/rain/` — `RainCanvas` and `MascotFactCard` (shown on `LearningPath` for `RAIN_LANGUAGES`)
+- `src/components/onboarding/` — `OnboardingFlow` (see Onboarding Flow section above)
 - `src/components/auth/` — `Login`, `SignUp`, `AuthModal`, `AuthScreen`
+- `src/components/mascot/` — `AfroslangMascot` (animated mascot character used in onboarding and lesson flows)
+- `src/components/streak/` — `StreakPopup` (modal shown when user maintains a daily practice streak)
+- `src/components/layout/Header.tsx` — top app bar shown in authenticated routes
 - `src/components/intro/` — `AfroslangIntro` (animated logo reveal — present in the codebase but not used in any route)
 - `src/components/splash/` — `SplashScreen` (unused in routing — do not re-add without intent)
 - `src/utils/logger.ts` — wrapper for console logging (use instead of bare `console.log`)
@@ -216,7 +242,8 @@ TypeScript path alias `@/*` maps to `./src/*` (configured in `tsconfig.json`). U
 8. Add to `LANG_COUNTRY` in `App.tsx` (language ID → country slug for URL)
 9. Add to `LANGUAGE_COUNTRIES` in `LandingPage.tsx` (language ID → ISO-2 country codes for Africa map)
 10. Add the relevant countries to `EXPLORE_COUNTRIES` in `LandingPage.tsx` if not already present
-11. Run `npm run validate:lessons` to check data integrity
+11. Add 10 placement test questions to the `PLACEMENT_QUESTIONS` map in `OnboardingFlow.tsx`
+12. Run `npm run validate:lessons` to check data integrity
 
 ### Lesson Data Validation
 
