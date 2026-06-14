@@ -235,9 +235,9 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
         const p = g.append('path')
           .datum(feat)
           .attr('d', pathGen)
-          .attr('fill', '#000000')
-          .attr('stroke', 'rgba(255,255,255,0.22)')
-          .attr('stroke-width', 0.5)
+          .attr('fill', '#1a1a1a')
+          .attr('stroke', 'rgba(255,255,255,0.35)')
+          .attr('stroke-width', 0.6)
           .attr('opacity', 1)
           .style('cursor', iso2 ? 'pointer' : 'default');
 
@@ -260,27 +260,27 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
             tooltip.style.opacity = '0';
             if (activeISO3 !== iso3) {
               d3.select(this)
-                .attr('fill', '#000000')
-                .attr('stroke', 'rgba(255,255,255,0.22)')
-                .attr('stroke-width', 0.5);
+                .attr('fill', '#1a1a1a')
+                .attr('stroke', 'rgba(255,255,255,0.35)')
+                .attr('stroke-width', 0.6);
             }
           })
           .on('mouseover', function(this: SVGPathElement) {
             if (activeISO3 === iso3) return;
             d3.select(this)
-              .attr('fill', '#1a1a1a')
-              .attr('stroke', 'rgba(255,255,255,0.6)')
+              .attr('fill', '#2d2d2d')
+              .attr('stroke', 'rgba(255,255,255,0.7)')
               .attr('stroke-width', 1.2);
           })
           .on('click', function(this: SVGPathElement) {
             if (activeEl) {
               activeEl
-                .attr('fill', '#000000')
-                .attr('stroke', 'rgba(255,255,255,0.22)')
+                .attr('fill', '#1a1a1a')
+                .attr('stroke', 'rgba(255,255,255,0.35)')
                 .attr('stroke-width', 0.5);
             }
             const sel = d3.select(this);
-            sel.attr('fill', '#111111')
+            sel.attr('fill', '#333333')
                .attr('stroke', 'rgba(255,255,255,0.9)')
                .attr('stroke-width', 1.6);
             activeEl   = sel;
@@ -339,8 +339,8 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
     const unlocked = unlockedCodesRef.current;
     pathMap.forEach((p, iso2) => {
       const u = unlocked.has(iso2);
-      p.attr('fill', u ? '#1a1a1a' : '#000000')
-       .attr('stroke', u ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.22)');
+      p.attr('fill', u ? '#2d2d2d' : '#1a1a1a')
+       .attr('stroke', u ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.35)');
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unlockedKey]);
@@ -354,12 +354,12 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
     pathMap.forEach((p, iso2) => {
       const u = unlocked.has(iso2);
       if (!hasQuery) {
-        p.attr('fill', u ? '#1a1a1a' : '#000000').attr('opacity', 1)
-         .attr('stroke', u ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.22)');
+        p.attr('fill', u ? '#2d2d2d' : '#1a1a1a').attr('opacity', 1)
+         .attr('stroke', u ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.35)');
       } else if (highlightedCodes!.has(iso2)) {
-        p.attr('fill', '#222222').attr('opacity', 1).attr('stroke', 'rgba(255,255,255,0.7)');
+        p.attr('fill', '#2d2d2d').attr('opacity', 1).attr('stroke', 'rgba(255,255,255,0.7)');
       } else {
-        p.attr('fill', '#000000').attr('opacity', 0.2).attr('stroke', 'rgba(255,255,255,0.08)');
+        p.attr('fill', '#1a1a1a').attr('opacity', 0.25).attr('stroke', 'rgba(255,255,255,0.12)');
       }
     });
   }, [highlightedCodes]);
