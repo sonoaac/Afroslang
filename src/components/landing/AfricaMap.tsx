@@ -371,17 +371,17 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
         const showLabel = area > 900 && !isNaN(centroid[0]);
 
         if (showLabel) {
-          const fs = area > 8000 ? 9 : area > 3000 ? 7.5 : area > 1500 ? 6.5 : 5.5;
+          const fs = area > 8000 ? 10.5 : area > 3000 ? 9 : area > 1500 ? 7.5 : 6.5;
           svg.append('text')
             .attr('x', centroid[0])
             .attr('y', centroid[1])
             .attr('text-anchor', 'middle')
             .attr('dominant-baseline', 'middle')
             .attr('pointer-events', 'none')
-            .style('font-family', "'Trench Slab', 'Plus Jakarta Sans', sans-serif")
+            .style('font-family', "'Kalam', 'Trench Slab', sans-serif")
             .style('font-weight', '700')
             .style('font-size', `${fs}px`)
-            .style('fill', 'rgba(255,255,255,0.75)')
+            .style('fill', 'rgba(255,255,255,0.88)')
             .style('letter-spacing', '0.08em')
             .text(iso2);
         }
@@ -572,7 +572,7 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
 
               {/* Country name */}
               <h2 style={{
-                fontFamily: "'Trench Slab', sans-serif",
+                fontFamily: "'Kalam', sans-serif",
                 fontWeight: 700,
                 fontSize: 'clamp(1.5rem, 7vw, 2rem)',
                 letterSpacing: '0.04em',
@@ -611,7 +611,7 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
               {/* Fun fact */}
               {popup.fact && (
                 <p style={{
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontFamily: "'Kalam', sans-serif",
                   fontSize: 'clamp(0.78rem, 3vw, 0.85rem)',
                   color: flagTextColor(popup.colors) === '#ffffff'
                     ? 'rgba(255,255,255,0.82)'
@@ -634,7 +634,7 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
                       backdropFilter: 'blur(8px)',
                       border: '1px solid rgba(255,255,255,0.25)',
                       color: '#ffffff',
-                      fontFamily: "'Trench Slab', sans-serif",
+                      fontFamily: "'Kalam', sans-serif",
                       fontWeight: 700,
                       fontSize: '0.8rem',
                       letterSpacing: '0.1em',
