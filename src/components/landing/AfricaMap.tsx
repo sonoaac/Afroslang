@@ -225,7 +225,7 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
     if (!el) return;
     const obs = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { setMapIn(true); obs.disconnect(); } },
-      { threshold: 0.08 }
+      { threshold: 0, rootMargin: '0px 0px -40px 0px' }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -456,8 +456,12 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
       {/* ── Keyframes ── */}
       <style>{`
         @keyframes mapSlideIn {
-          from { opacity: 0; transform: translateY(28px) scale(0.97); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
+          from { opacity: 0.2; transform: translateY(24px) scale(0.97); }
+          to   { opacity: 1;   transform: translateY(0)    scale(1);    }
+        }
+        /* Class-driven: added by IntersectionObserver; map is always visible without it */
+        .am-map-entered {
+          animation: mapSlideIn 0.75s cubic-bezier(0.22,1,0.36,1) both;
         }
         @keyframes popupRise {
           from { opacity: 0; transform: translateX(-50%) translateY(24px) scale(0.95); }
@@ -479,14 +483,10 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
         }
       `}</style>
 
-      {/* ── Map wrapper — scroll-in animation ── */}
+      {/* ── Map wrapper — scroll-in animation (never hidden; animation is additive) ── */}
       <div
         ref={wrapRef}
-        className="lp-africa-map-wrap"
-        style={{
-          animation: mapIn ? 'mapSlideIn 0.75s cubic-bezier(0.22,1,0.36,1) forwards' : 'none',
-          opacity: mapIn ? undefined : 0,
-        }}
+        className={`lp-africa-map-wrap${mapIn ? ' am-map-entered' : ''}`}
       >
         <div ref={containerRef} className="lp-africa-map" />
 
