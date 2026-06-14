@@ -64,18 +64,21 @@ export const AVATARS: CosmeticItem[] = [
 ];
 
 export const BACKGROUNDS: CosmeticItem[] = [
-  { id: 'bg_default',   name: 'Sandy Desert',  emoji: '🏜️',  price: 0 },
-  { id: 'bg_savanna',   name: 'Savanna',        emoji: '🌅',  price: 300 },
-  { id: 'bg_market',    name: 'Night Market',   emoji: '🏮',  price: 250 },
-  { id: 'bg_night',     name: 'Night Sky',      emoji: '🌃',  price: 400 },
-  { id: 'bg_forest',    name: 'Deep Forest',    emoji: '🌿',  price: 200 },
-  { id: 'bg_ocean',     name: 'Ocean Blue',     emoji: '🌊',  price: 350 },
-  { id: 'bg_cloudy',   name: 'Storm Clouds',   emoji: '⛈️',  price: 275 },
+  { id: 'bg_default',   name: 'Classic Dark',   emoji: '🌑',  price: 0 },
+  { id: 'bg_glow',      name: 'Midnight Glow',  emoji: '✨',  price: 200 },
+  { id: 'bg_savanna',   name: 'Savanna',         emoji: '🌅',  price: 300 },
+  { id: 'bg_market',    name: 'Night Market',    emoji: '🏮',  price: 250 },
+  { id: 'bg_night',     name: 'Night Sky',       emoji: '🌃',  price: 400 },
+  { id: 'bg_forest',    name: 'Deep Forest',     emoji: '🌿',  price: 200 },
+  { id: 'bg_ocean',     name: 'Ocean Blue',      emoji: '🌊',  price: 350 },
+  { id: 'bg_cloudy',    name: 'Storm Clouds',    emoji: '⛈️',  price: 275 },
 ];
 
 /** CSS gradient for each background ID, applied to the app root. */
 export function getBackgroundStyle(bgId: string | undefined): string {
   switch (bgId) {
+    case 'bg_glow':  // same CSS base as classic dark; GlCanvas renders on top
+      return 'radial-gradient(1200px 600px at 25% 20%, rgba(176,0,32,0.35) 0%, rgba(0,0,0,0) 60%), linear-gradient(135deg,#000000 0%,#120007 55%,#000000 100%)';
     case 'bg_savanna':
       return 'linear-gradient(45deg, #8B0000 0%, #c0392b 50%, #e67e22 100%)';
     case 'bg_market':
@@ -88,8 +91,8 @@ export function getBackgroundStyle(bgId: string | undefined): string {
       return 'linear-gradient(180deg, #1a8aaa 0%, #0d4a6a 50%, #0a1e2a 100%)';
     case 'bg_cloudy':
       return 'linear-gradient(0deg, #3a6fa8 0%, #1a5099 50%, #053780 100%)';
-    default: // bg_default — Sandy Desert (current default dark warm)
-      return 'radial-gradient(1200px 600px at 25% 20%, rgba(176, 0, 32, 0.35) 0%, rgba(0,0,0,0) 60%), linear-gradient(135deg, #000000 0%, #120007 55%, #000000 100%)';
+    default: // bg_default — Classic Dark (static, no canvas animation)
+      return 'linear-gradient(135deg, #000000 0%, #0a0005 50%, #000000 100%)';
   }
 }
 
