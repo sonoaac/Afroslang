@@ -383,7 +383,6 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
     return MAX_ATTEMPTS - count;
   };
 
-  // ── Friendly Firebase error map ────────────────────────────────────────────
   const friendlyAuthError = (msg: string): string => {
     const m = msg.toLowerCase();
     if (m.includes('invalid login') || m.includes('invalid credential') || m.includes('wrong password'))
@@ -653,7 +652,7 @@ export function LandingPage({ initialSheet, isLoggedIn, onContinue, onSelectLang
         <ul>
           <li><strong>localStorage</strong> — stores your learning progress, interface language preference, and guest session data locally on your device</li>
           <li><strong>sessionStorage</strong> — tracks whether the intro animation has been shown this session</li>
-          <li><strong>Firebase Auth cookies</strong> — maintains your login session securely</li>
+          <li><strong>Supabase Auth cookies</strong> — maintains your login session securely</li>
         </ul>
         <div className="sp-divider" />
         <h2>Third-Party Cookies</h2>

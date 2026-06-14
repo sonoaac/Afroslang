@@ -13,6 +13,7 @@ interface ProfileScreenProps {
   onContinueLearning: (languageId: string) => void;
   onChangeInterfaceLanguage: (lang: InterfaceLanguage) => void;
   onGoToShop?: () => void;
+  onGoToLegal?: () => void;
 }
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({
@@ -23,6 +24,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   onContinueLearning,
   onChangeInterfaceLanguage,
   onGoToShop,
+  onGoToLegal,
 }) => {
   const { user, userData, isGuest, logout, equipItem } = useAuth();
   const [signingOut, setSigningOut] = useState(false);
@@ -254,18 +256,18 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 >FR</button>
               </div>
             </div>
-            <div className="ps-setting-row ps-setting-row--link">
+            <button className="ps-setting-row ps-setting-row--link" onClick={onGoToLegal} style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
               <span className="ps-setting-label">{isEn ? 'Privacy Policy' : 'Politique de confidentialité'}</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <path d="M9 18l6-6-6-6" />
               </svg>
-            </div>
-            <div className="ps-setting-row ps-setting-row--link">
+            </button>
+            <button className="ps-setting-row ps-setting-row--link" onClick={onGoToLegal} style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
               <span className="ps-setting-label">{isEn ? 'Terms of Service' : 'Conditions d\'utilisation'}</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <path d="M9 18l6-6-6-6" />
               </svg>
-            </div>
+            </button>
           </div>
         </div>
 

@@ -20,24 +20,26 @@ export const SignUp: React.FC<SignUpProps> = ({ onSuccess, onSwitchToLogin }) =>
     setError('');
 
     try {
-      const { data: { user }, error } = await supabase.auth.signUp({ email, password });
+      const cleanUsername = username.trim();
+      const cleanEmail = email.trim().toLowerCase();
+      if (!/^[A-Za-z0-9_]{3,20}$/.test(cleanUsername)) {
+        throw new Error('Username must be 3-20 characters: letters, numbers, and underscores only.');
+      }
+      const { data: { user }, error } = await supabase.auth.signUp({ email: cleanEmail, password });
       if (error || !user) throw error ?? new Error('Signup failed');
       await supabase.from('profiles').insert({
-        id: user.id, username, email, hearts: 5, xp: 0,
+        id: user.id, username: cleanUsername, email: cleanEmail, hearts: 5, xp: 0,
         sandbits: 0, diamonds: 0, subscription_active: false,
         subscription_plan: null, created_at: new Date().toISOString(),
       });
       onSuccess();
     } catch (error: any) {
-      
-      // Provide more specific error messages
-      if (error.code === 'auth/configuration-not-found') {
-        setError('Firebase configuration not found. Please check your Firebase project settings.');
-      } else if (error.code === 'auth/email-already-in-use') {
+      const msg = (error.message || '').toLowerCase();
+      if (msg.includes('already registered') || msg.includes('already in use') || msg.includes('already exists')) {
         setError('This email is already registered. Please try logging in instead.');
-      } else if (error.code === 'auth/weak-password') {
+      } else if (msg.includes('weak password') || msg.includes('password should')) {
         setError('Password should be at least 6 characters long.');
-      } else if (error.code === 'auth/invalid-email') {
+      } else if (msg.includes('invalid email') || msg.includes('valid email')) {
         setError('Please enter a valid email address.');
       } else {
         setError(error.message || 'An error occurred during signup. Please try again.');

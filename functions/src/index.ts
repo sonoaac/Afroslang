@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import Stripe from 'stripe';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -15,6 +16,17 @@ function getStripe(): Stripe {
     _stripe = new Stripe(key, { apiVersion: '2024-06-20' });
   }
   return _stripe;
+}
+
+let _supabase: SupabaseClient | null = null;
+function getSupabase(): SupabaseClient {
+  if (!_supabase) {
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) throw new Error('Supabase service credentials are not set');
+    _supabase = createClient(url, key);
+  }
+  return _supabase;
 }
 
 const MAX_FREE_HEARTS = 5;
@@ -37,34 +49,33 @@ async function setSubscriptionActive(
   renewsAt: number,
   stripeCustomerId: string,
 ): Promise<void> {
-  await db.doc(`users/${userId}`).update({
-    subscription: {
-      active: true,
-      plan,
-      stripeSubId,
-      renewsAt,
-      stripeCustomerId,
-    },
-    // Unlimited hearts for Plus members
+  const { error } = await getSupabase().from('profiles').update({
+    subscription_active: true,
+    subscription_plan: plan,
+    stripe_sub_id: stripeSubId,
+    stripe_customer_id: stripeCustomerId,
+    renews_at: renewsAt,
+    past_due: false,
     hearts: UNLIMITED_HEARTS,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-  });
+    hearts_current: UNLIMITED_HEARTS,
+    hearts_max: UNLIMITED_HEARTS,
+  }).eq('id', userId);
+  if (error) throw error;
   console.log(`[afroslang] Subscription ACTIVATED for user ${userId} (${plan})`);
 }
 
 async function setSubscriptionCanceled(userId: string): Promise<void> {
-  await db.doc(`users/${userId}`).update({
-    subscription: {
-      active: false,
-      plan: null,
-      stripeSubId: null,
-      renewsAt: null,
-      stripeCustomerId: null,
-    },
-    // Reset hearts to free-tier max
+  const { error } = await getSupabase().from('profiles').update({
+    subscription_active: false,
+    subscription_plan: null,
+    stripe_sub_id: null,
+    renews_at: null,
+    past_due: false,
     hearts: MAX_FREE_HEARTS,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-  });
+    hearts_current: MAX_FREE_HEARTS,
+    hearts_max: MAX_FREE_HEARTS,
+  }).eq('id', userId);
+  if (error) throw error;
   console.log(`[afroslang] Subscription CANCELLED for user ${userId}`);
 }
 
@@ -80,7 +91,7 @@ function planFromSub(sub: Stripe.Subscription): 'monthly' | 'yearly' {
 // Webhook handler
 // ---------------------------------------------------------------------------
 export const stripeWebhook = functions
-  .runWith({ secrets: ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET'] })
+  .runWith({ secrets: ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'] })
   .https.onRequest(async (req, res) => {
     if (req.method !== 'POST') {
       res.status(405).send('Method Not Allowed');
@@ -134,10 +145,17 @@ export const stripeWebhook = functions
               console.warn('[afroslang] Unknown diamond pack amount:', session.amount_total);
               break;
             }
-            await db.doc(`users/${userId}`).update({
-              diamonds: admin.firestore.FieldValue.increment(diamonds),
-              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-            });
+            const { data: profile, error: loadError } = await getSupabase()
+              .from('profiles')
+              .select('diamonds')
+              .eq('id', userId)
+              .single();
+            if (loadError) throw loadError;
+            const { error: updateError } = await getSupabase()
+              .from('profiles')
+              .update({ diamonds: (profile?.diamonds ?? 0) + diamonds })
+              .eq('id', userId);
+            if (updateError) throw updateError;
             console.log(`[afroslang] Credited ${diamonds} diamond(s) to user ${userId}`);
             break;
           }
@@ -234,10 +252,11 @@ export const stripeWebhook = functions
           if (!userId) break;
 
           // Mark past_due but keep hearts until actually cancelled
-          await db.doc(`users/${userId}`).update({
-            'subscription.pastDue': true,
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          });
+          const { error } = await getSupabase()
+            .from('profiles')
+            .update({ past_due: true })
+            .eq('id', userId);
+          if (error) throw error;
           console.log(`[afroslang] Payment failed for user ${userId}`);
           break;
         }
@@ -321,7 +340,7 @@ function rcPlanFromProductId(productId: string): 'monthly' | 'yearly' {
 }
 
 export const revenueCatWebhook = functions
-  .runWith({ secrets: ['RC_WEBHOOK_SECRET'] })
+  .runWith({ secrets: ['RC_WEBHOOK_SECRET', 'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'] })
   .https.onRequest(async (req, res) => {
     if (req.method !== 'POST') {
       res.status(405).send('Method Not Allowed');
@@ -363,18 +382,18 @@ export const revenueCatWebhook = functions
           if (!RC_SUBSCRIPTION_PRODUCTS.has(productId)) break;
           const plan = rcPlanFromProductId(productId);
           const expiresMs = event.expiration_at_ms ?? null;
-          await db.doc(`users/${userId}`).update({
-            subscription: {
-              active: true,
-              plan,
-              store: event.store ?? 'APP_STORE',
-              renewsAt: expiresMs,
-              stripeSubId: null,
-              stripeCustomerId: null,
-            },
+          const { error } = await getSupabase().from('profiles').update({
+            subscription_active: true,
+            subscription_plan: plan,
+            stripe_sub_id: null,
+            stripe_customer_id: null,
+            renews_at: expiresMs,
+            past_due: false,
             hearts: UNLIMITED_HEARTS,
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          });
+            hearts_current: UNLIMITED_HEARTS,
+            hearts_max: UNLIMITED_HEARTS,
+          }).eq('id', userId);
+          if (error) throw error;
           console.log(`[RC] Subscription ACTIVE (${plan}) for user ${userId}`);
           break;
         }
@@ -383,18 +402,18 @@ export const revenueCatWebhook = functions
         case 'CANCELLATION':
         case 'EXPIRATION': {
           if (!RC_SUBSCRIPTION_PRODUCTS.has(productId)) break;
-          await db.doc(`users/${userId}`).update({
-            subscription: {
-              active: false,
-              plan: null,
-              store: null,
-              renewsAt: null,
-              stripeSubId: null,
-              stripeCustomerId: null,
-            },
+          const { error } = await getSupabase().from('profiles').update({
+            subscription_active: false,
+            subscription_plan: null,
+            stripe_sub_id: null,
+            stripe_customer_id: null,
+            renews_at: null,
+            past_due: false,
             hearts: MAX_FREE_HEARTS,
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          });
+            hearts_current: MAX_FREE_HEARTS,
+            hearts_max: MAX_FREE_HEARTS,
+          }).eq('id', userId);
+          if (error) throw error;
           console.log(`[RC] Subscription CANCELLED for user ${userId}`);
           break;
         }
@@ -406,10 +425,17 @@ export const revenueCatWebhook = functions
             console.warn('[RC] Unknown consumable product:', productId);
             break;
           }
-          await db.doc(`users/${userId}`).update({
-            diamonds: admin.firestore.FieldValue.increment(diamonds),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          });
+          const { data: profile, error: loadError } = await getSupabase()
+            .from('profiles')
+            .select('diamonds')
+            .eq('id', userId)
+            .single();
+          if (loadError) throw loadError;
+          const { error: updateError } = await getSupabase()
+            .from('profiles')
+            .update({ diamonds: (profile?.diamonds ?? 0) + diamonds })
+            .eq('id', userId);
+          if (updateError) throw updateError;
           console.log(`[RC] Credited ${diamonds} diamond(s) to user ${userId}`);
           break;
         }
@@ -434,20 +460,13 @@ export const revenueCatWebhook = functions
 async function userIdFromCustomer(customerId: string): Promise<string | null> {
   if (!customerId) return null;
 
-  const snap = await db
-    .collection('users')
-    .where('subscription.stripeCustomerId', '==', customerId)
+  const { data, error } = await getSupabase()
+    .from('profiles')
+    .select('id')
+    .eq('stripe_customer_id', customerId)
     .limit(1)
-    .get();
+    .maybeSingle();
 
-  if (!snap.empty) return snap.docs[0].id;
-
-  // Also check the legacy flat field written by the old webhook code
-  const snap2 = await db
-    .collection('users')
-    .where('stripeCustomerId', '==', customerId)
-    .limit(1)
-    .get();
-
-  return snap2.empty ? null : snap2.docs[0].id;
+  if (error) throw error;
+  return data?.id ?? null;
 }

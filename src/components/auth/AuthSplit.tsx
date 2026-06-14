@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import './AuthSplit.css';
 import { AfroslangSignature } from './AfroslangSignature';
@@ -18,6 +19,7 @@ export const AuthSplit: React.FC<AuthSplitProps> = ({
   onGuestMode,
   hideGuestMode = false,
 }) => {
+  const navigate = useNavigate();
   const [mode, setMode] = useState<AuthMode>(initialMode);
 
   const [loginEmail, setLoginEmail] = useState('');
@@ -26,7 +28,7 @@ export const AuthSplit: React.FC<AuthSplitProps> = ({
   const [loginError, setLoginError] = useState('');
   const [loginSuccess, setLoginSuccess] = useState('');
 
-  const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [signupLoading, setSignupLoading] = useState(false);
@@ -96,10 +98,15 @@ export const AuthSplit: React.FC<AuthSplitProps> = ({
     setSignupError('');
 
     try {
-      const { data: { user }, error } = await supabase.auth.signUp({ email: signupEmail, password: signupPassword });
+      const cleanUsername = username.trim();
+      const cleanEmail = signupEmail.trim().toLowerCase();
+      if (!/^[A-Za-z0-9_]{3,20}$/.test(cleanUsername)) {
+        throw new Error('Username must be 3-20 characters: letters, numbers, and underscores only.');
+      }
+      const { data: { user }, error } = await supabase.auth.signUp({ email: cleanEmail, password: signupPassword });
       if (error || !user) throw error ?? new Error('Signup failed');
       await supabase.from('profiles').insert({
-        id: user.id, username: fullName, email: signupEmail,
+        id: user.id, username: cleanUsername, email: cleanEmail,
         hearts: 5, xp: 0, sandbits: 0, diamonds: 0,
         subscription_active: false, subscription_plan: null,
         created_at: new Date().toISOString(),
@@ -197,10 +204,10 @@ export const AuthSplit: React.FC<AuthSplitProps> = ({
                 <input
                   className="authSplitInput"
                   type="text"
-                  name="fullname"
-                  placeholder="  FULLNAME"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  name="username"
+                  placeholder="  USERNAME"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
                 />
                 <input
@@ -228,6 +235,16 @@ export const AuthSplit: React.FC<AuthSplitProps> = ({
               <button className="authSplitSubmitBtn" type="submit" disabled={signupLoading}>
                 {signupLoading ? '...' : 'SIGN UP'}
               </button>
+              <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', textAlign: 'center', margin: '0.75rem 0 0', lineHeight: 1.5 }}>
+                By signing up you agree to our{' '}
+                <button
+                  type="button"
+                  onClick={() => navigate('/privacy')}
+                  style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.65)', textDecoration: 'underline', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}
+                >
+                  Privacy Policy & Terms
+                </button>
+              </p>
             </form>
           </div>
         </div>

@@ -105,30 +105,12 @@ export const loadUserData = async (uid: string): Promise<UserData | null> => {
 };
 
 export const updateUserData = async (uid: string, data: Partial<UserData>): Promise<void> => {
-  const update: Record<string, unknown> = {};
-  if (data.hearts       !== undefined) update.hearts       = data.hearts;
-  if (data.xp           !== undefined) update.xp           = data.xp;
-  if (data.sandbits     !== undefined) update.sandbits     = data.sandbits;
-  if (data.diamonds     !== undefined) update.diamonds     = data.diamonds;
-  if (data.equippedAvatar     !== undefined) update.equipped_avatar     = data.equippedAvatar;
-  if (data.equippedBackground !== undefined) update.equipped_background = data.equippedBackground;
-  if (data.ownedAvatars       !== undefined) update.owned_avatars       = data.ownedAvatars;
-  if (data.ownedBackgrounds   !== undefined) update.owned_backgrounds   = data.ownedBackgrounds;
-  if (data.subscription) {
-    update.subscription_active    = data.subscription.active;
-    update.subscription_plan      = data.subscription.plan;
-    update.stripe_sub_id          = data.subscription.stripeSubId ?? null;
-    update.stripe_customer_id     = data.subscription.stripeCustomerId ?? null;
-    update.renews_at              = data.subscription.renewsAt ?? null;
-    update.past_due               = data.subscription.pastDue ?? false;
-  }
-  if (data.heartsData) {
-    update.hearts_current     = data.heartsData.currentHearts;
-    update.hearts_last_reset  = data.heartsData.lastResetTime;
-    update.hearts_max         = data.heartsData.maxHearts;
-  }
-  if (Object.keys(update).length === 0) return;
-  await supabase.from('profiles').update(update).eq('id', uid);
+  void uid;
+  if (data.username === undefined) return;
+  const { error } = await supabase.rpc('app_update_username', {
+    p_username: data.username,
+  });
+  if (error) throw error;
 };
 
 export const saveUserProgress = async (
@@ -137,34 +119,16 @@ export const saveUserProgress = async (
   lessonId: string,
   xpGained: number,
   heartsLost: number,
-): Promise<void> => {
-  // Upsert language progress row
-  const { data: existing } = await supabase
-    .from('language_progress')
-    .select('completed_lessons,xp,hearts')
-    .eq('user_id', uid)
-    .eq('language_id', languageId)
-    .single();
-
-  const prev = existing as ProgressRow | null;
-  const completedLessons = prev?.completed_lessons ?? [];
-  const newLessons = completedLessons.includes(lessonId) ? completedLessons : [...completedLessons, lessonId];
-
-  await Promise.all([
-    supabase.from('language_progress').upsert({
-      user_id: uid,
-      language_id: languageId,
-      completed_lessons: newLessons,
-      xp: (prev?.xp ?? 0) + xpGained,
-      hearts: Math.max(0, (prev?.hearts ?? 5) - heartsLost),
-      updated_at: new Date().toISOString(),
-    }, { onConflict: 'user_id,language_id' }),
-    supabase.rpc('increment_user_xp_hearts', {
-      p_uid: uid,
-      p_xp: xpGained,
-      p_hearts_lost: heartsLost,
-    }),
-  ]);
+): Promise<boolean> => {
+  void uid;
+  const { data, error } = await supabase.rpc('app_complete_lesson', {
+    p_language_id: languageId,
+    p_lesson_id: lessonId,
+    p_xp_gained: xpGained,
+    p_hearts_lost: heartsLost,
+  });
+  if (error) throw error;
+  return data === true;
 };
 
 export const createGuestUser = (): UserData => ({

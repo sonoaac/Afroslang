@@ -19,6 +19,7 @@ import { FeedbackPage } from './components/feedback/FeedbackPage';
 import { LatestNews } from './components/layout/LatestNews';
 import { ShopScreen } from './features/store/ShopScreen';
 import { ProfileScreen } from './components/profile/ProfileScreen';
+import { PrivacyPage } from './components/legal/PrivacyPage';
 
 import { useAuth } from './contexts/AuthContext';
 import { getLanguageById } from './data/languages';
@@ -116,22 +117,25 @@ function LearnView({
     if (!language || !activeLesson) return;
     setLastCompletedXP(xpEarned);
 
+    let serverAwardedXp = false;
     if (user && !isGuest) {
-      await saveUserProgress(user.id, language, activeLesson.id, xpEarned, heartsLost);
+      serverAwardedXp = await saveUserProgress(user.id, language, activeLesson.id, xpEarned, heartsLost);
       try {
         const weekId = await getCurrentWeekIdFromDB();
         const userLeague = await getUserLeague(user.id, weekId);
-        await addWeeklyXP(
-          user.id, userLeague || 'Copper',
-          userData?.username || 'User', xpEarned,
-          userData?.subscription?.active || false, weekId
-        );
+        if (serverAwardedXp) {
+          await addWeeklyXP(
+            user.id, userLeague || 'Copper',
+            userData?.username || 'User', xpEarned,
+            userData?.subscription?.active || false, weekId
+          );
+        }
       } catch {}
     }
 
     setUserProgressMap(prev => {
       const current = prev[language] || createDefaultProgress(language);
-      const shouldCountXP = user && !isGuest;
+      const shouldCountXP = user && !isGuest && serverAwardedXp;
       const newXp    = shouldCountXP ? current.xp + xpEarned : current.xp;
       const newLevel = shouldCountXP ? Math.floor(newXp / 100) + 1 : current.level;
 
@@ -522,9 +526,15 @@ function App() {
             onContinueLearning={handleLanguageSelect}
             onChangeInterfaceLanguage={setInterfaceLanguage}
             onGoToShop={() => navigate('/shop')}
+            onGoToLegal={() => navigate('/privacy')}
           />
         ) : <Navigate to="/" replace />
       } />
+
+      {/* Privacy Policy & Terms */}
+      <Route path="/privacy" element={appShell(
+        <PrivacyPage onBack={() => navigate(-1)} />
+      )} />
 
       {/* Latest news */}
       <Route path="/news" element={

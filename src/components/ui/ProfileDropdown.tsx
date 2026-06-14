@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { deactivateDemoSubscription } from '../../utils/demoSubscription';
 import { User, LogOut, UserPlus, LogIn, Crown } from 'lucide-react';
 
 interface ProfileDropdownProps {
@@ -30,14 +29,6 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
 
   const handleSignOut = async () => {
     await logout();
-    setIsOpen(false);
-  };
-
-  const handleDeactivateDemo = async () => {
-    if (user && userData?.subscription?.demo) {
-      await deactivateDemoSubscription(user.id);
-      window.location.reload();
-    }
     setIsOpen(false);
   };
 
@@ -164,16 +155,6 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
                     <Crown className="w-4 h-4" />
                     <span>Premium Active</span>
                   </div>
-                )}
-                
-                {userData?.subscription?.demo && (
-                  <button
-                    onClick={handleDeactivateDemo}
-                    className="flex items-center w-full px-4 py-2 text-sm text-orange-600 hover:bg-orange-50 transition-colors"
-                  >
-                    <Crown className="w-4 h-4 mr-3" />
-                    End Demo Subscription
-                  </button>
                 )}
                 
                 <div className="border-t border-gray-100 my-1"></div>

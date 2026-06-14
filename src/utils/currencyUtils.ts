@@ -99,9 +99,13 @@ export async function equipCosmetic(
   itemId: string,
   type: 'avatar' | 'background',
 ): Promise<Partial<UserData>> {
-  const col = type === 'avatar' ? 'equipped_avatar' : 'equipped_background';
   const key = type === 'avatar' ? 'equippedAvatar'  : 'equippedBackground';
-  await supabase.from('profiles').update({ [col]: itemId }).eq('id', userId);
+  void userId;
+  const { error } = await supabase.rpc('app_equip_cosmetic', {
+    p_item_id: itemId,
+    p_type: type,
+  });
+  if (error) throw error;
   return { [key]: itemId };
 }
 
@@ -115,9 +119,9 @@ export function isXpBoostActive(userData: UserData | null): boolean {
 
 /** Award Sandbit leaderboard reward to a user. */
 export async function awardLeaderboardSandbits(userId: string, rank: 1 | 2 | 3): Promise<void> {
-  const amount = LEADERBOARD_REWARDS[rank];
-  const { data } = await supabase.from('profiles').select('sandbits').eq('id', userId).single();
-  await supabase.from('profiles').update({ sandbits: (data?.sandbits ?? 0) + amount }).eq('id', userId);
+  void userId;
+  void rank;
+  throw new Error('Leaderboard rewards must be awarded by a trusted backend job.');
 }
 
 /** Convert diamonds → sandbits (1 diamond = 50 SB). */
@@ -127,15 +131,13 @@ export async function convertDiamondsToSandbits(
   diamondsToSpend: number,
 ): Promise<Partial<UserData> | null> {
   if (diamondsToSpend < 1) return null;
-  const { data } = await supabase.from('profiles').select('diamonds,sandbits').eq('id', userId).single();
-  if (!data) return null;
-  const currentDiamonds = data.diamonds ?? 0;
-  if (currentDiamonds < diamondsToSpend) return null;
-  const newDiamonds = currentDiamonds - diamondsToSpend;
-  const newSandbits = (data.sandbits ?? 0) + diamondsToSpend * SANDBITS_PER_DIAMOND;
-  const { error } = await supabase.from('profiles').update({ diamonds: newDiamonds, sandbits: newSandbits }).eq('id', userId);
-  if (error) return null;
-  return { diamonds: newDiamonds, sandbits: newSandbits };
+  void userId;
+  void _userData;
+  const { data, error } = await supabase.rpc('app_convert_diamonds_to_sandbits', {
+    p_diamonds_to_spend: diamondsToSpend,
+  });
+  if (error || !data?.[0]) return null;
+  return { diamonds: data[0].diamonds, sandbits: data[0].sandbits };
 }
 
 /** Purchase a cosmetic (avatar or background) with sandbits. */
@@ -145,36 +147,22 @@ export async function purchaseCosmetic(
   item: CosmeticItem,
   type: 'avatar' | 'background',
 ): Promise<Partial<UserData> | null> {
-  const ownedCol    = type === 'avatar' ? 'owned_avatars'      : 'owned_backgrounds';
-  const equippedCol = type === 'avatar' ? 'equipped_avatar'    : 'equipped_background';
   const ownedKey    = type === 'avatar' ? 'ownedAvatars'       : 'ownedBackgrounds';
   const equippedKey = type === 'avatar' ? 'equippedAvatar'     : 'equippedBackground';
-
-  const { data } = await supabase
-    .from('profiles')
-    .select('sandbits,owned_avatars,owned_backgrounds,equipped_avatar,equipped_background')
-    .eq('id', userId)
-    .single();
-  if (!data) return null;
-
-  const currentOwned: string[] = data[ownedCol] ?? [];
-  if (currentOwned.includes(item.id)) {
-    await supabase.from('profiles').update({ [equippedCol]: item.id }).eq('id', userId);
-    return { [equippedKey]: item.id };
-  }
-
-  const currentSandbits = data.sandbits ?? 0;
-  if (currentSandbits < item.price) return null;
-
-  const newSandbits = currentSandbits - item.price;
-  const newOwned    = [...currentOwned, item.id];
-  const { error } = await supabase.from('profiles').update({
-    sandbits: newSandbits,
-    [ownedCol]: newOwned,
-    [equippedCol]: item.id,
-  }).eq('id', userId);
-  if (error) return null;
-  return { sandbits: newSandbits, [ownedKey]: newOwned, [equippedKey]: item.id };
+  void userId;
+  void _userData;
+  const { data, error } = await supabase.rpc('app_purchase_cosmetic', {
+    p_item_id: item.id,
+    p_type: type,
+    p_price: item.price,
+  });
+  if (error || !data?.[0]) return null;
+  const row = data[0];
+  return {
+    sandbits: row.sandbits,
+    [ownedKey]: type === 'avatar' ? row.owned_avatars : row.owned_backgrounds,
+    [equippedKey]: type === 'avatar' ? row.equipped_avatar : row.equipped_background,
+  };
 }
 
 // Only redirect to known Stripe payment origins

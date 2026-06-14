@@ -35,22 +35,20 @@ export const getCurrentHeartsStatus = async (userId: string): Promise<HeartsData
       if (toRestore > 0 && heartsData.currentHearts < MAX_HEARTS) {
         const newHearts = Math.min(heartsData.currentHearts + toRestore, MAX_HEARTS);
         const updated: HeartsData = { currentHearts: newHearts, lastResetTime: now, maxHearts: MAX_HEARTS };
-        await supabase.from('profiles').update({
-          hearts: newHearts,
-          hearts_current: newHearts,
-          hearts_last_reset: now,
-        }).eq('id', userId);
+        await supabase.rpc('app_update_hearts', {
+          p_current_hearts: newHearts,
+          p_last_reset: now,
+        });
         return updated;
       }
       return heartsData;
     }
 
     const initial: HeartsData = { currentHearts: MAX_HEARTS, lastResetTime: Date.now(), maxHearts: MAX_HEARTS };
-    await supabase.from('profiles').update({
-      hearts: MAX_HEARTS,
-      hearts_current: MAX_HEARTS,
-      hearts_last_reset: initial.lastResetTime,
-    }).eq('id', userId);
+    await supabase.rpc('app_update_hearts', {
+      p_current_hearts: MAX_HEARTS,
+      p_last_reset: initial.lastResetTime,
+    });
     return initial;
   } catch (error) {
     logger.error('Error getting hearts status:', error);
@@ -72,10 +70,10 @@ export const updateHearts = async (userId: string, heartsLost: number): Promise<
 
     const newHearts = Math.max(0, current.currentHearts - heartsLost);
     const updated: HeartsData = { ...current, currentHearts: newHearts };
-    await supabase.from('profiles').update({
-      hearts: newHearts,
-      hearts_current: newHearts,
-    }).eq('id', userId);
+    await supabase.rpc('app_update_hearts', {
+      p_current_hearts: newHearts,
+      p_last_reset: current.lastResetTime,
+    });
     return updated;
   } catch (error) {
     logger.error('Error updating hearts:', error);

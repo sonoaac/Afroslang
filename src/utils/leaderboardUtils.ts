@@ -50,29 +50,15 @@ export async function addWeeklyXP(
   weekId: string,
 ): Promise<void> {
   try {
-    const multiplier = isSubscribed ? 1.42 : 1;
-    const totalXP = Math.floor(gainedXP * multiplier);
-
-    // Upsert: insert or increment XP
-    const { data: existing } = await supabase
-      .from('leaderboard')
-      .select('xp')
-      .eq('user_id', userId)
-      .eq('week_id', weekId)
-      .single();
-
-    const newXP = (existing?.xp ?? 0) + totalXP;
-
-    await supabase.from('leaderboard').upsert({
-      user_id: userId,
-      username,
-      xp: newXP,
-      league,
-      subscribed: isSubscribed,
-      multiplier,
-      week_id: weekId,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: 'user_id,week_id' });
+    void userId;
+    void username;
+    void isSubscribed;
+    const { error } = await supabase.rpc('app_add_weekly_xp', {
+      p_league: league,
+      p_gained_xp: gainedXP,
+      p_week_id: weekId,
+    });
+    if (error) throw error;
   } catch (error) {
     logger.error('Error adding weekly XP:', error);
     throw error;
@@ -148,41 +134,5 @@ export async function getUserLeaderboardEntry(userId: string, weekId: string): P
 }
 
 export async function resetWeeklyLeaderboard(): Promise<void> {
-  try {
-    const currentWeek = getCurrentWeekId();
-    const nextWeek    = getNextWeekId();
-    const { data: allEntries } = await supabase
-      .from('leaderboard')
-      .select('*')
-      .eq('week_id', currentWeek)
-      .order('xp', { ascending: false });
-
-    if (!allEntries) return;
-
-    // Group by league, apply promotion/demotion
-    const byLeague: Record<string, typeof allEntries> = {};
-    for (const e of allEntries) {
-      (byLeague[e.league] ??= []).push(e);
-    }
-
-    for (const [leagueName, entries] of Object.entries(byLeague)) {
-      const idx   = LEAGUES.indexOf(leagueName as League);
-      const total = entries.length;
-      for (let i = 0; i < total; i++) {
-        const e = entries[i];
-        let newLeague: string = leagueName;
-        if (i < 7 && idx < LEAGUES.length - 1)            newLeague = LEAGUES[idx + 1];
-        else if (i >= total - Math.floor(total * 0.1) && idx > 0) newLeague = LEAGUES[idx - 1];
-        await supabase.from('leaderboard').upsert({
-          user_id: e.user_id, username: e.username,
-          xp: 0, league: newLeague,
-          subscribed: e.subscribed, multiplier: e.multiplier,
-          week_id: nextWeek, updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id,week_id' });
-      }
-    }
-  } catch (error) {
-    logger.error('Error resetting weekly leaderboard:', error);
-    throw error;
-  }
+  throw new Error('Weekly leaderboard resets must run from a trusted backend job.');
 }
