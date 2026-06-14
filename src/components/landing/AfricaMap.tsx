@@ -1,4 +1,5 @@
 import { useEffect, useRef, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 const ISO3_TO_ISO2: Record<string, string> = {
   DZA:'DZ', AGO:'AO', BEN:'BJ', BWA:'BW', BFA:'BF', BDI:'BI', CPV:'CV',
@@ -248,7 +249,8 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
         .attr('viewBox', `0 0 ${W} ${H}`)
         .style('width', '100%')
         .style('height', '100%')
-        .style('display', 'block');
+        .style('display', 'block')
+        .style('touch-action', 'manipulation');
 
       let geoData: any;
       try {
@@ -496,8 +498,8 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
         />
       </div>
 
-      {/* ── Mobile sticky-note popup ── */}
-      {popup && (
+      {/* ── Mobile sticky-note popup — portal to body to escape ancestor overflow/z-index ── */}
+      {popup && createPortal(
         <>
           {/* Page blur backdrop */}
           <div
@@ -672,7 +674,8 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
               </div>
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
     </>
   );
