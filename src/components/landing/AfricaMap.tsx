@@ -202,7 +202,7 @@ export function AfricaMap({ onCountrySelect, highlightedCodes, unlockedCodes }: 
 
       let geoData: any;
       try {
-        const r = await fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson');
+        const r = await fetch('/world.geojson');
         geoData = await r.json();
       } catch { return; }
       if (cancelled) return;
